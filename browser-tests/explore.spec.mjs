@@ -10,8 +10,13 @@ test("contextual exploration is private until explicit show; mappings follow cue
    const desk=await context.newPage(),stage=await context.newPage();
    await desk.goto(address.deskUrl);await stage.goto(address.stageUrl);
    await expect(desk.locator(".explorer")).toBeVisible();
+   await expect(desk.locator(".explorer>.section-heading #explore-show")).toBeDisabled();
    await desk.getByRole("button",{name:"Early web",exact:true}).click();
    await expect(desk.locator("#explore-excerpt")).toContainText("Documents have addresses.");
+   await expect(desk.locator("#explore-show")).toBeEnabled();
+   const actionBox=await desk.locator("#explore-show").boundingBox();
+   const excerptBox=await desk.locator("#explore-excerpt").boundingBox();
+   expect(actionBox.y+actionBox.height).toBeLessThan(excerptBox.y);
    await expect(stage.locator("h1")).toHaveText("Who is the interface for?");
    await desk.locator("#explore-query").fill("server");
    await desk.locator("#explore-search-form button").click();
