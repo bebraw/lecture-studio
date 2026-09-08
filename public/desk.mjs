@@ -5,6 +5,8 @@ let state, files = [], note, selected, requestKey = "", modelKey = "", draftSequ
 let previewKey = "";
 let stageKey = "", stageReadPending = false;
 let explorer;
+let syncLectureSlide;
+let updateBuildSlide;
 const call = (path, value) => api(token, path, value);
 function notice(text, error = false) { $("notice").hidden = false; $("notice").textContent = text; $("notice").classList.toggle("error", error); }
 function action(id, run) { $(id).addEventListener("click", async () => { $(id).disabled = true; try { await run(); } catch (e) { notice(e.message, true); } finally { $(id).disabled = false; if (state) updateRuntime(state); } }); }
@@ -20,6 +22,7 @@ function beat() { return state.acts.find(a => a.id === state.activeAct) || state
 function drawPlot() {
  explorer?.setCue(beat());
  if ($("live-next")) { $("live-next").textContent = beat().title; $("live-question").textContent = beat().question; }
+ syncLectureSlide?.();
  $("acts").innerHTML = state.acts.map((a, i) => '<button data-act="' + escape(a.id) + '" class="act ' + (a.id === state.activeAct ? "active" : "") + '"><span class="act-index">0' + (i + 1) + '</span><span><small>' + escape(a.era) + ' · ' + escape(a.time) + '</small><strong>' + escape(a.title) + '</strong></span></button>').join("");
  $("acts").querySelectorAll("button").forEach(button => button.onclick = async () => {
    try { state = await call("act", { act: button.dataset.act }); drawPlot(); $("beat-title").textContent = beat().title; $("beat-question").textContent = beat().question; $("transition").textContent = beat().transition; }
@@ -65,6 +68,7 @@ function updateRuntime(data) {
  state = { ...state, libraryStatus: data.libraryStatus, workspace: data.workspace, codex: data.codex, blank: data.blank, stage: data.stage, canReturnToMaterial: data.canReturnToMaterial, lastBrief: data.lastBrief };
  $("show-sent-brief").disabled = !data.lastBrief;
  const c = data.codex;
+ updateBuildSlide?.(c);
  updatePreviewShortcuts(data);
  if ($("live-progress")) $("live-progress").textContent = buildLabel(c);
  $("codex-status").textContent = c.status; $("activity").textContent = buildLabel(c); $("workspace").textContent = data.workspace;
@@ -186,6 +190,79 @@ function setupModes() {
  live.innerHTML = '<div><span class="section-label">ON STAGE NOW</span><h2 id="live-now">Opening question</h2><p id="live-progress" role="status">Not connected</p></div><div><span class="section-label">DISCUSSION CUE · PRIVATE</span><h2 id="live-next"></h2><p id="live-question"></p><div class="button-row"><button id="previous-beat">← Previous cue</button><button id="next-beat">Next cue →</button><button id="use-question">Draft this question</button></div><p class="small muted">Browsing cues does not change the stage or start a build.</p></div>';
  document.querySelector(".desk-grid").before(live);
  live.firstElementChild.remove();
+ const audienceSlides = [
+   ["Opening · title","Web development: past, present, and possible futures","Understand how the web evolved—and explore where it might go by building an application together."],
+   ["Opening · your experience","When you use the web today, what feels unnecessarily difficult?","Take at least two minutes to discuss with a neighbour. Choose one example to share.\n\nFinding information · Repeating information · Navigating interfaces · Knowing what to trust"],
+   ["Opening · shared experiment","We will build one application—and change how we use it.","You help choose the direction. An agent helps implement it. Together, we inspect what actually works."],
+   ["Past · chapter","Past — Documents become interactive","How does a page communicate what we can do?"],
+   ["Past · links","A link offers a next step.","An address identifies a resource. A link lets us reach it."],
+   ["Past · predict","What will still work if we remove the styling and JavaScript?","Make a prediction before we try it."],
+   ["Past · forms","Forms turn reading into action.","A form communicates an action, its inputs, and where the request will go."],
+   ["Past · enhancement","Keep the capability. Add the convenience.","Progressive enhancement starts with a working core, then adds presentation and richer interaction."],
+   ["Past → present · improve","The capability works. What would make the interaction better?","Suggest one change—and explain who it would help."],
+   ["Present · chapter","Present — The browser becomes an application","What do we gain when the interface responds without a new page?"],
+   ["Present · shared experiment","One room. A changing result.","Make a choice. Watch how the shared view responds."],
+   ["Present · tradeoffs","What does faster feedback add—and what does it hide?","Compare the two versions. Name one benefit and one cost."],
+   ["Present → future · another client","A person can use this. What would another client need to understand it?","Think about the available actions, required input, and resulting state."],
+   ["Future · chapter","Future — Who constructs the interface?","Existing applications can become clearer to agents. Agents may also compose interfaces around services.\n\nTwo hypotheses that can coexist."],
+   ["Future · stable or generated?","Which applications need a stable interface, and which could use a generated one?","Choose one example of each. What makes the difference?"],
+   ["Future · shared capability","Can people and agents use the same underlying capability?","Different interfaces need not mean independently maintained rules."],
+   ["Future · context","What context would improve this result—and what should remain private?","Name one useful piece of context and one boundary you would set."],
+   ["Closing · return","If the interface changes, what should remain dependable?","Return to your opening frustration. Does what we built help—or move the problem somewhere else?"],
+   ["Closing · next step","What would you investigate or build next?","One question. One counterexample. One practical experiment."]
+ ];
+ const slideActs=["opening","opening","opening","document","document","document","forms","forms","forms","application","application","application","application","agents","agents","agents","context","synthesis","synthesis"];
+ const slideGuides=["00–03 · Establish the two threads: web history and direction, demonstrated through agentic development.","03–08 · Hear two examples. Remember them for the closing discussion. Use a show of hands if the room app is not ready.","08–12 · Explain the prepared template and recorded context. Invite a visual-theme choice. Show the real prompt before sending it; build in the background, not automatically.","12–15 · Start Document A when ready. Use the hypermedia definition and diagram while it runs. These are overlapping approaches, not replacement eras.","15–20 · Show a real link, its URL and browser navigation. Connect distributed information to the audience’s experience, rather than listing dates.","20–24 · Take predictions, then inspect the running result. If the build is unfinished, inspect the prepared baseline.","24–29 · Start Document B using the prepared room. Explain native submission while it builds; inspect the actual request and response.","29–34 · Use the enhancement definition and layers. Test without JavaScript. Discuss keyboard access; semantic HTML alone is not proof of accessibility.","34–38 · Gather suggestions. Carry one into the Present prompt; do not promise every suggestion will be implemented.","38–41 · Start the Present build. Show its prompt and explain what is preserved from the native form.","41–49 · Invite predefined votes once deployed and reachable. Compare two browser views. If unavailable, demonstrate locally without pretending the audience is connected.","49–54 · Give frameworks credit. Discuss state, latency, failure and discoverability through the actual app, not a technology list.","54–58 · Inspect the form or shared contract. Distinguish explicit actions from behavior that must be inferred.","58–62 · Start constrained Future composition when inputs are ready. Explain that the agent building this app and an agent using it are different roles.","62–70 · Give pairs two minutes, then discuss examples while the build runs. Use the two-directions diagram. This is a position, not a proven forecast.","70–76 · Inspect the generated result and shared constraints. Explain the drift risk of duplicate contracts, without claiming separate APIs are always wrong.","76–83 · Show the actual context receipt. Distinguish aggregate audience choices from personal data; discuss profiling and incorrect assumptions.","83–88 · Return to the examples students gave. Invite a counterexample to the shared-capability hypothesis.","88–90+ · Leave space for students. Offer the free SDLCAI tickets as an optional continuation, not a required action. Use slack up to 105 minutes for discussion."];
+ const buildSlides=new Map();
+ for(const [after,act,title] of [[13,"agents","Build · Compose a constrained interface"],[9,"application","Build · Make the room interactive"],[6,"forms","Build · Add the native voting form"],[3,"document","Build · Create the seminar document"]]){
+   audienceSlides.splice(after+1,0,["Live build",title,""]);
+   slideActs.splice(after+1,0,act);
+   slideGuides.splice(after+1,0,"Review the prompt with the audience. Start explicitly, then continue the discussion while the agent works. Inspect the result when ready; do not wait on this slide.");
+ }
+ audienceSlides.forEach((slide,index)=>{if(slide[0]==="Live build")buildSlides.set(index,slideActs[index]);});
+ const launch=document.createElement("button");launch.id="start-slide-build";launch.className="primary";launch.textContent="Start this build";launch.hidden=true;
+ $("next-beat").parentElement.append(launch);
+ const launchStatus=document.createElement("span");launchStatus.className="small muted";launchStatus.id="slide-build-status";launch.after(launchStatus);
+ const guide=document.createElement('p');guide.className='small muted';guide.id='lecture-guide';live.lastElementChild.append(guide);
+ let slideIndex=0, slideBusy=false, lectureReset;
+ const startedSlides=new Set();
+ const promptFor=index=>state.acts.find(a=>a.id===buildSlides.get(index))?.brief||"";
+ updateBuildSlide=c=>{
+   const isBuild=buildSlides.has(slideIndex);
+   launch.hidden=!isBuild;launchStatus.hidden=!isBuild;
+   launch.disabled=c.status!=="ready"||startedSlides.has(slideIndex);
+   launchStatus.textContent=startedSlides.has(slideIndex)?"Started · continue to the next discussion slide.":c.status==="ready"?"Sends the prompt displayed on this slide.":"Connect Codex or finish the current turn before starting.";
+ };
+ action("start-slide-build",async()=>{
+   if(!buildSlides.has(slideIndex)||startedSlides.has(slideIndex)||state.codex.status!=="ready")return;
+   const index=slideIndex, brief=promptFor(index);
+   // Re-show the exact prompt so an intervening excerpt cannot obscure what is sent.
+   await showLectureSlide(index);
+   const data=await call("codex/start",{brief,model:$("model").value});
+   startedSlides.add(index);$("brief").value=brief;updateRuntime(data);updateBuildSlide(data.codex);
+ });
+ syncLectureSlide=()=>{
+   if(lectureReset!==state.resetVersion){slideIndex=0;lectureReset=state.resetVersion;startedSlides.clear();}
+   if(slideActs[slideIndex]!==state.activeAct)slideIndex=Math.max(0,slideActs.indexOf(state.activeAct));
+   const [label,title,body]=audienceSlides[slideIndex];
+   live.querySelector(".section-label").textContent="LECTURE · "+(slideIndex+1)+" / "+audienceSlides.length+" · "+label;
+   $("live-next").textContent=title;$("live-question").textContent=buildSlides.has(slideIndex)?promptFor(slideIndex):body;
+   updateBuildSlide(state.codex);
+   guide.textContent="PRIVATE · "+slideGuides[slideIndex];
+ };
+ const showLectureSlide=async(index)=>{
+   if(slideBusy)return;slideBusy=true;
+   try{
+     const [,title,body]=audienceSlides[index];
+     const data=await call("publish",{...draft(),act:slideActs[index],mode:buildSlides.has(index)?"brief":"question",title,body:buildSlides.has(index)?promptFor(index):body,source:""});
+     state=await call("act",{act:slideActs[index]});slideIndex=index;
+     fields(data.draft);preview(data);updateRuntime(state);drawPlot();
+     if (!$("notice").classList.contains("error")) $("notice").hidden = true;
+   }finally{slideBusy=false;}
+ };
+ $("previous-beat").textContent="← Previous slide";
+ $("next-beat").textContent="Next slide →";
+ live.lastElementChild.querySelector("p.small").textContent="Previous and Next show the slide to the room. They never start a build.";
  const stagePanel = document.createElement("section"); stagePanel.id = "current-stage-panel";
  stagePanel.innerHTML = '<div class="section-heading"><span class="section-label">ON STAGE</span><span id="live-progress" class="small muted"></span></div><div id="current-stage" class="preview stage-surface"></div>';
  document.querySelector(".material-column").prepend(stagePanel);
@@ -194,12 +271,12 @@ function setupModes() {
  stageControls.before(controlsHome);
  const cueControls = document.createElement("div"); cueControls.className = "cue-stage-controls";
  live.lastElementChild.append(cueControls);
- $("use-question").textContent = "Show this question →";
- $("use-question").className = "primary";
+ $("use-question").remove();
+ $("next-beat").className = "primary";
  const placeStageControls = () => {
    const inPresent = document.body.classList.contains("presenting") && !document.body.classList.contains("finding");
    controlsHome.append(stageControls);
-   (inPresent ? $("use-question").parentElement : stageControls).append($("blank"));
+   (inPresent ? $("next-beat").parentElement : stageControls).append($("blank"));
  };
  const find = document.createElement("button"); find.id = "find-material"; find.textContent = "Find something…"; find.className = "quiet";
  const done = document.createElement("button"); done.id = "finish-finding"; done.textContent = "Done · back to presenting"; done.className = "primary";
@@ -219,15 +296,7 @@ function setupModes() {
  done.onclick = () => { document.body.classList.remove("finding"); placeStageControls(); find.focus(); };
  document.addEventListener("keydown", event => { if (event.key === "Escape" && document.body.classList.contains("finding")) done.click(); });
  for (const [id, step] of [["previous-beat", -1], ["next-beat", 1]]) action(id, async () => {
-   const index = state.acts.findIndex(a => a.id === state.activeAct);
-   const next = state.acts[Math.min(state.acts.length - 1, Math.max(0, index + step))];
-   state = await call("act", { act: next.id }); drawPlot();
- });
- action("use-question", async () => {
-   const next = { ...draft(), mode: "question", title: beat().title, body: beat().question, source: "" };
-   const data = await call("publish", next);
-   fields(data.draft); preview(data); updateRuntime(data);
-   notice("Question shown to the room.");
+   await showLectureSlide(Math.min(audienceSlides.length-1,Math.max(0,slideIndex+step)));
  });
  setMode(sessionStorage.getItem("lecture-studio-mode") || "present");
 }

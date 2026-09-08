@@ -1,6 +1,6 @@
 import { test, expect } from "@playwright/test";
 import {fixture} from "../tests/fixture.mjs";
-test("publishing a question does not shift the desk when its notice appears", async ({browser}) => {
+test("slide navigation stays quiet and does not shift the desk", async ({browser}) => {
  const {studio,address}=await fixture();
  const context=await browser.newContext();
  try {
@@ -9,15 +9,24 @@ test("publishing a question does not shift the desk when its notice appears", as
      await desk.setViewportSize({width,height:1050});
      await desk.goto(address.deskUrl);
      await desk.locator("#present-mode").click();
-     const cue=desk.locator("#use-question");
+     const cue=desk.locator("#previous-beat");
      await expect(cue).toBeVisible();
      const before=await cue.evaluate(el=>el.getBoundingClientRect().top+window.scrollY);
      await cue.click();
-     await expect(desk.locator("#notice")).toHaveText("Question shown to the room.");
+     await expect(desk.locator("#notice")).toBeHidden();
      const after=await cue.evaluate(el=>el.getBoundingClientRect().top+window.scrollY);
      expect(after).toBe(before);
      await expect(desk.locator("#notice")).toHaveCSS("position","fixed");
    }
+   const stage=await context.newPage();await stage.goto(address.stageUrl);
+   const previous=await stage.locator("h1").textContent();
+   await expect(desk.locator("#audience-slide")).toHaveCount(0);
+   await expect(stage.locator("h1")).toHaveText(previous);
+   await desk.locator("#next-beat").click();
+   await expect(stage.locator("h1")).toHaveText("When you use the web today, what feels unnecessarily difficult?");
+   await expect(stage.locator("body")).toContainText("Take at least two minutes to discuss with a neighbour.");
+   await desk.locator("#previous-beat").click();
+   await expect(stage.locator("h1")).toHaveText("Web development: past, present, and possible futures");
  } finally {await context.close();await new Promise(resolve=>studio.server.close(resolve));}
 });
 test("private selection, deliberate projection, graphic rendering and approval handoff", async ({browser}) => {
@@ -77,7 +86,7 @@ test("private selection, deliberate projection, graphic rendering and approval h
    await expect(desk.locator("#current-stage-panel")).toBeVisible();
    await expect(desk.locator("#preview")).toBeHidden();
    await expect(desk.locator("#current-stage .layer")).toHaveCount(3);
-   await expect(desk.locator("#use-question")).toBeVisible();
+   await expect(desk.locator("#use-question")).toHaveCount(0);
    await expect(desk.locator(".live-overview #blank")).toBeVisible();
    await expect(desk.locator("#publish")).toHaveCount(1);
    await expect(desk.locator(".plot")).toBeHidden();
@@ -85,11 +94,9 @@ test("private selection, deliberate projection, graphic rendering and approval h
    await expect(desk.locator("#brief")).toBeVisible();
    let published = await stage.locator("h1").textContent();
    await desk.locator("#next-beat").click();
-   await expect(desk.locator("#live-next")).toContainText("address");
-   await expect(stage.locator("h1")).toHaveText(published);
-   await desk.locator("#use-question").click();
-   published = "The web gives things an address.";
-   await expect(desk.locator("#preview")).toContainText("address");
+   await expect(desk.locator("#live-next")).toContainText("unnecessarily difficult");
+   published = "When you use the web today, what feels unnecessarily difficult?";
+   await expect(desk.locator("#preview")).toContainText("unnecessarily difficult");
    await expect(stage.locator("h1")).toHaveText(published);
    await desk.locator("#find-material").click();
    await expect(desk.locator("#current-stage-panel")).toBeHidden();
@@ -97,7 +104,7 @@ test("private selection, deliberate projection, graphic rendering and approval h
    await expect(desk.locator(".material-column #publish")).toBeVisible();
    await expect(desk.locator("#search")).toBeVisible();
    await desk.keyboard.press("Escape");
-   await expect(desk.locator("#use-question")).toBeVisible();
+   await expect(desk.locator("#next-beat")).toBeVisible();
    await expect(desk.locator("#search")).toBeHidden();
    let previewLoads = 0;
    await context.route("http://localhost:8799/**", route => { previewLoads++; return route.fulfill({contentType:"text/html",body:"<h1>Live fixture app</h1>"}); });
@@ -109,7 +116,7 @@ test("private selection, deliberate projection, graphic rendering and approval h
    await expect(stage.frameLocator("iframe").locator("h1")).toHaveText("Live fixture app");
    await expect(desk.locator("#current-stage")).toContainText("Live app is on the projected stage.");
    await expect(desk.locator("#current-stage iframe")).toHaveCount(0);
-   await expect(desk.locator("#preview")).toContainText("address");
+   await expect(desk.locator("#preview")).toContainText("unnecessarily difficult");
    await expect(desk.locator("#open-preview")).toHaveAttribute("rel","noopener noreferrer");
    await desk.locator("#back-material").click();
    await expect(stage.locator("h1")).toHaveText(published);
@@ -120,7 +127,7 @@ test("private selection, deliberate projection, graphic rendering and approval h
    await desk.locator("#prepare-mode").click();
    desk.once("dialog",dialog=>dialog.dismiss());
    await desk.locator("#reset-lecture").click();
-   await expect(desk.locator("#live-next")).toContainText("address");
+   await expect(desk.locator("#live-next")).toContainText("unnecessarily difficult");
    desk.once("dialog",dialog=>dialog.accept());
    await desk.locator("#reset-lecture").click();
    await expect(stage.locator("h1")).toHaveText("Who is the interface for?");

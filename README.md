@@ -1,5 +1,13 @@
 # Lecture Studio
 
+Present mode uses a single ordered lecture sequence: title, opening question, then the historical and future discussion slides. **Previous slide** and **Next slide** publish immediately and synchronize the related cue/material. Previous at the beginning shows the opening title. These controls never start a build. There is no separate Show current slide button or audience-slide dropdown. Prepare-mode plot browsing remains private.
+
+## Curated projection cards
+
+Present mode offers two predefined cards per cue, with no search field. Prepare mode retains search and shortcut configuration. Only sections named `Slide: Definition`, `Slide: Image`, or `Slide: Quote` are eligible in Explore. Use `Presenter cue` for private discussion guidance and `Source` for projected attribution. Definitions are paraphrases, not quotations; quotes must be exact and attributed.
+
+The vault's `Lectures/Web Development 2026/Projection/` folder contains the initial definition/diagram pairs. Original research notes remain unchanged. Diagrams use Mermaid; remote raster images remain blocked by the existing image policy. Custom card mappings use a new browser storage key, preserving older shortcut settings without using them in Present.
+
 A local rehearsal prototype for a discussional lecture: **one capability, three ages**.
 
 The private desk brings together a seven-beat plot, read-only Obsidian material, a projection draft, and a local Codex connection. A separate stage window shows only material you explicitly publish and a generic build-status label.

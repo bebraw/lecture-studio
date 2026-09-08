@@ -96,4 +96,6 @@
 .connections-panel>p:last-child{margin:12px 0 0}
 .explorer>.section-heading{flex-wrap:wrap}
 .explorer #explore-show{margin-left:auto;flex-shrink:0}
+.presenting .explorer #explore-search-form,.presenting .explorer #explore-results{display:none!important}
+.presenting #explore-selection>label{display:none}
 .desk .notice{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);z-index:40;width:max-content;max-width:calc(100vw - 32px);max-height:25vh;overflow:auto;overflow-wrap:anywhere;padding:12px 18px;border:1px solid var(--ink);border-radius:3px;box-shadow:0 6px 20px #18382f22;pointer-events:none}
