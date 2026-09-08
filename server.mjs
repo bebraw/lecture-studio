@@ -51,7 +51,7 @@ export function createStudio({ library = new ObsidianLibrary(), bridge = new Cod
  const publicState = () => {
    const c = bridge.state;
    const p = poll.state(), counts = p.frozen || p.snapshot;
-   const projected = pollOnStage ? publicStage({ ...initialDraft(), mode: "material", title: p.config.question, body: p.config.options.map(o => o.label + ": " + (counts?.choices.find(c=>c.id===o.id)?.votes || 0)).join("\n\n") + "\n\n" + (p.frozen ? "Selected: " + p.frozen.winner.label + " — " + p.frozen.reason : "Join: " + p.joinUrl), source: p.frozen ? "Voting closed · frozen revision " + p.frozen.revision : "Audience vote · " + (p.error ? "connection issue; showing last counts" : counts?.status || "not opened") }, String(version) + "-poll-" + (counts?.revision || 0) + "-" + !!p.frozen + "-" + p.error) : stage;
+   const projected = pollOnStage ? publicStage({ ...initialDraft(), mode: "material", title: p.config.question, body: (p.pollId==="friction"?"Take at least two minutes to discuss with a neighbour. Choose one example to share.\n\n":"") + p.config.options.map(o => o.label + ": " + (counts?.choices.find(c=>c.id===o.id)?.votes || 0)).join("\n\n") + "\n\n" + (p.frozen ? "Selected: " + p.frozen.winner.label + " — " + p.frozen.reason : (p.configured ? "Join: " + p.joinUrl : "Audience room is not configured. Discuss the choices together.")), source: p.frozen ? "Voting closed · frozen revision " + p.frozen.revision : "Audience vote · " + (p.error ? "connection issue; showing last counts" : counts?.status || "not opened") }, String(version) + "-poll-" + (counts?.revision || 0) + "-" + !!p.frozen + "-" + p.error) : stage;
    const activity = ["Running a command", "Editing files", "Using a tool", "Looking up a source", "Responding", "Working"].includes(c.activity) ? c.activity : "Working";
    return { ...projected, blank, build: { activity, status: c.status, outcome: ["completed", "failed", "interrupted"].includes(c.outcome) ? c.outcome : null, startedAt: c.startedAt || null, finishedAt: c.finishedAt || null } };
  };
@@ -91,7 +91,8 @@ export function createStudio({ library = new ObsidianLibrary(), bridge = new Cod
        if (url.pathname.startsWith("/api/poll/")) {
          if (rehearsalJob.status === "creating") throw new Error("Wait for the fresh rehearsal");
          const action = url.pathname.slice("/api/poll/".length);
-         if (action === "configure") poll.configure(body);
+         if (action === "select") poll.select(body.id);
+         else if (action === "configure") poll.configure(body);
          else if (["open", "lock", "refresh"].includes(action)) await poll.act(action);
          else if (action === "receipt") return json(res, { text: poll.receipt() });
          else if (action === "show") {

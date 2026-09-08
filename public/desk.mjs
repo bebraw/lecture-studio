@@ -219,20 +219,51 @@ function setupModes() {
    slideActs.splice(after+1,0,act);
    slideGuides.splice(after+1,0,"Review the prompt with the audience. Start explicitly, then continue the discussion while the agent works. Inspect the result when ready; do not wait on this slide.");
  }
- audienceSlides.forEach((slide,index)=>{if(slide[0]==="Live build")buildSlides.set(index,slideActs[index]);});
+ const voteSlides=new Map();
+ audienceSlides[1][0]="Vote · friction";
+ const themeIndex=audienceSlides.findIndex(s=>s[0]==="Live build");
+ audienceSlides.splice(themeIndex,0,["Vote · theme","Which visual theme should shape our app?","Choose the visual direction we will use in the build."]);
+ slideActs.splice(themeIndex,0,"document");slideGuides.splice(themeIndex,0,"Open the prepared theme vote. Close it to freeze the choice before starting the build.");
+ const priorityIndex=audienceSlides.findIndex(s=>s[1]==="Build · Compose a constrained interface");
+ audienceSlides.splice(priorityIndex,0,["Vote · priority","What should the generated seminar view prioritize?","Your choice sets the ordering and emphasis of the generated view."]);
+ slideActs.splice(priorityIndex,0,"agents");slideGuides.splice(priorityIndex,0,"Open the prepared priority vote. Close it before starting composition.");
+ audienceSlides.forEach((slide,index)=>{if(slide[0]==="Live build")buildSlides.set(index,slideActs[index]);if(slide[0].startsWith("Vote · "))voteSlides.set(index,slide[0].slice(7));});
+ const openVote=document.createElement("button");openVote.id="slide-vote-open";openVote.textContent="Open voting";
+ const closeVote=document.createElement("button");closeVote.id="slide-vote-close";closeVote.textContent="Close voting and continue";closeVote.className="primary";
+ $("next-beat").parentElement.append(openVote,closeVote);
  const launch=document.createElement("button");launch.id="start-slide-build";launch.className="primary";launch.textContent="Start this build";launch.hidden=true;
  $("next-beat").parentElement.append(launch);
  const launchStatus=document.createElement("span");launchStatus.className="small muted";launchStatus.id="slide-build-status";launch.after(launchStatus);
  const guide=document.createElement('p');guide.className='small muted';guide.id='lecture-guide';live.lastElementChild.append(guide);
  let slideIndex=0, slideBusy=false, lectureReset;
  const startedSlides=new Set();
- const promptFor=index=>state.acts.find(a=>a.id===buildSlides.get(index))?.brief||"";
+ const promptFor=index=>{
+   const base=state.acts.find(a=>a.id===buildSlides.get(index))?.brief||"";
+   const relevant=buildSlides.get(index)==="agents"?["friction","theme","priority"]:["friction","theme"];
+   return base+"\n\nAudience requirements:\n"+relevant.map(id=>{
+     const d=state.poll?.decisions?.[id];
+     return d?id+": "+d.instruction+"\nFrozen result: "+JSON.stringify({selected:d.winner,revision:d.revision,totalVotes:d.totalVotes,reason:d.reason}):id+": No frozen audience result yet. Keep the prepared project default; do not claim the audience selected it.";
+   }).join("\n\n");
+ };
  updateBuildSlide=c=>{
    const isBuild=buildSlides.has(slideIndex);
+   const isVote=voteSlides.has(slideIndex),p=state.poll;
+   openVote.hidden=closeVote.hidden=!isVote;
+   openVote.disabled=!p?.configured||p.busy||!!p.frozen;
+   closeVote.disabled=!p?.configured||p.busy;
    launch.hidden=!isBuild;launchStatus.hidden=!isBuild;
    launch.disabled=c.status!=="ready"||startedSlides.has(slideIndex);
    launchStatus.textContent=startedSlides.has(slideIndex)?"Started · continue to the next discussion slide.":c.status==="ready"?"Sends the prompt displayed on this slide.":"Connect Codex or finish the current turn before starting.";
  };
+ action("slide-vote-open",async()=>{
+   updateRuntime(await call("poll/select",{id:voteSlides.get(slideIndex)}));
+   updateRuntime(await call("poll/open",{}));
+   updateRuntime(await call("poll/show",{}));
+ });
+ action("slide-vote-close",async()=>{
+   if(!state.poll?.frozen)updateRuntime(await call("poll/lock",{}));
+   await showLectureSlide(Math.min(audienceSlides.length-1,slideIndex+1));
+ });
  action("start-slide-build",async()=>{
    if(!buildSlides.has(slideIndex)||startedSlides.has(slideIndex)||state.codex.status!=="ready")return;
    const index=slideIndex, brief=promptFor(index);
@@ -254,9 +285,13 @@ function setupModes() {
    if(slideBusy)return;slideBusy=true;
    try{
      const [,title,body]=audienceSlides[index];
+     if(voteSlides.has(index)){
+       updateRuntime(await call("poll/select",{id:voteSlides.get(index)}));
+     }
      const data=await call("publish",{...draft(),act:slideActs[index],mode:buildSlides.has(index)?"brief":"question",title,body:buildSlides.has(index)?promptFor(index):body,source:""});
      state=await call("act",{act:slideActs[index]});slideIndex=index;
      fields(data.draft);preview(data);updateRuntime(state);drawPlot();
+     if(voteSlides.has(index))updateRuntime(await call("poll/show",{}));
      if (!$("notice").classList.contains("error")) $("notice").hidden = true;
    }finally{slideBusy=false;}
  };
@@ -363,6 +398,7 @@ function setupPoll() {
  });
 }
 function updatePoll(p) {
+ if(state)state.poll=p;
  const configKey=JSON.stringify(p.config);
  if(configKey!==pollConfigKey){pollConfigKey=configKey;$("poll-question").value=p.config.question;$("poll-options").value=p.config.options.map(o=>o.id+"|"+o.label).join("\n");$("poll-default").value=p.config.defaultId;}
  $("poll-question-live").textContent=p.config.question;

@@ -6,7 +6,7 @@ test("build slide shows the exact prompt and starts only on explicit launch",asy
  try{
    const desk=await context.newPage(),stage=await context.newPage();
    await desk.goto(address.deskUrl);await stage.goto(address.stageUrl);
-   for(let i=0;i<4;i++)await desk.locator("#next-beat").click();
+   for(let i=0;i<5;i++)await desk.locator("#next-beat").click();
    await expect(stage.locator("h1")).toHaveText("Build · Create the seminar document");
    await expect(stage.locator("body")).toContainText("Build Document A");
    expect(bridge.lastPrompt).toBeUndefined();
