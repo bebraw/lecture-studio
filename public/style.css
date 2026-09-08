@@ -6,6 +6,11 @@
 .cue-stage-controls{border-top:1px solid var(--line);padding-top:12px;margin-top:16px}
 .cue-stage-controls>p{font-size:12px;margin:0}
 .cue-stage-controls .publish-row{margin-top:10px}
+.audience-poll{border-top:1px solid var(--line);margin-top:20px;padding-top:14px}
+.audience-poll summary{cursor:pointer;font-weight:600}
+.audience-poll label{margin:12px 0}
+.audience-poll #poll-question-live{margin:14px 0 8px}
+.presenting .poll-prepare{display:none}
 /* Present is a small performance surface; Prepare retains the full workbench. */
 .mode-switch{display:flex;border:1px solid var(--ink);border-radius:4px;padding:2px;gap:2px}
 .mode-switch button{border:0;background:transparent;font-size:12px;padding:7px 13px}

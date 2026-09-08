@@ -45,6 +45,7 @@ function selectSection() {
  $("selected-note").textContent = note.title; $("selected-note").hidden = false;
 }
 function updateRuntime(data) {
+ if (data.poll) updatePoll(data.poll);
  if (data.resetVersion !== undefined && state.resetVersion !== data.resetVersion) {
    fields(data.draft); $("brief").value = data.brief; state = data; drawPlot(); preview(data);
  }
@@ -135,6 +136,7 @@ const restore = document.createElement("button"); restore.id = "restore"; restor
 setupModes();
 setupPreviewShortcuts();
 setupRehearsals();
+setupPoll();
 init().catch(e => { $("auth-error").hidden = false; notice(e.message, true); });
 
 function setupModes() {
@@ -206,9 +208,39 @@ function updatePreviewShortcuts(data) {
  $("preview-choice").hidden = !urls.length;
  $("open-preview").hidden = !urls.length;
  $("show-preview").hidden = !urls.length;
- $("back-material").hidden = !data.canReturnToMaterial || !["demo", "brief"].includes(data.stage.mode);
+ $("back-material").hidden = !data.canReturnToMaterial || !["demo", "brief", "poll"].includes(data.stage.mode);
 }
 
+let pollConfigKey = "", pollRefreshing = false, lastPollRefresh = 0;
+function setupPoll() {
+ const panel=document.createElement("details");panel.className="audience-poll";
+ panel.innerHTML='<summary>Audience vote</summary><div class="poll-prepare"><p class="small muted">The public room must already have these exact option IDs and labels. This never seeds or resets votes.</p><label>Question<input id="poll-question"></label><label>Options · one id|label per line<textarea id="poll-options" rows="3"></textarea></label><label>Default option ID<input id="poll-default"></label><button id="poll-configure">Save poll definition</button></div><p id="poll-question-live"></p><a id="poll-join" target="_blank" rel="noopener noreferrer">Audience join link ↗</a><p id="poll-status" class="small" role="status"></p><div id="poll-counts"></div><div class="button-row"><button id="poll-open">Open vote</button><button id="poll-lock">Close vote</button><button id="poll-show">Show vote on stage</button><button id="poll-add">Add result to prompt</button></div>';
+ document.querySelector(".builder").append(panel);
+ action("poll-configure",async()=>updateRuntime(await call("poll/configure",{question:$("poll-question").value,options:$("poll-options").value.split("\n").filter(Boolean).map(line=>{const [id,...label]=line.split("|");return {id:id.trim(),label:label.join("|").trim()};}),defaultId:$("poll-default").value.trim()})));
+ for(const op of ["open","lock","show"])action("poll-"+op,async()=>updateRuntime(await call("poll/"+op,{})));
+ action("poll-add",async()=>{
+   const {text}=await call("poll/receipt",{});
+   if(!$("brief").value.includes(text)) $("brief").value += "\n\n"+text;
+   await call("brief",{brief:$("brief").value});
+   notice("Frozen result added to the editable prompt. Nothing was sent or projected.");
+ });
+}
+function updatePoll(p) {
+ const configKey=JSON.stringify(p.config);
+ if(configKey!==pollConfigKey){pollConfigKey=configKey;$("poll-question").value=p.config.question;$("poll-options").value=p.config.options.map(o=>o.id+"|"+o.label).join("\n");$("poll-default").value=p.config.defaultId;}
+ $("poll-question-live").textContent=p.config.question;
+ $("poll-join").hidden=!p.joinUrl;$("poll-join").href=p.joinUrl||"#";
+ $("poll-status").textContent=!p.configured?"Configure the public room connection in the server environment.":p.error|| (p.frozen?"Closed · "+p.frozen.winner.label+" · "+p.frozen.reason:p.busy?"Contacting audience room…":p.snapshot?.status||"Ready to connect");
+ $("poll-counts").textContent=(p.frozen?.choices||p.snapshot?.choices||[]).map(c=>c.label+": "+c.votes).join(" · ");
+ $("poll-open").disabled=!p.configured||p.busy||!!p.frozen||p.snapshot?.status==="open";
+ $("poll-lock").disabled=!p.configured||p.busy||!!p.frozen;
+ $("poll-add").disabled=!p.frozen;
+ $("poll-configure").disabled=p.busy||!!p.frozen||p.snapshot?.status==="open";
+ if(p.snapshot?.status==="open"&&!p.frozen&&!p.busy&&!pollRefreshing&&Date.now()-lastPollRefresh>3000){
+   pollRefreshing=true;lastPollRefresh=Date.now();
+   call("poll/refresh",{}).then(updateRuntime).catch(()=>{}).finally(()=>pollRefreshing=false);
+ }
+}
 function setupRehearsals() {
  const panel = document.createElement("section"); panel.className = "rehearsal-controls";
  panel.innerHTML = '<span class="section-label">REHEARSAL</span><p class="small muted">Reset the lecture, or start in a fresh project folder. Previous checkouts and saved material stay intact.</p><div class="button-row"><button id="reset-lecture">Reset lecture…</button><button id="new-rehearsal">New rehearsal…</button></div><p id="rehearsal-status" role="status" class="small"></p>';

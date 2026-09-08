@@ -8,6 +8,7 @@ import { validateDraft, publicStage, renderMarkdown } from "./lib/material.mjs";
 import { ObsidianLibrary } from "./lib/obsidian.mjs";
 import { CodexBridge } from "./lib/codex.mjs";
 import { Rehearsals } from "./lib/rehearsals.mjs";
+import { AudiencePoll } from "./lib/audience-poll.mjs";
 
 const root = dirname(fileURLToPath(import.meta.url));
 export function safeEqual(a, b) {
@@ -28,25 +29,29 @@ async function readJson(request) {
  for await (const chunk of request) { size += chunk.length; if (size > 100000) throw new Error("Request is too large"); chunks.push(chunk); }
  return JSON.parse(Buffer.concat(chunks).toString());
 }
-export function createStudio({ library = new ObsidianLibrary(), bridge = new CodexBridge(), workspace = resolve(root, "../webdev-rehearsal-studio"), rehearsals = new Rehearsals(resolve(root, ".local/rehearsals")), port = 4317, host = "127.0.0.1", persist = true } = {}) {
+export function createStudio({ library = new ObsidianLibrary(), bridge = new CodexBridge(), poll = new AudiencePoll(), workspace = resolve(root, "../webdev-rehearsal-studio"), rehearsals = new Rehearsals(resolve(root, ".local/rehearsals")), port = 4317, host = "127.0.0.1", persist = true } = {}) {
  const deskToken = randomBytes(32).toString("hex"), stageToken = randomBytes(32).toString("hex");
  let origin, draft = initialDraft(), publishedDraft = initialDraft(), version = 1, blank = false, brief = acts[0].brief;
  let stage = publicStage(publishedDraft, version), lastBrief = "";
  let activeAct = "opening", libraryFiles = [], savedAt = null;
  let previousMaterial = null;
  let rehearsalJob = { status: "idle" }, resetVersion = 0;
+ let pollOnStage = false;
  const resetLecture = () => {
+   poll.reset(); pollOnStage = false;
    bridge.close();
    Object.assign(bridge.state, { status: "disconnected", activity: "Not connected", messages: [], requests: [], threadId: null, turnId: null, startedAt: null, finishedAt: null, outcome: null });
    draft = initialDraft(); publishedDraft = initialDraft(); stage = publicStage(publishedDraft, ++version);
    blank = false; brief = acts[0].brief; lastBrief = ""; activeAct = "opening"; previousMaterial = null; resetVersion++;
  };
  const json = (res, value, status = 200) => { res.writeHead(status, { "content-type": "application/json" }); res.end(JSON.stringify(value)); };
- const deskState = () => ({ acts, scope, draft, draftPreview: publicStage(draft, version), stage, blank, canReturnToMaterial: !!previousMaterial, activeAct, brief, lastBrief, codex: bridge.snapshot(), libraryStatus: library.status, workspace, savedAt, rehearsalJob, resetVersion });
+ const deskState = () => ({ acts, scope, draft, draftPreview: publicStage(draft, version), stage: pollOnStage ? { ...stage, title: poll.config.question, mode: "poll" } : stage, blank, canReturnToMaterial: !!previousMaterial, activeAct, brief, lastBrief, codex: bridge.snapshot(), libraryStatus: library.status, workspace, savedAt, rehearsalJob, resetVersion, poll: poll.state() });
  const publicState = () => {
    const c = bridge.state;
+   const p = poll.state(), counts = p.frozen || p.snapshot;
+   const projected = pollOnStage ? publicStage({ ...initialDraft(), mode: "material", title: p.config.question, body: p.config.options.map(o => o.label + ": " + (counts?.choices.find(c=>c.id===o.id)?.votes || 0)).join("\n\n") + "\n\n" + (p.frozen ? "Selected: " + p.frozen.winner.label + " — " + p.frozen.reason : "Join: " + p.joinUrl), source: p.frozen ? "Voting closed · frozen revision " + p.frozen.revision : "Audience vote · " + (p.error ? "connection issue; showing last counts" : counts?.status || "not opened") }, String(version) + "-poll-" + (counts?.revision || 0) + "-" + !!p.frozen + "-" + p.error) : stage;
    const activity = ["Running a command", "Editing files", "Using a tool", "Looking up a source", "Responding", "Working"].includes(c.activity) ? c.activity : "Working";
-   return { ...stage, blank, build: { activity, status: c.status, outcome: ["completed", "failed", "interrupted"].includes(c.outcome) ? c.outcome : null, startedAt: c.startedAt || null, finishedAt: c.finishedAt || null } };
+   return { ...projected, blank, build: { activity, status: c.status, outcome: ["completed", "failed", "interrupted"].includes(c.outcome) ? c.outcome : null, startedAt: c.startedAt || null, finishedAt: c.finishedAt || null } };
  };
  const server = createServer(async (req, res) => {
    res.setHeader("cache-control", "no-store");
@@ -77,9 +82,23 @@ export function createStudio({ library = new ObsidianLibrary(), bridge = new Cod
        }
        if (req.method !== "POST" || req.headers.origin !== origin) return json(res, { error: "Same-origin POST required" }, 403);
        const body = await readJson(req);
+       if (url.pathname.startsWith("/api/poll/")) {
+         if (rehearsalJob.status === "creating") throw new Error("Wait for the fresh rehearsal");
+         const action = url.pathname.slice("/api/poll/".length);
+         if (action === "configure") poll.configure(body);
+         else if (["open", "lock", "refresh"].includes(action)) await poll.act(action);
+         else if (action === "receipt") return json(res, { text: poll.receipt() });
+         else if (action === "show") {
+           if (!pollOnStage) previousMaterial = { ...publishedDraft };
+           pollOnStage = true; blank = false; version++;
+         } else return json(res, { error: "Not found" }, 404);
+         return json(res, deskState());
+       }
        if (rehearsalJob.status === "creating" && !["/api/codex/interrupt", "/api/codex/answer"].includes(url.pathname)) return json(res, { error: "A fresh rehearsal is being prepared. Please wait." }, 409);
        if (url.pathname === "/api/reset-lecture" || url.pathname === "/api/new-rehearsal") {
          if (body.confirm !== true) throw new Error("Confirm the reset first");
+         if (poll.busy) throw new Error("Wait for the current poll operation");
+         if (poll.snapshot?.status === "open" && !poll.frozen) throw new Error("Close the audience vote before resetting");
          if (url.pathname === "/api/reset-lecture") { resetLecture(); return json(res, deskState()); }
          rehearsalJob = { status: "creating" };
          // Disconnect only after setup succeeds; a failed clone leaves the current session intact.
@@ -94,9 +113,11 @@ export function createStudio({ library = new ObsidianLibrary(), bridge = new Cod
          if (!acts.some(a => a.id === body.act)) throw new Error("Unknown narrative beat");
          activeAct = body.act;
        } else if (url.pathname === "/api/publish") {
+         pollOnStage = false;
          const next = validateDraft(body); next.demoUrl = validDemoUrl(next.demoUrl, origin);
          draft = next; publishedDraft = { ...next }; stage = publicStage(publishedDraft, ++version, stage.brief); blank = false;
        } else if (url.pathname === "/api/show-preview") {
+         pollOnStage = false;
          if (typeof body.url !== "string" || body.url.length > 2048) throw new Error("Invalid preview URL");
          const demoUrl = validDemoUrl(body.url, origin);
          if (!demoUrl) throw new Error("Choose a preview URL");
@@ -104,6 +125,7 @@ export function createStudio({ library = new ObsidianLibrary(), bridge = new Cod
          publishedDraft = { ...initialDraft(), act: activeAct, mode: "demo", title: "Live app · work in progress", body: "", demoUrl, source: "Agent-supplied preview · selected by the lecturer" };
          stage = publicStage(publishedDraft, ++version); blank = false;
        } else if (url.pathname === "/api/back-material") {
+         pollOnStage = false;
          if (!previousMaterial) throw new Error("No previous material");
          publishedDraft = previousMaterial; previousMaterial = null;
          stage = publicStage(publishedDraft, ++version); blank = false;
@@ -112,6 +134,7 @@ export function createStudio({ library = new ObsidianLibrary(), bridge = new Cod
          if (typeof body.brief !== "string" || body.brief.length > 20000) throw new Error("Brief is too long");
          brief = body.brief;
        } else if (url.pathname === "/api/publish-brief" || url.pathname === "/api/publish-sent-brief") {
+         pollOnStage = false;
          const sent = url.pathname === "/api/publish-sent-brief";
          const text = sent ? lastBrief : body.brief;
          if (typeof text !== "string" || !text.trim() || text.length > 20000) throw new Error(sent ? "No successfully submitted prompt yet" : "Use a non-empty prompt under 20,000 characters");
@@ -133,6 +156,7 @@ export function createStudio({ library = new ObsidianLibrary(), bridge = new Cod
          const saved = JSON.parse(await readFile(resolve(root, ".local/session.json"), "utf8"));
          const next = validateDraft(saved.draft); next.demoUrl = validDemoUrl(next.demoUrl, origin);
          if (typeof saved.brief !== "string" || saved.brief.length > 20000) throw new Error("Invalid saved brief");
+         if (saved.pollConfig) poll.configure(saved.pollConfig);
          draft = next; brief = saved.brief;
          activeAct = acts.some(a => a.id === saved.activeAct) ? saved.activeAct : "opening";
          savedAt = saved.savedAt;
@@ -141,7 +165,7 @@ export function createStudio({ library = new ObsidianLibrary(), bridge = new Cod
          if (!persist) throw new Error("Saving is disabled in test mode");
          await mkdir(resolve(root, ".local"), { recursive: true, mode: 0o700 });
          savedAt = new Date().toISOString();
-         await writeFile(resolve(root, ".local/session.json"), JSON.stringify({ savedAt, activeAct, draft, publishedDraft, brief, lastBrief }, null, 2), { mode: 0o600 });
+         await writeFile(resolve(root, ".local/session.json"), JSON.stringify({ savedAt, activeAct, draft, publishedDraft, brief, lastBrief, pollConfig: poll.config }, null, 2), { mode: 0o600 });
        } else return json(res, { error: "Not found" }, 404);
        return json(res, deskState());
      }

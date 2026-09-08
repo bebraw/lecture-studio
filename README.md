@@ -65,6 +65,28 @@ On macOS/Linux, disconnect/reset signals the process group launched by this stud
 
 Restart the studio once after installing this update to activate the new reset endpoints.
 
+## Audience votes shape the prompt
+
+In **Prepare → Audience vote**, define a question, 2–6 options (`id|label` per line), and a default. In Present, the same collapsible section offers **Open vote**, **Show vote on stage**, **Close vote**, and **Add result to prompt**. Open does not automatically project; adding does not automatically send. Counts refresh while the desk is connected. Close locks the room and captures an immutable aggregate revision.
+
+The selected result and counts are inserted as labeled reference data into the editable prompt. Zero votes use the prepared default. Ties use the default if it is tied, otherwise the first tied option in prepared order. The rule is visible, not presented as audience consensus. No later refresh can modify the frozen receipt. Save draft/Restore draft also store the poll definition, but never its credentials.
+
+### Public app setup required
+
+This is an adapter to the existing lecture room API, not a second public voting service. Set `LECTURE_POLL_ORIGIN`, `LECTURE_POLL_ROOM` (default `webdev-2026`), and `LECTURE_POLL_TOKEN` in the studio launching environment; restart the studio. The token must match the public app's `PRESENTER_TOKEN`. It stays server-side and is stripped from the Codex child environment. The join URL is always the public app's `/rooms/{room}` URL, never a studio capability URL.
+
+The public app must already expose:
+
+- `GET /api/rooms/{room}`: `{status:"open"|"locked", revision, totalVotes, choices:[{id,label,votes}]}`.
+- Authenticated `POST /presenter/rooms/{room}/open` and `.../lock`, returning that same aggregate.
+- `GET /rooms/{room}`: the audience's native form, posting back to the room. Keep its existing same-origin checks, predefined-choice validation, and replaceable anonymous vote semantics.
+
+For the default theme poll, seed the public app with exactly `editorial|Editorial`, `retro-web|Retro web`, and `playful|Playful` in a designated rehearsal room. **The pinned starter currently seeds seminar interests, not these themes.** Configure the app's choices first, or configure the studio to match its existing interests. The studio checks IDs and labels before opening or locking and refuses a mismatch; it never calls seed or reset. No public deployment or vote mutation was performed while implementing this feature.
+
+Reuse the audience join link/your existing QR. Closing the poll must succeed before a result can be used; failures display an error and retain last-known counts. Resetting the lecture is refused while a known vote is open. A studio restart does not close the public room. Cookie-based deduplication is a convenience, not strong identity or protection against determined multiple voting; retain the public app's anti-abuse controls.
+
+Tests cover the full studio flow with a simulated room, including explicit projection, freezing, ties, defaults and mismatch refusal. A live public-room rehearsal remains necessary after configuration.
+
 ## Showing prompts
 
 **Show prompt to the room** projects the editable prompt without sending it. **Send to Codex** remains separate. After a successful submission, **Show exact prompt sent** projects the stored submitted text, even if the next prompt has been edited. Prompt text is displayed literally, without Markdown interpretation. Failed submissions do not replace that snapshot.
