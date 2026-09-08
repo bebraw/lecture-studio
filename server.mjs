@@ -9,6 +9,7 @@ import { ObsidianLibrary } from "./lib/obsidian.mjs";
 import { CodexBridge } from "./lib/codex.mjs";
 import { Rehearsals } from "./lib/rehearsals.mjs";
 import { AudiencePoll } from "./lib/audience-poll.mjs";
+import { LectureSearch } from "./lib/lecture-search.mjs";
 
 const root = dirname(fileURLToPath(import.meta.url));
 export function safeEqual(a, b) {
@@ -31,6 +32,7 @@ async function readJson(request) {
 }
 export function createStudio({ library = new ObsidianLibrary(), bridge = new CodexBridge(), poll = new AudiencePoll(), workspace = resolve(root, "../webdev-rehearsal-studio"), rehearsals = new Rehearsals(resolve(root, ".local/rehearsals")), port = 4317, host = "127.0.0.1", persist = true } = {}) {
  const deskToken = randomBytes(32).toString("hex"), stageToken = randomBytes(32).toString("hex");
+ const lectureSearch = new LectureSearch(library);
  let origin, draft = initialDraft(), publishedDraft = initialDraft(), version = 1, blank = false, brief = acts[0].brief;
  let stage = publicStage(publishedDraft, version), lastBrief = "";
  let activeAct = "opening", libraryFiles = [], savedAt = null;
@@ -71,7 +73,11 @@ export function createStudio({ library = new ObsidianLibrary(), bridge = new Cod
          if (url.pathname === "/api/desk") return json(res, deskState());
          if (url.pathname === "/api/stage") return json(res, publicState());
          if (url.pathname === "/api/stage-link") return json(res, { url: origin + "/stage#" + stageToken });
-         if (url.pathname === "/api/library") { libraryFiles = await library.list(); return json(res, { files: libraryFiles }); }
+         if (url.pathname === "/api/library") { libraryFiles = await library.list(); lectureSearch.clear(); return json(res, { files: libraryFiles }); }
+         if (url.pathname === "/api/search") {
+           if (!libraryFiles.length) libraryFiles = await library.list();
+           return json(res, await lectureSearch.search(url.searchParams.get("q")));
+         }
          if (url.pathname === "/api/note") {
            const path = url.searchParams.get("path");
            if (!libraryFiles.some(file => file.path === path)) throw new Error("Select a note from the lecture library first");
@@ -171,7 +177,7 @@ export function createStudio({ library = new ObsidianLibrary(), bridge = new Cod
      }
      if (req.method !== "GET") return json(res, { error: "Method not allowed" }, 405);
      let path;
-     const staticFiles = { "/": "desk.html", "/desk": "desk.html", "/stage": "stage.html", "/style.css": "style.css", "/desk.mjs": "desk.mjs", "/stage.mjs": "stage.mjs", "/shared.mjs": "shared.mjs" };
+     const staticFiles = { "/": "desk.html", "/desk": "desk.html", "/stage": "stage.html", "/style.css": "style.css", "/desk.mjs": "desk.mjs", "/stage.mjs": "stage.mjs", "/shared.mjs": "shared.mjs", "/explore.mjs": "explore.mjs" };
      if (staticFiles[url.pathname]) path = resolve(root, "public", staticFiles[url.pathname]);
      else if (url.pathname.startsWith("/vendor/mermaid/")) {
        const vendorRoot = await realpath(resolve(root, "node_modules/mermaid/dist"));

@@ -103,6 +103,18 @@ Links are labeled as agent-supplied and not checked for availability. This first
 
 ## Obsidian workflow
 
+### Explore this idea
+
+Present includes contextual shortcuts and an inline full-text search under the stage panel. Shortcuts follow the selected discussion cue, not the current projection or build status. Opening suggestions include early web, client/server, HTTP and the prepared project. Some shortcuts open a specific note/section; others run a topic search.
+
+Select a search result or shortcut to read privately, choose a section, then **Show this excerpt** to publish. Reading, searching, and changing cues never send content to Codex or automatically change the stage. Markdown is rendered with the same restrictions as the existing library; remote images remain disabled when publishing an excerpt.
+
+In Prepare, expand **Customize shortcuts for this cue**. Each line is `Label | relative note path | optional section`; use `?server` in place of a path for a search shortcut. Up to six mappings per cue are stored in this browser's local storage, not in Obsidian or Git. Restore defaults removes the override for the selected cue.
+
+Search indexes only the configured lecture folder, using four concurrent reads on the first search. It matches all query words across the note title, section title, and body, returning at most 20 sections. The index stays in server memory; reconnecting the library through **Connect Obsidian**, or restarting the studio, clears it. Unavailable notes are reported; no extra model call is used.
+
+Restart the studio after this update to load the new search route and browser module.
+
 The adapter reads only Markdown files under:
 
 ```text

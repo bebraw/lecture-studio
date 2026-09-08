@@ -18,6 +18,21 @@
 .presenting:not(.finding) .material-column>.preview-label,.presenting:not(.finding) .material-column>#preview{display:none}
 .presenting .live-overview{grid-template-columns:1fr}
 .stage-blank-preview{background:#101c18;color:var(--paper);display:flex;align-items:center;justify-content:center}
+.explorer{margin-top:26px;border-top:1px solid var(--line);padding-top:20px}
+.explorer h2{font-size:25px;margin:0}
+.explorer .section-heading{align-items:baseline}
+.explorer .section-heading>span{max-width:50%;text-align:right}
+.explorer .search-row{display:flex!important;margin-top:16px}
+.explorer #explore-results{max-height:220px;overflow:auto}
+.explore-result{display:block;width:100%;text-align:left;border:0;border-bottom:1px solid var(--line);background:transparent}
+.explore-result strong,.explore-result span{display:block}
+.explore-result span{font-size:11px;font-weight:400;margin-top:6px}
+#explore-selection{margin-top:18px;padding:18px;background:var(--white);border:1px solid var(--line)}
+#explore-selection h3{font-size:25px;margin-bottom:12px}
+#explore-excerpt{max-height:280px;overflow:auto;margin:16px 0;font-size:15px;line-height:1.5}
+#explore-source{overflow-wrap:anywhere}
+.explore-prepare{margin-top:16px}
+.presenting .explore-prepare{display:none}
 /* Present is a small performance surface; Prepare retains the full workbench. */
 .mode-switch{display:flex;border:1px solid var(--ink);border-radius:4px;padding:2px;gap:2px}
 .mode-switch button{border:0;background:transparent;font-size:12px;padding:7px 13px}

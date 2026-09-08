@@ -1,8 +1,10 @@
 import { auth, api, escape, surface, renderDiagrams, buildLabel, previewCandidates } from "./shared.mjs";
+import { mountExplorer } from "./explore.mjs";
 const $ = id => document.getElementById(id), token = auth("desk");
 let state, files = [], note, selected, requestKey = "", modelKey = "", draftSequence = 0;
 let previewKey = "";
 let stageKey = "", stageReadPending = false;
+let explorer;
 const call = (path, value) => api(token, path, value);
 function notice(text, error = false) { $("notice").hidden = false; $("notice").textContent = text; $("notice").classList.toggle("error", error); }
 function action(id, run) { $(id).addEventListener("click", async () => { $(id).disabled = true; try { await run(); } catch (e) { notice(e.message, true); } finally { $(id).disabled = false; if (state) updateRuntime(state); } }); }
@@ -16,6 +18,7 @@ function preview(data) {
 async function saveDraft() { const sequence = ++draftSequence; const data = await call("draft", draft()); if (sequence === draftSequence) preview(data); return data; }
 function beat() { return state.acts.find(a => a.id === state.activeAct) || state.acts[0]; }
 function drawPlot() {
+ explorer?.setCue(beat());
  if ($("live-next")) { $("live-next").textContent = beat().title; $("live-question").textContent = beat().question; }
  $("acts").innerHTML = state.acts.map((a, i) => '<button data-act="' + escape(a.id) + '" class="act ' + (a.id === state.activeAct ? "active" : "") + '"><span class="act-index">0' + (i + 1) + '</span><span><small>' + escape(a.era) + ' · ' + escape(a.time) + '</small><strong>' + escape(a.title) + '</strong></span></button>').join("");
  $("acts").querySelectorAll("button").forEach(button => button.onclick = async () => {
@@ -136,6 +139,10 @@ setupModes();
 setupPreviewShortcuts();
 setupRehearsals();
 setupPoll();
+explorer = mountExplorer({ host: document.querySelector(".material-column"), call, getScope: () => state.scope, onShow: async material => {
+ const data = await call("publish", { ...draft(), ...material, mode: "material", allowRemoteImages: false });
+ fields(data.draft); preview(data); updateRuntime(data);
+}});
 init().catch(e => { $("auth-error").hidden = false; notice(e.message, true); });
 
 function setupModes() {
