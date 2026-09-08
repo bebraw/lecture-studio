@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Lecture Studio · Private desk</title><link rel="stylesheet" href="/style.css"></head>
+<body class="desk"><header class="topbar"><a class="brand" href="/desk">Lecture<span>studio</span><i>LOCAL / 01</i></a><div class="top-actions"><span class="private-label">PRIVATE DESK</span><button id="save" class="quiet">Save draft</button><button id="open-stage" class="primary">Open projected stage ↗</button></div></header>
+<div id="auth-error" class="banner" hidden>Open the private desk link printed by the local server.</div><div id="notice" class="notice" role="status" hidden></div>
+<main class="desk-grid">
+<aside class="plot"><div class="section-label">THE THREAD</div><h1>One capability.<br>Three ages.</h1><p class="muted small">A plot to return to.<br>Not a script to follow.</p><nav id="acts" aria-label="Narrative beats"></nav><div class="return-anchor"><span class="section-label">RETURN TO</span><p>Who is the<br>interface for?</p></div><p class="small muted">90 minutes + room to wander.<br>Changing beats never changes the projection.</p></aside>
+<section class="material-column" aria-label="Narrative material">
+<div class="section-heading"><span class="section-label">01 / FIND THE NEXT IDEA</span><span id="library-status" class="small muted">Obsidian · not connected</span></div>
+<div class="search-row"><label class="search-field"><span class="sr-only">Find lecture notes</span><input id="search" type="search" placeholder="Find a concept, question, or reference…" autocomplete="off"></label><button id="load-library">Connect Obsidian</button></div>
+<div class="library-layout"><div id="note-list" class="note-list" aria-label="Lecture notes"><p class="muted small">Read-only access to the lecture folder.<br>No vault content goes to Codex automatically.</p></div><div id="note-detail" class="note-detail"><div class="section-label">ON THE DESK</div><h2 id="beat-title">Who is the interface for?</h2><p id="beat-question">What is the oldest version of the web you remember using?</p><div id="note-controls" hidden><label>Section<select id="sections"></select></label><button id="use-section">Use section in draft ↓</button></div><p id="transition" class="transition"></p></div></div>
+<div class="section-heading border-top"><span class="section-label">02 / COMPOSE THE STAGE</span><span id="draft-status" class="small muted">Private draft</span></div>
+<div class="draft-controls"><label>Surface<select id="mode"><option value="question">Audience question</option><option value="material">Note / reference</option><option value="diagram">Mechanism / graphic</option><option value="demo">Live app</option><option value="brief">Build brief</option></select></label><label id="diagram-field">Graphic<select id="diagram"><option value="ages">One capability, three ages</option><option value="enhancement">Progressive enhancement</option><option value="futures">Two agentic directions</option><option value="context">Context crosses a boundary</option></select></label></div>
+<label class="field">Title<input id="title" maxlength="200" value="Who is the interface for?"></label>
+<label class="field">On-screen text <span class="muted small">Markdown supported · keep it short</span><textarea id="body" rows="4">What is the oldest version of the web you remember using?</textarea></label>
+<div class="draft-controls"><label>Source / credit<input id="source" placeholder="Source note or reference"></label><label id="url-field">App URL<input id="demo-url" type="url" placeholder="http://127.0.0.1:8787/rooms/webdev-2026"></label></div>
+<label class="checkbox small"><input id="remote-images" type="checkbox">Allow remote images in this material (requires network)</label>
+<div class="preview-label"><span class="section-label">NEXT ON STAGE</span><span id="word-count" class="small muted"></span></div>
+<div id="preview" class="preview stage-surface"></div>
+<div class="publish-row"><button id="publish" class="primary large">Show this to the room →</button><button id="blank" class="quiet">Blank stage</button><span id="stage-status" class="small muted">Stage holds until you publish.</span></div>
+</section>
+<aside class="builder" aria-label="Codex implementation">
+<div class="section-heading"><span class="section-label">03 / BUILD IN THE BACKGROUND</span><span id="codex-status" class="status-dot">Disconnected</span></div><h2>The brief is visible.<br>The work is real.</h2><p class="small muted">Local Codex process, remote model. Only this brief is handed over from the desk; project instructions still apply.</p>
+<details class="connection"><summary>Rehearsal connection</summary><p id="workspace" class="path small"></p><div class="button-row"><button id="connect-codex">Connect Codex</button><button id="disconnect-codex" class="quiet">Disconnect</button></div><p class="small muted">Workspace-write sandbox. Approvals appear here. Reconnecting starts a new conversation.</p></details>
+<label class="field">Model<select id="model"><option value="">Codex configured default</option></select></label>
+<div class="brief-heading"><label for="brief">Reviewed build brief</label><button id="suggest-brief" class="text-button">Use cue’s build prompt</button></div>
+<textarea id="brief" rows="9" spellcheck="false">Show our opening defaults and ask what we want to change. Explain what is already prepared. Do not implement yet.</textarea>
+<div class="button-row"><button id="add-excerpt" class="quiet">Add selected excerpt</button><button id="show-brief" class="quiet">Project brief</button></div>
+<div class="button-row build-actions"><button id="send" class="primary" disabled>Send to Codex →</button><button id="interrupt" class="quiet" disabled>Interrupt</button></div>
+<p id="activity" class="activity">Ready when you are. No model request has been sent.</p>
+<div id="requests"></div>
+<details class="output" open><summary>Private agent response</summary><div id="messages"><p class="muted small">The room will never see this panel. Finished is not the same as verified.</p></div></details>
+</aside></main><script type="module" src="/desk.mjs"></script></body></html>
