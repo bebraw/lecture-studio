@@ -16,7 +16,7 @@ Codex CLI **0.153.4** is confirmed working by the lecturer. This is a tested ver
 
 The desk opens in **Present**, remembering your choice per browser tab. Use **Prepare** for the full library, material editing, model selection, and saving/restoring drafts.
 
-Present keeps the published title, selected private discussion cue, draft preview, brief, and build controls visible. **Previous cue / Next cue** browse the plot without changing the stage; **Draft this question** prepares the selected question; **Show this to the room** publishes it. None of these sends a coding prompt.
+Present keeps the published title, selected private discussion cue, preview, brief, and build controls visible. **Previous cue / Next cue** browse without changing the stage; **Show this question** immediately publishes the selected question in one click. No separate drafting step is needed for cues, and no coding prompt is sent. Obsidian material can still be edited and published through **Find something…**.
 
 **Find something…** temporarily reveals the library and draft editors. Press Escape or **Done** to return. Switching modes preserves your editors and ongoing Codex connection.
 

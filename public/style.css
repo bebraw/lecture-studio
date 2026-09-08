@@ -11,6 +11,8 @@
 .audience-poll label{margin:12px 0}
 .audience-poll #poll-question-live{margin:14px 0 8px}
 .presenting .poll-prepare{display:none}
+.presenting:not(.finding) .publish-row{display:none}
+.cue-stage-controls:empty{display:none}
 /* Present is a small performance surface; Prepare retains the full workbench. */
 .mode-switch{display:flex;border:1px solid var(--ink);border-radius:4px;padding:2px;gap:2px}
 .mode-switch button{border:0;background:transparent;font-size:12px;padding:7px 13px}

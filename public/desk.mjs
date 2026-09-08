@@ -150,11 +150,13 @@ function setupModes() {
  const controlsHome = document.createElement("div");
  stageControls.before(controlsHome);
  const cueControls = document.createElement("div"); cueControls.className = "cue-stage-controls";
- const hint = document.createElement("p"); hint.className = "small muted"; hint.textContent = "Show publishes the prepared preview below.";
- cueControls.append(hint); live.lastElementChild.append(cueControls);
+ live.lastElementChild.append(cueControls);
+ $("use-question").textContent = "Show this question →";
+ $("use-question").className = "primary";
  const placeStageControls = () => {
    const inPresent = document.body.classList.contains("presenting") && !document.body.classList.contains("finding");
-   (inPresent ? cueControls : controlsHome).append(stageControls);
+   controlsHome.append(stageControls);
+   (inPresent ? $("use-question").parentElement : stageControls).append($("blank"));
  };
  const find = document.createElement("button"); find.id = "find-material"; find.textContent = "Find something…"; find.className = "quiet";
  const done = document.createElement("button"); done.id = "finish-finding"; done.textContent = "Done · back to presenting"; done.className = "primary";
@@ -178,7 +180,12 @@ function setupModes() {
    const next = state.acts[Math.min(state.acts.length - 1, Math.max(0, index + step))];
    state = await call("act", { act: next.id }); drawPlot();
  });
- action("use-question", async () => { fields({ ...draft(), mode: "question", title: beat().title, body: beat().question, source: "" }); await saveDraft(); });
+ action("use-question", async () => {
+   const next = { ...draft(), mode: "question", title: beat().title, body: beat().question, source: "" };
+   const data = await call("publish", next);
+   fields(data.draft); preview(data); updateRuntime(data);
+   notice("Question shown to the room.");
+ });
  setMode(sessionStorage.getItem("lecture-studio-mode") || "present");
 }
 
