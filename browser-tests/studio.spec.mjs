@@ -32,6 +32,14 @@ test("private selection, deliberate projection, graphic rendering and approval h
    await expect(stage.locator("body")).not.toContainText("private-test-command");
    await desk.getByRole("button",{name:"Approve once",exact:true}).click();
    await expect(desk.locator("#messages")).toContainText("Fixture implementation complete.");
+   await desk.locator("#brief").fill("A different, unsent prompt.");
+   await desk.locator("#show-brief").click();
+   await expect(stage.locator(".brief-copy")).toHaveText("A different, unsent prompt.");
+   await desk.locator("#show-sent-brief").click();
+   await expect(stage.locator(".brief-copy")).toHaveText("PRIVATE implementation brief.");
+   await expect(desk.locator("#brief")).toHaveValue("A different, unsent prompt.");
+   await desk.locator("#back-material").click();
+   await expect(stage.locator(".layer")).toHaveCount(3);
    await desk.locator("#blank").click();await expect(stage.locator("body")).toHaveClass(/blank/);
    await expect(stage.locator("#stage-content")).toHaveCSS("visibility","hidden");
    await desk.locator("#blank").click();await expect(stage.locator("body")).not.toHaveClass(/blank/);

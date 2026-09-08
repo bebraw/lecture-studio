@@ -100,7 +100,7 @@ export function createStudio({ library = new ObsidianLibrary(), bridge = new Cod
          if (typeof body.url !== "string" || body.url.length > 2048) throw new Error("Invalid preview URL");
          const demoUrl = validDemoUrl(body.url, origin);
          if (!demoUrl) throw new Error("Choose a preview URL");
-         if (publishedDraft.mode !== "demo") previousMaterial = { ...publishedDraft };
+         if (!["demo", "brief"].includes(publishedDraft.mode)) previousMaterial = { ...publishedDraft };
          publishedDraft = { ...initialDraft(), act: activeAct, mode: "demo", title: "Live app · work in progress", body: "", demoUrl, source: "Agent-supplied preview · selected by the lecturer" };
          stage = publicStage(publishedDraft, ++version); blank = false;
        } else if (url.pathname === "/api/back-material") {
@@ -111,17 +111,20 @@ export function createStudio({ library = new ObsidianLibrary(), bridge = new Cod
        } else if (url.pathname === "/api/brief") {
          if (typeof body.brief !== "string" || body.brief.length > 20000) throw new Error("Brief is too long");
          brief = body.brief;
-       } else if (url.pathname === "/api/publish-brief") {
-         if (typeof body.brief !== "string" || body.brief.length > 20000) throw new Error("Brief is too long");
-         brief = body.brief;
-         draft = { ...draft, mode: "brief", title: "Here is what we are asking.", body: brief, source: "Reviewed build brief · selected by the lecturer" };
-         publishedDraft = { ...draft }; stage = publicStage(publishedDraft, ++version, brief); blank = false;
+       } else if (url.pathname === "/api/publish-brief" || url.pathname === "/api/publish-sent-brief") {
+         const sent = url.pathname === "/api/publish-sent-brief";
+         const text = sent ? lastBrief : body.brief;
+         if (typeof text !== "string" || !text.trim() || text.length > 20000) throw new Error(sent ? "No successfully submitted prompt yet" : "Use a non-empty prompt under 20,000 characters");
+         if (!["brief", "demo"].includes(publishedDraft.mode)) previousMaterial = { ...publishedDraft };
+         if (!sent) brief = text;
+         publishedDraft = { ...draft, mode: "brief", title: sent ? "The prompt sent to Codex" : "The prompt we are discussing", body: text, source: sent ? "Exact submitted prompt" : "Draft prompt · not sent by this action" };
+         stage = publicStage(publishedDraft, ++version, text); blank = false;
        } else if (url.pathname === "/api/codex/connect") {
          await bridge.connect(workspace);
        } else if (url.pathname === "/api/codex/start") {
          if (typeof body.brief !== "string" || !body.brief.trim() || body.brief.length > 20000) throw new Error("Review a non-empty brief first");
-         lastBrief = body.brief; brief = body.brief;
          await bridge.start(body.brief, body.model || "");
+         lastBrief = body.brief; brief = body.brief;
        } else if (url.pathname === "/api/codex/interrupt") { await bridge.interrupt();
        } else if (url.pathname === "/api/codex/disconnect") { bridge.close();
        } else if (url.pathname === "/api/codex/answer") { bridge.answer(body.id, body.decision, body.answers);

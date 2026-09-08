@@ -65,6 +65,12 @@ On macOS/Linux, disconnect/reset signals the process group launched by this stud
 
 Restart the studio once after installing this update to activate the new reset endpoints.
 
+## Showing prompts
+
+**Show prompt to the room** projects the editable prompt without sending it. **Send to Codex** remains separate. After a successful submission, **Show exact prompt sent** projects the stored submitted text, even if the next prompt has been edited. Prompt text is displayed literally, without Markdown interpretation. Failed submissions do not replace that snapshot.
+
+**Back to material** restores the material from before the prompt/app detour. Projecting a prompt does not overwrite your unpublished material draft.
+
 ## Preview shortcuts
 
 Local preview URLs in Codex's current response appear as a contextual shortcut on the private desk. Choose a URL when there are several, then **Open privately** or **Show on stage**. Detection does not fetch the URL or change the projection. **Back to material** restores the material that was on stage before the preview; unpublished draft edits stay intact.
