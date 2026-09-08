@@ -1,7 +1,7 @@
 import { test, expect } from "@playwright/test";
 import {fixture} from "../tests/fixture.mjs";
 test("private selection, deliberate projection, graphic rendering and approval handoff", async ({browser}) => {
- const {studio,address,bridge}=await fixture();
+ const {studio,address,bridge}=await fixture({rehearsals:{create:async()=>"/test/rehearsal-001"}});
  const context=await browser.newContext({viewport:{width:1600,height:1050}});
  try {
    const desk=await context.newPage(), stage=await context.newPage();
@@ -72,6 +72,19 @@ test("private selection, deliberate projection, graphic rendering and approval h
    await expect(stage.locator("iframe")).toHaveCount(0);
    await desk.screenshot({path:"test-results/present.png",fullPage:true});
    await stage.screenshot({path:"test-results/stage.png",fullPage:true});
+   await expect(desk.locator("#new-rehearsal")).toBeHidden();
+   await desk.locator("#prepare-mode").click();
+   desk.once("dialog",dialog=>dialog.dismiss());
+   await desk.locator("#reset-lecture").click();
+   await expect(desk.locator("#live-next")).toContainText("address");
+   desk.once("dialog",dialog=>dialog.accept());
+   await desk.locator("#reset-lecture").click();
+   await expect(stage.locator("h1")).toHaveText("Who is the interface for?");
+   await expect(desk.locator("#preview-shortcuts")).toBeHidden();
+   desk.once("dialog",dialog=>dialog.accept());
+   await desk.locator("#new-rehearsal").click();
+   await expect(desk.locator("#rehearsal-status")).toHaveText("Fresh rehearsal ready.");
+   await expect(desk.locator("#workspace")).toHaveText("/test/rehearsal-001");
    expect(errors).toEqual([]);
  } finally {await context.close();await new Promise(resolve=>studio.server.close(resolve));}
 });

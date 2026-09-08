@@ -52,6 +52,19 @@ Optional settings are documented in [.env.example](.env.example). Create your ow
 
 Start with the opening prompt, which asks for defaults and discussion without implementation. The later prompts are suggestions, not hidden context. Existing project instructions still apply.
 
+## Resetting and starting fresh
+
+In **Prepare**, the Rehearsal controls offer:
+
+- **Reset lecture…** clears the unsaved draft, brief, projection, preview shortcuts and Codex conversation, returning to the opening. The current project files, Obsidian notes and saved material are retained.
+- **New rehearsal…** creates a numbered folder under ignored `.local/rehearsals/`, clones `lecture-start-v10`, verifies its pinned commit, installs dependencies and selects the new checkout. Existing checkouts are never reset, cleaned or deleted. Failed setup leaves the active rehearsal unchanged and retains the attempted folder for inspection.
+
+Both actions ask for confirmation. Fresh setup runs in the background; progress appears in Prepare. The latest successfully created checkout is remembered across server restarts. Dependency installation needs network access and a compatible Node/npm runtime. Saved draft restoration does not select an old project.
+
+On macOS/Linux, disconnect/reset signals the process group launched by this studio, including preview children that remain in that group. Independently launched or daemonized servers cannot safely be identified and are not killed; stop those yourself. Windows cleanup stops the direct Codex child only. These process-group changes apply to sessions launched after restarting the updated studio.
+
+Restart the studio once after installing this update to activate the new reset endpoints.
+
 ## Preview shortcuts
 
 Local preview URLs in Codex's current response appear as a contextual shortcut on the private desk. Choose a URL when there are several, then **Open privately** or **Show on stage**. Detection does not fetch the URL or change the projection. **Back to material** restores the material that was on stage before the preview; unpublished draft edits stay intact.

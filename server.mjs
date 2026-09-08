@@ -7,6 +7,7 @@ import { acts, initialDraft, scope } from "./lib/narrative.mjs";
 import { validateDraft, publicStage, renderMarkdown } from "./lib/material.mjs";
 import { ObsidianLibrary } from "./lib/obsidian.mjs";
 import { CodexBridge } from "./lib/codex.mjs";
+import { Rehearsals } from "./lib/rehearsals.mjs";
 
 const root = dirname(fileURLToPath(import.meta.url));
 export function safeEqual(a, b) {
@@ -27,14 +28,21 @@ async function readJson(request) {
  for await (const chunk of request) { size += chunk.length; if (size > 100000) throw new Error("Request is too large"); chunks.push(chunk); }
  return JSON.parse(Buffer.concat(chunks).toString());
 }
-export function createStudio({ library = new ObsidianLibrary(), bridge = new CodexBridge(), workspace = resolve(root, "../webdev-rehearsal-studio"), port = 4317, host = "127.0.0.1", persist = true } = {}) {
+export function createStudio({ library = new ObsidianLibrary(), bridge = new CodexBridge(), workspace = resolve(root, "../webdev-rehearsal-studio"), rehearsals = new Rehearsals(resolve(root, ".local/rehearsals")), port = 4317, host = "127.0.0.1", persist = true } = {}) {
  const deskToken = randomBytes(32).toString("hex"), stageToken = randomBytes(32).toString("hex");
  let origin, draft = initialDraft(), publishedDraft = initialDraft(), version = 1, blank = false, brief = acts[0].brief;
  let stage = publicStage(publishedDraft, version), lastBrief = "";
  let activeAct = "opening", libraryFiles = [], savedAt = null;
  let previousMaterial = null;
+ let rehearsalJob = { status: "idle" }, resetVersion = 0;
+ const resetLecture = () => {
+   bridge.close();
+   Object.assign(bridge.state, { status: "disconnected", activity: "Not connected", messages: [], requests: [], threadId: null, turnId: null, startedAt: null, finishedAt: null, outcome: null });
+   draft = initialDraft(); publishedDraft = initialDraft(); stage = publicStage(publishedDraft, ++version);
+   blank = false; brief = acts[0].brief; lastBrief = ""; activeAct = "opening"; previousMaterial = null; resetVersion++;
+ };
  const json = (res, value, status = 200) => { res.writeHead(status, { "content-type": "application/json" }); res.end(JSON.stringify(value)); };
- const deskState = () => ({ acts, scope, draft, draftPreview: publicStage(draft, version), stage, blank, canReturnToMaterial: !!previousMaterial, activeAct, brief, lastBrief, codex: bridge.snapshot(), libraryStatus: library.status, workspace, savedAt });
+ const deskState = () => ({ acts, scope, draft, draftPreview: publicStage(draft, version), stage, blank, canReturnToMaterial: !!previousMaterial, activeAct, brief, lastBrief, codex: bridge.snapshot(), libraryStatus: library.status, workspace, savedAt, rehearsalJob, resetVersion });
  const publicState = () => {
    const c = bridge.state;
    const activity = ["Running a command", "Editing files", "Using a tool", "Looking up a source", "Responding", "Working"].includes(c.activity) ? c.activity : "Working";
@@ -69,6 +77,17 @@ export function createStudio({ library = new ObsidianLibrary(), bridge = new Cod
        }
        if (req.method !== "POST" || req.headers.origin !== origin) return json(res, { error: "Same-origin POST required" }, 403);
        const body = await readJson(req);
+       if (rehearsalJob.status === "creating" && !["/api/codex/interrupt", "/api/codex/answer"].includes(url.pathname)) return json(res, { error: "A fresh rehearsal is being prepared. Please wait." }, 409);
+       if (url.pathname === "/api/reset-lecture" || url.pathname === "/api/new-rehearsal") {
+         if (body.confirm !== true) throw new Error("Confirm the reset first");
+         if (url.pathname === "/api/reset-lecture") { resetLecture(); return json(res, deskState()); }
+         rehearsalJob = { status: "creating" };
+         // Disconnect only after setup succeeds; a failed clone leaves the current session intact.
+         void rehearsals.create().then(next => {
+           workspace = next; resetLecture(); rehearsalJob = { status: "ready" };
+         }).catch(() => { rehearsalJob = { status: "failed", error: "Setup failed. Previous rehearsal is unchanged. Check network, Git and npm; the attempted folder was retained." }; });
+         return json(res, deskState(), 202);
+       }
        if (url.pathname === "/api/draft") {
          draft = validateDraft(body); draft.demoUrl = validDemoUrl(draft.demoUrl, origin);
        } else if (url.pathname === "/api/act") {
@@ -141,6 +160,7 @@ export function createStudio({ library = new ObsidianLibrary(), bridge = new Cod
  });
  server.on("close", () => { bridge.close(); void library.close(); });
  return { server, bridge, library, async start() {
+   if (persist) workspace = await rehearsals.current(workspace);
    await new Promise((resolve, reject) => { server.once("error", reject); server.listen(port, host, resolve); });
    origin = "http://" + host + ":" + server.address().port;
    return { origin, deskUrl: origin + "/desk#" + deskToken, stageUrl: origin + "/stage#" + stageToken, deskToken, stageToken };

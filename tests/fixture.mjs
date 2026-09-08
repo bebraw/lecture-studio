@@ -1,6 +1,6 @@
 import {scope} from "../lib/narrative.mjs";
 import {createStudio} from "../server.mjs";
-export async function fixture() {
+export async function fixture(options = {}) {
  const bridge = {
    state:{status:"disconnected",activity:"Not connected",models:[],messages:[{id:"1",text:"private-output"}],requests:[],turnId:null},
    snapshot(){return this.state},
@@ -10,6 +10,6 @@ export async function fixture() {
    answer(){this.state={...this.state,status:"ready",turnId:null,requests:[],messages:[{id:"done",text:"Fixture implementation complete."}]}},close(){}
  };
  const library={status:"Fixture",async list(){return [{path:scope+"/Example.md",label:"Example"}]}, async read(path){return {path,title:"Progressive enhancement",sections:[{heading:"Stage block",body:"A capability that survives."},{heading:"Presenter",body:"private-note"},{heading:"Visual",body:"```mermaid\nflowchart LR\nA[HTML] --> B[Enhancement]\n```"}]}},async close(){}};
- const studio=createStudio({bridge,library,port:0,persist:false});
+ const studio=createStudio({bridge,library,port:0,persist:false,...options});
  return {studio,bridge,address:await studio.start()};
 }

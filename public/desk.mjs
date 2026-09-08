@@ -45,6 +45,17 @@ function selectSection() {
  $("selected-note").textContent = note.title; $("selected-note").hidden = false;
 }
 function updateRuntime(data) {
+ if (data.resetVersion !== undefined && state.resetVersion !== data.resetVersion) {
+   fields(data.draft); $("brief").value = data.brief; state = data; drawPlot(); preview(data);
+ }
+ state.resetVersion = data.resetVersion;
+ state.rehearsalJob = data.rehearsalJob;
+ if ($("rehearsal-status")) {
+   const job = data.rehearsalJob || {};
+   $("rehearsal-status").textContent = job.status === "creating" ? "Preparing a fresh checkout and installing dependencies…" : job.status === "failed" ? job.error : job.status === "ready" ? "Fresh rehearsal ready." : "";
+   $("new-rehearsal").disabled = job.status === "creating";
+   $("reset-lecture").disabled = job.status === "creating";
+ }
  state = { ...state, codex: data.codex, blank: data.blank, stage: data.stage, canReturnToMaterial: data.canReturnToMaterial };
  const c = data.codex;
  updatePreviewShortcuts(data);
@@ -53,7 +64,7 @@ function updateRuntime(data) {
    $("live-progress").textContent = buildLabel(c);
  }
  $("codex-status").textContent = c.status; $("activity").textContent = buildLabel(c); $("workspace").textContent = data.workspace;
- $("send").disabled = c.status !== "ready"; $("interrupt").disabled = !c.turnId;
+ $("send").disabled = c.status !== "ready" || data.rehearsalJob?.status === "creating"; $("interrupt").disabled = !c.turnId;
  $("connect-codex").disabled = c.status !== "disconnected"; $("disconnect-codex").disabled = c.status === "disconnected";
  $("blank").textContent = data.blank ? "Unblank stage" : "Blank stage";
  $("library-status").textContent = "Obsidian · " + data.libraryStatus;
@@ -121,6 +132,7 @@ $("note-detail").append(selectedTitle, content);
 const restore = document.createElement("button"); restore.id = "restore"; restore.textContent = "Restore draft"; restore.className = "quiet"; $("save").before(restore);
 setupModes();
 setupPreviewShortcuts();
+setupRehearsals();
 init().catch(e => { $("auth-error").hidden = false; notice(e.message, true); });
 
 function setupModes() {
@@ -193,4 +205,17 @@ function updatePreviewShortcuts(data) {
  $("open-preview").hidden = !urls.length;
  $("show-preview").hidden = !urls.length;
  $("back-material").hidden = !data.canReturnToMaterial || data.stage.mode !== "demo";
+}
+
+function setupRehearsals() {
+ const panel = document.createElement("section"); panel.className = "rehearsal-controls";
+ panel.innerHTML = '<span class="section-label">REHEARSAL</span><p class="small muted">Reset the lecture, or start in a fresh project folder. Previous checkouts and saved material stay intact.</p><div class="button-row"><button id="reset-lecture">Reset lecture…</button><button id="new-rehearsal">New rehearsal…</button></div><p id="rehearsal-status" role="status" class="small"></p>';
+ document.querySelector(".plot").append(panel);
+ for (const [id, question] of [
+   ["reset-lecture", "Return to the opening and discard the current unsaved lecture draft? This disconnects Codex and stops its owned process group. Project files and saved material stay intact."],
+   ["new-rehearsal", "Create a fresh numbered checkout from lecture-start-v10? Once ready, this resets the lecture and disconnects the previous Codex session. Existing checkouts and saved material are kept."]
+ ]) action(id, async () => {
+   if (!window.confirm(question)) return;
+   updateRuntime(await call(id, { confirm: true }));
+ });
 }
