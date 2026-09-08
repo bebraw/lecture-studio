@@ -13,13 +13,18 @@
 .presenting .poll-prepare{display:none}
 .presenting:not(.finding) .publish-row{display:none}
 .cue-stage-controls:empty{display:none}
+#current-stage-panel{display:none}
+.presenting:not(.finding) #current-stage-panel{display:block}
+.presenting:not(.finding) .material-column>.preview-label,.presenting:not(.finding) .material-column>#preview{display:none}
+.presenting .live-overview{grid-template-columns:1fr}
+.stage-blank-preview{background:#101c18;color:var(--paper);display:flex;align-items:center;justify-content:center}
 /* Present is a small performance surface; Prepare retains the full workbench. */
 .mode-switch{display:flex;border:1px solid var(--ink);border-radius:4px;padding:2px;gap:2px}
 .mode-switch button{border:0;background:transparent;font-size:12px;padding:7px 13px}
 .mode-switch button[aria-pressed=true]{background:var(--ink);color:var(--white)}
 .live-overview{display:none}
 #find-material,#finish-finding{display:none}
-.presenting .live-overview{display:grid;grid-template-columns:1fr 1fr;gap:50px;padding:28px 40px;border-bottom:1px solid var(--line)}
+.presenting .live-overview{display:grid;grid-template-columns:1fr;gap:24px;padding:28px 40px;border-bottom:1px solid var(--line)}
 .live-overview h2{font-size:28px;margin:12px 0}
 .live-overview p{font-size:14px;margin-bottom:0}
 #live-progress{font:12px Menlo,monospace;color:var(--muted)}

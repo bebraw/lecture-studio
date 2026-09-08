@@ -47,6 +47,9 @@ test("private selection, deliberate projection, graphic rendering and approval h
    expect(await stage.locator("h1").evaluate(el=>parseFloat(getComputedStyle(el).fontSize))).toBeGreaterThan(70);
    await desk.screenshot({path:"test-results/desk.png",fullPage:true});
    await desk.locator("#present-mode").click();
+   await expect(desk.locator("#current-stage-panel")).toBeVisible();
+   await expect(desk.locator("#preview")).toBeHidden();
+   await expect(desk.locator("#current-stage .layer")).toHaveCount(3);
    await expect(desk.locator("#use-question")).toBeVisible();
    await expect(desk.locator(".live-overview #blank")).toBeVisible();
    await expect(desk.locator("#publish")).toHaveCount(1);
@@ -62,6 +65,8 @@ test("private selection, deliberate projection, graphic rendering and approval h
    await expect(desk.locator("#preview")).toContainText("address");
    await expect(stage.locator("h1")).toHaveText(published);
    await desk.locator("#find-material").click();
+   await expect(desk.locator("#current-stage-panel")).toBeHidden();
+   await expect(desk.locator("#preview")).toBeVisible();
    await expect(desk.locator(".material-column #publish")).toBeVisible();
    await expect(desk.locator("#search")).toBeVisible();
    await desk.keyboard.press("Escape");
@@ -75,6 +80,8 @@ test("private selection, deliberate projection, graphic rendering and approval h
    await expect(stage.locator("iframe")).toHaveCount(0);
    await desk.locator("#show-preview").click();
    await expect(stage.frameLocator("iframe").locator("h1")).toHaveText("Live fixture app");
+   await expect(desk.locator("#current-stage")).toContainText("Live app is on the projected stage.");
+   await expect(desk.locator("#current-stage iframe")).toHaveCount(0);
    await expect(desk.locator("#preview")).toContainText("address");
    await expect(desk.locator("#open-preview")).toHaveAttribute("rel","noopener noreferrer");
    await desk.locator("#back-material").click();

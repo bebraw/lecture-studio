@@ -2,6 +2,7 @@ import { auth, api, escape, surface, renderDiagrams, buildLabel, previewCandidat
 const $ = id => document.getElementById(id), token = auth("desk");
 let state, files = [], note, selected, requestKey = "", modelKey = "", draftSequence = 0;
 let previewKey = "";
+let stageKey = "", stageReadPending = false;
 const call = (path, value) => api(token, path, value);
 function notice(text, error = false) { $("notice").hidden = false; $("notice").textContent = text; $("notice").classList.toggle("error", error); }
 function action(id, run) { $(id).addEventListener("click", async () => { $(id).disabled = true; try { await run(); } catch (e) { notice(e.message, true); } finally { $(id).disabled = false; if (state) updateRuntime(state); } }); }
@@ -45,6 +46,7 @@ function selectSection() {
  $("selected-note").textContent = note.title; $("selected-note").hidden = false;
 }
 function updateRuntime(data) {
+ void refreshStageView();
  if (data.poll) updatePoll(data.poll);
  if (data.resetVersion !== undefined && state.resetVersion !== data.resetVersion) {
    fields(data.draft); $("brief").value = data.brief; state = data; drawPlot(); preview(data);
@@ -61,10 +63,7 @@ function updateRuntime(data) {
  $("show-sent-brief").disabled = !data.lastBrief;
  const c = data.codex;
  updatePreviewShortcuts(data);
- if ($("live-now")) {
-   $("live-now").textContent = data.blank ? "Stage is blank" : data.stage.title;
-   $("live-progress").textContent = buildLabel(c);
- }
+ if ($("live-progress")) $("live-progress").textContent = buildLabel(c);
  $("codex-status").textContent = c.status; $("activity").textContent = buildLabel(c); $("workspace").textContent = data.workspace;
  $("send").disabled = c.status !== "ready" || data.rehearsalJob?.status === "creating"; $("interrupt").disabled = !c.turnId;
  $("connect-codex").disabled = c.status !== "disconnected"; $("disconnect-codex").disabled = c.status === "disconnected";
@@ -146,6 +145,10 @@ function setupModes() {
  const live = document.createElement("section"); live.className = "live-overview";
  live.innerHTML = '<div><span class="section-label">ON STAGE NOW</span><h2 id="live-now">Opening question</h2><p id="live-progress" role="status">Not connected</p></div><div><span class="section-label">DISCUSSION CUE · PRIVATE</span><h2 id="live-next"></h2><p id="live-question"></p><div class="button-row"><button id="previous-beat">← Previous cue</button><button id="next-beat">Next cue →</button><button id="use-question">Draft this question</button></div><p class="small muted">Browsing cues does not change the stage or start a build.</p></div>';
  document.querySelector(".desk-grid").before(live);
+ live.firstElementChild.remove();
+ const stagePanel = document.createElement("section"); stagePanel.id = "current-stage-panel";
+ stagePanel.innerHTML = '<div class="section-heading"><span class="section-label">ON STAGE</span><span id="live-progress" class="small muted"></span></div><div id="current-stage" class="preview stage-surface"></div>';
+ document.querySelector(".material-column").prepend(stagePanel);
  const stageControls = document.querySelector(".publish-row");
  const controlsHome = document.createElement("div");
  stageControls.before(controlsHome);
@@ -187,6 +190,24 @@ function setupModes() {
    notice("Question shown to the room.");
  });
  setMode(sessionStorage.getItem("lecture-studio-mode") || "present");
+}
+
+async function refreshStageView() {
+ if (stageReadPending || !$("current-stage")) return;
+ stageReadPending = true;
+ try {
+   const shown = await call("stage");
+   const key = JSON.stringify([shown.version, shown.blank]);
+   if (key !== stageKey) {
+     stageKey = key;
+     $("current-stage").classList.toggle("stage-blank-preview", shown.blank);
+     $("current-stage").innerHTML = shown.blank ? '<p>Stage is blank</p>' : shown.mode === "demo"
+       ? '<h1>' + escape(shown.title) + '</h1><p>Live app is on the projected stage.</p><p class="small">' + escape(shown.demoUrl) + '</p>'
+       : surface(shown);
+     void renderDiagrams($("current-stage"));
+   }
+ } catch { /* Keep the last stage view; the desk connection notice handles server failures. */ }
+ finally { stageReadPending = false; }
 }
 
 function setupPreviewShortcuts() {

@@ -14,6 +14,8 @@ Codex CLI **0.153.4** is confirmed working by the lecturer. This is a tested ver
 
 ## Prepare and Present
 
+Present has one **On stage** panel reflecting published content, not the private draft. Blank state, prompts, graphics and audience counts follow the projection. For a live app it shows the selected URL instead of opening a second interactive app instance. The editable **Material draft · Private** preview is shown only in Prepare or Find something.
+
 The desk opens in **Present**, remembering your choice per browser tab. Use **Prepare** for the full library, material editing, model selection, and saving/restoring drafts.
 
 Present keeps the published title, selected private discussion cue, preview, brief, and build controls visible. **Previous cue / Next cue** browse without changing the stage; **Show this question** immediately publishes the selected question in one click. No separate drafting step is needed for cues, and no coding prompt is sent. Obsidian material can still be edited and published through **Find something…**.
