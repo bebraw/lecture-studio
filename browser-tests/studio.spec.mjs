@@ -1,5 +1,25 @@
 import { test, expect } from "@playwright/test";
 import {fixture} from "../tests/fixture.mjs";
+test("publishing a question does not shift the desk when its notice appears", async ({browser}) => {
+ const {studio,address}=await fixture();
+ const context=await browser.newContext();
+ try {
+   const desk=await context.newPage();
+   for (const width of [1600, 390]) {
+     await desk.setViewportSize({width,height:1050});
+     await desk.goto(address.deskUrl);
+     await desk.locator("#present-mode").click();
+     const cue=desk.locator("#use-question");
+     await expect(cue).toBeVisible();
+     const before=await cue.evaluate(el=>el.getBoundingClientRect().top+window.scrollY);
+     await cue.click();
+     await expect(desk.locator("#notice")).toHaveText("Question shown to the room.");
+     const after=await cue.evaluate(el=>el.getBoundingClientRect().top+window.scrollY);
+     expect(after).toBe(before);
+     await expect(desk.locator("#notice")).toHaveCSS("position","fixed");
+   }
+ } finally {await context.close();await new Promise(resolve=>studio.server.close(resolve));}
+});
 test("private selection, deliberate projection, graphic rendering and approval handoff", async ({browser}) => {
  const {studio,address,bridge}=await fixture({rehearsals:{create:async()=>"/test/rehearsal-001"}});
  const context=await browser.newContext({viewport:{width:1600,height:1050}});
