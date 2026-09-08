@@ -44,10 +44,10 @@ Optional settings are documented in [.env.example](.env.example). Create your ow
 ## A ten-minute rehearsal
 
 1. Open the desk and stage side by side. Move the stage to the projected display.
-2. Connect Obsidian. Select a concept, then its **Stage block** or **Visual** section. Reading it does not project it.
+2. Open **Connections** in the header and connect Obsidian. Select a concept, then its **Stage block** or **Visual** section. Reading it does not project it. The header shows both service statuses; note exploration also connects Obsidian automatically.
 3. Use the section in the draft. Edit it, then press **Show this to the room**. Try blanking and unblanking the stage.
 4. Browse the discussion cues. This changes only the private selection. Use **Use cue’s build prompt** when you want its suggested build brief.
-5. Open **Rehearsal connection**, then **Connect Codex**. This starts the local bridge and reads the model list; it does not send a model prompt.
+5. Open **Connections**, then **Connect Codex**. This starts the local bridge and reads the model list; it does not send a model prompt. The same panel holds Codex disconnect and the rehearsal workspace. Escape or clicking outside closes it.
 6. Freestyle the opening brief with the audience. **Project brief** exposes the exact text you are discussing; **Send to Codex** separately starts implementation.
 7. Keep talking while Codex works. Approvals and agent responses appear only on the private desk. Show and discuss the result without a separate verification checkbox.
 8. When the agent has provided a preview URL, choose **Live app**, paste the URL, and publish. The wrapper does not start the app server automatically.

@@ -10,7 +10,11 @@ test("private selection, deliberate projection, graphic rendering and approval h
    await desk.locator("#prepare-mode").click();
    await expect(desk.locator("#preview h1")).toHaveText("Who is the interface for?");
    await expect(stage.locator("h1")).toHaveText("Who is the interface for?");
+   await desk.locator("#connections summary").click();
+   await expect(desk.locator("#notes-signal")).toContainText("Obsidian");
+   await expect(desk.locator("#codex-signal")).toContainText("disconnected");
    await desk.getByRole("button",{name:"Connect Obsidian",exact:true}).click();
+   await desk.locator("#connections summary").click();
    await desk.getByRole("button",{name:"Example",exact:true}).click();
    await expect(desk.locator("#note-content")).toContainText("A capability that survives.");
    await desk.getByRole("button",{name:"Use section in draft"}).click();
@@ -24,7 +28,10 @@ test("private selection, deliberate projection, graphic rendering and approval h
    await desk.locator("#mode").selectOption("diagram");await desk.locator("#diagram").selectOption("enhancement");
    await desk.locator("#body").fill("");await desk.locator("#publish").click();
    await expect(stage.locator(".layer")).toHaveCount(3);
-   await desk.locator(".connection summary").click();await desk.locator("#connect-codex").click();
+   await desk.locator("#connections summary").click();await desk.locator("#connect-codex").click();
+   await expect(desk.locator("#codex-signal")).toHaveText("Codex · ready");
+   await desk.keyboard.press("Escape");
+   await expect(desk.locator("#connect-codex")).not.toBeVisible();
    await desk.locator("#brief").fill("PRIVATE implementation brief.");
    await desk.locator("#send").click();
    await expect(desk.locator("#requests")).toContainText("private-test-command");

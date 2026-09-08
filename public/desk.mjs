@@ -62,7 +62,7 @@ function updateRuntime(data) {
    $("new-rehearsal").disabled = job.status === "creating";
    $("reset-lecture").disabled = job.status === "creating";
  }
- state = { ...state, codex: data.codex, blank: data.blank, stage: data.stage, canReturnToMaterial: data.canReturnToMaterial, lastBrief: data.lastBrief };
+ state = { ...state, libraryStatus: data.libraryStatus, workspace: data.workspace, codex: data.codex, blank: data.blank, stage: data.stage, canReturnToMaterial: data.canReturnToMaterial, lastBrief: data.lastBrief };
  $("show-sent-brief").disabled = !data.lastBrief;
  const c = data.codex;
  updatePreviewShortcuts(data);
@@ -72,6 +72,12 @@ function updateRuntime(data) {
  $("connect-codex").disabled = c.status !== "disconnected"; $("disconnect-codex").disabled = c.status === "disconnected";
  $("blank").textContent = data.blank ? "Unblank stage" : "Blank stage";
  $("library-status").textContent = "Obsidian · " + data.libraryStatus;
+ const notesReady = data.libraryStatus.startsWith("Connected");
+ $("notes-signal").textContent = "Obsidian · " + (notesReady ? "ready" : /Unavailable|failed/i.test(data.libraryStatus) ? "unavailable" : "offline");
+ $("notes-signal").dataset.state = notesReady ? "ready" : "offline";
+ $("codex-signal").textContent = "Codex · " + c.status;
+ $("codex-signal").dataset.state = c.status;
+ $("load-library").textContent = notesReady ? "Refresh lecture notes" : "Connect Obsidian";
  $("stage-status").textContent = data.blank ? "Stage is blank." : "Published: " + data.stage.title;
  const key = JSON.stringify(c.models);
  if (key !== modelKey) { modelKey = key; const value = $("model").value; $("model").innerHTML = '<option value="">Codex configured default</option>' + c.models.map(m => '<option value="' + escape(m.id) + '">' + escape(m.name) + '</option>').join(""); $("model").value = value; }
@@ -135,7 +141,34 @@ const content = document.createElement("div"); content.id = "note-content"; cont
 const selectedTitle = document.createElement("h3"); selectedTitle.id = "selected-note"; selectedTitle.hidden = true;
 $("note-detail").append(selectedTitle, content);
 const restore = document.createElement("button"); restore.id = "restore"; restore.textContent = "Restore draft"; restore.className = "quiet"; $("save").before(restore);
+setupConnections();
 setupModes();
+
+function setupConnections() {
+ const panel = document.querySelector(".connection");
+ panel.id = "connections";
+ panel.className = "connection header-connections";
+ panel.querySelector("summary").innerHTML = 'Connections <span class="connection-signals"><span id="notes-signal">Obsidian · offline</span><span id="codex-signal">Codex · disconnected</span></span>';
+ const content = document.createElement("div");
+ content.className = "connections-panel";
+ while (panel.children.length > 1) content.append(panel.children[1]);
+ const notes = document.createElement("section");
+ notes.append($("library-status"), $("load-library"));
+ const hint = document.createElement("p");
+ hint.className = "small muted";
+ hint.textContent = "Read-only lecture folder. Exploring notes also connects automatically.";
+ notes.append(hint);
+ content.prepend(notes);
+ content.insertBefore($("codex-status"), $("workspace"));
+ panel.append(content);
+ document.querySelector(".top-actions").prepend(panel);
+ document.addEventListener("click", event => {
+   if (!panel.contains(event.target)) panel.open = false;
+ });
+ document.addEventListener("keydown", event => {
+   if (event.key === "Escape" && panel.open) { panel.open = false; panel.querySelector("summary").focus(); }
+ });
+}
 setupPreviewShortcuts();
 setupRehearsals();
 setupPoll();
