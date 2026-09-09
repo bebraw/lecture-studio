@@ -284,6 +284,58 @@
 .stage-copy .syntax-tag{color:#365b78}
 .stage-copy .syntax-value{color:#526b42}
 .stage-copy .syntax-comment{color:#666}
+/* Tables and examples need the slide area more than their headings do. */
+.stage #stage-content:has(table) h1,
+.stage #stage-content:has(pre code) h1,
+.stage #stage-content:has(img) h1{
+ font-size:clamp(28px,min(3.6vw,5.5vh),60px);margin-bottom:2vh;
+}
+.stage .stage-copy:has(table){max-width:none;width:100%}
+.stage-copy table{
+ width:100%;border-collapse:collapse;table-layout:fixed;
+ text-align:left;line-height:1.35;
+}
+.stage-copy th,.stage-copy td{
+ padding:.6em .75em;vertical-align:top;border-bottom:1px solid #d8d8d8;
+ overflow-wrap:break-word;
+}
+.stage-copy th{font-weight:600;border-bottom:2px solid #777}
+.stage-copy th:first-child,.stage-copy td:first-child{padding-left:0}
+.stage-copy th:last-child,.stage-copy td:last-child{padding-right:0}
+/* Projection scale: 1920×1080 reference, shared by stage previews. */
+.stage:not(.audience){--slide-unit:min(1vw,1.7778vh);padding:3vh 4vw 2.5vh}
+.stage:not(.audience) #stage-content{justify-content:center;padding:2vh 0}
+.stage:not(.audience) #stage-content>h1{
+ font-family:var(--body-font,Arial,sans-serif);font-weight:600;
+ font-size:calc(var(--slide-unit)*3.5);line-height:1.12;letter-spacing:-.025em;
+ max-width:none;margin-bottom:3vh;
+}
+.stage:not(.audience) .stage-copy{
+ font-size:calc(var(--slide-unit)*2.15);line-height:1.35;max-width:none;
+}
+.stage:not(.audience) #stage-content:has(table)>h1,
+.stage:not(.audience) #stage-content:has(pre code)>h1,
+.stage:not(.audience) #stage-content:has(img)>h1{
+ font-size:calc(var(--slide-unit)*2.95);margin-bottom:2vh;
+}
+.stage:not(.audience) .stage-copy pre:has(code){
+ font-size:calc(var(--slide-unit)*2.05);line-height:1.3;padding:0;
+}
+.stage:not(.audience) .stage-copy:has(pre code):has(>h3){
+ display:grid;grid-template-columns:3fr 2fr;column-gap:3vw;
+}
+.stage:not(.audience) .stage-copy:has(pre code):has(>h3)>pre{grid-column:1;grid-row:1 / span 5}
+.stage:not(.audience) .stage-copy:has(pre code):has(>h3)>:not(pre){grid-column:2}
+.stage:not(.audience) .stage-copy:has(pre code):has(>h3) pre{font-size:calc(var(--slide-unit)*1.9)}
+.stage:not(.audience) .stage-copy table{font-size:calc(var(--slide-unit)*1.95)}
+.stage-copy table:has(th:nth-child(3)) th:first-child{width:25%}
+.stage-copy table:not(:has(th:nth-child(3))) th:first-child{width:32%}
+.stage:not(.audience) .stage-copy img{display:block;margin:auto;max-height:65vh;max-width:100%;object-fit:contain}
+.stage:not(.audience) #source-credit{font-size:calc(var(--slide-unit)*1.25);line-height:1.25}
+.stage:not(.audience) #student-link{font-size:calc(var(--slide-unit)*1.4)}
+.stage:not(.audience) #build-signal{font-size:calc(var(--slide-unit)*.9)}
+.stage:not(.audience) .stage-copy:has(>ul):not(:has(pre)){font-size:calc(var(--slide-unit)*1.85)}
+.stage:not(.audience) .stage-copy li{margin-bottom:.4em}
 #feedback-error{color:#a21b16}
 .word-cloud{display:flex;flex-wrap:wrap;justify-content:center;align-items:center;gap:12px 24px}
 .word-cloud>span{line-height:1.2;overflow-wrap:anywhere}
