@@ -73,7 +73,7 @@ function updateRuntime(data) {
  const c = data.codex;
  updateBuildSlide?.(c);
  updatePreviewShortcuts(data);
- if ($("live-progress")) $("live-progress").textContent = buildLabel(c);
+ if ($("live-progress")) $("live-progress").textContent = c.startedAt ? buildLabel(c) : "";
  $("codex-status").textContent = c.status; $("activity").textContent = buildLabel(c); $("workspace").textContent = data.workspace;
  $("send").disabled = c.status !== "ready" || data.rehearsalJob?.status === "creating"; $("interrupt").disabled = !c.turnId;
  $("connect-codex").disabled = c.status !== "disconnected"; $("disconnect-codex").disabled = c.status === "disconnected";
