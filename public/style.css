@@ -334,6 +334,13 @@
 .stage:not(.audience) #source-credit{font-size:calc(var(--slide-unit)*1.25);line-height:1.25}
 .stage:not(.audience) #student-link{font-size:calc(var(--slide-unit)*1.4)}
 .stage:not(.audience) #build-signal{font-size:calc(var(--slide-unit)*.9)}
+.stage:not(.audience)>.stage-bottom:has(#slide-number){grid-template-columns:auto minmax(0,1fr) auto auto}
+#slide-number{font:500 calc(var(--slide-unit)*1.25)/1.2 var(--body-font);white-space:nowrap}
+#slide-progress{position:fixed;bottom:0;left:0;width:100%;height:3px;border:0;appearance:none;background:#eee}
+#slide-progress::-webkit-progress-bar{background:#eee}
+#slide-progress::-webkit-progress-value{background:#737373}
+#slide-progress::-moz-progress-bar{background:#737373}
+.stage.blank #slide-progress{visibility:hidden}
 .stage:not(.audience) .stage-copy:has(>ul):not(:has(pre)){font-size:calc(var(--slide-unit)*1.85)}
 .stage:not(.audience) .stage-copy li{margin-bottom:.4em}
 #feedback-error{color:#a21b16}

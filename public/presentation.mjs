@@ -164,7 +164,8 @@ export function mountPresentations({call,update}){
    const addStep=(s,parent,target,label=s.title)=>{
      const b=document.createElement("button");b.className="outline-step";b.dataset.stepId=s.id;b.setAttribute("aria-current",s.id===p.current?"step":"false");
      if(parent){b.classList.add("outline-related");b.dataset.relatedTo=parent;b.title="Related slide";}
-     b.textContent=label;b.setAttribute("aria-label",s.title+(parent?" — related slide":""));
+     const number=p.outline.findIndex(item=>item.id===s.id)+1;
+     b.textContent=number+". "+label;b.setAttribute("aria-label","Slide "+number+": "+s.title+(parent?" — related slide":""));
      b.onclick=()=>selectSlide(s.id,parent);target.append(b);
    };
    for(const s of p.outline.filter(s=>!detours.has(s.id))){
