@@ -26,7 +26,7 @@ export function mountPresentations({call,update}){
  $("open-stage").title="Open projected stage";
  $("open-stage").setAttribute("aria-label","Open projected stage");
  const details=document.createElement("details");details.id="presentation-details";
- const summary=document.createElement("summary");summary.textContent="Notes & output";details.append(summary);
+ const summary=document.createElement("summary");summary.textContent="Notes";details.append(summary);
  const notes=document.createElement("section");notes.id="presentation-detail-content";
  details.append(notes);panel.append(outline,details);
  notes.append($("graph-notes"),$("graph-prompt"));
@@ -34,7 +34,9 @@ export function mountPresentations({call,update}){
  const codexControls=document.createElement("div");codexControls.id="codex-controls";
  codexControls.append(modelLabel,$("activity"),$("interrupt"));
  document.querySelector(".connections-panel").append(codexControls);
- notes.append($("requests"),$("messages"),$("preview-shortcuts"),$("back-material"));
+ notes.append($("requests"));
+ const output=document.createElement("details");output.id="build-output";
+ const outputSummary=document.createElement("summary");outputSummary.textContent="Build output";output.append(outputSummary,$("messages"),$("preview-shortcuts"),$("back-material"));notes.append(output);
  const stagePanel=$("current-stage-panel");$("graph-detours").before(stagePanel);
  $("graph-next").parentElement.append($("live-progress"));
  stagePanel.querySelector(".section-heading").remove();
@@ -49,7 +51,7 @@ export function mountPresentations({call,update}){
  name.onclick=()=>{if(data?.presentation&&document.body.classList.contains("presenting"))return;setup.hidden=!setup.hidden;name.setAttribute("aria-expanded",String(!setup.hidden));};
  picker.addEventListener("keydown",event=>{if(event.key==="Escape"){closePicker();name.focus();event.stopPropagation();}});
  document.addEventListener("click",event=>{if(!picker.contains(event.target))closePicker();});
- const setDetailsMode=()=>{details.open=false;};
+ const setDetailsMode=()=>{details.open=true;};
  $("prepare-mode").addEventListener("click",setDetailsMode);
  $("present-mode").addEventListener("click",()=>{closePicker();name.disabled=true;setDetailsMode();if(data?.presentation)void run("show");});
  $("prepare-mode").addEventListener("click",()=>{name.disabled=false;});

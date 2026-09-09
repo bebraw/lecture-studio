@@ -89,7 +89,9 @@ test("Obsidian snapshot loads privately and detours return without changing the 
    await expect(desk.locator("#current-stage h1")).toHaveCSS("font-size",prepareHeadingSize);
    await expect(desk.locator(".builder")).toBeHidden();
    await expect(desk.locator(".material-column")).toBeHidden();
-   await expect(desk.locator("#presentation-details")).not.toHaveAttribute("open","");
+   await expect(desk.locator("#presentation-details")).toHaveAttribute("open","");
+   await expect(desk.locator("#presentation-details>summary")).toHaveText("Notes");
+   await expect(desk.locator("#build-output")).not.toHaveAttribute("open","");
    await expect(desk.locator("#graph-presentation #current-stage")).toBeVisible();
    await expect(stage.locator("h1")).toHaveText("Snapshot title");
    await expect(stage.locator("h1")).toHaveCSS("font-family","Verdana, sans-serif");
