@@ -148,6 +148,23 @@ async function init() {
  action("interrupt", async () => updateRuntime(await call("codex/interrupt", {})));
  async function poll() { try { updateRuntime(await call("desk")); } catch (e) { notice("Desk connection lost. Stage holds its last view. " + e.message, true); } finally { setTimeout(poll, 1200); } }
  setTimeout(poll, 1200);
+ // One attempt per authorized page load, never from the polling loop.
+ // Connecting does not load a presentation, publish, or submit a build.
+ void autoConnect();
+}
+async function autoConnect() {
+ const attempts = [
+   ["Obsidian", async () => { files = (await call("library")).files; listNotes(); }],
+   ["Codex", async () => {
+     if (state.codex.status === "disconnected") await call("codex/connect", {});
+   }]
+ ];
+ const results = await Promise.allSettled(attempts.map(([, connect]) => connect()));
+ try { updateRuntime(await call("desk")); } catch { return; }
+ const failures = results.flatMap((result, i) =>
+   result.status === "rejected" && !(i === 1 && state.codex.status !== "disconnected")
+     ? [attempts[i][0] + ": " + result.reason.message] : []);
+ if (failures.length) notice("Automatic connection unavailable. Retry in Connections. " + failures.join(" · "), true);
 }
 const content = document.createElement("div"); content.id = "note-content"; content.className = "note-content";
 const selectedTitle = document.createElement("h3"); selectedTitle.id = "selected-note"; selectedTitle.hidden = true;
@@ -168,7 +185,7 @@ function setupConnections() {
  notes.append($("library-status"), $("load-library"));
  const hint = document.createElement("p");
  hint.className = "small muted";
- hint.textContent = "Read-only lecture folder. Exploring notes also connects automatically.";
+ hint.textContent = "Connects automatically when this desk opens. Read-only lecture folder; coding starts only when you send a prompt.";
  notes.append(hint);
  content.prepend(notes);
  content.insertBefore($("codex-status"), $("workspace"));
