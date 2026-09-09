@@ -1,4 +1,4 @@
-import { auth, api, surface, renderDiagrams, buildLabel } from "./shared.mjs";
+import { auth, api, surface, renderDiagrams, buildLabel, applyTheme } from "./shared.mjs";
 const token = auth("stage"); let version = -1;
 async function poll() {
  try {
@@ -6,6 +6,7 @@ async function poll() {
    document.body.classList.toggle("blank", state.blank);
    if (state.version !== version) {
      version = state.version;
+     applyTheme(document.body,state.theme);
      document.querySelector("#stage-content").innerHTML = surface(state);
      document.querySelector("#stage-content").dataset.mode = state.mode;
      document.querySelector("#era").textContent = state.act.replaceAll("-", " ").toUpperCase();

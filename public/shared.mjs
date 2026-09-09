@@ -1,3 +1,8 @@
+export function applyTheme(element,theme={}){
+ for(const [key,variable] of Object.entries({background:"paper",text:"ink",muted:"muted",accent:"accent",headingFont:"heading-font",bodyFont:"body-font",codeFont:"code-font"})){
+   if(theme[key])element.style.setProperty("--"+variable,theme[key]);else element.style.removeProperty("--"+variable);
+ }
+}
 export function previewCandidates(messages, ownOrigin) {
  const own = new URL(ownOrigin), found = new Set();
  for (const message of messages || []) {
@@ -52,7 +57,8 @@ export async function renderDiagrams(container) {
  if (!blocks.length) return;
  try {
    mermaid ??= (await import("/vendor/mermaid/mermaid.esm.min.mjs")).default;
-   mermaid.initialize({ startOnLoad: false, securityLevel: "strict", theme: "neutral", suppressErrorRendering: true, flowchart: { htmlLabels: false }, maxTextSize: 16000 });
+   const style=getComputedStyle(container),color=name=>style.getPropertyValue("--"+name).trim();
+   mermaid.initialize({ startOnLoad: false, securityLevel: "strict", theme: "base", themeVariables:{background:color("paper"),primaryColor:color("paper"),primaryTextColor:color("ink"),primaryBorderColor:color("muted"),lineColor:color("muted"),secondaryColor:color("accent"),tertiaryColor:color("paper"),fontFamily:color("body-font")}, suppressErrorRendering: true, flowchart: { htmlLabels: false }, maxTextSize: 16000 });
    for (const block of blocks) {
      const text = block.textContent;
      const parent = block.closest("pre");
