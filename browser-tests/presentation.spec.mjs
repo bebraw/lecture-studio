@@ -3,9 +3,10 @@ import {fixture} from "../tests/fixture.mjs";
 test("Obsidian snapshot loads privately and detours return without changing the definition",async({browser})=>{
  const path="Lectures/Web Development 2026/Presentations/Test.md";
  const definition={version:1,title:"Independent presentation",start:"title",steps:[{id:"title",type:"title",title:"Snapshot title",next:"question"},{id:"question",type:"question",title:"Audience question",related:["aside"]},{id:"aside",type:"material",title:"Definition detour",body:"A useful definition.",notes:"PRIVATE FACILITATION"}]};
- definition.theme={headingFont:"Verdana, sans-serif",muted:"#555555"};
- const library={status:"Fixture",list:async()=>[{path,label:"Test"}],read:async()=>({sections:[{heading:"Presentation",body:"```json\n"+JSON.stringify(definition)+"\n```"}]}),close:async()=>{}};
- const {studio,address}=await fixture({library});const context=await browser.newContext();
+ // Projection titles now share the body font; exercise that theme override too.
+ definition.theme={headingFont:"Verdana, sans-serif",bodyFont:"Verdana, sans-serif",muted:"#555555"};
+ const library={status:"Disconnected",async list(){this.status="Connected · fixture";return [{path,label:"Test"}];},read:async()=>({sections:[{heading:"Presentation",body:"```json\n"+JSON.stringify(definition)+"\n```"}]}),close:async()=>{}};
+ const {studio,address,bridge}=await fixture({library});const context=await browser.newContext();
  try{
    const desk=await context.newPage(),stage=await context.newPage();await desk.goto(address.deskUrl);await stage.goto(address.stageUrl);
    await expect(desk.locator(".builder")).toBeHidden();
@@ -22,7 +23,11 @@ test("Obsidian snapshot loads privately and detours return without changing the 
    await expect(desk.locator("body")).not.toContainText("Load an Obsidian presentation to see");
    await expect(desk.locator("#presentation-setup")).toBeHidden();
    await desk.locator("#presentation-name").click();
-   await desk.locator("#presentations-list").click();await desk.locator("#presentation-load").click();
+   await expect(desk.locator("#presentation-choice option")).toHaveText(["Test"]);
+   await expect(desk.locator("#codex-signal")).toHaveAttribute("aria-label","Codex: ready");
+   expect(bridge.lastPrompt).toBeUndefined();
+   await expect(desk.locator("#graph-presentation")).toBeHidden();
+   await desk.locator("#presentation-load").click();
    await expect(desk.locator("#presentation-setup")).toBeHidden();
    await expect(desk.locator("#live-toggle")).toHaveAttribute("aria-pressed","false");
    await expect(desk.locator("#session-menu")).toHaveCount(0);
@@ -42,7 +47,7 @@ test("Obsidian snapshot loads privately and detours return without changing the 
    });
    expect(rhythm.top).toBe(12);
    expect(rhythm.controls).toBe(8);
-   await expect(desk.locator("#codex-signal")).toHaveAttribute("aria-label","Codex: disconnected");
+   await expect(desk.locator("#codex-signal")).toHaveAttribute("aria-label","Codex: ready");
    await desk.locator("#presentation-outline").evaluate(el=>{el.style.maxHeight="45px";});
    const pagePosition=await desk.evaluate(()=>window.scrollY);
    const previewPosition=await desk.locator("#current-stage").boundingBox();
@@ -69,7 +74,7 @@ test("Obsidian snapshot loads privately and detours return without changing the 
    await expect(desk.locator("#current-stage h1")).toHaveText("Snapshot title");
    expect((await desk.locator(".topbar").boundingBox()).height).toBeLessThanOrEqual(60);
    await expect(desk.locator("#presentation-outline")).not.toContainText("Optional detours");
-   await expect(desk.locator('.outline-related[data-related-to="question"]')).toHaveText("Definition detour");
+   await expect(desk.locator('.outline-related[data-related-to="question"]')).toHaveText("3. Definition detour");
    await expect(desk.locator('.outline-related[data-related-to="question"]')).toBeHidden();
    await expect(desk.locator(".plot")).toBeHidden();
    const width=await desk.locator("#presentation-outline").evaluate(el=>el.getBoundingClientRect().width);
