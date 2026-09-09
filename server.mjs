@@ -9,6 +9,7 @@ import { ObsidianLibrary } from "./lib/obsidian.mjs";
 import { CodexBridge } from "./lib/codex.mjs";
 import { Rehearsals } from "./lib/rehearsals.mjs";
 import { AudiencePoll } from "./lib/audience-poll.mjs";
+import { AudienceStageSync } from "./lib/audience-stage.mjs";
 import { LectureSearch } from "./lib/lecture-search.mjs";
 import {parsePresentation,PresentationSession} from "./lib/presentation.mjs";
 
@@ -34,12 +35,13 @@ async function readJson(request) {
 export function createStudio({ library = new ObsidianLibrary(), bridge = new CodexBridge(), poll = new AudiencePoll(), workspace = resolve(root, "../webdev-rehearsal-studio"), rehearsals = new Rehearsals(resolve(root, ".local/rehearsals")), port = 4317, host = "127.0.0.1", persist = true } = {}) {
  const deskToken = randomBytes(32).toString("hex"), stageToken = randomBytes(32).toString("hex");
  const lectureSearch = new LectureSearch(library);
+ const audienceSync = new AudienceStageSync(poll);
  let origin, draft = initialDraft(), publishedDraft = initialDraft(), version = 1, blank = false, brief = acts[0].brief;
  let stage = publicStage(publishedDraft, version), lastBrief = "";
  let activeAct = "opening", libraryFiles = [], savedAt = null;
  let previousMaterial = null;
  let rehearsalJob = { status: "idle" }, resetVersion = 0;
- let pollOnStage = false;
+ let pollOnStage = false, projectedPoll=null, pollResults=false;
  let presentation=null, graphPoll=null, graphBusy=false;
  const graphPolls=new Map();
  const showGraph=()=>{
@@ -49,7 +51,7 @@ export function createStudio({ library = new ObsidianLibrary(), bridge = new Cod
        const p=new AudiencePoll({origin:poll.origin,token:poll.token,room:s.room,fetcher:poll.fetcher});
        p.configure(s.poll);graphPolls.set(s.id,p);
      }
-     graphPoll=graphPolls.get(s.id);pollOnStage=true;
+     graphPoll=graphPolls.get(s.id);projectedPoll=graphPoll;pollOnStage=true;pollResults=false;
    }else{graphPoll=null;pollOnStage=false;}
    draft=validateDraft({...initialDraft(),mode:s.type==="build"?"brief":s.type==="question"?"question":"material",title:s.title,body:s.type==="build"?presentation.resolve().prompt:s.body||"",source:s.source||""});
    publishedDraft={...draft};stage={...publicStage(draft,++version),theme:presentation.definition.theme};blank=false;
@@ -63,14 +65,16 @@ export function createStudio({ library = new ObsidianLibrary(), bridge = new Cod
    blank = false; brief = acts[0].brief; lastBrief = ""; activeAct = "opening"; previousMaterial = null; resetVersion++;
  };
  const json = (res, value, status = 200) => { res.writeHead(status, { "content-type": "application/json" }); res.end(JSON.stringify(value)); };
- const deskState = () => ({ presentation:presentation?.state()||null, graphPoll:graphPoll?.state()||null, acts, scope, draft, draftPreview: publicStage(draft, version), stage: pollOnStage ? { ...stage, title: (graphPoll||poll).config.question, mode: "poll" } : stage, blank, canReturnToMaterial: !!previousMaterial, activeAct, brief, lastBrief, codex: bridge.snapshot(), libraryStatus: library.status, workspace, savedAt, rehearsalJob, resetVersion, poll: poll.state() });
+ const deskState = () => ({ audienceSync:{error:audienceSync.error}, presentation:presentation?.state()||null, graphPoll:graphPoll?.state()||null, acts, scope, draft, draftPreview: publicStage(draft, version), stage: pollOnStage ? { ...stage, title: (projectedPoll||poll).config.question, mode: "poll" } : stage, blank, canReturnToMaterial: !!previousMaterial, activeAct, brief, lastBrief, codex: bridge.snapshot(), libraryStatus: library.status, workspace, savedAt, rehearsalJob, resetVersion, poll: poll.state() });
  const publicState = () => {
    const c = bridge.state;
-   const p = (graphPoll||poll).state(), counts = p.frozen || p.snapshot;
-   const projected = pollOnStage ? publicStage({ ...initialDraft(), mode: "material", title: p.config.question, body: (p.pollId==="friction"?"Take at least two minutes to discuss with a neighbour. Choose one example to share.\n\n":"") + p.config.options.map(o => o.label + ": " + (counts?.choices.find(c=>c.id===o.id)?.votes || 0)).join("\n\n") + "\n\n" + (p.frozen ? "Selected: " + p.frozen.winner.label + " — " + p.frozen.reason : (p.configured ? "Join: " + p.joinUrl : "Audience room is not configured. Discuss the choices together.")), source: p.frozen ? "Voting closed · frozen revision " + p.frozen.revision : "Audience vote · " + (p.error ? "connection issue; showing last counts" : counts?.status || "not opened") }, String(version) + "-poll-" + (counts?.revision || 0) + "-" + !!p.frozen + "-" + p.error) : stage;
+   const p = (projectedPoll||poll).state(), counts = p.frozen || p.snapshot;
+   const projected = pollOnStage ? publicStage({ ...initialDraft(), mode: "material", title: p.config.question, body: p.config.options.map(o => o.label + (pollResults ? ": " + (counts?.choices.find(c=>c.id===o.id)?.votes || 0) : "")).join("\n\n") + "\n\n" + (pollResults && p.frozen ? "Selected: " + p.frozen.winner.label + " — " + p.frozen.reason : (p.configured ? "Join: " + p.joinUrl : "Audience room is not configured. Discuss the choices together.")), source: p.frozen ? "Voting closed" : "Audience vote" }, String(version) + "-poll-" + (counts?.revision || 0) + "-" + !!p.frozen + "-" + pollResults) : stage;
    const activity = ["Running a command", "Editing files", "Using a tool", "Looking up a source", "Responding", "Working"].includes(c.activity) ? c.activity : "Working";
    return { ...projected, theme:stage.theme, blank, build: { activity, status: c.status, outcome: ["completed", "failed", "interrupted"].includes(c.outcome) ? c.outcome : null, startedAt: c.startedAt || null, finishedAt: c.finishedAt || null } };
  };
+ const broadcastTimer=setInterval(()=>{if(version>1)audienceSync.publish(publicState());},1000);
+ broadcastTimer.unref();
  const server = createServer(async (req, res) => {
    res.setHeader("cache-control", "no-store");
    res.setHeader("referrer-policy", "no-referrer");
@@ -117,7 +121,7 @@ export function createStudio({ library = new ObsidianLibrary(), bridge = new Cod
                if(!files.some(f=>f.path===body.path))throw new Error("Select a presentation from the lecture folder");
                next=new PresentationSession(parsePresentation(await library.read(body.path)),body.path);
              }
-             presentation=next;graphPoll=null;graphPolls.clear();pollOnStage=false;
+             presentation=next;graphPoll=null;graphPolls.clear();
              // Loading is private: the existing projection stays until navigation.
            }else{
              if(!presentation)throw new Error("Load a presentation first");
@@ -130,8 +134,15 @@ export function createStudio({ library = new ObsidianLibrary(), bridge = new Cod
                presentation.defaults.add(presentation.current);showGraph();
              }else if(op==="poll-open"||op==="poll-close"||op==="poll-refresh"){
                if(presentation.step().type!=="poll")throw new Error("Choose a poll step");
-               showGraph();await graphPoll.act(op==="poll-open"?"open":op==="poll-close"?"lock":"refresh");
+               const s=presentation.step();
+               if(!graphPolls.has(s.id)){const p=new AudiencePoll({origin:poll.origin,token:poll.token,room:s.room,fetcher:poll.fetcher});p.configure(s.poll);graphPolls.set(s.id,p);}
+               graphPoll=graphPolls.get(s.id);
+               if(op==="poll-open"&&[...graphPolls.values(),poll].some(p=>p!==graphPoll&&p.snapshot?.status==="open"))throw new Error("Close the current vote first");
+               await graphPoll.act(op==="poll-open"?"open":op==="poll-close"?"lock":"refresh");
                if(graphPoll.frozen)presentation.decisions[presentation.current]=structuredClone(graphPoll.frozen);
+             }else if(op==="poll-question"||op==="poll-results"){
+               if(presentation.step().type!=="poll")throw new Error("Choose a poll step");
+               showGraph();pollResults=op==="poll-results";
              }else if(op==="build"){
                if(presentation.step().type!=="build")throw new Error("Choose a build step");
                const resolved=presentation.resolve();
@@ -251,7 +262,7 @@ export function createStudio({ library = new ObsidianLibrary(), bridge = new Cod
      json(res, { error: String(error.message || "Request failed").slice(0, 2000) }, 400);
    }
  });
- server.on("close", () => { bridge.close(); void library.close(); });
+ server.on("close", () => { clearInterval(broadcastTimer);audienceSync.close();bridge.close(); void library.close(); });
  return { server, bridge, library, async start() {
    if (persist) workspace = await rehearsals.current(workspace);
    await new Promise((resolve, reject) => { server.once("error", reject); server.listen(port, host, resolve); });

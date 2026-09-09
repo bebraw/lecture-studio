@@ -3,6 +3,7 @@ import type { RoomSnapshot } from "./room-state";
 export interface RoomViewModel {
   roomId: string;
   snapshot: RoomSnapshot;
+  hideResults?: boolean;
 }
 
 export function renderRoomDocument(view: RoomViewModel): string {
@@ -24,7 +25,7 @@ export function renderRoomDocument(view: RoomViewModel): string {
 </html>`;
 }
 
-export function renderRoomFragment({ roomId, snapshot }: RoomViewModel): string {
+export function renderRoomFragment({ roomId, snapshot, hideResults=false }: RoomViewModel): string {
   const action = `/rooms/${encodeURIComponent(roomId)}`;
   const sectionAttributes = `data-room-revision="${snapshot.revision}" data-room-status="${snapshot.status}"`;
 
@@ -40,7 +41,7 @@ export function renderRoomFragment({ roomId, snapshot }: RoomViewModel): string 
   <input id="room-choice-${index}" name="choice" type="radio" value="${escapeHtml(choice.id)}" required${
     snapshot.currentSelection === choice.id ? " checked" : ""
   }>
-  <label for="room-choice-${index}">${escapeHtml(choice.label)} — ${choice.votes}</label>
+  <label for="room-choice-${index}">${escapeHtml(choice.label)}${hideResults?"":" — "+choice.votes}</label>
 </div>`,
     )
     .join("\n");
@@ -50,7 +51,7 @@ export function renderRoomFragment({ roomId, snapshot }: RoomViewModel): string 
   const disabled = snapshot.status === "locked" ? " disabled" : "";
 
   return `<section id="room-results" data-progressive-fragment ${sectionAttributes} tabindex="-1" aria-live="polite">
-  <p>${snapshot.totalVotes} total votes</p>
+  ${hideResults?"":"<p>"+snapshot.totalVotes+" total votes</p>"}
   ${lockedMessage}
   <form action="${action}" method="post" data-progressive-form data-progressive-target="#room-results">
     <fieldset${disabled}>

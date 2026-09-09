@@ -1,6 +1,7 @@
 import {handleRoomRequest,readRoomSnapshot} from "./room-http";
 import {renderRoomFragment} from "./room-view";
 export {RoomState} from "./room-state";
+export {StageState} from "./stage-state";
 
 const rooms:Record<string,{question:string;choices:{id:string;label:string}[]}>={
  "webdev-2026-friction":{question:"What feels unnecessarily difficult on the web?",choices:[{id:"finding",label:"Finding information"},{id:"repeating",label:"Repeating information"},{id:"navigation",label:"Navigating interfaces"},{id:"trust",label:"Knowing what to trust"}]},
@@ -20,8 +21,37 @@ async function authorized(request:Request,secret:string){
 export default {
  async fetch(request:Request,env:Env):Promise<Response>{
    const url=new URL(request.url);
-   if(url.pathname==="/style.css"&&request.method==="GET")return new Response(css,{headers:{"content-type":"text/css","x-content-type-options":"nosniff"}});
-   if(url.pathname==="/"&&request.method==="GET")return html("Lecture audience",'<p>Choose the poll your lecturer has opened.</p><ul>'+Object.entries(rooms).map(([id,room])=>'<li><a href="/rooms/'+id+'">'+room.question+'</a></li>').join("")+"</ul>");
+   if(url.pathname==="/presenter/stage"){
+     if(request.method!=="POST")return new Response("Method not allowed",{status:405});
+     if(!await authorized(request,env.PRESENTER_TOKEN))return new Response("Unauthorized",{status:401});
+     let bytes=0;const chunks:Uint8Array[]=[];
+     if(!request.body)return new Response("Expected stage",{status:400});
+     const reader=request.body.getReader();
+     while(true){const {done,value}=await reader.read();if(done)break;bytes+=value.length;if(bytes>100000){await reader.cancel();return new Response("Too large",{status:413});}chunks.push(value);}
+     try{
+       const buffer=new Uint8Array(bytes);let offset=0;for(const chunk of chunks){buffer.set(chunk,offset);offset+=chunk.length;}
+       const input=JSON.parse(new TextDecoder().decode(buffer));
+       if(!input||typeof input.title!=="string"||typeof input.html!=="string")throw new Error();
+       const stage:Record<string,unknown>={};
+       for(const key of ["act","mode","title","html","source","diagram","demoUrl","version","theme","blank","build"])if(input[key]!==undefined)stage[key]=input[key];
+       await env.STAGE_STATE.getByName("lecture").publish(stage);
+       return Response.json({ok:true});
+     }catch{return new Response("Invalid stage",{status:400});}
+   }
+   if(url.pathname==="/api/audience"&&request.method==="GET"){
+     const stage=await env.STAGE_STATE.getByName("lecture").read();
+     const snapshots=await Promise.all(Object.keys(rooms).map(async id=>({id,snapshot:await readRoomSnapshot(request,env,id)})));
+     const active=snapshots.find(item=>item.snapshot.status==="open");
+     return Response.json({stage,poll:active?{id:active.id,question:rooms[active.id].question,html:renderRoomFragment({roomId:active.id,snapshot:active.snapshot,hideResults:true})}:null},{headers:{"cache-control":"no-store","x-content-type-options":"nosniff"}});
+   }
+   if(request.method==="GET"&&(url.pathname==="/"||["/style.css","/audience.css","/audience.mjs","/shared.mjs"].includes(url.pathname)||url.pathname.startsWith("/vendor/mermaid/"))){
+     const asset=await env.ASSETS.fetch(request);
+     const response=new Response(asset.body,asset);
+     response.headers.set("content-security-policy","default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' https: data:; frame-src https:; object-src 'none'; base-uri 'none'; frame-ancestors 'none'; form-action 'self'");
+     response.headers.set("referrer-policy","same-origin");
+     response.headers.set("x-content-type-options","nosniff");
+     return response;
+   }
    const match=/^\/(rooms|api\/rooms|presenter\/rooms)\/([a-z0-9-]+)(?:\/(seed|open|lock))?$/.exec(url.pathname);
    if(!match||!Object.hasOwn(rooms,match[2]))return new Response("Not found",{status:404});
    const [,kind,id,operation]=match,definition=rooms[id];
@@ -30,6 +60,10 @@ export default {
      if(request.method!=="POST")return new Response("Method not allowed",{status:405});
      if(!await authorized(request,env.PRESENTER_TOKEN))return new Response("Unauthorized",{status:401});
      if(!operation)return new Response("Not found",{status:404});
+     if(operation==="open"){
+       const others=await Promise.all(Object.keys(rooms).filter(key=>key!==id).map(key=>env.ROOM_STATE.getByName(key).getSnapshot()));
+       if(others.some(snapshot=>snapshot.status==="open"))return new Response("Close the current vote first",{status:409});
+     }
      if(operation==="seed"){
        // Only initialize an empty room. Repeated setup never resets existing votes.
        await room.initializeChoices(definition.choices);
@@ -40,7 +74,9 @@ export default {
        const snapshot=await readRoomSnapshot(request,env,id);
        return html(definition.question,renderRoomFragment({roomId:id,snapshot})+'<p><a href="/">All polls</a> · <a href="/rooms/'+id+'">Refresh results</a></p><p>Your browser remembers your vote. Changing your choice replaces it.</p>');
      }
-     return await handleRoomRequest(request,env,{voterCookieMaxAgeSeconds:14400})||new Response("Not found",{status:404});
+     const response=await handleRoomRequest(request,env,{voterCookieMaxAgeSeconds:14400});
+     if(response?.status===303){const next=new Response(response.body,response);next.headers.set("location","/");return next;}
+     return response||new Response("Not found",{status:404});
    }else if(request.method!=="GET")return new Response("Method not allowed",{status:405});
    const snapshot=await room.getSnapshot();
    return Response.json({choices:snapshot.choices,status:snapshot.status,revision:snapshot.revision,totalVotes:snapshot.totalVotes},{headers:{"cache-control":"no-store","x-content-type-options":"nosniff"}});

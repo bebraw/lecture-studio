@@ -132,12 +132,18 @@ export function mountPresentations({call,update}){
    finally{$("presentations-list").disabled=false;}
  };
  $("presentation-load").onclick=async()=>{if(await run("load",{path:$("presentation-choice").value})){closePicker();name.focus({preventScroll:true});}};
+ for(const [id,label,op] of [["question","Project question","poll-question"],["results","Project results","poll-results"]]){
+   const button=document.createElement("button");button.id="graph-"+id;button.textContent=label;
+   $("graph-close").after(button);button.onclick=()=>run(op);
+ }
+ const syncNotice=document.createElement("span");syncNotice.role="status";syncNotice.className="small muted";$("graph-status").after(syncNotice);
  for(const [id,op] of [["previous","previous"],["return","return"],["defaults","defaults"],["open","poll-open"],["close","poll-close"]])$("graph-"+id).onclick=()=>run(op);
  $("graph-next").onclick=()=>navigate("next");
  $("graph-previous").onclick=()=>navigate("previous");
  $("graph-build").onclick=()=>run("build",{model:$("model").value});
  return value=>{
-   data=value;const p=data.presentation;
+   data=value;const p=data.presentation;syncNotice.textContent=data.audienceSync?.error||"";
+   for(const id of ["question","results"])$("graph-"+id).hidden=p?.step.type!=="poll";
    liveToggle.disabled=!p;syncLive();
    document.body.classList.toggle("using-presentation",!!p);panel.hidden=!p;
    name.textContent=p?.title||"Choose presentation";

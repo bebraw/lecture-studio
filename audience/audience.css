@@ -1,0 +1,12 @@
+.audience{height:auto;min-height:100dvh;overflow:auto}
+.audience .stage-surface{min-width:0}
+.audience .stage-bottom{position:static}
+.audience fieldset{border:0;padding:0;margin:1rem 0}
+.audience fieldset div{position:relative;margin:.5rem 0}
+.audience label{display:block;padding:.7rem .7rem .7rem 2.2rem;border:1px solid var(--muted);cursor:pointer;font-size:1.1rem;font-weight:400}
+.audience input[type=radio]{position:absolute;top:50%;left:.65rem;transform:translateY(-50%);width:auto;margin:0}
+.audience input:focus-visible+label{outline:2px solid var(--ink);outline-offset:2px}
+.audience #build-signal:empty{display:none}
+.audience button{font:inherit;padding:.6rem 1.2rem}
+.audience [data-mode=poll]{max-width:48rem;width:100%;margin:auto}
+@media(max-width:600px){.audience .stage-surface{padding:20px}.audience .stage-surface h1{font-size:2rem}.audience .stage-copy{font-size:1.1rem}.audience .stage-top,.audience .stage-bottom{padding:12px 20px}.audience .diagram{overflow:auto}.audience .stage-surface iframe{height:60vh}}
