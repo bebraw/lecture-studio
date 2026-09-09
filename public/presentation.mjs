@@ -25,6 +25,8 @@ export function mountPresentations({call,update}){
  const modelLabel=$("model").closest("label");notes.append(modelLabel);
  notes.append($("activity"),$("interrupt"),$("requests"),$("messages"),$("preview-shortcuts"),$("back-material"));
  const stagePanel=$("current-stage-panel");$("graph-detours").before(stagePanel);
+ $("graph-next").parentElement.append($("live-progress"));
+ stagePanel.querySelector(".section-heading").remove();
  $("graph-detours").remove();
  const picker=document.createElement("div");picker.id="presentation-picker";
  const name=document.createElement("button");name.id="presentation-name";name.setAttribute("aria-expanded","false");name.setAttribute("aria-controls","presentation-setup");

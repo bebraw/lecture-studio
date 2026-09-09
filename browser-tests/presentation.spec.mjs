@@ -27,7 +27,14 @@ test("Obsidian snapshot loads privately and detours return without changing the 
    await expect(desk.locator("#current-stage h1")).toHaveText("Snapshot title");
    await expect(desk.locator("#current-stage")).toHaveCSS("background-color","rgb(255, 255, 255)");
    const prepareHeadingSize=await desk.locator("#current-stage h1").evaluate(el=>getComputedStyle(el).fontSize);
-   await expect(desk.locator("#current-stage-panel #live-progress")).toBeEmpty();
+   await expect(desk.locator("#graph-presentation>.button-row #live-progress")).toBeEmpty();
+   const rhythm=await desk.evaluate(()=>{
+     const box=selector=>document.querySelector(selector).getBoundingClientRect();
+     return {top:box("#current-stage").top-box(".topbar").bottom,
+       controls:box("#graph-presentation>.button-row").top-box("#current-stage").bottom};
+   });
+   expect(rhythm.top).toBe(12);
+   expect(rhythm.controls).toBe(8);
    await expect(desk.locator("#codex-signal")).toHaveAttribute("aria-label","Codex: disconnected");
    await desk.locator("#presentation-outline").evaluate(el=>{el.style.maxHeight="45px";});
    const pagePosition=await desk.evaluate(()=>window.scrollY);

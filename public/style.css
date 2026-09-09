@@ -160,14 +160,14 @@
 #presentation-name{font-size:14px;font-weight:600;max-width:45%;line-height:1.35}
 #presentation-name:empty{display:none}
 .using-presentation .desk-grid{display:block!important;min-height:0}
-#graph-presentation{max-width:1200px;margin:auto;border:0;padding:16px 24px}
+#graph-presentation{max-width:1200px;margin:auto;border:0;padding:12px 16px}
 #graph-presentation #current-stage-panel{display:block!important;margin:0;padding:0;border:0}
 #graph-presentation #current-stage-panel>.section-heading{justify-content:flex-end;margin:0 0 6px}
 #graph-presentation #current-stage-panel>.section-heading{min-height:16px}
 #graph-presentation #current-stage-panel>.section-heading>.section-label{display:none}
 #graph-presentation #current-stage{min-height:240px;max-height:55vh;border:1px solid var(--line);margin:0}
-#presentation-details{border-top:1px solid var(--line);margin-top:16px;padding-top:10px}
-#presentation-details>summary{cursor:pointer;font-weight:600;padding:6px 0}
+#presentation-details{border-top:1px solid var(--line);margin-top:8px;padding-top:0}
+#presentation-details>summary{cursor:pointer;font-weight:600;padding:8px 0;font-size:12px;line-height:16px}
 #presentation-details #presentation-outline{padding:8px 0;border:0;width:100%}
 #presentation-detail-content{padding:8px 0}
 .using-presentation:not(.presenting) #presentation-detail-content{display:none}
@@ -192,7 +192,9 @@
 .using-presentation:not(.presenting) #current-stage{height:40vh!important}
 #graph-label{display:block!important;min-height:14px}
 #graph-presentation #graph-label{display:none!important}
-#graph-presentation>.button-row{flex-wrap:nowrap;overflow-x:auto;min-height:38px}
+#graph-presentation>.button-row{flex-wrap:nowrap;align-items:center;overflow-x:auto;min-height:32px;margin-top:8px;gap:8px}
+#graph-presentation>.button-row #live-progress{margin-left:auto;white-space:nowrap;font-size:11px;line-height:16px}
+#graph-presentation>.button-row #live-progress:empty{display:none}
 #graph-presentation>.button-row button{flex-shrink:0;white-space:nowrap}
 .using-presentation:not(.presenting) #graph-detours{display:none}
 .stage,.desk .stage-surface{--paper:#fff;--ink:#202020;--muted:#616161;--accent:#e6e6e6;--heading-font:Georgia,serif;--body-font:Arial,sans-serif;--code-font:Menlo,monospace;background:var(--paper);color:var(--ink);font-family:var(--body-font)}
@@ -234,6 +236,12 @@
 .session-actions [role=status]:empty{display:none}
 .using-presentation #presentation-outline{display:block;max-height:32vh;overflow-y:auto;overscroll-behavior:contain;padding:8px 0;border:0}
 .using-presentation #presentation-detail-content{display:block!important}
-.using-presentation #current-stage-panel{position:sticky;top:0;z-index:5;background:#fff;padding-top:8px!important}
+.using-presentation #current-stage-panel{position:sticky;top:0;z-index:5;background:#fff;padding-top:0!important}
+.using-presentation:not(.presenting) #current-stage-panel{padding-top:0!important}
+.desk .outline-step{padding:6px 8px;line-height:16px;border:0;border-bottom:1px solid var(--line);font-size:12px}
+.desk .outline-step.outline-related{padding:4px 8px 4px 24px;font-size:11px;border-bottom:0}
+#presentation-outline h3{margin:12px 8px 4px;font-size:11px;line-height:16px}
+#presentation-outline h3:first-child{margin-top:0}
+.desk .topbar button,.desk .header-connections>summary,#session-menu>summary{min-height:30px;line-height:16px}
 .using-presentation #current-stage{height:40vh!important;max-height:40vh!important;min-height:180px!important}
 @media(max-width:650px){.desk .connection-signals{display:none}.desk #presentation-name{max-width:22vw}.desk .topbar{padding:6px 8px}}
