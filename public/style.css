@@ -248,6 +248,13 @@
 .using-presentation:not(.presenting) #current-stage-panel{padding-top:0!important}
 .desk .outline-step{padding:6px 8px;line-height:16px;border:0;border-bottom:1px solid var(--line);font-size:12px}
 .desk .outline-step.outline-related{padding:4px 8px 4px 24px;font-size:11px;border-bottom:0}
+.outline-row{display:flex;align-items:center;min-height:30px;border-bottom:1px solid var(--line);gap:8px}
+.desk .outline-row>.outline-step{flex:1;min-width:0;border:0;width:auto}
+.outline-links{display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:4px 8px}
+.related-topic{font-size:11px;color:var(--muted)}
+.desk .outline-links .outline-related{width:auto;padding:4px 6px;border:0;text-decoration:underline;text-underline-offset:3px}
+.outline-links .outline-related::before{content:none}
+@media(max-width:800px){.outline-row{flex-wrap:wrap;gap:0}.outline-row>.outline-step{flex-basis:100%!important}.outline-links{padding-left:16px}}
 #presentation-outline h3{margin:12px 8px 4px;font-size:11px;line-height:16px}
 #presentation-outline h3:first-child{margin-top:0}
 .desk .topbar button,.desk .header-connections>summary,#session-menu>summary{min-height:30px;line-height:16px}

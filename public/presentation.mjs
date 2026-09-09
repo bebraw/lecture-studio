@@ -82,10 +82,11 @@ export function mountPresentations({call,update}){
    if(direction==="next")return p.step.next||p.outline.find(s=>(s.related||[]).includes(p.current))?.next;
    return p.outline.find(s=>s.next===p.current)?.id||p.outline.find(s=>(s.related||[]).includes(p.current))?.id;
  }
- let navigating=false;
+ let navigating=false,relatedParent="";
  async function selectSlide(id,parent){
    if(navigating)return;
    navigating=true;
+   relatedParent=parent||"";
    try{
      if(!preparing()&&parent===data.presentation.current)await run("detour",{id});
      else if(await run("select",{id})){if(!preparing())await run("show");}
@@ -150,20 +151,34 @@ export function mountPresentations({call,update}){
    if(!p){snapshot="";return;}
    const detours=new Set(p.outline.flatMap(s=>s.related||[]));
    let chapter="";
-   const addStep=(s,parent)=>{
+   const addStep=(s,parent,target,label=s.title)=>{
      const b=document.createElement("button");b.className="outline-step";b.dataset.stepId=s.id;b.setAttribute("aria-current",s.id===p.current?"step":"false");
      if(parent){b.classList.add("outline-related");b.dataset.relatedTo=parent;b.title="Related slide";}
-     b.textContent=s.title;b.setAttribute("aria-label",s.title+(parent?" — related slide":""));
-     b.onclick=()=>selectSlide(s.id,parent);outline.append(b);
+     b.textContent=label;b.setAttribute("aria-label",s.title+(parent?" — related slide":""));
+     b.onclick=()=>selectSlide(s.id,parent);target.append(b);
    };
    for(const s of p.outline.filter(s=>!detours.has(s.id))){
      const group=s.chapter||"Narrative";
      if(group!==chapter){chapter=group;const h=document.createElement("h3");h.textContent=group;outline.append(h);}
-     addStep(s);
-     for(const id of s.related||[]){const related=p.outline.find(step=>step.id===id);if(related)addStep(related,s.id);}
+     const row=document.createElement("div");row.className="outline-row";row.dataset.rowId=s.id;outline.append(row);
+     addStep(s,null,row);
+     const links=document.createElement("div");links.className="outline-links";row.append(links);
+     let topic="";
+     for(const id of s.related||[]){
+       const related=p.outline.find(step=>step.id===id);if(!related)continue;
+       const parts=related.title.split(" · ");
+       const prefix=parts.length>1?parts.slice(0,-1).join(" · "):"";
+       if(prefix&&prefix!==topic){const label=document.createElement("span");label.className="related-topic";label.textContent=prefix;links.append(label);topic=prefix;}
+       addStep(related,s.id,links,parts.length>1?parts.at(-1):related.title);
+     }
    }
    }
    if(!p)return;
+   const parent=p.outline.find(s=>s.id===relatedParent&&(s.related||[]).includes(p.current))||p.outline.find(s=>(s.related||[]).includes(p.current));
+   for(const row of outline.querySelectorAll(".outline-row")){
+     const active=row.dataset.rowId===(parent?.id||p.current);
+     row.querySelector(".outline-links").hidden=!active;
+   }
    applyTheme($("current-stage"),p.theme);
    for(const button of outline.querySelectorAll("[data-step-id]"))button.setAttribute("aria-current",button.dataset.stepId===p.current?"step":"false");
    const nextPreview=JSON.stringify(p.preview);
