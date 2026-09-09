@@ -10,6 +10,7 @@ import { CodexBridge } from "./lib/codex.mjs";
 import { Rehearsals } from "./lib/rehearsals.mjs";
 import { AudiencePoll } from "./lib/audience-poll.mjs";
 import { LectureSearch } from "./lib/lecture-search.mjs";
+import {parsePresentation,PresentationSession} from "./lib/presentation.mjs";
 
 const root = dirname(fileURLToPath(import.meta.url));
 export function safeEqual(a, b) {
@@ -39,21 +40,36 @@ export function createStudio({ library = new ObsidianLibrary(), bridge = new Cod
  let previousMaterial = null;
  let rehearsalJob = { status: "idle" }, resetVersion = 0;
  let pollOnStage = false;
+ let presentation=null, graphPoll=null, graphBusy=false;
+ const graphPolls=new Map();
+ const showGraph=()=>{
+   const s=presentation.step();
+   if(s.type==="poll"){
+     if(!graphPolls.has(s.id)){
+       const p=new AudiencePoll({origin:poll.origin,token:poll.token,room:s.room,fetcher:poll.fetcher});
+       p.configure(s.poll);graphPolls.set(s.id,p);
+     }
+     graphPoll=graphPolls.get(s.id);pollOnStage=true;
+   }else{graphPoll=null;pollOnStage=false;}
+   draft=validateDraft({...initialDraft(),mode:s.type==="build"?"brief":s.type==="question"?"question":"material",title:s.title,body:s.type==="build"?presentation.resolve().prompt:s.body||"",source:s.source||""});
+   publishedDraft={...draft};stage={...publicStage(draft,++version),theme:presentation.definition.theme};blank=false;
+ };
  const resetLecture = () => {
    poll.reset(); pollOnStage = false;
+   presentation=null;graphPoll=null;graphPolls.clear();
    bridge.close();
    Object.assign(bridge.state, { status: "disconnected", activity: "Not connected", messages: [], requests: [], threadId: null, turnId: null, startedAt: null, finishedAt: null, outcome: null });
    draft = initialDraft(); publishedDraft = initialDraft(); stage = publicStage(publishedDraft, ++version);
    blank = false; brief = acts[0].brief; lastBrief = ""; activeAct = "opening"; previousMaterial = null; resetVersion++;
  };
  const json = (res, value, status = 200) => { res.writeHead(status, { "content-type": "application/json" }); res.end(JSON.stringify(value)); };
- const deskState = () => ({ acts, scope, draft, draftPreview: publicStage(draft, version), stage: pollOnStage ? { ...stage, title: poll.config.question, mode: "poll" } : stage, blank, canReturnToMaterial: !!previousMaterial, activeAct, brief, lastBrief, codex: bridge.snapshot(), libraryStatus: library.status, workspace, savedAt, rehearsalJob, resetVersion, poll: poll.state() });
+ const deskState = () => ({ presentation:presentation?.state()||null, graphPoll:graphPoll?.state()||null, acts, scope, draft, draftPreview: publicStage(draft, version), stage: pollOnStage ? { ...stage, title: (graphPoll||poll).config.question, mode: "poll" } : stage, blank, canReturnToMaterial: !!previousMaterial, activeAct, brief, lastBrief, codex: bridge.snapshot(), libraryStatus: library.status, workspace, savedAt, rehearsalJob, resetVersion, poll: poll.state() });
  const publicState = () => {
    const c = bridge.state;
-   const p = poll.state(), counts = p.frozen || p.snapshot;
+   const p = (graphPoll||poll).state(), counts = p.frozen || p.snapshot;
    const projected = pollOnStage ? publicStage({ ...initialDraft(), mode: "material", title: p.config.question, body: (p.pollId==="friction"?"Take at least two minutes to discuss with a neighbour. Choose one example to share.\n\n":"") + p.config.options.map(o => o.label + ": " + (counts?.choices.find(c=>c.id===o.id)?.votes || 0)).join("\n\n") + "\n\n" + (p.frozen ? "Selected: " + p.frozen.winner.label + " — " + p.frozen.reason : (p.configured ? "Join: " + p.joinUrl : "Audience room is not configured. Discuss the choices together.")), source: p.frozen ? "Voting closed · frozen revision " + p.frozen.revision : "Audience vote · " + (p.error ? "connection issue; showing last counts" : counts?.status || "not opened") }, String(version) + "-poll-" + (counts?.revision || 0) + "-" + !!p.frozen + "-" + p.error) : stage;
    const activity = ["Running a command", "Editing files", "Using a tool", "Looking up a source", "Responding", "Working"].includes(c.activity) ? c.activity : "Working";
-   return { ...projected, blank, build: { activity, status: c.status, outcome: ["completed", "failed", "interrupted"].includes(c.outcome) ? c.outcome : null, startedAt: c.startedAt || null, finishedAt: c.finishedAt || null } };
+   return { ...projected, theme:stage.theme, blank, build: { activity, status: c.status, outcome: ["completed", "failed", "interrupted"].includes(c.outcome) ? c.outcome : null, startedAt: c.startedAt || null, finishedAt: c.finishedAt || null } };
  };
  const server = createServer(async (req, res) => {
    res.setHeader("cache-control", "no-store");
@@ -88,6 +104,48 @@ export function createStudio({ library = new ObsidianLibrary(), bridge = new Cod
        }
        if (req.method !== "POST" || req.headers.origin !== origin) return json(res, { error: "Same-origin POST required" }, 403);
        const body = await readJson(req);
+       if(url.pathname.startsWith("/api/presentation/")){
+         if(graphBusy||rehearsalJob.status==="creating")throw new Error("Presentation operation in progress");
+         graphBusy=true;
+         try{
+           const op=url.pathname.slice("/api/presentation/".length);
+           if(op==="load"||op==="unload"){
+             if(bridge.state.turnId||[...graphPolls.values(),poll].some(p=>p.busy||p.snapshot?.status==="open"))throw new Error("Finish the build and close voting before changing presentations");
+             let next=null;
+             if(op==="load"){
+               const files=await library.list();
+               if(!files.some(f=>f.path===body.path))throw new Error("Select a presentation from the lecture folder");
+               next=new PresentationSession(parsePresentation(await library.read(body.path)),body.path);
+             }
+             presentation=next;graphPoll=null;graphPolls.clear();pollOnStage=false;
+             // Loading is private: the existing projection stays until navigation.
+           }else{
+             if(!presentation)throw new Error("Load a presentation first");
+             if(op==="select"){
+               presentation.move("select",body.id);
+             }else if(["next","previous","detour","return","show"].includes(op)){
+               if(op!=="show")presentation.move(op,body.id);
+               showGraph();
+             }else if(op==="defaults"){
+               presentation.defaults.add(presentation.current);showGraph();
+             }else if(op==="poll-open"||op==="poll-close"||op==="poll-refresh"){
+               if(presentation.step().type!=="poll")throw new Error("Choose a poll step");
+               showGraph();await graphPoll.act(op==="poll-open"?"open":op==="poll-close"?"lock":"refresh");
+               if(graphPoll.frozen)presentation.decisions[presentation.current]=structuredClone(graphPoll.frozen);
+             }else if(op==="build"){
+               if(presentation.step().type!=="build")throw new Error("Choose a build step");
+               const resolved=presentation.resolve();
+               if(resolved.missing.length)throw new Error("Collect the required decisions or explicitly accept prepared defaults");
+               if(presentation.runs.some(r=>r.step===presentation.current))throw new Error("This step has already started in this session");
+               showGraph();
+               await bridge.start(resolved.prompt,body.model||"");
+               lastBrief=brief=resolved.prompt;
+               presentation.runs.push({step:presentation.current,prompt:resolved.prompt,inputs:structuredClone(resolved.inputs),startedAt:new Date().toISOString()});
+             }else throw new Error("Unknown presentation operation");
+           }
+           return json(res,deskState());
+         }finally{graphBusy=false;}
+       }
        if (url.pathname.startsWith("/api/poll/")) {
          if (rehearsalJob.status === "creating") throw new Error("Wait for the fresh rehearsal");
          const action = url.pathname.slice("/api/poll/".length);
@@ -103,6 +161,7 @@ export function createStudio({ library = new ObsidianLibrary(), bridge = new Cod
        }
        if (rehearsalJob.status === "creating" && !["/api/codex/interrupt", "/api/codex/answer"].includes(url.pathname)) return json(res, { error: "A fresh rehearsal is being prepared. Please wait." }, 409);
        if (url.pathname === "/api/reset-lecture" || url.pathname === "/api/new-rehearsal") {
+         if(graphBusy||[...graphPolls.values()].some(p=>p.busy||p.snapshot?.status==="open"))throw new Error("Close presentation voting before resetting");
          if (body.confirm !== true) throw new Error("Confirm the reset first");
          if (poll.busy) throw new Error("Wait for the current poll operation");
          if (poll.snapshot?.status === "open" && !poll.frozen) throw new Error("Close the audience vote before resetting");
@@ -178,7 +237,7 @@ export function createStudio({ library = new ObsidianLibrary(), bridge = new Cod
      }
      if (req.method !== "GET") return json(res, { error: "Method not allowed" }, 405);
      let path;
-     const staticFiles = { "/": "desk.html", "/desk": "desk.html", "/stage": "stage.html", "/style.css": "style.css", "/desk.mjs": "desk.mjs", "/stage.mjs": "stage.mjs", "/shared.mjs": "shared.mjs", "/explore.mjs": "explore.mjs" };
+     const staticFiles = { "/": "desk.html", "/desk": "desk.html", "/stage": "stage.html", "/style.css": "style.css", "/desk.mjs": "desk.mjs", "/stage.mjs": "stage.mjs", "/shared.mjs": "shared.mjs", "/explore.mjs": "explore.mjs", "/presentation.mjs": "presentation.mjs" };
      if (staticFiles[url.pathname]) path = resolve(root, "public", staticFiles[url.pathname]);
      else if (url.pathname.startsWith("/vendor/mermaid/")) {
        const vendorRoot = await realpath(resolve(root, "node_modules/mermaid/dist"));

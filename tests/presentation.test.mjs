@@ -1,0 +1,27 @@
+import {test} from "node:test";
+import assert from "node:assert/strict";
+import {parsePresentation,PresentationSession,parseTheme} from "../lib/presentation.mjs";
+const definition={version:1,title:"Test",start:"question",steps:[{id:"question",type:"question",title:"Question",next:"poll",related:["aside"]},{id:"aside",type:"material",title:"Aside"},{id:"poll",type:"poll",title:"Theme",room:"test",poll:{question:"Theme?",options:[{id:"one",label:"One"},{id:"two",label:"Two"}],defaultId:"one"},next:"build"},{id:"build",type:"build",title:"Build",body:"Implement.",uses:[{poll:"poll",instructions:{one:"Use one.",two:"Use two."}}]}]};
+const note=value=>({sections:[{heading:"Presentation",body:"```json\n"+JSON.stringify(value)+"\n```"}]});
+test("presentation themes default to white and validate overrides",()=>{
+ assert.equal(parseTheme().background,"#ffffff");
+ assert.equal(parseTheme({headingFont:"Verdana, sans-serif"}).headingFont,"Verdana, sans-serif");
+ assert.throws(()=>parseTheme({background:"url(example)"}),/Invalid theme/);
+ assert.throws(()=>parseTheme({bodyFont:"bad; color:red"}),/Invalid theme/);
+ assert.equal(new PresentationSession(parsePresentation(note(definition)),"test").state().theme.text,"#202020");
+});
+test("presentation snapshot, detour return and explicit defaults",()=>{
+ const p=new PresentationSession(parsePresentation(note(definition)),"test");
+ definition.steps[0].title="Changed";
+ assert.equal(p.step().title,"Question");
+ p.move("detour","aside");p.move("return");assert.equal(p.current,"question");
+ p.move("next");p.move("next");
+ assert.deepEqual(p.resolve().missing,["poll"]);
+ p.defaults.add("build");assert.match(p.resolve().prompt,/Use one/);
+ p.decisions.poll={winner:{id:"two",label:"Two"},revision:7};
+ assert.match(p.resolve().prompt,/Use two/);
+ assert.equal(p.resolve().inputs[0].revision,7);
+});
+test("invalid graph links are rejected",()=>{
+ assert.throws(()=>parsePresentation(note({...definition,start:"missing"})),/Missing start/);
+});
