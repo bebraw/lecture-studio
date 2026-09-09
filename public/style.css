@@ -164,6 +164,7 @@
 #graph-presentation{max-width:1200px;margin:auto;border:0;padding:16px 24px}
 #graph-presentation #current-stage-panel{display:block!important;margin:0;padding:0;border:0}
 #graph-presentation #current-stage-panel>.section-heading{justify-content:flex-end;margin:0 0 6px}
+#graph-presentation #current-stage-panel>.section-heading{min-height:16px}
 #graph-presentation #current-stage-panel>.section-heading>.section-label{display:none}
 #graph-presentation #current-stage{min-height:240px;max-height:55vh;border:1px solid var(--line);margin:0}
 #presentation-details{border-top:1px solid var(--line);margin-top:16px;padding-top:10px}
@@ -186,10 +187,12 @@
 .using-presentation:not(.presenting) #presentation-outline{max-height:32vh;overflow-y:auto;overscroll-behavior:contain}
 .outline-step.outline-related{padding-left:22px;font-size:11px;color:var(--muted);border-bottom:0}
 .outline-step.outline-related::before{content:"↳ ";color:var(--muted)}
+.desk .outline-step:focus-visible{outline:2px solid var(--ink);outline-offset:-2px}
 /* Slide changes must not move the preview, controls, or outline. */
 #graph-presentation #current-stage{height:55vh;overflow:auto;scrollbar-gutter:stable}
 .using-presentation:not(.presenting) #current-stage{height:40vh!important}
 #graph-label{display:block!important;min-height:14px}
+#graph-presentation #graph-label{display:none!important}
 #graph-presentation>.button-row{flex-wrap:nowrap;overflow-x:auto;min-height:38px}
 #graph-presentation>.button-row button{flex-shrink:0;white-space:nowrap}
 .using-presentation:not(.presenting) #graph-detours{display:none}
@@ -210,4 +213,21 @@
 .desk .connection-signals [data-state="ready"]::before{background:#287d3c}
 .desk .connection-signals [data-state="connecting"]::before,.desk .connection-signals [data-state="working"]::before,.desk .connection-signals [data-state="waiting"]::before{background:#b87900}
 .desk .brand i{display:none}
+.desk #session-menu{position:relative;font-size:11px}
+#session-menu>summary{cursor:pointer;border:1px solid #aaa;padding:6px 9px}
+#session-menu>summary{display:flex;align-items:center;gap:6px;white-space:nowrap;list-style:none}
+#session-menu>summary::-webkit-details-marker{display:none}
+#session-menu>summary::after{content:"▾"}
+.desk .top-actions>*,.desk .mode-switch{flex-shrink:0}
+.desk .topbar button{white-space:nowrap}
+.session-actions{position:absolute;right:0;top:calc(100% + 6px);z-index:30;width:250px;padding:10px;background:#fff;border:1px solid #aaa}
+.session-actions button{width:100%;text-align:left}
+.session-actions .rehearsal-controls{display:block!important;margin:8px 0 0;padding:0;border:0}
+.session-actions .rehearsal-controls>p:not([role=status]),.session-actions .section-label{display:none}
+.session-actions .button-row{margin:0}
+.session-actions [role=status]:empty{display:none}
+.using-presentation #presentation-outline{display:block;max-height:32vh;overflow-y:auto;overscroll-behavior:contain;padding:8px 0;border:0}
+.using-presentation #presentation-detail-content{display:block!important}
+.using-presentation #current-stage-panel{position:sticky;top:0;z-index:5;background:#fff;padding-top:8px!important}
+.using-presentation #current-stage{height:40vh!important;max-height:40vh!important;min-height:180px!important}
 @media(max-width:650px){.desk .connection-signals{display:none}.desk #presentation-name{max-width:22vw}.desk .topbar{padding:6px 8px}}
