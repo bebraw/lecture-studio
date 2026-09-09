@@ -70,7 +70,7 @@ export function mountPresentations({call,update}){
  $("presentation-choice").hidden=true;$("presentation-load").hidden=true;
  setup.querySelector("h2").remove();
  let data, snapshot="", outlineKey="", previewKey="";
- let refreshing=false;
+ let refreshing=false,initialListRequested=false;
  setInterval(async()=>{
    if(preparing()||refreshing||data?.presentation?.step.type!=="poll"||data.graphPoll?.snapshot?.status!=="open"||data.graphPoll?.frozen)return;
    refreshing=true;try{update(await call("presentation/poll-refresh",{}));}catch(e){$("graph-status").textContent=e.message;}finally{refreshing=false;}
@@ -123,10 +123,13 @@ export function mountPresentations({call,update}){
    event.preventDefault();if(!event.repeat)void navigate(event.key==="ArrowLeft"?"previous":"next",true);
  });
  $("presentations-list").onclick=async()=>{
+   if($("presentations-list").disabled)return;
    $("presentations-list").disabled=true;
    try{
+     const selected=$("presentation-choice").value||data?.presentation?.path;
      const {files}=await call("library");
      $("presentation-choice").replaceChildren(...files.filter(f=>f.path.includes("/Presentations/")).map(f=>new Option(f.label.split("/").pop().replace(/\.md$/i,""),f.path)));
+     if([...$("presentation-choice").options].some(o=>o.value===selected))$("presentation-choice").value=selected;
      $("presentation-choice").hidden=!$("presentation-choice").options.length;
      $("presentation-load").hidden=!$("presentation-choice").options.length;
      $("presentations-list").textContent="Refresh list";
@@ -146,6 +149,10 @@ export function mountPresentations({call,update}){
  $("graph-build").onclick=()=>run("build",{model:$("model").value});
  return value=>{
    data=value;const p=data.presentation;syncNotice.textContent=data.audienceSync?.error||"";
+   if(!initialListRequested&&data.libraryStatus?.startsWith("Connected")){
+     initialListRequested=true;
+     void $("presentations-list").onclick();
+   }
    for(const id of ["question","results"])$("graph-"+id).hidden=p?.step.type!=="poll";
    if(document.body.classList.contains("presenting")!==!!data.live)(data.live?$("present-mode"):$("prepare-mode")).click();
    liveToggle.disabled=!p||liveChanging;syncLive();
