@@ -1,10 +1,12 @@
 import { auth, api, escape, surface, renderDiagrams, buildLabel, previewCandidates } from "./shared.mjs";
 import { mountExplorer } from "./explore.mjs";
+import {mountPresentations} from "./presentation.mjs";
 const $ = id => document.getElementById(id), token = auth("desk");
 let state, files = [], note, selected, requestKey = "", modelKey = "", draftSequence = 0;
 let previewKey = "";
 let stageKey = "", stageReadPending = false;
 let explorer;
+let updatePresentation;
 let syncLectureSlide;
 let updateBuildSlide;
 const call = (path, value) => api(token, path, value);
@@ -52,6 +54,7 @@ function selectSection() {
  $("selected-note").textContent = note.title; $("selected-note").hidden = false;
 }
 function updateRuntime(data) {
+ updatePresentation?.(data);
  void refreshStageView();
  if (data.poll) updatePoll(data.poll);
  if (data.resetVersion !== undefined && state.resetVersion !== data.resetVersion) {
@@ -65,7 +68,7 @@ function updateRuntime(data) {
    $("new-rehearsal").disabled = job.status === "creating";
    $("reset-lecture").disabled = job.status === "creating";
  }
- state = { ...state, libraryStatus: data.libraryStatus, workspace: data.workspace, codex: data.codex, blank: data.blank, stage: data.stage, canReturnToMaterial: data.canReturnToMaterial, lastBrief: data.lastBrief };
+ state = { ...state, presentation:data.presentation, graphPoll:data.graphPoll, libraryStatus: data.libraryStatus, workspace: data.workspace, codex: data.codex, blank: data.blank, stage: data.stage, canReturnToMaterial: data.canReturnToMaterial, lastBrief: data.lastBrief };
  $("show-sent-brief").disabled = !data.lastBrief;
  const c = data.codex;
  updateBuildSlide?.(c);
@@ -77,9 +80,13 @@ function updateRuntime(data) {
  $("blank").textContent = data.blank ? "Unblank stage" : "Blank stage";
  $("library-status").textContent = "Obsidian · " + data.libraryStatus;
  const notesReady = data.libraryStatus.startsWith("Connected");
- $("notes-signal").textContent = "Obsidian · " + (notesReady ? "ready" : /Unavailable|failed/i.test(data.libraryStatus) ? "unavailable" : "offline");
+ $("notes-signal").textContent = "Obsidian";
+ $("notes-signal").title = "Obsidian: " + (notesReady ? "ready" : /Unavailable|failed/i.test(data.libraryStatus) ? "unavailable" : "offline");
+ $("notes-signal").setAttribute("aria-label",$("notes-signal").title);
  $("notes-signal").dataset.state = notesReady ? "ready" : "offline";
- $("codex-signal").textContent = "Codex · " + c.status;
+ $("codex-signal").textContent = "Codex";
+ $("codex-signal").title = "Codex: " + c.status;
+ $("codex-signal").setAttribute("aria-label",$("codex-signal").title);
  $("codex-signal").dataset.state = c.status;
  $("load-library").textContent = notesReady ? "Refresh lecture notes" : "Connect Obsidian";
  $("stage-status").textContent = data.blank ? "Stage is blank." : "Published: " + data.stage.title;
@@ -152,7 +159,7 @@ function setupConnections() {
  const panel = document.querySelector(".connection");
  panel.id = "connections";
  panel.className = "connection header-connections";
- panel.querySelector("summary").innerHTML = 'Connections <span class="connection-signals"><span id="notes-signal">Obsidian · offline</span><span id="codex-signal">Codex · disconnected</span></span>';
+ panel.querySelector("summary").innerHTML = '<span class="sr-only">Connections</span><span class="connection-signals"><span id="notes-signal" data-state="offline" title="Obsidian: offline" aria-label="Obsidian: offline">Obsidian</span><span id="codex-signal" data-state="disconnected" title="Codex: disconnected" aria-label="Codex: disconnected">Codex</span></span>';
  const content = document.createElement("div");
  content.className = "connections-panel";
  while (panel.children.length > 1) content.append(panel.children[1]);
@@ -180,6 +187,7 @@ explorer = mountExplorer({ host: document.querySelector(".material-column"), cal
  const data = await call("publish", { ...draft(), ...material, mode: "material", allowRemoteImages: false });
  fields(data.draft); preview(data); updateRuntime(data);
 }});
+updatePresentation=mountPresentations({call,update:updateRuntime});
 init().catch(e => { $("auth-error").hidden = false; notice(e.message, true); });
 
 function setupModes() {
@@ -337,10 +345,12 @@ function setupModes() {
 }
 
 async function refreshStageView() {
+ if(state?.presentation)return;
  if (stageReadPending || !$("current-stage")) return;
  stageReadPending = true;
  try {
    const shown = await call("stage");
+   if(state?.presentation)return;
    const key = JSON.stringify([shown.version, shown.blank]);
    if (key !== stageKey) {
      stageKey = key;
