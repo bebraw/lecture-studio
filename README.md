@@ -100,7 +100,7 @@ Open the **Private desk** link printed by the server. Keep that link and window 
 The implementation checkout is a fresh sibling folder:
 
 ```text
-../webdev-rehearsal-studio
+../lecture-studio
 ```
 
 It starts at [lecture-start-v10](https://github.com/bebraw/webdev-through-ages/tree/lecture-start-v10), commit `6a5dae4e7bf7b0b510c525a91497cd6620869bbc`, on branch `rehearsal-studio`. Dependencies are installed. No implementation turn has been sent, and no application has been deployed.
@@ -216,6 +216,7 @@ npm run check
 This runs unit/integration tests plus a Chromium rehearsal. If the matching Playwright browser is unavailable on another machine, run `npx playwright install chromium` first.
 
 Verified here:
+
 - live scoped Obsidian listing and section retrieval;
 - live Codex handshake and model listing, with no thread or turn created;
 - mock-protocol turn creation, exact prompt handoff, approval handling, and one-active-turn behavior;
