@@ -18,7 +18,10 @@ test("Obsidian snapshot loads privately and detours return without changing the 
    await expect(stage.locator("body")).toHaveCSS("background-color","rgb(255, 255, 255)");
    await expect(desk.locator("#presentation-outline")).toBeHidden();
    await expect(desk.locator("body")).not.toContainText("Load an Obsidian presentation to see");
+   await expect(desk.locator("#presentation-setup")).toBeHidden();
+   await desk.locator("#presentation-name").click();
    await desk.locator("#presentations-list").click();await desk.locator("#presentation-load").click();
+   await expect(desk.locator("#presentation-setup")).toBeHidden();
    await desk.locator("#prepare-mode").click();
    await expect(desk.locator("#graph-title")).toHaveText("Snapshot title");
    await expect(desk.locator("#current-stage h1")).toHaveText("Snapshot title");
@@ -69,6 +72,7 @@ test("Obsidian snapshot loads privately and detours return without changing the 
    definition.steps[0].title="Edited in vault";
    library.status="Unavailable";
    await desk.locator("#present-mode").click();
+   await expect(desk.locator("#presentation-name")).toBeDisabled();
    await expect(desk.locator(".builder")).toBeHidden();
    await expect(desk.locator(".material-column")).toBeHidden();
    await expect(desk.locator("#presentation-details")).not.toHaveAttribute("open","");

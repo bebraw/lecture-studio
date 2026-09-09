@@ -213,6 +213,13 @@
 .desk .connection-signals [data-state="ready"]::before{background:#287d3c}
 .desk .connection-signals [data-state="connecting"]::before,.desk .connection-signals [data-state="working"]::before,.desk .connection-signals [data-state="waiting"]::before{background:#b87900}
 .desk .brand i{display:none}
+#presentation-picker{position:relative;min-width:0;flex:1}
+.desk #presentation-picker #presentation-name{max-width:100%;text-align:left;padding-right:24px}
+#presentation-name::after{content:" ▾"}
+#presentation-name:disabled::after{content:""}
+#presentation-picker #presentation-setup{position:absolute;top:calc(100% + 6px);left:0;z-index:35;width:420px;max-width:calc(100vw - 32px);background:#fff;border:1px solid #aaa;padding:10px}
+#presentation-picker #presentation-setup[hidden]{display:none!important}
+#presentation-picker #presentation-choice{display:block;width:100%;margin:8px 0}
 .desk #session-menu{position:relative;font-size:11px}
 #session-menu>summary{cursor:pointer;border:1px solid #aaa;padding:6px 9px}
 #session-menu>summary{display:flex;align-items:center;gap:6px;white-space:nowrap;list-style:none}

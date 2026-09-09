@@ -26,10 +26,17 @@ export function mountPresentations({call,update}){
  notes.append($("activity"),$("interrupt"),$("requests"),$("messages"),$("preview-shortcuts"),$("back-material"));
  const stagePanel=$("current-stage-panel");$("graph-detours").before(stagePanel);
  $("graph-detours").remove();
- const name=document.createElement("span");name.id="presentation-name";document.querySelector(".brand").after(name);
+ const picker=document.createElement("div");picker.id="presentation-picker";
+ const name=document.createElement("button");name.id="presentation-name";name.setAttribute("aria-expanded","false");name.setAttribute("aria-controls","presentation-setup");
+ picker.append(name,setup);document.querySelector(".brand").after(picker);setup.hidden=true;
+ const closePicker=()=>{setup.hidden=true;name.setAttribute("aria-expanded","false");};
+ name.onclick=()=>{if(data?.presentation&&document.body.classList.contains("presenting"))return;setup.hidden=!setup.hidden;name.setAttribute("aria-expanded",String(!setup.hidden));};
+ picker.addEventListener("keydown",event=>{if(event.key==="Escape"){closePicker();name.focus();event.stopPropagation();}});
+ document.addEventListener("click",event=>{if(!picker.contains(event.target))closePicker();});
  const setDetailsMode=()=>{details.open=false;};
  $("prepare-mode").addEventListener("click",setDetailsMode);
- $("present-mode").addEventListener("click",()=>{setDetailsMode();if(data?.presentation)void run("show");});
+ $("present-mode").addEventListener("click",()=>{closePicker();name.disabled=true;setDetailsMode();if(data?.presentation)void run("show");});
+ $("prepare-mode").addEventListener("click",()=>{name.disabled=false;});
  $("presentations-list").textContent="Refresh list";
  $("presentation-load").textContent="Load";
  $("presentation-unload").remove();
@@ -97,7 +104,7 @@ export function mountPresentations({call,update}){
    $("presentations-list").disabled=true;
    try{
      const {files}=await call("library");
-     $("presentation-choice").replaceChildren(...files.filter(f=>f.path.includes("/Presentations/")).map(f=>new Option(f.label,f.path)));
+     $("presentation-choice").replaceChildren(...files.filter(f=>f.path.includes("/Presentations/")).map(f=>new Option(f.label.split("/").pop().replace(/\.md$/i,""),f.path)));
      $("presentation-choice").hidden=!$("presentation-choice").options.length;
      $("presentation-load").hidden=!$("presentation-choice").options.length;
      $("presentations-list").textContent="Refresh list";
@@ -105,7 +112,7 @@ export function mountPresentations({call,update}){
    }catch(e){$("presentation-message").textContent=e.message;}
    finally{$("presentations-list").disabled=false;}
  };
- $("presentation-load").onclick=()=>run("load",{path:$("presentation-choice").value});
+ $("presentation-load").onclick=async()=>{if(await run("load",{path:$("presentation-choice").value})){closePicker();name.focus({preventScroll:true});}};
  for(const [id,op] of [["previous","previous"],["return","return"],["defaults","defaults"],["open","poll-open"],["close","poll-close"]])$("graph-"+id).onclick=()=>run(op);
  $("graph-next").onclick=()=>navigate("next");
  $("graph-previous").onclick=()=>navigate("previous");
@@ -113,7 +120,9 @@ export function mountPresentations({call,update}){
  return value=>{
    data=value;const p=data.presentation;
    document.body.classList.toggle("using-presentation",!!p);panel.hidden=!p;
-   name.textContent=p?.title||"";
+   name.textContent=p?.title||"Choose presentation";
+   name.title=name.textContent;
+   name.disabled=document.body.classList.contains("presenting")&&!!p;
    $("restart-presentation").disabled=!p;
    outline.hidden=!p;
    const key=JSON.stringify([p?.loadedAt,p?.outline]);
