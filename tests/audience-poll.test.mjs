@@ -19,7 +19,13 @@ test("open, aggregate, lock, freeze, receipt; no votes or resets sent",async()=>
  await poll.act("lock");const receipt=poll.receipt();
  assert.equal(poll.frozen.winner.id,"retro-web");
  votes([100,0,0]);assert.equal(poll.receipt(),receipt);
- await assert.rejects(()=>poll.act("open"),/frozen/);
+ await poll.act("open");
+ assert.equal(poll.frozen,null);
+ assert.equal(poll.snapshot.status,"open");
+ assert.equal(poll.snapshot.totalVotes,100);
+ assert.throws(()=>poll.receipt(),/Close/);
+ await poll.act("lock");
+ assert.equal(poll.frozen.winner.id,"editorial");
  assert.ok(!JSON.stringify(poll.state()).includes("private-presenter-secret"));
  assert.ok(calls.every(c=>!c.url.endsWith("/reset")&&!c.url.endsWith("/seed")));
  assert.ok(calls.filter(c=>c.init.method==="GET").every(c=>!c.init.headers.Authorization));

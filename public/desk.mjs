@@ -276,7 +276,8 @@ function setupModes() {
    const isBuild=buildSlides.has(slideIndex);
    const isVote=voteSlides.has(slideIndex),p=state.poll;
    openVote.hidden=closeVote.hidden=!isVote;
-   openVote.disabled=!p?.configured||p.busy||!!p.frozen;
+   openVote.textContent=p?.frozen?"Reopen voting":"Open voting";
+   openVote.disabled=!p?.configured||p.busy||p.snapshot?.status==="open";
    closeVote.disabled=!p?.configured||p.busy;
    launch.hidden=!isBuild;launchStatus.hidden=!isBuild;
    launch.disabled=c.status!=="ready"||startedSlides.has(slideIndex);
@@ -434,7 +435,8 @@ function updatePoll(p) {
  $("poll-join").hidden=!p.joinUrl;$("poll-join").href=p.joinUrl||"#";
  $("poll-status").textContent=!p.configured?"Configure the public room connection in the server environment.":p.error|| (p.frozen?"Closed · "+p.frozen.winner.label+" · "+p.frozen.reason:p.busy?"Contacting audience room…":p.snapshot?.status||"Ready to connect");
  $("poll-counts").textContent=(p.frozen?.choices||p.snapshot?.choices||[]).map(c=>c.label+": "+c.votes).join(" · ");
- $("poll-open").disabled=!p.configured||p.busy||!!p.frozen||p.snapshot?.status==="open";
+ $("poll-open").textContent=p.frozen?"Reopen voting":"Open vote";
+ $("poll-open").disabled=!p.configured||p.busy||p.snapshot?.status==="open";
  $("poll-lock").disabled=!p.configured||p.busy||!!p.frozen;
  $("poll-add").disabled=!p.frozen;
  $("poll-configure").disabled=p.busy||!!p.frozen||p.snapshot?.status==="open";

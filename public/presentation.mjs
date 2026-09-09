@@ -214,6 +214,7 @@ export function mountPresentations({call,update}){
    $("graph-defaults").hidden=!p.resolved.missing.length;
    $("graph-build").hidden=p.step.type!=="build";
    $("graph-build").disabled=p.resolved.missing.length>0||data.codex.status!=="ready"||p.runs.some(r=>r.step===p.current);
-   for(const id of ["open","close"]){$("graph-"+id).hidden=p.step.type!=="poll";$("graph-"+id).disabled=!data.graphPoll?.configured||!!data.graphPoll?.frozen||(id==="open"&&!data.live);}
+   $("graph-open").textContent=data.graphPoll?.frozen?"Reopen voting":"Open voting";
+   for(const id of ["open","close"]){$("graph-"+id).hidden=p.step.type!=="poll";$("graph-"+id).disabled=!data.graphPoll?.configured||!!data.graphPoll?.busy||(id==="open"?(!data.live||data.graphPoll?.snapshot?.status==="open"):(!!data.graphPoll?.frozen||data.graphPoll?.snapshot?.status!=="open"));}
  };
 }

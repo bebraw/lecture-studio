@@ -185,6 +185,7 @@ export function createStudio({ library = new ObsidianLibrary(), bridge = new Cod
                if(op==="poll-open"&&[...graphPolls.values(),poll].some(p=>p!==graphPoll&&p.snapshot?.status==="open"))throw new Error("Close the current vote first");
                await graphPoll.act(op==="poll-open"?"open":op==="poll-close"?"lock":"refresh");
                if(graphPoll.frozen)presentation.decisions[presentation.current]=structuredClone(graphPoll.frozen);
+               else if(op==="poll-open")delete presentation.decisions[presentation.current];
              }else if(op==="poll-question"||op==="poll-results"){
                if(presentation.step().type!=="poll")throw new Error("Choose a poll step");
                showGraph();pollResults=op==="poll-results";
