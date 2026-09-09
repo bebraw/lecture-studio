@@ -55,7 +55,7 @@ test("Obsidian snapshot loads privately and detours return without changing the 
    await expect.poll(selectedVisible).toBe(true);
    expect(await desk.evaluate(()=>window.scrollY)).toBe(pagePosition);
    expect((await desk.locator("#current-stage").boundingBox()).y).toBe(previewPosition.y);
-   await expect(stage.locator("h1")).toHaveText("Who is the interface for?");
+   await expect(stage.locator("h1")).toHaveText("Waiting for the lecturer");
    await desk.keyboard.press("ArrowLeft");
    await expect(desk.locator("#current-stage h1")).toHaveText("Snapshot title");
    await expect.poll(selectedVisible).toBe(true);
@@ -72,7 +72,7 @@ test("Obsidian snapshot loads privately and detours return without changing the 
    await expect(desk.locator(".plot")).toBeHidden();
    const width=await desk.locator("#presentation-outline").evaluate(el=>el.getBoundingClientRect().width);
    expect(width).toBeGreaterThanOrEqual(290);
-   await expect(stage.locator("h1")).toHaveText("Who is the interface for?");
+   await expect(stage.locator("h1")).toHaveText("Waiting for the lecturer");
    const outlineBox=await desk.locator("#presentation-outline").boundingBox();
    const previewBox=await desk.locator("#current-stage").boundingBox();
    const questionButton=desk.locator('#presentation-outline [data-step-id="question"]');
@@ -112,7 +112,7 @@ test("Obsidian snapshot loads privately and detours return without changing the 
    await expect(desk.locator("#graph-title")).toHaveText("Snapshot title");
    await expect(desk.locator("#current-stage h1")).toHaveText("Snapshot title");
    await expect(desk.locator("#graph-next")).toHaveText("Next →");
-   await expect(stage.locator("h1")).toHaveText("Audience question");
+   await expect(stage.locator("h1")).toHaveText("Waiting for the lecturer");
    await expect(desk.locator("#graph-show")).toHaveCount(0);
    await desk.locator("#live-toggle").click();
    await expect(stage.locator("h1")).toHaveText("Snapshot title");

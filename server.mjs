@@ -41,7 +41,8 @@ export function createStudio({ library = new ObsidianLibrary(), bridge = new Cod
  let activeAct = "opening", libraryFiles = [], savedAt = null;
  let previousMaterial = null;
  let rehearsalJob = { status: "idle" }, resetVersion = 0;
- let pollOnStage = false, projectedPoll=null, pollResults=false;
+ let pollOnStage = false, projectedPoll=null, pollResults=false, live=false, liveTransition=false;
+ const waitingStage=()=>({...publicStage({...initialDraft(),act:"",mode:"material",title:"Waiting for the lecturer",body:"",source:""},String(version)+"-off"),live:false,projectionKind:"waiting",blank:false,build:{status:"ready",startedAt:null,finishedAt:null}});
  let presentation=null, graphPoll=null, graphBusy=false;
  const graphPolls=new Map();
  const showGraph=()=>{
@@ -57,6 +58,7 @@ export function createStudio({ library = new ObsidianLibrary(), bridge = new Cod
    publishedDraft={...draft};stage={...publicStage(draft,++version),theme:presentation.definition.theme};blank=false;
  };
  const resetLecture = () => {
+   live=false;
    poll.reset(); pollOnStage = false;
    presentation=null;graphPoll=null;graphPolls.clear();
    bridge.close();
@@ -65,15 +67,16 @@ export function createStudio({ library = new ObsidianLibrary(), bridge = new Cod
    blank = false; brief = acts[0].brief; lastBrief = ""; activeAct = "opening"; previousMaterial = null; resetVersion++;
  };
  const json = (res, value, status = 200) => { res.writeHead(status, { "content-type": "application/json" }); res.end(JSON.stringify(value)); };
- const deskState = () => ({ projection:publicState(), audienceSync:{error:audienceSync.error}, presentation:presentation?.state()||null, graphPoll:graphPoll?.state()||null, acts, scope, draft, draftPreview: publicStage(draft, version), stage: pollOnStage ? { ...stage, title: (projectedPoll||poll).config.question, mode: "poll" } : stage, blank, canReturnToMaterial: !!previousMaterial, activeAct, brief, lastBrief, codex: bridge.snapshot(), libraryStatus: library.status, workspace, savedAt, rehearsalJob, resetVersion, poll: poll.state() });
+ const deskState = () => ({ live, projection:publicState(), audienceSync:{error:audienceSync.error}, presentation:presentation?.state()||null, graphPoll:graphPoll?.state()||null, acts, scope, draft, draftPreview: publicStage(draft, version), stage: pollOnStage ? { ...stage, title: (projectedPoll||poll).config.question, mode: "poll" } : stage, blank, canReturnToMaterial: !!previousMaterial, activeAct, brief, lastBrief, codex: bridge.snapshot(), libraryStatus: library.status, workspace, savedAt, rehearsalJob, resetVersion, poll: poll.state() });
  const publicState = () => {
+   if(!live)return waitingStage();
    const c = bridge.state;
    const p = (projectedPoll||poll).state(), counts = p.frozen || p.snapshot;
    const projected = pollOnStage ? publicStage({ ...initialDraft(), mode: "material", title: p.config.question, body: p.config.options.map(o => o.label + (pollResults ? ": " + (counts?.choices.find(c=>c.id===o.id)?.votes || 0) : "")).join("\n\n") + "\n\n" + (pollResults && p.frozen ? "Selected: " + p.frozen.winner.label + " — " + p.frozen.reason : (p.configured ? "Join: " + p.joinUrl : "Audience room is not configured. Discuss the choices together.")), source: p.frozen ? "Voting closed" : "Audience vote" }, String(version) + "-poll-" + (counts?.revision || 0) + "-" + !!p.frozen + "-" + pollResults) : stage;
    const activity = ["Running a command", "Editing files", "Using a tool", "Looking up a source", "Responding", "Working"].includes(c.activity) ? c.activity : "Working";
-   return { ...projected, projectionKind:pollOnStage?(pollResults?"results":"question"):stage.mode, theme:stage.theme, blank, build: { activity, status: c.status, outcome: ["completed", "failed", "interrupted"].includes(c.outcome) ? c.outcome : null, startedAt: c.startedAt || null, finishedAt: c.finishedAt || null } };
+   return { ...projected,live:true, projectionKind:pollOnStage?(pollResults?"results":"question"):stage.mode, theme:stage.theme, blank, build: { activity, status: c.status, outcome: ["completed", "failed", "interrupted"].includes(c.outcome) ? c.outcome : null, startedAt: c.startedAt || null, finishedAt: c.finishedAt || null } };
  };
- const broadcastTimer=setInterval(()=>{if(version>1)audienceSync.publish(publicState());},1000);
+ const broadcastTimer=setInterval(()=>{if(!liveTransition)audienceSync.publish(publicState());},1000);
  broadcastTimer.unref();
  const server = createServer(async (req, res) => {
    res.setHeader("cache-control", "no-store");
@@ -113,7 +116,20 @@ export function createStudio({ library = new ObsidianLibrary(), bridge = new Cod
          graphBusy=true;
          try{
            const op=url.pathname.slice("/api/presentation/".length);
+           if(op==="live"){
+             if(typeof body.live!=="boolean")throw new Error("Choose Live on or off");
+             if(body.live){if(!presentation)throw new Error("Load a presentation first");showGraph();live=true;audienceSync.publish(publicState());}
+             else{
+               if([...graphPolls.values(),poll].some(p=>p.busy||p.snapshot?.status==="open"))throw new Error("Close voting before turning Live off");
+               liveTransition=true;
+               try{await audienceSync.deliver(waitingStage());live=false;version++;}
+               catch(error){audienceSync.publish(publicState());throw error;}
+               finally{liveTransition=false;}
+             }
+             return json(res,deskState());
+           }
            if(op==="load"||op==="unload"){
+             if(live)throw new Error("Turn Live off before changing presentations");
              if(bridge.state.turnId||[...graphPolls.values(),poll].some(p=>p.busy||p.snapshot?.status==="open"))throw new Error("Finish the build and close voting before changing presentations");
              let next=null;
              if(op==="load"){
@@ -133,6 +149,7 @@ export function createStudio({ library = new ObsidianLibrary(), bridge = new Cod
              }else if(op==="defaults"){
                presentation.defaults.add(presentation.current);showGraph();
              }else if(op==="poll-open"||op==="poll-close"||op==="poll-refresh"){
+               if(op==="poll-open"&&!live)throw new Error("Turn Live on before opening voting");
                if(presentation.step().type!=="poll")throw new Error("Choose a poll step");
                const s=presentation.step();
                if(!graphPolls.has(s.id)){const p=new AudiencePoll({origin:poll.origin,token:poll.token,room:s.room,fetcher:poll.fetcher});p.configure(s.poll);graphPolls.set(s.id,p);}
@@ -190,10 +207,12 @@ export function createStudio({ library = new ObsidianLibrary(), bridge = new Cod
          if (!acts.some(a => a.id === body.act)) throw new Error("Unknown narrative beat");
          activeAct = body.act;
        } else if (url.pathname === "/api/publish") {
+         if(!presentation)live=true;
          pollOnStage = false;
          const next = validateDraft(body); next.demoUrl = validDemoUrl(next.demoUrl, origin);
          draft = next; publishedDraft = { ...next }; stage = publicStage(publishedDraft, ++version, stage.brief); blank = false;
        } else if (url.pathname === "/api/show-preview") {
+         if(!presentation)live=true;
          pollOnStage = false;
          if (typeof body.url !== "string" || body.url.length > 2048) throw new Error("Invalid preview URL");
          const demoUrl = validDemoUrl(body.url, origin);
@@ -202,6 +221,7 @@ export function createStudio({ library = new ObsidianLibrary(), bridge = new Cod
          publishedDraft = { ...initialDraft(), act: activeAct, mode: "demo", title: "Live app · work in progress", body: "", demoUrl, source: "Agent-supplied preview · selected by the lecturer" };
          stage = publicStage(publishedDraft, ++version); blank = false;
        } else if (url.pathname === "/api/back-material") {
+         if(!presentation)live=true;
          pollOnStage = false;
          if (!previousMaterial) throw new Error("No previous material");
          publishedDraft = previousMaterial; previousMaterial = null;
@@ -211,6 +231,7 @@ export function createStudio({ library = new ObsidianLibrary(), bridge = new Cod
          if (typeof body.brief !== "string" || body.brief.length > 20000) throw new Error("Brief is too long");
          brief = body.brief;
        } else if (url.pathname === "/api/publish-brief" || url.pathname === "/api/publish-sent-brief") {
+         if(!presentation)live=true;
          pollOnStage = false;
          const sent = url.pathname === "/api/publish-sent-brief";
          const text = sent ? lastBrief : body.brief;

@@ -32,14 +32,19 @@ export default {
        const buffer=new Uint8Array(bytes);let offset=0;for(const chunk of chunks){buffer.set(chunk,offset);offset+=chunk.length;}
        const input=JSON.parse(new TextDecoder().decode(buffer));
        if(!input||typeof input.title!=="string"||typeof input.html!=="string")throw new Error();
+       if(input.live===false){
+         const snapshots=await Promise.all(Object.keys(rooms).map(id=>env.ROOM_STATE.getByName(id).getSnapshot()));
+         if(snapshots.some(s=>s.status==="open"))return new Response("Close voting before turning Live off",{status:409});
+       }
        const stage:Record<string,unknown>={};
-       for(const key of ["act","mode","title","html","source","diagram","demoUrl","version","theme","blank","build"])if(input[key]!==undefined)stage[key]=input[key];
+       for(const key of ["live","act","mode","title","html","source","diagram","demoUrl","version","theme","blank","build"])if(input[key]!==undefined)stage[key]=input[key];
        await env.STAGE_STATE.getByName("lecture").publish(stage);
        return Response.json({ok:true});
      }catch{return new Response("Invalid stage",{status:400});}
    }
    if(url.pathname==="/api/audience"&&request.method==="GET"){
      const stage=await env.STAGE_STATE.getByName("lecture").read();
+     if(stage?.live===false)return Response.json({stage:null,poll:null},{headers:{"cache-control":"no-store","x-content-type-options":"nosniff"}});
      const snapshots=await Promise.all(Object.keys(rooms).map(async id=>({id,snapshot:await readRoomSnapshot(request,env,id)})));
      const active=snapshots.find(item=>item.snapshot.status==="open");
      return Response.json({stage,poll:active?{id:active.id,question:rooms[active.id].question,html:renderRoomFragment({roomId:active.id,snapshot:active.snapshot,hideResults:true})}:null},{headers:{"cache-control":"no-store","x-content-type-options":"nosniff"}});

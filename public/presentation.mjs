@@ -15,10 +15,11 @@ export function mountPresentations({call,update}){
  document.querySelector(".desk-grid").before(panel);
  const $=id=>document.getElementById(id);
  const liveToggle=document.createElement("button");liveToggle.id="live-toggle";liveToggle.setAttribute("aria-pressed","false");
- liveToggle.textContent="Live off";liveToggle.title="Off: browse privately. On: send the selected slide and follow navigation.";
+ liveToggle.textContent="Live off";liveToggle.title="Off: audience waits while you prepare privately. On: broadcast the selected slide.";
  document.querySelector(".mode-switch").append(liveToggle);
  $("prepare-mode").hidden=true;$("present-mode").hidden=true;
- liveToggle.onclick=()=>{(document.body.classList.contains("presenting")?$("prepare-mode"):$("present-mode")).click();};
+ let liveChanging=false;
+ liveToggle.onclick=async()=>{if(liveChanging)return;liveChanging=true;liveToggle.disabled=true;try{await run("live",{live:!data?.live});}finally{liveChanging=false;liveToggle.disabled=!data?.presentation;}};
  const syncLive=()=>{const on=document.body.classList.contains("presenting");liveToggle.textContent=on?"Live on":"Live off";liveToggle.setAttribute("aria-pressed",String(on));};
  $("prepare-mode").addEventListener("click",syncLive);$("present-mode").addEventListener("click",syncLive);
  $("prepare-mode").click();
@@ -55,7 +56,7 @@ export function mountPresentations({call,update}){
  document.addEventListener("click",event=>{if(!picker.contains(event.target))closePicker();});
  const setDetailsMode=()=>{details.open=true;};
  $("prepare-mode").addEventListener("click",setDetailsMode);
- $("present-mode").addEventListener("click",()=>{closePicker();name.disabled=true;setDetailsMode();if(data?.presentation)void run("show");});
+ $("present-mode").addEventListener("click",()=>{closePicker();name.disabled=true;setDetailsMode();});
  $("prepare-mode").addEventListener("click",()=>{name.disabled=false;});
  $("presentations-list").textContent="Refresh list";
  $("presentation-load").textContent="Load";
@@ -146,7 +147,8 @@ export function mountPresentations({call,update}){
  return value=>{
    data=value;const p=data.presentation;syncNotice.textContent=data.audienceSync?.error||"";
    for(const id of ["question","results"])$("graph-"+id).hidden=p?.step.type!=="poll";
-   liveToggle.disabled=!p;syncLive();
+   if(document.body.classList.contains("presenting")!==!!data.live)(data.live?$("present-mode"):$("prepare-mode")).click();
+   liveToggle.disabled=!p||liveChanging;syncLive();
    document.body.classList.toggle("using-presentation",!!p);panel.hidden=!p;
    name.textContent=p?.title||"Choose presentation";
    name.title=name.textContent;
@@ -190,9 +192,9 @@ export function mountPresentations({call,update}){
    const shown=data.projection;
    const preview=preparing()||!shown?p.preview:shown;
    const kind=shown?.blank?"Blank":({question:"Question",results:"Results",material:"Slide",brief:"Build prompt",demo:"App",diagram:"Diagram"}[shown?.projectionKind]||"Slide");
-   projectionStatus.textContent=(preparing()?"Preview · ":"")+"On stage: "+kind+(preparing()&&shown?" — "+shown.title:"");
+   projectionStatus.textContent=preparing()?"Private preview · audience waiting":"On stage: "+kind;
    projectionStatus.title=shown?.title||"";
-   for(const id of ["question","results"])$("graph-"+id).setAttribute("aria-pressed",String(shown?.projectionKind===id&&shown?.title===p.step.poll?.question));
+   for(const id of ["question","results"]){$("graph-"+id).disabled=!data.live;$("graph-"+id).setAttribute("aria-pressed",String(data.live&&shown?.projectionKind===id&&shown?.title===p.step.poll?.question));}
    applyTheme($("current-stage"),preparing()?p.theme:shown?.theme||p.theme);
    for(const button of outline.querySelectorAll("[data-step-id]"))button.setAttribute("aria-current",button.dataset.stepId===p.current?"step":"false");
    const nextPreview=JSON.stringify({...preview,build:undefined});
@@ -211,6 +213,6 @@ export function mountPresentations({call,update}){
    $("graph-defaults").hidden=!p.resolved.missing.length;
    $("graph-build").hidden=p.step.type!=="build";
    $("graph-build").disabled=p.resolved.missing.length>0||data.codex.status!=="ready"||p.runs.some(r=>r.step===p.current);
-   for(const id of ["open","close"]){$("graph-"+id).hidden=p.step.type!=="poll";$("graph-"+id).disabled=!data.graphPoll?.configured||!!data.graphPoll?.frozen;}
+   for(const id of ["open","close"]){$("graph-"+id).hidden=p.step.type!=="poll";$("graph-"+id).disabled=!data.graphPoll?.configured||!!data.graphPoll?.frozen||(id==="open"&&!data.live);}
  };
 }

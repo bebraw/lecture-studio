@@ -17,13 +17,22 @@ test("only published slides sync; polling never replaces another projected slide
  const call=async(op,body={})=>{const response=await fetch(address.origin+"/api/presentation/"+op,{method:"POST",headers:{origin:address.origin,authorization:"Bearer "+address.deskToken,"content-type":"application/json"},body:JSON.stringify(body)});const value=await response.json();assert.equal(response.status,200,JSON.stringify(value));return value;};
  const wait=()=>new Promise(resolve=>setTimeout(resolve,1100));
  try{
-   await call("load",{path});await wait();assert.equal(writes.length,0);
-   await call("show");await wait();assert.equal(writes.at(-1).title,"Public title");
+   await call("load",{path});await wait();assert.equal(writes.at(-1).live,false);
+   assert.equal(writes.at(-1).title,"Waiting for the lecturer");
+   await call("live",{live:true});await wait();assert.equal(writes.at(-1).title,"Public title");
    await call("select",{id:"vote"});await call("poll-open");await wait();
    assert.equal(writes.at(-1).title,"Public title");
    await call("poll-refresh");await wait();assert.equal(writes.at(-1).title,"Public title");
    await call("poll-question");await wait();assert.match(writes.at(-1).html,/Editorial/);assert.doesNotMatch(writes.at(-1).html,/Editorial: 0/);
    await call("poll-results");await wait();assert.match(writes.at(-1).html,/Editorial: 0/);
-   await call("poll-close");assert.doesNotMatch(JSON.stringify(writes),/PRIVATE|private-output|workspace/);
+   const blocked=await fetch(address.origin+"/api/presentation/live",{method:"POST",headers:{origin:address.origin,authorization:"Bearer "+address.deskToken,"content-type":"application/json"},body:JSON.stringify({live:false})});
+   assert.equal(blocked.status,400);
+   await call("poll-close");
+   const stopped=await call("live",{live:false});assert.equal(stopped.live,false);
+   assert.equal(writes.at(-1).live,false);
+   await call("select",{id:"title"});await call("show");await wait();
+   assert.equal(writes.at(-1).title,"Waiting for the lecturer");
+   await call("live",{live:true});await wait();assert.equal(writes.at(-1).title,"Public title");
+   assert.doesNotMatch(JSON.stringify(writes),/PRIVATE|private-output|workspace/);
  }finally{await new Promise(resolve=>studio.server.close(resolve));}
 });
