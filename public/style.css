@@ -275,6 +275,15 @@
 .feedback-panel p{font-size:12px;margin:8px 0;overflow-wrap:anywhere}
 .feedback-item{border-top:1px solid #ccc;padding:8px 0}
 .feedback-item p{white-space:pre-wrap}
+/* Code is primary slide content, not a small-print annotation. */
+.stage .stage-copy pre:has(code),.desk .stage-surface .stage-copy pre:has(code){
+ font-size:1.15em;line-height:1.35;white-space:pre-wrap;overflow-wrap:anywhere;
+ margin:0 0 .6em;padding:.35em 0;background:#fff;color:#202020;
+}
+.stage-copy pre code{font-size:inherit}
+.stage-copy .syntax-tag{color:#365b78}
+.stage-copy .syntax-value{color:#526b42}
+.stage-copy .syntax-comment{color:#666}
 #feedback-error{color:#a21b16}
 .word-cloud{display:flex;flex-wrap:wrap;justify-content:center;align-items:center;gap:12px 24px}
 .word-cloud>span{line-height:1.2;overflow-wrap:anywhere}
