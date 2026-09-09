@@ -1,5 +1,29 @@
 # Lecture Studio
 
+## Live broadcast and deployment
+
+The header's **Live** control is server-owned. Live off clears the public student
+view to “Waiting for the lecturer”; browsing slides remains private. Live on
+immediately broadcasts the selected slide. Close any open vote before turning
+Live off. If the audience service cannot confirm the update, the desk reports an
+error rather than claiming the broadcast stopped. Reloading a desk does not
+change Live state; restarting the local server starts with Live off.
+
+Pushes to main run unit tests and focused presentation browser tests, then deploy
+only the public audience Worker through GitHub Actions. The local studio, Obsidian
+and Codex integrations remain local. Manual runs are also available in Actions.
+The target is `lecture-votes-20260909-bfbeb2745cce` in account
+`3118f9560af77a0819ba24e1a14bcc9e`. Deployment preserves the existing presenter
+secret and room data; it never seeds, resets, or submits votes.
+
+GitHub needs the repository secret `CLOUDFLARE_API_TOKEN`, scoped to this
+Cloudflare account with Workers Scripts Write and Account Settings Read.
+The current credential expires September 10, 2027; rotate it before then.
+Do not put this token or the separate presenter token in the repository.
+
+The sections below include historical prototype workflows; the Live control
+above supersedes the old Prepare/Present switching behavior.
+
 Present mode uses a single ordered lecture sequence: title, opening question, then the historical and future discussion slides. **Previous slide** and **Next slide** publish immediately and synchronize the related cue/material. Previous at the beginning shows the opening title. These controls never start a build. There is no separate Show current slide button or audience-slide dropdown. Prepare-mode plot browsing remains private.
 
 ## Curated projection cards
