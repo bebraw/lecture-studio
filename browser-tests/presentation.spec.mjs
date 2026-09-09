@@ -68,6 +68,7 @@ test("Obsidian snapshot loads privately and detours return without changing the 
    expect((await desk.locator(".topbar").boundingBox()).height).toBeLessThanOrEqual(60);
    await expect(desk.locator("#presentation-outline")).not.toContainText("Optional detours");
    await expect(desk.locator('.outline-related[data-related-to="question"]')).toHaveText("Definition detour");
+   await expect(desk.locator('.outline-related[data-related-to="question"]')).toBeHidden();
    await expect(desk.locator(".plot")).toBeHidden();
    const width=await desk.locator("#presentation-outline").evaluate(el=>el.getBoundingClientRect().width);
    expect(width).toBeGreaterThanOrEqual(290);
@@ -78,6 +79,7 @@ test("Obsidian snapshot loads privately and detours return without changing the 
    await questionButton.click();
    await expect(desk.locator("#current-stage h1")).toHaveText("Audience question");
    await expect(questionButton).toBeFocused();
+   await expect(desk.locator('.outline-related[data-related-to="question"]')).toBeVisible();
    expect((await desk.locator("#presentation-outline").boundingBox()).y).toBe(outlineBox.y);
    expect((await desk.locator("#current-stage").boundingBox()).height).toBe(previewBox.height);
    await desk.locator('#presentation-outline [data-step-id="title"]').click();
