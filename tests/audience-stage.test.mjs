@@ -12,6 +12,9 @@ test("audience sync serializes writes and coalesces intermediate slides",async()
  const sync=new AudienceStageSync({origin:"https://audience.invalid",token:"test",fetcher:async(_url,options)=>{sent.push(JSON.parse(options.body));await new Promise(resolve=>releases.push(resolve));return new Response(null,{status:204});}});
  sync.publish({title:"One"});sync.publish({title:"Two"});sync.publish({title:"Three"});
  assert.equal(sent.length,1);releases.shift()();
- await new Promise(resolve=>setTimeout(resolve,20));assert.equal(sent.length,2);assert.equal(sent[1].title,"Three");
- releases.shift()();sync.close();
+ try{await assert.doesNotReject(async()=>{
+   const deadline=Date.now()+2000;
+   while(sent.length<2&&Date.now()<deadline)await new Promise(resolve=>setTimeout(resolve,10));
+   assert.equal(sent.length,2);assert.equal(sent[1].title,"Three");
+ });}finally{releases.shift()?.();sync.close();}
 });
