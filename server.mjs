@@ -12,6 +12,7 @@ import { AudiencePoll } from "./lib/audience-poll.mjs";
 import { AudienceStageSync } from "./lib/audience-stage.mjs";
 import { LectureSearch } from "./lib/lecture-search.mjs";
 import {parsePresentation,PresentationSession} from "./lib/presentation.mjs";
+import {feedbackRequest,feedbackSlide} from "./lib/feedback.mjs";
 
 const root = dirname(fileURLToPath(import.meta.url));
 export function safeEqual(a, b) {
@@ -40,12 +41,14 @@ export function createStudio({ library = new ObsidianLibrary(), bridge = new Cod
  let stage = publicStage(publishedDraft, version), lastBrief = "";
  let activeAct = "opening", libraryFiles = [], savedAt = null;
  let previousMaterial = null;
+ let feedbackPrevious=null;
  let rehearsalJob = { status: "idle" }, resetVersion = 0;
  let pollOnStage = false, projectedPoll=null, pollResults=false, live=false, liveTransition=false;
  const waitingStage=()=>({...publicStage({...initialDraft(),act:"",mode:"material",title:"Waiting for the lecturer",body:"",source:""},String(version)+"-off"),live:false,projectionKind:"waiting",blank:false,build:{status:"ready",startedAt:null,finishedAt:null}});
  let presentation=null, graphPoll=null, graphBusy=false;
  const graphPolls=new Map();
  const showGraph=()=>{
+   feedbackPrevious=null;
    const s=presentation.step();
    if(s.type==="poll"){
      if(!graphPolls.has(s.id)){
@@ -58,6 +61,7 @@ export function createStudio({ library = new ObsidianLibrary(), bridge = new Cod
    publishedDraft={...draft};stage={...publicStage(draft,++version),theme:presentation.definition.theme};blank=false;
  };
  const resetLecture = () => {
+   feedbackPrevious=null;
    live=false;
    poll.reset(); pollOnStage = false;
    presentation=null;graphPoll=null;graphPolls.clear();
@@ -94,6 +98,7 @@ export function createStudio({ library = new ObsidianLibrary(), bridge = new Cod
        if (!isDesk && !(isStage && url.pathname === "/api/stage" && req.method === "GET")) return json(res, { error: "This window is not authorized" }, 401);
        if (req.method === "GET") {
          if (url.pathname === "/api/desk") return json(res, deskState());
+         if (url.pathname === "/api/feedback") return json(res,await feedbackRequest(poll));
          if (url.pathname === "/api/stage") return json(res, publicState());
          if (url.pathname === "/api/stage-link") return json(res, { url: origin + "/stage#" + stageToken });
          if (url.pathname === "/api/library") { libraryFiles = await library.list(); lectureSearch.clear(); return json(res, { files: libraryFiles }); }
@@ -111,6 +116,29 @@ export function createStudio({ library = new ObsidianLibrary(), bridge = new Cod
        }
        if (req.method !== "POST" || req.headers.origin !== origin) return json(res, { error: "Same-origin POST required" }, 403);
        const body = await readJson(req);
+       if(url.pathname==="/api/feedback"){
+         if(graphBusy||liveTransition)throw new Error("Wait for the current stage update");
+         graphBusy=true;
+         try{
+           if(body.action==="show-question"||body.action==="show-cloud"){
+             if(!live)throw new Error("Turn Live on first");
+             const snapshot=await feedbackRequest(poll);
+             const selected=feedbackSlide(snapshot,body.action==="show-question"?body.id:null);
+             feedbackPrevious ||= {stage,pollOnStage};
+             stage={...stage,...selected,version:++version};pollOnStage=false;blank=false;
+             return json(res,deskState());
+           }
+           if(body.action==="return"){
+             if(feedbackPrevious){stage={...feedbackPrevious.stage,version:++version};pollOnStage=feedbackPrevious.pollOnStage;feedbackPrevious=null;}
+             return json(res,deskState());
+           }
+           if(body.action==="start"){
+             if(!live)throw new Error("Turn Live on first");
+             await audienceSync.deliver(publicState());
+           }
+           return json(res,await feedbackRequest(poll,body));
+         }finally{graphBusy=false;}
+       }
        if(url.pathname.startsWith("/api/presentation/")){
          if(graphBusy||rehearsalJob.status==="creating")throw new Error("Presentation operation in progress");
          graphBusy=true;
@@ -275,7 +303,8 @@ export function createStudio({ library = new ObsidianLibrary(), bridge = new Cod
        const vendorRoot = await realpath(resolve(root, "node_modules/mermaid/dist"));
        path = await realpath(resolve(vendorRoot, decodeURIComponent(url.pathname.slice("/vendor/mermaid/".length))));
        if (!path.startsWith(vendorRoot + sep) || ![".mjs", ".js", ".woff2"].includes(extname(path))) return json(res, { error: "Not found" }, 404);
-     } else return json(res, { error: "Not found" }, 404);
+     } else if(url.pathname==="/feedback.mjs")path=resolve(root,"public/feedback.mjs");
+     else return json(res, { error: "Not found" }, 404);
      const content = await readFile(path);
      const type = { ".html": "text/html; charset=utf-8", ".css": "text/css", ".mjs": "text/javascript", ".js": "text/javascript", ".woff2": "font/woff2" }[extname(path)];
      res.writeHead(200, { "content-type": type }); res.end(content);

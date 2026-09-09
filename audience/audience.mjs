@@ -1,6 +1,38 @@
 import {surface,applyTheme,renderDiagrams,buildLabel,escape} from "./shared.mjs";
 const main=document.querySelector("#stage-content"),notice=document.querySelector("#stage-connection");
 let key="",submitting=false,voteError="";
+const feedback=document.createElement("details");
+feedback.id="student-feedback";feedback.hidden=true;
+feedback.innerHTML='<summary>Send a response</summary><form><label id="feedback-label" for="feedback-text"></label><textarea id="feedback-text" required maxlength="400"></textarea><p>Private to the lecturer unless selected for discussion. No names or sensitive information. Responses expire after 24 hours.</p><button>Send privately</button><p id="feedback-notice" role="status"></p></form>';
+document.querySelector(".stage-bottom").before(feedback);
+let feedbackConfig=null,feedbackBusy=false;
+async function refreshFeedback(){
+ try{
+   const response=await fetch("/api/feedback",{cache:"no-store",signal:AbortSignal.timeout(8000)});
+   if(!response.ok)throw new Error();
+   const config=await response.json();
+   if(config?.round!==feedbackConfig?.round){feedback.querySelector("form").reset();feedback.querySelector("#feedback-notice").textContent="";}
+   feedbackConfig=config;feedback.hidden=!config?.open;
+   if(config?.open){
+     feedback.querySelector("summary").textContent=config.mode==="words"?"Add words":"Ask a question";
+     feedback.querySelector("#feedback-label").textContent=config.prompt;
+     feedback.querySelector("textarea").maxLength=config.mode==="words"?32:400;
+   }
+ }catch{feedback.hidden=true;}
+ finally{setTimeout(refreshFeedback,3000);}
+}
+feedback.querySelector("form").onsubmit=async event=>{
+ event.preventDefault();if(feedbackBusy||!feedbackConfig?.open)return;
+ feedbackBusy=true;const button=feedback.querySelector("button");button.disabled=true;
+ try{
+   const response=await fetch("/api/feedback",{method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify({round:feedbackConfig.round,text:feedback.querySelector("textarea").value}),signal:AbortSignal.timeout(8000)});
+   const result=await response.json();if(!response.ok)throw new Error(result.error||"Not confirmed");
+   feedback.querySelector("textarea").value="";
+   feedback.querySelector("#feedback-notice").textContent="Sent privately. The lecturer chooses what to show.";
+ }catch(e){feedback.querySelector("#feedback-notice").textContent=e.message;}
+ finally{feedbackBusy=false;button.disabled=false;}
+};
+void refreshFeedback();
 async function refresh(){
  try{
    const response=await fetch("/api/audience",{cache:"no-store",signal:AbortSignal.timeout(8000)});

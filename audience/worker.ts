@@ -1,5 +1,7 @@
 import {handleRoomRequest,readRoomSnapshot} from "./room-http";
 import {renderRoomFragment} from "./room-view";
+import {feedbackRequest} from "./feedback-http";
+import type {JsonValue} from "./stage-state";
 export {RoomState} from "./room-state";
 export {StageState} from "./stage-state";
 
@@ -21,6 +23,11 @@ async function authorized(request:Request,secret:string){
 export default {
  async fetch(request:Request,env:Env):Promise<Response>{
    const url=new URL(request.url);
+   if(url.pathname==="/api/feedback")return feedbackRequest(request,env,false);
+   if(url.pathname==="/presenter/feedback"){
+     if(!await authorized(request,env.PRESENTER_TOKEN))return new Response("Unauthorized",{status:401});
+     return feedbackRequest(request,env,true);
+   }
    if(url.pathname==="/presenter/stage"){
      if(request.method!=="POST")return new Response("Method not allowed",{status:405});
      if(!await authorized(request,env.PRESENTER_TOKEN))return new Response("Unauthorized",{status:401});
@@ -36,7 +43,7 @@ export default {
          const snapshots=await Promise.all(Object.keys(rooms).map(id=>env.ROOM_STATE.getByName(id).getSnapshot()));
          if(snapshots.some(s=>s.status==="open"))return new Response("Close voting before turning Live off",{status:409});
        }
-       const stage:Record<string,unknown>={};
+       const stage:Record<string,JsonValue>={};
        for(const key of ["live","act","mode","title","html","source","diagram","demoUrl","version","theme","blank","build"])if(input[key]!==undefined)stage[key]=input[key];
        await env.STAGE_STATE.getByName("lecture").publish(stage);
        return Response.json({ok:true});

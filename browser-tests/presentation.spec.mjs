@@ -16,6 +16,8 @@ test("Obsidian snapshot loads privately and detours return without changing the 
    await expect(desk.locator("body")).toHaveCSS("background-color","rgb(255, 255, 255)");
    await expect(desk.locator(".builder")).toHaveCSS("background-color","rgb(245, 245, 245)");
    await expect(stage.locator("body")).toHaveCSS("background-color","rgb(255, 255, 255)");
+   await expect(stage.locator("#student-link")).toHaveText("live.scalableweb.dev");
+   await expect(stage.locator("#student-link")).toHaveAttribute("href","https://live.scalableweb.dev");
    await expect(desk.locator("#presentation-outline")).toBeHidden();
    await expect(desk.locator("body")).not.toContainText("Load an Obsidian presentation to see");
    await expect(desk.locator("#presentation-setup")).toBeHidden();
@@ -102,6 +104,7 @@ test("Obsidian snapshot loads privately and detours return without changing the 
    await desk.locator("#graph-next").click();
    await desk.locator('#presentation-outline [data-step-id="aside"]').click();
    await expect(stage.locator("h1")).toHaveText("Definition detour");
+   await expect(stage.locator("#student-link")).toBeVisible();
    await expect(stage.locator("body")).not.toContainText("PRIVATE FACILITATION");
    await expect(stage.locator("#build-signal")).toBeVisible();
    await desk.locator("#graph-return").click();

@@ -2,6 +2,40 @@
 
 ## Live broadcast and deployment
 
+### Private audience responses
+
+The header's **Responses** menu opens either questions or a word collection,
+independently of voting. Students submit from a collapsible form below their
+shared stage. Nothing submitted is automatically published or sent to Codex.
+
+- **Discuss** projects one selected question; **Back to slide** restores the
+  previous projection. **Done** removes an item from the pending review list.
+- For words, **Approve** admits individual responses to the cloud.
+  **Show approved cloud** publishes a frozen snapshot of approved responses only.
+  Repeated terms are combined case-insensitively; the 40 most frequent approved
+  terms are shown with counts. New submissions require another review and show.
+- **Close collection** stops submissions without removing responses.
+  **Open new collection** replaces the old queue after confirmation. Live off
+  also closes collection. No votes are affected.
+
+Limits: 400 characters per question; 1–3 words / 32 characters per cloud response;
+20 seconds between submissions and five per anonymous browser per collection;
+120 submissions per minute per hashed network address; 500 total per collection.
+Cookies and network limits deter casual flooding, not determined abuse. The
+shared-network allowance accommodates a classroom behind one network.
+No names or raw IP addresses are stored. The queue and hashed limiter data expire
+after 24 hours; already projected snapshots remain until you change the stage.
+Cloudflare's storage recovery window may retain recoverable data beyond deletion.
+
+Run `node audience/check-feedback.mjs` against an isolated Worker on port 8796
+for the local-only acceptance test. It never targets the public lecture.
+
+Students join at **https://live.scalableweb.dev**. The projected stage keeps this
+address in its footer on every slide, alongside attribution and build progress.
+Use this origin for `LECTURE_POLL_ORIGIN` so the desk's links and polls match.
+The custom domain is managed in the Cloudflare dashboard on the existing audience
+Worker; the main scalableweb.dev site is unchanged.
+
 The header's **Live** control is server-owned. Live off clears the public student
 view to “Waiting for the lecturer”; browsing slides remains private. Live on
 immediately broadcasts the selected slide. Close any open vote before turning

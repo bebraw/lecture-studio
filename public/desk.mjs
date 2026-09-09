@@ -1,6 +1,7 @@
 import { auth, api, escape, surface, renderDiagrams, buildLabel, previewCandidates } from "./shared.mjs";
 import { mountExplorer } from "./explore.mjs";
 import {mountPresentations} from "./presentation.mjs";
+import {mountFeedback} from "./feedback.mjs";
 const $ = id => document.getElementById(id), token = auth("desk");
 let state, files = [], note, selected, requestKey = "", modelKey = "", draftSequence = 0;
 let previewKey = "";
@@ -188,6 +189,7 @@ explorer = mountExplorer({ host: document.querySelector(".material-column"), cal
  fields(data.draft); preview(data); updateRuntime(data);
 }});
 updatePresentation=mountPresentations({call,update:updateRuntime});
+mountFeedback({call,update:updateRuntime});
 init().catch(e => { $("auth-error").hidden = false; notice(e.message, true); });
 
 function setupModes() {
