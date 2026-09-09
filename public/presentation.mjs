@@ -14,16 +14,27 @@ export function mountPresentations({call,update}){
  panel.innerHTML='<span id="graph-label" class="section-label"></span><h2 id="graph-title"></h2><p id="graph-notes" class="small muted"></p><pre id="graph-prompt"></pre><div id="graph-detours" class="button-row"></div><div class="button-row"><button id="graph-previous">Previous</button><button id="graph-next" class="primary">Begin presentation</button><button id="graph-return">Return to narrative</button><button id="graph-defaults">Use declared defaults</button><button id="graph-build">Start this build</button><button id="graph-open">Open voting</button><button id="graph-close">Close voting</button></div><p id="graph-status" role="status"></p>';
  document.querySelector(".desk-grid").before(panel);
  const $=id=>document.getElementById(id);
+ const liveToggle=document.createElement("button");liveToggle.id="live-toggle";liveToggle.setAttribute("aria-pressed","false");
+ liveToggle.textContent="Live off";liveToggle.title="Off: browse privately. On: send the selected slide and follow navigation.";
+ document.querySelector(".mode-switch").append(liveToggle);
+ $("prepare-mode").hidden=true;$("present-mode").hidden=true;
+ liveToggle.onclick=()=>{(document.body.classList.contains("presenting")?$("prepare-mode"):$("present-mode")).click();};
+ const syncLive=()=>{const on=document.body.classList.contains("presenting");liveToggle.textContent=on?"Live on":"Live off";liveToggle.setAttribute("aria-pressed",String(on));};
+ $("prepare-mode").addEventListener("click",syncLive);$("present-mode").addEventListener("click",syncLive);
+ $("prepare-mode").click();
  $("open-stage").textContent="Stage ↗";
  $("open-stage").title="Open projected stage";
  $("open-stage").setAttribute("aria-label","Open projected stage");
  const details=document.createElement("details");details.id="presentation-details";
- const summary=document.createElement("summary");summary.textContent="Details";details.append(summary);
+ const summary=document.createElement("summary");summary.textContent="Notes & output";details.append(summary);
  const notes=document.createElement("section");notes.id="presentation-detail-content";
  details.append(notes);panel.append(outline,details);
  notes.append($("graph-notes"),$("graph-prompt"));
- const modelLabel=$("model").closest("label");notes.append(modelLabel);
- notes.append($("activity"),$("interrupt"),$("requests"),$("messages"),$("preview-shortcuts"),$("back-material"));
+ const modelLabel=$("model").closest("label");
+ const codexControls=document.createElement("div");codexControls.id="codex-controls";
+ codexControls.append(modelLabel,$("activity"),$("interrupt"));
+ document.querySelector(".connections-panel").append(codexControls);
+ notes.append($("requests"),$("messages"),$("preview-shortcuts"),$("back-material"));
  const stagePanel=$("current-stage-panel");$("graph-detours").before(stagePanel);
  $("graph-next").parentElement.append($("live-progress"));
  stagePanel.querySelector(".section-heading").remove();
@@ -31,6 +42,9 @@ export function mountPresentations({call,update}){
  const picker=document.createElement("div");picker.id="presentation-picker";
  const name=document.createElement("button");name.id="presentation-name";name.setAttribute("aria-expanded","false");name.setAttribute("aria-controls","presentation-setup");
  picker.append(name,setup);document.querySelector(".brand").after(picker);setup.hidden=true;
+ setup.append($("restart-presentation"));
+ if(rehearsalControls)document.querySelector(".connections-panel").append(rehearsalControls);
+ session.remove();
  const closePicker=()=>{setup.hidden=true;name.setAttribute("aria-expanded","false");};
  name.onclick=()=>{if(data?.presentation&&document.body.classList.contains("presenting"))return;setup.hidden=!setup.hidden;name.setAttribute("aria-expanded",String(!setup.hidden));};
  picker.addEventListener("keydown",event=>{if(event.key==="Escape"){closePicker();name.focus();event.stopPropagation();}});
@@ -46,7 +60,7 @@ export function mountPresentations({call,update}){
  $("new-rehearsal").textContent="Start fresh app workspace…";
  $("restart-presentation").onclick=async()=>{
    if(!data?.presentation||!confirm("Restart this presentation from its latest Obsidian content? Slide position and recorded presentation decisions will reset. App workspace files will stay intact."))return;
-   if(await run("load",{path:data.presentation.path}))session.open=false;
+   if(await run("load",{path:data.presentation.path}))closePicker();
  };
  $("presentation-choice").hidden=true;$("presentation-load").hidden=true;
  setup.querySelector("h2").remove();
@@ -121,6 +135,7 @@ export function mountPresentations({call,update}){
  $("graph-build").onclick=()=>run("build",{model:$("model").value});
  return value=>{
    data=value;const p=data.presentation;
+   liveToggle.disabled=!p;syncLive();
    document.body.classList.toggle("using-presentation",!!p);panel.hidden=!p;
    name.textContent=p?.title||"Choose presentation";
    name.title=name.textContent;
