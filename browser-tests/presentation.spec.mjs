@@ -11,7 +11,8 @@ test("Obsidian snapshot loads privately and detours return without changing the 
    await expect(desk.locator(".builder")).toBeHidden();
    await expect(desk.locator(".material-column")).toBeHidden();
    await expect(desk.locator("#presentation-choice")).toBeHidden();
-   await expect(desk.locator("#presentations-list")).toHaveText("Connect Obsidian");
+   await expect(desk.locator("#presentations-list")).toHaveText("Refresh list");
+   await expect(desk.locator("#presentation-unload")).toHaveCount(0);
    await expect(desk.locator("body")).toHaveCSS("background-color","rgb(255, 255, 255)");
    await expect(desk.locator(".builder")).toHaveCSS("background-color","rgb(245, 245, 245)");
    await expect(stage.locator("body")).toHaveCSS("background-color","rgb(255, 255, 255)");
@@ -22,10 +23,31 @@ test("Obsidian snapshot loads privately and detours return without changing the 
    await expect(desk.locator("#graph-title")).toHaveText("Snapshot title");
    await expect(desk.locator("#current-stage h1")).toHaveText("Snapshot title");
    await expect(desk.locator("#current-stage")).toHaveCSS("background-color","rgb(255, 255, 255)");
+   await expect(desk.locator("#current-stage-panel #live-progress")).toBeEmpty();
+   await expect(desk.locator("#codex-signal")).toHaveAttribute("aria-label","Codex: disconnected");
+   await desk.locator("#presentation-outline").evaluate(el=>{el.style.maxHeight="45px";});
+   const pagePosition=await desk.evaluate(()=>window.scrollY);
+   const previewPosition=await desk.locator("#current-stage").boundingBox();
    await desk.keyboard.press("ArrowRight");
    await expect(desk.locator("#current-stage h1")).toHaveText("Audience question");
+   await expect(desk.locator('#presentation-outline [data-step-id="question"]')).toBeFocused();
+   await expect.poll(()=>desk.locator("#presentation-outline").evaluate(el=>el.scrollTop)).toBeGreaterThan(0);
+   const selectedVisible=()=>desk.locator("#presentation-outline").evaluate(el=>{
+     const item=el.querySelector('[aria-current="step"]').getBoundingClientRect(),box=el.getBoundingClientRect();
+     return item.top>=box.top-1&&item.bottom<=box.bottom+1;
+   });
+   await expect.poll(selectedVisible).toBe(true);
+   expect(await desk.evaluate(()=>window.scrollY)).toBe(pagePosition);
+   expect((await desk.locator("#current-stage").boundingBox()).y).toBe(previewPosition.y);
    await expect(stage.locator("h1")).toHaveText("Who is the interface for?");
    await desk.keyboard.press("ArrowLeft");
+   await expect(desk.locator("#current-stage h1")).toHaveText("Snapshot title");
+   await expect.poll(selectedVisible).toBe(true);
+   await desk.locator("#presentation-outline").evaluate(el=>{el.style.removeProperty("max-height");});
+   await expect(desk.locator('#presentation-outline [data-step-id="title"]')).toBeFocused();
+   await desk.locator("#connections>summary").focus();
+   await desk.keyboard.press("ArrowRight");
+   await expect(desk.locator("#connections>summary")).toBeFocused();
    await expect(desk.locator("#current-stage h1")).toHaveText("Snapshot title");
    expect((await desk.locator(".topbar").boundingBox()).height).toBeLessThanOrEqual(60);
    await expect(desk.locator("#presentation-outline")).not.toContainText("Optional detours");
@@ -46,7 +68,7 @@ test("Obsidian snapshot loads privately and detours return without changing the 
    await expect(desk.locator("#current-stage h1")).toHaveText("Snapshot title");
    definition.steps[0].title="Edited in vault";
    library.status="Unavailable";
-   await desk.locator("#present-mode").click();await desk.locator("#graph-next").click();
+   await desk.locator("#present-mode").click();
    await expect(desk.locator(".builder")).toBeHidden();
    await expect(desk.locator(".material-column")).toBeHidden();
    await expect(desk.locator("#presentation-details")).not.toHaveAttribute("open","");
@@ -56,7 +78,7 @@ test("Obsidian snapshot loads privately and detours return without changing the 
    await expect(desk.locator("#current-stage h1")).toHaveCSS("font-family","Verdana, sans-serif");
    await expect(desk.locator("#graph-presentation")).toBeVisible();
    await desk.locator("#graph-next").click();
-   await desk.getByRole("button",{name:"Definition detour",exact:true}).click();
+   await desk.locator('#presentation-outline [data-step-id="aside"]').click();
    await expect(stage.locator("h1")).toHaveText("Definition detour");
    await expect(stage.locator("body")).not.toContainText("PRIVATE FACILITATION");
    await expect(stage.locator("#build-signal")).toBeVisible();
@@ -69,7 +91,11 @@ test("Obsidian snapshot loads privately and detours return without changing the 
    await expect(desk.locator("#current-stage h1")).toHaveText("Snapshot title");
    await expect(desk.locator("#graph-next")).toHaveText("Next →");
    await expect(stage.locator("h1")).toHaveText("Audience question");
-   await desk.locator("#graph-show").click();
+   await expect(desk.locator("#graph-show")).toHaveCount(0);
+   await desk.locator("#present-mode").click();
    await expect(stage.locator("h1")).toHaveText("Snapshot title");
+   await expect(desk.locator("#presentation-outline")).toBeVisible();
+   await desk.locator('#presentation-outline [data-step-id="question"]').click();
+   await expect(stage.locator("h1")).toHaveText("Audience question");
  }finally{await context.close();await new Promise(resolve=>studio.server.close(resolve));}
 });
