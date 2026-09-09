@@ -3,6 +3,15 @@ import assert from "node:assert/strict";
 import {parsePresentation,PresentationSession,parseTheme} from "../lib/presentation.mjs";
 const definition={version:1,title:"Test",start:"question",steps:[{id:"question",type:"question",title:"Question",next:"poll",related:["aside"]},{id:"aside",type:"material",title:"Aside"},{id:"poll",type:"poll",title:"Theme",room:"test",poll:{question:"Theme?",options:[{id:"one",label:"One"},{id:"two",label:"Two"}],defaultId:"one"},next:"build"},{id:"build",type:"build",title:"Build",body:"Implement.",uses:[{poll:"poll",instructions:{one:"Use one.",two:"Use two."}}]}]};
 const note=value=>({sections:[{heading:"Presentation",body:"```json\n"+JSON.stringify(value)+"\n```"}]});
+test("remote slide images require an explicit boolean opt-in",()=>{
+ const d={version:1,title:"Images",start:"image",steps:[{id:"image",type:"material",title:"Browser",body:"![Browser](https://www.w3.org/browser.gif)"}]};
+ const preview=()=>new PresentationSession(parsePresentation(note(d)),"test").state().preview.html;
+ assert.doesNotMatch(preview(),/<img /);
+ d.steps[0].allowRemoteImages=true;
+ assert.match(preview(),/<img referrerpolicy="no-referrer"/);
+ d.steps[0].allowRemoteImages="true";
+ assert.throws(preview,/Invalid remote image/);
+});
 test("presentation themes default to white and validate overrides",()=>{
  assert.equal(parseTheme().background,"#ffffff");
  assert.equal(parseTheme({headingFont:"Verdana, sans-serif"}).headingFont,"Verdana, sans-serif");

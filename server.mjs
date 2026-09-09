@@ -57,7 +57,7 @@ export function createStudio({ library = new ObsidianLibrary(), bridge = new Cod
      }
      graphPoll=graphPolls.get(s.id);projectedPoll=graphPoll;pollOnStage=true;pollResults=false;
    }else{graphPoll=null;pollOnStage=false;}
-   draft=validateDraft({...initialDraft(),mode:s.type==="build"?"brief":s.type==="question"?"question":"material",title:s.title,body:s.type==="build"?presentation.resolve().prompt:s.body||"",source:s.source||""});
+   draft=validateDraft({...initialDraft(),mode:s.type==="build"?"brief":s.type==="question"?"question":"material",title:s.title,body:s.type==="build"?presentation.resolve().prompt:s.body||"",source:s.source||"",allowRemoteImages:s.allowRemoteImages===true});
    publishedDraft={...draft};stage={...publicStage(draft,++version),theme:presentation.definition.theme};blank=false;
  };
  const resetLecture = () => {
