@@ -3,3 +3,6 @@ node_modules/
 .local/
 test-results/
 playwright-report/
+audience/.wrangler/
+audience/worker-configuration.d.ts
+audience/.dev.vars

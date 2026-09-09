@@ -1,0 +1,11 @@
+{
+  "$schema":"node_modules/wrangler/config-schema.json",
+  "name":"lecture-studio-audience",
+  "main":"worker.ts",
+  "compatibility_date":"2026-09-04",
+  "workers_dev":true,
+  "preview_urls":false,
+  "secrets":{"required":["PRESENTER_TOKEN"]},
+  "durable_objects":{"bindings":[{"name":"ROOM_STATE","class_name":"RoomState"}]},
+  "migrations":[{"tag":"v1","new_sqlite_classes":["RoomState"]}]
+}
