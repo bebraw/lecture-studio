@@ -65,13 +65,13 @@ export function createStudio({ library = new ObsidianLibrary(), bridge = new Cod
    blank = false; brief = acts[0].brief; lastBrief = ""; activeAct = "opening"; previousMaterial = null; resetVersion++;
  };
  const json = (res, value, status = 200) => { res.writeHead(status, { "content-type": "application/json" }); res.end(JSON.stringify(value)); };
- const deskState = () => ({ audienceSync:{error:audienceSync.error}, presentation:presentation?.state()||null, graphPoll:graphPoll?.state()||null, acts, scope, draft, draftPreview: publicStage(draft, version), stage: pollOnStage ? { ...stage, title: (projectedPoll||poll).config.question, mode: "poll" } : stage, blank, canReturnToMaterial: !!previousMaterial, activeAct, brief, lastBrief, codex: bridge.snapshot(), libraryStatus: library.status, workspace, savedAt, rehearsalJob, resetVersion, poll: poll.state() });
+ const deskState = () => ({ projection:publicState(), audienceSync:{error:audienceSync.error}, presentation:presentation?.state()||null, graphPoll:graphPoll?.state()||null, acts, scope, draft, draftPreview: publicStage(draft, version), stage: pollOnStage ? { ...stage, title: (projectedPoll||poll).config.question, mode: "poll" } : stage, blank, canReturnToMaterial: !!previousMaterial, activeAct, brief, lastBrief, codex: bridge.snapshot(), libraryStatus: library.status, workspace, savedAt, rehearsalJob, resetVersion, poll: poll.state() });
  const publicState = () => {
    const c = bridge.state;
    const p = (projectedPoll||poll).state(), counts = p.frozen || p.snapshot;
    const projected = pollOnStage ? publicStage({ ...initialDraft(), mode: "material", title: p.config.question, body: p.config.options.map(o => o.label + (pollResults ? ": " + (counts?.choices.find(c=>c.id===o.id)?.votes || 0) : "")).join("\n\n") + "\n\n" + (pollResults && p.frozen ? "Selected: " + p.frozen.winner.label + " — " + p.frozen.reason : (p.configured ? "Join: " + p.joinUrl : "Audience room is not configured. Discuss the choices together.")), source: p.frozen ? "Voting closed" : "Audience vote" }, String(version) + "-poll-" + (counts?.revision || 0) + "-" + !!p.frozen + "-" + pollResults) : stage;
    const activity = ["Running a command", "Editing files", "Using a tool", "Looking up a source", "Responding", "Working"].includes(c.activity) ? c.activity : "Working";
-   return { ...projected, theme:stage.theme, blank, build: { activity, status: c.status, outcome: ["completed", "failed", "interrupted"].includes(c.outcome) ? c.outcome : null, startedAt: c.startedAt || null, finishedAt: c.finishedAt || null } };
+   return { ...projected, projectionKind:pollOnStage?(pollResults?"results":"question"):stage.mode, theme:stage.theme, blank, build: { activity, status: c.status, outcome: ["completed", "failed", "interrupted"].includes(c.outcome) ? c.outcome : null, startedAt: c.startedAt || null, finishedAt: c.finishedAt || null } };
  };
  const broadcastTimer=setInterval(()=>{if(version>1)audienceSync.publish(publicState());},1000);
  broadcastTimer.unref();

@@ -38,6 +38,8 @@ export function mountPresentations({call,update}){
  const output=document.createElement("details");output.id="build-output";
  const outputSummary=document.createElement("summary");outputSummary.textContent="Build output";output.append(outputSummary,$("messages"),$("preview-shortcuts"),$("back-material"));notes.append(output);
  const stagePanel=$("current-stage-panel");$("graph-detours").before(stagePanel);
+ const projectionStatus=document.createElement("span");projectionStatus.id="projection-status";projectionStatus.className="small muted";projectionStatus.setAttribute("role","status");
+ $("graph-next").parentElement.append(projectionStatus);
  $("graph-next").parentElement.append($("live-progress"));
  stagePanel.querySelector(".section-heading").remove();
  $("graph-detours").remove();
@@ -185,10 +187,16 @@ export function mountPresentations({call,update}){
      const active=row.dataset.rowId===(parent?.id||p.current);
      row.querySelector(".outline-links").hidden=!active;
    }
-   applyTheme($("current-stage"),p.theme);
+   const shown=data.projection;
+   const preview=preparing()||!shown?p.preview:shown;
+   const kind=shown?.blank?"Blank":({question:"Question",results:"Results",material:"Slide",brief:"Build prompt",demo:"App",diagram:"Diagram"}[shown?.projectionKind]||"Slide");
+   projectionStatus.textContent=(preparing()?"Preview · ":"")+"On stage: "+kind+(preparing()&&shown?" — "+shown.title:"");
+   projectionStatus.title=shown?.title||"";
+   for(const id of ["question","results"])$("graph-"+id).setAttribute("aria-pressed",String(shown?.projectionKind===id&&shown?.title===p.step.poll?.question));
+   applyTheme($("current-stage"),preparing()?p.theme:shown?.theme||p.theme);
    for(const button of outline.querySelectorAll("[data-step-id]"))button.setAttribute("aria-current",button.dataset.stepId===p.current?"step":"false");
-   const nextPreview=JSON.stringify(p.preview);
-   if(nextPreview!==previewKey){previewKey=nextPreview;$("current-stage").classList.remove("stage-blank-preview");$("current-stage").innerHTML=surface(p.preview);void renderDiagrams($("current-stage"));}
+   const nextPreview=JSON.stringify({...preview,build:undefined});
+   if(nextPreview!==previewKey){previewKey=nextPreview;$("current-stage").classList.toggle("stage-blank-preview",!!preview.blank);$("current-stage").innerHTML=preview.blank?"<p>Stage is blank</p>":surface(preview);void renderDiagrams($("current-stage"));}
    if(snapshot!==p.loadedAt){snapshot=p.loadedAt;setDetailsMode();}
    if(data.codex.requests?.length)details.open=true;
    $("presentation-choice").title="Loaded: "+p.title+" · "+p.loadedAt;
