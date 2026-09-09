@@ -26,6 +26,7 @@ test("Obsidian snapshot loads privately and detours return without changing the 
    await expect(desk.locator("#graph-title")).toHaveText("Snapshot title");
    await expect(desk.locator("#current-stage h1")).toHaveText("Snapshot title");
    await expect(desk.locator("#current-stage")).toHaveCSS("background-color","rgb(255, 255, 255)");
+   const prepareHeadingSize=await desk.locator("#current-stage h1").evaluate(el=>getComputedStyle(el).fontSize);
    await expect(desk.locator("#current-stage-panel #live-progress")).toBeEmpty();
    await expect(desk.locator("#codex-signal")).toHaveAttribute("aria-label","Codex: disconnected");
    await desk.locator("#presentation-outline").evaluate(el=>{el.style.maxHeight="45px";});
@@ -73,6 +74,7 @@ test("Obsidian snapshot loads privately and detours return without changing the 
    library.status="Unavailable";
    await desk.locator("#present-mode").click();
    await expect(desk.locator("#presentation-name")).toBeDisabled();
+   await expect(desk.locator("#current-stage h1")).toHaveCSS("font-size",prepareHeadingSize);
    await expect(desk.locator(".builder")).toBeHidden();
    await expect(desk.locator(".material-column")).toBeHidden();
    await expect(desk.locator("#presentation-details")).not.toHaveAttribute("open","");

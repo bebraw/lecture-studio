@@ -56,7 +56,6 @@
 .presenting .material-column{padding:24px 40px}
 .presenting .preview-label{margin-top:0}
 .presenting .preview{min-height:240px;max-height:380px}
-.presenting .preview h1{font-size:36px}
 .presenting .builder{padding:24px 30px}
 .presenting .builder>h2,.presenting .builder>p.muted,.presenting .builder>.field,
 .presenting #add-excerpt{display:none}
