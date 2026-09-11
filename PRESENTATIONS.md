@@ -19,6 +19,7 @@ Missing decisions block a build until the vote is closed or **Use declared defau
 The stage's existing subtle progress footer remains independent of navigation. Existing detected-app preview controls remain available; dedicated app-inspection graph steps are not implemented in this first migration. Richer content is Markdown/Mermaid under the existing renderer; local image embeds are not added here.
 
 The original hard-coded lecture remains only as an explicit legacy fallback. The old narrow sidebar has been replaced by the loaded presentation outline. Edit the full lecture in Obsidian, not the legacy JavaScript arrays. The opening and discussion examples remain available for short tests.
+
 # Presentation themes
 
 The top-level presentation JSON may include a `theme` object. Omitted fields use these defaults:

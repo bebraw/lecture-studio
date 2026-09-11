@@ -235,8 +235,8 @@ The local browser wrapper is intentionally independent of the audience app. Elec
 
 Local bookmarks: http://127.0.0.1:4317/desk and http://127.0.0.1:4317/stage. The loopback-only server supplies role-specific authorization in each page; no URL token is needed. These pages are accessible to local users.
 
-
 ### Share a local build with the audience
+
 With Live on, **Show on stage** starts an owned Cloudflare Quick Tunnel for the selected local app port. The audience page embeds the resulting HTTPS app; the local projector keeps the local URL. Opening a preview privately does not start a tunnel. Leaving the app for slides, turning Live off, resetting the lecture, or stopping the studio closes the tunnel. The app’s entire selected port is public while shared, including its form/API routes.
 
 Install cloudflared (`brew install cloudflared` on macOS), or set LECTURE_CLOUDFLARED_BIN. A failed tunnel start is reported without replacing the projected slide. The studio’s own port cannot be tunneled. Students keep using https://live.scalableweb.dev; no audience Worker update is needed for this feature. Keep the app server and studio running. New tunnel hostnames may take time to appear in DNS; networks that block trycloudflare.com need an allowed network or a configured named tunnel.

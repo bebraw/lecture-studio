@@ -2,7 +2,9 @@ import type { RoomChoice, RoomSnapshot, RoomStatus } from "./room-state";
 import { renderRoomDocument } from "./room-view";
 
 type RoomEnvironment = Pick<Env, "ROOM_STATE">;
-type AuthorizeRoomAdministration = (request: Request) => Promise<boolean> | boolean;
+type AuthorizeRoomAdministration = (
+  request: Request,
+) => Promise<boolean> | boolean;
 
 export interface RoomRequestOptions {
   allowedOrigins?: readonly string[];
@@ -14,7 +16,8 @@ const maximumBodyBytes = 4_096;
 const maximumCookieMaxAgeSeconds = 365 * 24 * 60 * 60;
 const minimumCookieMaxAgeSeconds = 60;
 const voterCookieName = "room_voter";
-const voterIdPattern = /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/;
+const voterIdPattern =
+  /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/;
 
 export class RoomAdministrationUnauthorizedError extends Error {
   constructor() {
@@ -40,7 +43,10 @@ export async function handleRoomRequest(
   }
 
   if (request.method !== "POST") {
-    return new Response("Method Not Allowed", { status: 405, headers: { allow: "GET, POST" } });
+    return new Response("Method Not Allowed", {
+      status: 405,
+      headers: { allow: "GET, POST" },
+    });
   }
 
   if (!hasAllowedOrigin(request, options.allowedOrigins)) {
@@ -53,13 +59,20 @@ export async function handleRoomRequest(
   const choiceId = form.get("choice");
   if (!choiceId) return new Response("Choose one option.", { status: 400 });
 
-  const voter = readOrCreateVoter(request, resolveCookieMaxAge(options.voterCookieMaxAgeSeconds));
+  const voter = readOrCreateVoter(
+    request,
+    resolveCookieMaxAge(options.voterCookieMaxAgeSeconds),
+  );
   const voterKey = await hashVoterKey(roomId, voter.id);
   const result = await room.castVote(voterKey, choiceId);
 
   if (!result.ok) {
-    if (result.code === "room-locked") return new Response("Voting is locked.", { status: 409 });
-    return new Response(result.code === "unknown-choice" ? "Unknown choice." : "Invalid voter.", { status: 400 });
+    if (result.code === "room-locked")
+      return new Response("Voting is locked.", { status: 409 });
+    return new Response(
+      result.code === "unknown-choice" ? "Unknown choice." : "Invalid voter.",
+      { status: 400 },
+    );
   }
 
   const headers = new Headers({ location: url.pathname });
@@ -67,10 +80,16 @@ export async function handleRoomRequest(
   return new Response(null, { status: 303, headers });
 }
 
-export async function readRoomSnapshot(request: Request, env: RoomEnvironment, roomId: string): Promise<RoomSnapshot> {
+export async function readRoomSnapshot(
+  request: Request,
+  env: RoomEnvironment,
+  roomId: string,
+): Promise<RoomSnapshot> {
   const room = env.ROOM_STATE.getByName(roomId);
   const voterId = readVoterId(request);
-  return voterId ? await room.getSnapshot(await hashVoterKey(roomId, voterId)) : await room.getSnapshot();
+  return voterId
+    ? await room.getSnapshot(await hashVoterKey(roomId, voterId))
+    : await room.getSnapshot();
 }
 
 export async function seedRoom(
@@ -80,7 +99,8 @@ export async function seedRoom(
   choices: RoomChoice[],
   authorize: AuthorizeRoomAdministration,
 ): Promise<RoomSnapshot> {
-  if (!(await authorize(request))) throw new RoomAdministrationUnauthorizedError();
+  if (!(await authorize(request)))
+    throw new RoomAdministrationUnauthorizedError();
   return await env.ROOM_STATE.getByName(roomId).seedChoices(choices);
 }
 
@@ -90,7 +110,8 @@ export async function resetRoom(
   roomId: string,
   authorize: AuthorizeRoomAdministration,
 ): Promise<RoomSnapshot> {
-  if (!(await authorize(request))) throw new RoomAdministrationUnauthorizedError();
+  if (!(await authorize(request)))
+    throw new RoomAdministrationUnauthorizedError();
   return await env.ROOM_STATE.getByName(roomId).resetVotes();
 }
 
@@ -101,7 +122,8 @@ export async function setRoomStatus(
   status: RoomStatus,
   authorize: AuthorizeRoomAdministration,
 ): Promise<RoomSnapshot> {
-  if (!(await authorize(request))) throw new RoomAdministrationUnauthorizedError();
+  if (!(await authorize(request)))
+    throw new RoomAdministrationUnauthorizedError();
   return await env.ROOM_STATE.getByName(roomId).setStatus(status);
 }
 
@@ -111,14 +133,21 @@ function parseRoomId(pathname: string): string | undefined {
 
   try {
     const roomId = decodeURIComponent(match[1]);
-    return roomId.trim().length > 0 && roomId.length <= 128 ? roomId : undefined;
+    return roomId.trim().length > 0 && roomId.length <= 128
+      ? roomId
+      : undefined;
   } catch {
     return undefined;
   }
 }
 
-async function readUrlEncodedForm(request: Request): Promise<URLSearchParams | Response> {
-  const contentType = request.headers.get("content-type")?.split(";", 1)[0]?.trim();
+async function readUrlEncodedForm(
+  request: Request,
+): Promise<URLSearchParams | Response> {
+  const contentType = request.headers
+    .get("content-type")
+    ?.split(";", 1)[0]
+    ?.trim();
   if (contentType !== "application/x-www-form-urlencoded") {
     return new Response("Expected an HTML form submission.", { status: 415 });
   }
@@ -166,7 +195,10 @@ function readVoterId(request: Request): string | undefined {
   return existingId && voterIdPattern.test(existingId) ? existingId : undefined;
 }
 
-function readOrCreateVoter(request: Request, maxAgeSeconds: number): { id: string; cookie?: string } {
+function readOrCreateVoter(
+  request: Request,
+  maxAgeSeconds: number,
+): { id: string; cookie?: string } {
   const existingId = readVoterId(request);
   if (existingId) return { id: existingId };
 
@@ -178,7 +210,10 @@ function readOrCreateVoter(request: Request, maxAgeSeconds: number): { id: strin
   };
 }
 
-function hasAllowedOrigin(request: Request, additionalOrigins: readonly string[] = []): boolean {
+function hasAllowedOrigin(
+  request: Request,
+  additionalOrigins: readonly string[] = [],
+): boolean {
   const origin = request.headers.get("origin");
   if (!origin) return false;
 
@@ -188,7 +223,11 @@ function hasAllowedOrigin(request: Request, additionalOrigins: readonly string[]
 
 function resolveCookieMaxAge(configuredSeconds: number | undefined): number {
   const seconds = configuredSeconds ?? defaultVoterCookieMaxAgeSeconds;
-  if (!Number.isInteger(seconds) || seconds < minimumCookieMaxAgeSeconds || seconds > maximumCookieMaxAgeSeconds) {
+  if (
+    !Number.isInteger(seconds) ||
+    seconds < minimumCookieMaxAgeSeconds ||
+    seconds > maximumCookieMaxAgeSeconds
+  ) {
     throw new TypeError(
       `Voter cookie duration must be an integer from ${minimumCookieMaxAgeSeconds} to ${maximumCookieMaxAgeSeconds} seconds.`,
     );
@@ -199,14 +238,17 @@ function resolveCookieMaxAge(configuredSeconds: number | undefined): number {
 async function hashVoterKey(roomId: string, voterId: string): Promise<string> {
   const bytes = new TextEncoder().encode(`${roomId}:${voterId}`);
   const digest = await crypto.subtle.digest("SHA-256", bytes);
-  return [...new Uint8Array(digest)].map((byte) => byte.toString(16).padStart(2, "0")).join("");
+  return [...new Uint8Array(digest)]
+    .map((byte) => byte.toString(16).padStart(2, "0"))
+    .join("");
 }
 
 function htmlResponse(body: string): Response {
   return new Response(body, {
     headers: {
       "cache-control": "no-store",
-      "content-security-policy": "default-src 'self'; base-uri 'none'; frame-ancestors 'none'; form-action 'self'",
+      "content-security-policy":
+        "default-src 'self'; base-uri 'none'; frame-ancestors 'none'; form-action 'self'",
       "content-type": "text/html; charset=utf-8",
       "referrer-policy": "strict-origin-when-cross-origin",
       "x-content-type-options": "nosniff",

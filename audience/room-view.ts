@@ -25,7 +25,11 @@ export function renderRoomDocument(view: RoomViewModel): string {
 </html>`;
 }
 
-export function renderRoomFragment({ roomId, snapshot, hideResults=false }: RoomViewModel): string {
+export function renderRoomFragment({
+  roomId,
+  snapshot,
+  hideResults = false,
+}: RoomViewModel): string {
   const action = `/rooms/${encodeURIComponent(roomId)}`;
   const sectionAttributes = `data-room-revision="${snapshot.revision}" data-room-status="${snapshot.status}"`;
 
@@ -41,17 +45,21 @@ export function renderRoomFragment({ roomId, snapshot, hideResults=false }: Room
   <input id="room-choice-${index}" name="choice" type="radio" value="${escapeHtml(choice.id)}" required${
     snapshot.currentSelection === choice.id ? " checked" : ""
   }>
-  <label for="room-choice-${index}">${escapeHtml(choice.label)}${hideResults?"":" — "+choice.votes}</label>
+  <label for="room-choice-${index}">${escapeHtml(choice.label)}${hideResults ? "" : " — " + choice.votes}</label>
 </div>`,
     )
     .join("\n");
 
-  const lockedMessage = snapshot.status === "locked" ? `<p>Voting is locked at revision ${snapshot.revision}.</p>` : "";
-  const submitButton = snapshot.status === "open" ? '    <button type="submit">Vote</button>' : "";
+  const lockedMessage =
+    snapshot.status === "locked"
+      ? `<p>Voting is locked at revision ${snapshot.revision}.</p>`
+      : "";
+  const submitButton =
+    snapshot.status === "open" ? '    <button type="submit">Vote</button>' : "";
   const disabled = snapshot.status === "locked" ? " disabled" : "";
 
   return `<section id="room-results" data-progressive-fragment ${sectionAttributes} tabindex="-1" aria-live="polite">
-  ${hideResults?"":"<p>"+snapshot.totalVotes+" total votes</p>"}
+  ${hideResults ? "" : "<p>" + snapshot.totalVotes + " total votes</p>"}
   ${lockedMessage}
   <form action="${action}" method="post" data-progressive-form data-progressive-target="#room-results">
     <fieldset${disabled}>
@@ -64,5 +72,9 @@ ${submitButton}
 }
 
 function escapeHtml(value: string): string {
-  return value.replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;").replaceAll('"', "&quot;");
+  return value
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;");
 }

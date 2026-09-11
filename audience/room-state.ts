@@ -20,7 +20,8 @@ export interface RoomSnapshot {
 }
 
 export type RoomVoteResult =
-  { ok: true; snapshot: RoomSnapshot } | { ok: false; code: "invalid-voter-key" | "room-locked" | "unknown-choice" };
+  | { ok: true; snapshot: RoomSnapshot }
+  | { ok: false; code: "invalid-voter-key" | "room-locked" | "unknown-choice" };
 
 interface ChoiceRow extends Record<string, SqlStorageValue> {
   id: string;
@@ -79,10 +80,14 @@ export class RoomState extends DurableObject<Env> {
   }
 
   async castVote(voterKey: string, choiceId: string): Promise<RoomVoteResult> {
-    if (!isIdentifier(voterKey)) return { ok: false, code: "invalid-voter-key" };
-    if (this.readMetadata().status === "locked") return { ok: false, code: "room-locked" };
+    if (!isIdentifier(voterKey))
+      return { ok: false, code: "invalid-voter-key" };
+    if (this.readMetadata().status === "locked")
+      return { ok: false, code: "room-locked" };
 
-    const choice = this.ctx.storage.sql.exec<{ id: string }>("SELECT id FROM choices WHERE id = ?", choiceId).toArray()[0];
+    const choice = this.ctx.storage.sql
+      .exec<{ id: string }>("SELECT id FROM choices WHERE id = ?", choiceId)
+      .toArray()[0];
     if (!choice) return { ok: false, code: "unknown-choice" };
 
     if (this.readSelection(voterKey) !== choiceId) {
@@ -102,23 +107,33 @@ export class RoomState extends DurableObject<Env> {
   }
 
   async openSession(sessionId: string): Promise<RoomSnapshot> {
-    if (!/^[a-zA-Z0-9-]{1,80}$/.test(sessionId)) throw new TypeError("Invalid lecture session");
+    if (!/^[a-zA-Z0-9-]{1,80}$/.test(sessionId))
+      throw new TypeError("Invalid lecture session");
     this.ctx.storage.transactionSync(() => {
-      const current = this.ctx.storage.sql.exec("SELECT id FROM lecture_session WHERE singleton = 1").toArray()[0]?.id;
+      const current = this.ctx.storage.sql
+        .exec("SELECT id FROM lecture_session WHERE singleton = 1")
+        .toArray()[0]?.id;
       if (current !== sessionId) {
         this.ctx.storage.sql.exec("DELETE FROM votes");
-        this.ctx.storage.sql.exec("INSERT INTO lecture_session (singleton, id) VALUES (1, ?) ON CONFLICT(singleton) DO UPDATE SET id = excluded.id", sessionId);
+        this.ctx.storage.sql.exec(
+          "INSERT INTO lecture_session (singleton, id) VALUES (1, ?) ON CONFLICT(singleton) DO UPDATE SET id = excluded.id",
+          sessionId,
+        );
         this.incrementRevision();
       }
       if (this.readMetadata().status !== "open") {
-        this.ctx.storage.sql.exec("UPDATE room_metadata SET status = 'open', revision = revision + 1 WHERE singleton = 1");
+        this.ctx.storage.sql.exec(
+          "UPDATE room_metadata SET status = 'open', revision = revision + 1 WHERE singleton = 1",
+        );
       }
     });
     return this.readSnapshot();
   }
 
   async resetVotes(): Promise<RoomSnapshot> {
-    const voteCount = this.ctx.storage.sql.exec<VoteCountRow>("SELECT COUNT(*) AS vote_count FROM votes").one().vote_count;
+    const voteCount = this.ctx.storage.sql
+      .exec<VoteCountRow>("SELECT COUNT(*) AS vote_count FROM votes")
+      .one().vote_count;
     if (voteCount > 0) {
       this.ctx.storage.transactionSync(() => {
         this.ctx.storage.sql.exec("DELETE FROM votes");
@@ -144,7 +159,10 @@ export class RoomState extends DurableObject<Env> {
     return this.seedChoices(choices, "locked");
   }
 
-  async seedChoices(choices: RoomChoice[], status: RoomStatus = "open"): Promise<RoomSnapshot> {
+  async seedChoices(
+    choices: RoomChoice[],
+    status: RoomStatus = "open",
+  ): Promise<RoomSnapshot> {
     validateChoices(choices);
     validateStatus(status);
 
@@ -153,9 +171,17 @@ export class RoomState extends DurableObject<Env> {
       this.ctx.storage.sql.exec("DELETE FROM choices");
 
       for (const [position, choice] of choices.entries()) {
-        this.ctx.storage.sql.exec("INSERT INTO choices (id, label, position) VALUES (?, ?, ?)", choice.id, choice.label, position);
+        this.ctx.storage.sql.exec(
+          "INSERT INTO choices (id, label, position) VALUES (?, ?, ?)",
+          choice.id,
+          choice.label,
+          position,
+        );
       }
-      this.ctx.storage.sql.exec("UPDATE room_metadata SET status = ?, revision = revision + 1 WHERE singleton = 1", status);
+      this.ctx.storage.sql.exec(
+        "UPDATE room_metadata SET status = ?, revision = revision + 1 WHERE singleton = 1",
+        status,
+      );
     });
 
     return this.readSnapshot();
@@ -164,22 +190,38 @@ export class RoomState extends DurableObject<Env> {
   async setStatus(status: RoomStatus): Promise<RoomSnapshot> {
     validateStatus(status);
     if (this.readMetadata().status !== status) {
-      this.ctx.storage.sql.exec("UPDATE room_metadata SET status = ?, revision = revision + 1 WHERE singleton = 1", status);
+      this.ctx.storage.sql.exec(
+        "UPDATE room_metadata SET status = ?, revision = revision + 1 WHERE singleton = 1",
+        status,
+      );
     }
     return this.readSnapshot();
   }
 
   private incrementRevision(): void {
-    this.ctx.storage.sql.exec("UPDATE room_metadata SET revision = revision + 1 WHERE singleton = 1");
+    this.ctx.storage.sql.exec(
+      "UPDATE room_metadata SET revision = revision + 1 WHERE singleton = 1",
+    );
   }
 
   private readMetadata(): MetadataRow {
-    return this.ctx.storage.sql.exec<MetadataRow>("SELECT status, revision FROM room_metadata WHERE singleton = 1").one();
+    return this.ctx.storage.sql
+      .exec<MetadataRow>(
+        "SELECT status, revision FROM room_metadata WHERE singleton = 1",
+      )
+      .one();
   }
 
   private readSelection(voterKey?: string): string | null {
     if (!voterKey || !isIdentifier(voterKey)) return null;
-    return this.ctx.storage.sql.exec<VoteRow>("SELECT choice_id FROM votes WHERE voter_key = ?", voterKey).toArray()[0]?.choice_id ?? null;
+    return (
+      this.ctx.storage.sql
+        .exec<VoteRow>(
+          "SELECT choice_id FROM votes WHERE voter_key = ?",
+          voterKey,
+        )
+        .toArray()[0]?.choice_id ?? null
+    );
   }
 
   private readSnapshot(voterKey?: string): RoomSnapshot {
@@ -192,7 +234,11 @@ export class RoomState extends DurableObject<Env> {
          ORDER BY choices.position`,
       )
       .toArray();
-    const choices = rows.map(({ id, label, vote_count: votes }) => ({ id, label, votes }));
+    const choices = rows.map(({ id, label, vote_count: votes }) => ({
+      id,
+      label,
+      votes,
+    }));
     const metadata = this.readMetadata();
 
     return {
@@ -206,22 +252,36 @@ export class RoomState extends DurableObject<Env> {
 }
 
 function validateStatus(status: RoomStatus): void {
-  if (status !== "open" && status !== "locked") throw new TypeError('Room status must be "open" or "locked".');
+  if (status !== "open" && status !== "locked")
+    throw new TypeError('Room status must be "open" or "locked".');
 }
 
 function validateChoices(choices: RoomChoice[]): void {
   if (choices.length === 0 || choices.length > maximumChoices) {
-    throw new TypeError(`A room must have between 1 and ${maximumChoices} choices.`);
+    throw new TypeError(
+      `A room must have between 1 and ${maximumChoices} choices.`,
+    );
   }
 
   const ids = new Set<string>();
 
   for (const choice of choices) {
-    if (!isIdentifier(choice.id)) throw new TypeError("Choice ids must be non-empty and at most 128 characters.");
-    if (choice.label.trim().length === 0 || choice.label.length > maximumLabelLength) {
-      throw new TypeError("Choice labels must be non-empty and at most 200 characters.");
+    if (!isIdentifier(choice.id))
+      throw new TypeError(
+        "Choice ids must be non-empty and at most 128 characters.",
+      );
+    if (
+      choice.label.trim().length === 0 ||
+      choice.label.length > maximumLabelLength
+    ) {
+      throw new TypeError(
+        "Choice labels must be non-empty and at most 200 characters.",
+      );
     }
-    if (ids.has(choice.id)) throw new TypeError(`Choice id ${JSON.stringify(choice.id)} is duplicated.`);
+    if (ids.has(choice.id))
+      throw new TypeError(
+        `Choice id ${JSON.stringify(choice.id)} is duplicated.`,
+      );
     ids.add(choice.id);
   }
 }

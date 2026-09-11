@@ -1,13 +1,34 @@
-import type {ServerResponse} from "node:http";
-import type {AddressInfo} from "node:net";
-import type {Library,Bridge,Draft,Stage,NoteFile} from "./shared/models.ts";
+import type { ServerResponse } from "node:http";
+import type { AddressInfo } from "node:net";
+import type {
+  Library,
+  Bridge,
+  Draft,
+  Stage,
+  NoteFile,
+} from "./shared/models.ts";
 export interface StudioOptions {
- library?:Library;bridge?:Bridge;poll?:AudiencePoll;workspace?:string;
- rehearsals?:Pick<Rehearsals,"current"|"create">;port?:number;host?:string;persist?:boolean;
- previewTunnel?:Pick<PreviewTunnel,"open"|"publicUrl"|"close"|"pending">;
+  library?: Library;
+  bridge?: Bridge;
+  poll?: AudiencePoll;
+  workspace?: string;
+  rehearsals?: Pick<Rehearsals, "current" | "create">;
+  port?: number;
+  host?: string;
+  persist?: boolean;
+  previewTunnel?: Pick<
+    PreviewTunnel,
+    "open" | "publicUrl" | "close" | "pending"
+  >;
 }
-import {readJson} from "./lib/local-http.ts";
-import {asError,record,stringValue,optionalString,stringMap} from "./shared/errors.ts";
+import { readJson } from "./lib/local-http.ts";
+import {
+  asError,
+  record,
+  stringValue,
+  optionalString,
+  stringMap,
+} from "./shared/errors.ts";
 import { createServer } from "node:http";
 import { randomBytes, timingSafeEqual } from "node:crypto";
 import { readFile, writeFile, mkdir, realpath } from "node:fs/promises";
@@ -26,12 +47,12 @@ import { parsePresentation, PresentationSession } from "./lib/presentation.ts";
 import { feedbackRequest, feedbackSlide } from "./lib/feedback.ts";
 
 const root = dirname(fileURLToPath(import.meta.url));
-export function safeEqual(a:string, b:string) {
+export function safeEqual(a: string, b: string) {
   const left = Buffer.from(a),
     right = Buffer.from(b);
   return left.length === right.length && timingSafeEqual(left, right);
 }
-export function validDemoUrl(value:string, ownOrigin:string) {
+export function validDemoUrl(value: string, ownOrigin: string) {
   if (!value) return "";
   const url = new URL(value);
   if (
@@ -61,13 +82,14 @@ export function createStudio({
   port = 4317,
   host = "127.0.0.1",
   persist = true,
-}:StudioOptions = {}) {
-  if (!["127.0.0.1", "::1"].includes(host)) throw new Error("Lecture Studio must bind to loopback");
+}: StudioOptions = {}) {
+  if (!["127.0.0.1", "::1"].includes(host))
+    throw new Error("Lecture Studio must bind to loopback");
   const deskToken = randomBytes(32).toString("hex"),
     stageToken = randomBytes(32).toString("hex");
   const lectureSearch = new LectureSearch(library);
   const audienceSync = new AudienceStageSync(poll);
-  let origin="",
+  let origin = "",
     draft = initialDraft(),
     publishedDraft = initialDraft(),
     version = 1,
@@ -76,14 +98,16 @@ export function createStudio({
   let stage = publicStage(publishedDraft, version),
     lastBrief = "";
   let activeAct = "opening",
-    libraryFiles:NoteFile[] = [],
-    savedAt:string|null = null;
-  let previousMaterial:Draft|null = null;
-  let feedbackPrevious:{stage:Stage;pollOnStage:boolean}|null = null;
-  let rehearsalJob:{status:string;error?:string;workspace?:string} = { status: "idle" },
+    libraryFiles: NoteFile[] = [],
+    savedAt: string | null = null;
+  let previousMaterial: Draft | null = null;
+  let feedbackPrevious: { stage: Stage; pollOnStage: boolean } | null = null;
+  let rehearsalJob: { status: string; error?: string; workspace?: string } = {
+      status: "idle",
+    },
     resetVersion = 0;
   let pollOnStage = false,
-    projectedPoll:AudiencePoll|null = null,
+    projectedPoll: AudiencePoll | null = null,
     pollResults = false,
     live = false,
     liveTransition = false;
@@ -104,12 +128,12 @@ export function createStudio({
     blank: false,
     build: { status: "ready", startedAt: null, finishedAt: null },
   });
-  let presentation:PresentationSession|null = null,
-    graphPoll:AudiencePoll|null = null,
+  let presentation: PresentationSession | null = null,
+    graphPoll: AudiencePoll | null = null,
     graphBusy = false;
-  const graphPolls = new Map<string,AudiencePoll>();
+  const graphPolls = new Map<string, AudiencePoll>();
   const showGraph = () => {
-    if(!presentation)throw new Error("Load a presentation first");
+    if (!presentation) throw new Error("Load a presentation first");
     feedbackPrevious = null;
     const s = presentation.step();
     if (s.type === "poll") {
@@ -183,7 +207,7 @@ export function createStudio({
     previousMaterial = null;
     resetVersion++;
   };
-  const json = (res:ServerResponse, value:unknown, status = 200) => {
+  const json = (res: ServerResponse, value: unknown, status = 200) => {
     res.writeHead(status, { "content-type": "application/json" });
     res.end(JSON.stringify(value));
   };
@@ -217,7 +241,7 @@ export function createStudio({
     resetVersion,
     poll: poll.state(),
   });
-  const publicState = ():Stage => {
+  const publicState = (): Stage => {
     if (!live) return waitingStage();
     const c = bridge.state;
     const p = (projectedPoll || poll).state(),
@@ -280,7 +304,9 @@ export function createStudio({
       build: {
         activity,
         status: c.status,
-        outcome: ["completed", "failed", "interrupted"].includes(c.outcome ?? "")
+        outcome: ["completed", "failed", "interrupted"].includes(
+          c.outcome ?? "",
+        )
           ? c.outcome
           : null,
         startedAt: c.startedAt || null,
@@ -290,10 +316,13 @@ export function createStudio({
   };
   const audienceState = () => {
     const state = publicState();
-    if (!previewTunnel.pending && (!state.live || state.mode !== "demo")) previewTunnel.close();
-    return state.mode === "demo" ? {...state,demoUrl:previewTunnel.publicUrl(state.demoUrl)} : state;
+    if (!previewTunnel.pending && (!state.live || state.mode !== "demo"))
+      previewTunnel.close();
+    return state.mode === "demo"
+      ? { ...state, demoUrl: previewTunnel.publicUrl(state.demoUrl) }
+      : state;
   };
-  const sharePreview = async (url:string) => {
+  const sharePreview = async (url: string) => {
     if (poll.origin && poll.token && new URL(url).protocol === "http:")
       await previewTunnel.open(url, origin);
   };
@@ -376,7 +405,9 @@ export function createStudio({
               const snapshot = await feedbackRequest(poll);
               const selected = feedbackSlide(
                 snapshot,
-                body.action === "show-question" ? stringValue(body.id,"question") : undefined,
+                body.action === "show-question"
+                  ? stringValue(body.id, "question")
+                  : undefined,
               );
               feedbackPrevious ||= { stage, pollOnStage };
               stage = { ...stage, ...selected, version: ++version };
@@ -428,7 +459,8 @@ export function createStudio({
                   live = false;
                   previewTunnel.close();
                   version++;
-                } catch (caught) { const error = asError(caught);
+                } catch (caught) {
+                  const error = asError(caught);
                   audienceSync.publish(audienceState());
                   throw error;
                 } finally {
@@ -457,8 +489,12 @@ export function createStudio({
                     "Select a presentation from the lecture folder",
                   );
                 next = new PresentationSession(
-                  parsePresentation(await library.read(stringValue(body.path,"presentation path"))),
-                  stringValue(body.path,"presentation path"),
+                  parsePresentation(
+                    await library.read(
+                      stringValue(body.path, "presentation path"),
+                    ),
+                  ),
+                  stringValue(body.path, "presentation path"),
                 );
               }
               poll.reset();
@@ -469,11 +505,12 @@ export function createStudio({
             } else {
               if (!presentation) throw new Error("Load a presentation first");
               if (op === "select") {
-                presentation.move("select", stringValue(body.id,"step"));
+                presentation.move("select", stringValue(body.id, "step"));
               } else if (
                 ["next", "previous", "detour", "return", "show"].includes(op)
               ) {
-                if (op !== "show") presentation.move(op, optionalString(body.id,"step"));
+                if (op !== "show")
+                  presentation.move(op, optionalString(body.id, "step"));
                 showGraph();
               } else if (op === "defaults") {
                 presentation.defaults.add(presentation.current);
@@ -533,13 +570,18 @@ export function createStudio({
                     "Collect the required decisions or explicitly accept prepared defaults",
                   );
                 if (
-                  presentation.runs.some((r) => r.step === presentation!.current)
+                  presentation.runs.some(
+                    (r) => r.step === presentation!.current,
+                  )
                 )
                   throw new Error(
                     "This step has already started in this session",
                   );
                 showGraph();
-                await bridge.start(resolved.prompt, optionalString(body.model,"model") ?? "");
+                await bridge.start(
+                  resolved.prompt,
+                  optionalString(body.model, "model") ?? "",
+                );
                 lastBrief = brief = resolved.prompt;
                 presentation.runs.push({
                   step: presentation.current,
@@ -558,7 +600,7 @@ export function createStudio({
           if (rehearsalJob.status === "creating")
             throw new Error("Wait for the fresh rehearsal");
           const action = url.pathname.slice("/api/poll/".length);
-          if (action === "select") poll.select(stringValue(body.id,"poll"));
+          if (action === "select") poll.select(stringValue(body.id, "poll"));
           else if (action === "configure") poll.configure(body);
           else if (["open", "lock", "refresh"].includes(action))
             await poll.act(action);
@@ -624,7 +666,7 @@ export function createStudio({
         } else if (url.pathname === "/api/act") {
           if (!acts.some((a) => a.id === body.act))
             throw new Error("Unknown narrative beat");
-          activeAct = stringValue(body.act,"narrative beat");
+          activeAct = stringValue(body.act, "narrative beat");
         } else if (url.pathname === "/api/publish") {
           if (!presentation) live = true;
           pollOnStage = false;
@@ -708,7 +750,10 @@ export function createStudio({
             body.brief.length > 20000
           )
             throw new Error("Review a non-empty brief first");
-          await bridge.start(body.brief, optionalString(body.model,"model") ?? "");
+          await bridge.start(
+            body.brief,
+            optionalString(body.model, "model") ?? "",
+          );
           lastBrief = body.brief;
           brief = body.brief;
         } else if (url.pathname === "/api/codex/interrupt") {
@@ -716,13 +761,20 @@ export function createStudio({
         } else if (url.pathname === "/api/codex/disconnect") {
           bridge.close();
         } else if (url.pathname === "/api/codex/answer") {
-          if(typeof body.id!=="string" && typeof body.id!=="number") throw new Error("Invalid approval ID");
-          bridge.answer(body.id, stringValue(body.decision,"decision"), stringMap(body.answers));
+          if (typeof body.id !== "string" && typeof body.id !== "number")
+            throw new Error("Invalid approval ID");
+          bridge.answer(
+            body.id,
+            stringValue(body.decision, "decision"),
+            stringMap(body.answers),
+          );
         } else if (url.pathname === "/api/restore") {
           if (!persist) throw new Error("Saving is disabled in test mode");
-          const saved = record(JSON.parse(
-            await readFile(resolve(root, ".local/session.json"), "utf8"),
-          ));
+          const saved = record(
+            JSON.parse(
+              await readFile(resolve(root, ".local/session.json"), "utf8"),
+            ),
+          );
           const next = validateDraft(saved.draft);
           next.demoUrl = validDemoUrl(next.demoUrl, origin);
           if (typeof saved.brief !== "string" || saved.brief.length > 20000)
@@ -731,9 +783,9 @@ export function createStudio({
           draft = next;
           brief = saved.brief;
           activeAct = acts.some((a) => a.id === saved.activeAct)
-            ? stringValue(saved.activeAct,"saved narrative beat")
+            ? stringValue(saved.activeAct, "saved narrative beat")
             : "opening";
-          savedAt = optionalString(saved.savedAt,"saved timestamp") ?? null;
+          savedAt = optionalString(saved.savedAt, "saved timestamp") ?? null;
           // Restoring a private draft must never restore the projected screen or run an agent.
         } else if (url.pathname === "/api/save") {
           if (!persist) throw new Error("Saving is disabled in test mode");
@@ -765,7 +817,7 @@ export function createStudio({
       if (req.method !== "GET")
         return json(res, { error: "Method not allowed" }, 405);
       let path;
-      const staticFiles:Record<string,string> = {
+      const staticFiles: Record<string, string> = {
         "/": "desk.html",
         "/desk": "desk.html",
         "/stage": "stage.html",
@@ -777,7 +829,13 @@ export function createStudio({
         "/presentation.mjs": "presentation.mjs",
       };
       if (staticFiles[url.pathname])
-        path = resolve(root, staticFiles[url.pathname].endsWith(".mjs") ? ".local/browser/public" : "public", staticFiles[url.pathname]);
+        path = resolve(
+          root,
+          staticFiles[url.pathname].endsWith(".mjs")
+            ? ".local/browser/public"
+            : "public",
+          staticFiles[url.pathname],
+        );
       else if (url.pathname.startsWith("/vendor/mermaid/")) {
         const vendorRoot = await realpath(
           resolve(root, "node_modules/mermaid/dist"),
@@ -796,22 +854,28 @@ export function createStudio({
       } else if (url.pathname === "/feedback.mjs")
         path = resolve(root, ".local/browser/public/feedback.mjs");
       else return json(res, { error: "Not found" }, 404);
-      let content:string|Buffer = await readFile(path);
+      let content: string | Buffer = await readFile(path);
       if (["/", "/desk", "/stage"].includes(url.pathname)) {
         const token = url.pathname === "/stage" ? stageToken : deskToken;
-        content = content.toString().replace("</head>", '<meta name="lecture-token" content="' + token + '"></head>');
+        content = content
+          .toString()
+          .replace(
+            "</head>",
+            '<meta name="lecture-token" content="' + token + '"></head>',
+          );
       }
-      const types:Record<string,string> = {
+      const types: Record<string, string> = {
         ".html": "text/html; charset=utf-8",
         ".css": "text/css",
         ".mjs": "text/javascript",
         ".js": "text/javascript",
         ".woff2": "font/woff2",
       };
-      const type=types[extname(path)] ?? "application/octet-stream";
+      const type = types[extname(path)] ?? "application/octet-stream";
       res.writeHead(200, { "content-type": type });
       res.end(content);
-    } catch (caught) { const error = asError(caught);
+    } catch (caught) {
+      const error = asError(caught);
       json(
         res,
         { error: String(error.message || "Request failed").slice(0, 2000) },
@@ -828,7 +892,7 @@ export function createStudio({
   });
   return {
     server,
-    snapshot:deskState,
+    snapshot: deskState,
     bridge,
     library,
     async start() {
@@ -837,7 +901,11 @@ export function createStudio({
         server.once("error", reject);
         server.listen(port, host, resolve);
       });
-      origin = "http://" + (host === "::1" ? "[::1]" : host) + ":" + (server.address() as AddressInfo).port;
+      origin =
+        "http://" +
+        (host === "::1" ? "[::1]" : host) +
+        ":" +
+        (server.address() as AddressInfo).port;
       return {
         origin,
         deskUrl: origin + "/desk",
