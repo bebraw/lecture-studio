@@ -1,4 +1,4 @@
-import type {IncomingMessage,ServerResponse} from "node:http";
+import type {ServerResponse} from "node:http";
 import type {AddressInfo} from "node:net";
 import type {Library,Bridge,Draft,Stage,NoteFile} from "./shared/models.ts";
 export interface StudioOptions {
@@ -6,7 +6,8 @@ export interface StudioOptions {
  rehearsals?:Pick<Rehearsals,"current"|"create">;port?:number;host?:string;persist?:boolean;
  previewTunnel?:Pick<PreviewTunnel,"open"|"publicUrl"|"close"|"pending">;
 }
-import {asError} from "./shared/errors.ts";
+import {readJson} from "./lib/local-http.ts";
+import {asError,record,stringValue,optionalString,stringMap} from "./shared/errors.ts";
 import { createServer } from "node:http";
 import { randomBytes, timingSafeEqual } from "node:crypto";
 import { readFile, writeFile, mkdir, realpath } from "node:fs/promises";
@@ -49,18 +50,6 @@ export function validDemoUrl(value:string, ownOrigin:string) {
       "Use a public HTTPS or loopback app URL without credentials, query, or fragment",
     );
   return url.href;
-}
-async function readJson(request:IncomingMessage) {
-  if (!request.headers["content-type"]?.startsWith("application/json"))
-    throw new Error("Expected JSON");
-  let size = 0;
-  const chunks = [];
-  for await (const chunk of request) {
-    size += chunk.length;
-    if (size > 100000) throw new Error("Request is too large");
-    chunks.push(chunk);
-  }
-  return JSON.parse(Buffer.concat(chunks).toString());
 }
 export function createStudio({
   library = new ObsidianLibrary(),
@@ -387,7 +376,7 @@ export function createStudio({
               const snapshot = await feedbackRequest(poll);
               const selected = feedbackSlide(
                 snapshot,
-                body.action === "show-question" ? body.id : undefined,
+                body.action === "show-question" ? stringValue(body.id,"question") : undefined,
               );
               feedbackPrevious ||= { stage, pollOnStage };
               stage = { ...stage, ...selected, version: ++version };
@@ -468,8 +457,8 @@ export function createStudio({
                     "Select a presentation from the lecture folder",
                   );
                 next = new PresentationSession(
-                  parsePresentation(await library.read(body.path)),
-                  body.path,
+                  parsePresentation(await library.read(stringValue(body.path,"presentation path"))),
+                  stringValue(body.path,"presentation path"),
                 );
               }
               poll.reset();
@@ -480,11 +469,11 @@ export function createStudio({
             } else {
               if (!presentation) throw new Error("Load a presentation first");
               if (op === "select") {
-                presentation.move("select", body.id);
+                presentation.move("select", stringValue(body.id,"step"));
               } else if (
                 ["next", "previous", "detour", "return", "show"].includes(op)
               ) {
-                if (op !== "show") presentation.move(op, body.id);
+                if (op !== "show") presentation.move(op, optionalString(body.id,"step"));
                 showGraph();
               } else if (op === "defaults") {
                 presentation.defaults.add(presentation.current);
@@ -550,7 +539,7 @@ export function createStudio({
                     "This step has already started in this session",
                   );
                 showGraph();
-                await bridge.start(resolved.prompt, body.model || "");
+                await bridge.start(resolved.prompt, optionalString(body.model,"model") ?? "");
                 lastBrief = brief = resolved.prompt;
                 presentation.runs.push({
                   step: presentation.current,
@@ -569,7 +558,7 @@ export function createStudio({
           if (rehearsalJob.status === "creating")
             throw new Error("Wait for the fresh rehearsal");
           const action = url.pathname.slice("/api/poll/".length);
-          if (action === "select") poll.select(body.id);
+          if (action === "select") poll.select(stringValue(body.id,"poll"));
           else if (action === "configure") poll.configure(body);
           else if (["open", "lock", "refresh"].includes(action))
             await poll.act(action);
@@ -635,7 +624,7 @@ export function createStudio({
         } else if (url.pathname === "/api/act") {
           if (!acts.some((a) => a.id === body.act))
             throw new Error("Unknown narrative beat");
-          activeAct = body.act;
+          activeAct = stringValue(body.act,"narrative beat");
         } else if (url.pathname === "/api/publish") {
           if (!presentation) live = true;
           pollOnStage = false;
@@ -719,7 +708,7 @@ export function createStudio({
             body.brief.length > 20000
           )
             throw new Error("Review a non-empty brief first");
-          await bridge.start(body.brief, body.model || "");
+          await bridge.start(body.brief, optionalString(body.model,"model") ?? "");
           lastBrief = body.brief;
           brief = body.brief;
         } else if (url.pathname === "/api/codex/interrupt") {
@@ -727,12 +716,13 @@ export function createStudio({
         } else if (url.pathname === "/api/codex/disconnect") {
           bridge.close();
         } else if (url.pathname === "/api/codex/answer") {
-          bridge.answer(body.id, body.decision, body.answers);
+          if(typeof body.id!=="string" && typeof body.id!=="number") throw new Error("Invalid approval ID");
+          bridge.answer(body.id, stringValue(body.decision,"decision"), stringMap(body.answers));
         } else if (url.pathname === "/api/restore") {
           if (!persist) throw new Error("Saving is disabled in test mode");
-          const saved = JSON.parse(
+          const saved = record(JSON.parse(
             await readFile(resolve(root, ".local/session.json"), "utf8"),
-          );
+          ));
           const next = validateDraft(saved.draft);
           next.demoUrl = validDemoUrl(next.demoUrl, origin);
           if (typeof saved.brief !== "string" || saved.brief.length > 20000)
@@ -741,9 +731,9 @@ export function createStudio({
           draft = next;
           brief = saved.brief;
           activeAct = acts.some((a) => a.id === saved.activeAct)
-            ? saved.activeAct
+            ? stringValue(saved.activeAct,"saved narrative beat")
             : "opening";
-          savedAt = saved.savedAt;
+          savedAt = optionalString(saved.savedAt,"saved timestamp") ?? null;
           // Restoring a private draft must never restore the projected screen or run an agent.
         } else if (url.pathname === "/api/save") {
           if (!persist) throw new Error("Saving is disabled in test mode");
