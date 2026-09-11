@@ -60,6 +60,55 @@ test("new lecture clears votes atomically; reopen and retry preserve them", asyn
     assert.equal((await room.openSession("lecture-one")).totalVotes, 1);
     assert.equal((await room.openSession("lecture-two")).totalVotes, 0);
     assert.equal((await room.castVote("voter", "a")).snapshot.totalVotes, 1);
+    const selected = await room.getSnapshot("voter");
+    assert.equal(selected.currentSelection, "a");
+    assert.equal(selected.status, "open");
+    assert.deepEqual(selected.choices, [
+      { id: "a", label: "A", votes: 1 },
+      { id: "b", label: "B", votes: 0 },
+    ]);
+    const repeated = await room.castVote("voter", "a");
+    assert.equal(repeated.ok, true);
+    assert.equal(repeated.snapshot.revision, selected.revision);
+    const replaced = await room.castVote("voter", "b");
+    assert.equal(replaced.snapshot.totalVotes, 1);
+    assert.equal(replaced.snapshot.currentSelection, "b");
+    assert.equal(replaced.snapshot.revision, selected.revision + 1);
+    assert.equal((await room.getSnapshot("other")).currentSelection, null);
+    assert.deepEqual(await room.castVote("", "a"), {
+      ok: false,
+      code: "invalid-voter-key",
+    });
+    assert.deepEqual(await room.castVote("voter", "missing"), {
+      ok: false,
+      code: "unknown-choice",
+    });
+    const locked = await room.setStatus("locked");
+    assert.equal(locked.status, "locked");
+    assert.equal(locked.revision, replaced.snapshot.revision + 1);
+    assert.equal((await room.setStatus("locked")).revision, locked.revision);
+    assert.deepEqual(await room.castVote("voter", "a"), {
+      ok: false,
+      code: "room-locked",
+    });
+    const initialized = await room.initializeChoices([{ id: "c", label: "C" }]);
+    assert.equal(initialized.totalVotes, 1);
+    assert.equal(initialized.choices.length, 2);
+    const reset = await room.resetVotes();
+    assert.equal(reset.totalVotes, 0);
+    assert.equal(reset.revision, locked.revision + 1);
+    assert.equal((await room.resetVotes()).revision, reset.revision);
+    await assert.rejects(() => room.setStatus("invalid"));
+    for (const choices of [
+      [],
+      [{ id: "", label: "A" }],
+      [{ id: "a", label: " " }],
+      [
+        { id: "a", label: "A" },
+        { id: "a", label: "B" },
+      ],
+    ])
+      await assert.rejects(() => room.seedChoices(choices));
     await assert.rejects(() => room.openSession("bad session"));
   } finally {
     db.close();

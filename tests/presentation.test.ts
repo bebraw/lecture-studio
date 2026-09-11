@@ -159,3 +159,82 @@ test("invalid graph links are rejected", () => {
     /Missing start/,
   );
 });
+
+test("presentation validation rejects missing IDs and malformed graph fields", () => {
+  const step = { id: "one", type: "material", title: "One" };
+  const deck = { version: 1, title: "Deck", start: "one", steps: [step] };
+  assert.equal(parsePresentation(note(deck)).start, "one");
+  const invalid: unknown[] = [
+    null,
+    {},
+    { ...deck, version: 2 },
+    { ...deck, title: 1 },
+    { ...deck, steps: [] },
+    {
+      ...deck,
+      steps: Array.from({ length: 101 }, (_, i) => ({ ...step, id: "s" + i })),
+    },
+    { ...deck, steps: [step, step] },
+    {
+      version: 1,
+      title: "Missing IDs",
+      steps: [{ type: "material", title: "One" }],
+    },
+  ];
+  for (const change of [
+    { id: 1 },
+    { id: "BAD" },
+    { type: "unknown" },
+    { body: 0 },
+    { notes: false },
+    { source: 1 },
+    { chapter: 1 },
+    { next: "missing" },
+    { related: "one" },
+    { related: ["missing"] },
+    { uses: {} },
+    { allowRemoteImages: "true" },
+  ])
+    invalid.push({ ...deck, steps: [{ ...step, ...change }] });
+  for (const input of invalid)
+    assert.throws(() => parsePresentation(note(input)), JSON.stringify(input));
+  for (const theme of [
+    null,
+    [],
+    "white",
+    { unknown: "#ffffff" },
+    { text: "#fff" },
+    { text: 7 },
+  ])
+    assert.throws(() => parseTheme(theme));
+});
+
+test("navigation rejects unknown steps and only returns through linked detours", () => {
+  const session = new PresentationSession(
+    parsePresentation(note(definition)),
+    "test",
+  );
+  assert.throws(() => session.move("select", "missing"), /Unknown step/);
+  assert.throws(() => session.move("detour", "build"), /linked detour/);
+  session.move("return");
+  assert.equal(session.current, "question");
+  session.move("detour", "aside");
+  assert.equal(session.current, "aside");
+  assert.equal(session.state().canReturn, true);
+  session.move("return");
+  assert.equal(session.current, "question");
+  assert.equal(session.state().canReturn, false);
+  session.move("next");
+  assert.equal(session.current, "poll");
+  session.move("previous");
+  assert.equal(session.current, "question");
+  session.move("select", "build");
+  assert.deepEqual(session.history, []);
+  assert.deepEqual(session.resolve().missing, ["poll"]);
+  session.defaults.add("build");
+  assert.deepEqual(session.resolve().inputs, [
+    { poll: "poll", selected: "one", default: true, revision: null },
+  ]);
+  session.current = "missing";
+  assert.throws(() => session.step(), /Unknown current/);
+});

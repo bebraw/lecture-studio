@@ -46,6 +46,7 @@ export function parsePresentation(note: Note): PresentationDefinition {
   if (
     !value ||
     value.version !== 1 ||
+    typeof value.start !== "string" ||
     !text(value.title, 200) ||
     !Array.isArray(value.steps) ||
     !value.steps.length ||
@@ -55,28 +56,34 @@ export function parsePresentation(note: Note): PresentationDefinition {
   const ids = new Set();
   value.theme = parseTheme(value.theme);
   for (const s of value.steps) {
+    if (!s || typeof s !== "object" || Array.isArray(s))
+      throw new Error("Invalid presentation step");
     if (
       s.allowRemoteImages !== undefined &&
       typeof s.allowRemoteImages !== "boolean"
     )
       throw new Error("Invalid remote image setting");
     if (
+      typeof s.id !== "string" ||
       !/^[a-z0-9-]{1,60}$/.test(s.id) ||
       ids.has(s.id) ||
       !text(s.title, 200) ||
-      !text(s.body || "", 16000) ||
-      !text(s.notes || "", 4000) ||
+      !text(s.body === undefined ? "" : s.body, 16000) ||
+      !text(s.notes === undefined ? "" : s.notes, 4000) ||
       !["title", "question", "material", "build", "poll"].includes(s.type)
     )
       throw new Error("Invalid or duplicate presentation step");
     ids.add(s.id);
     if (s.chapter !== undefined && !text(s.chapter, 100))
       throw new Error("Invalid chapter");
-    if (!text(s.source || "", 500) || (s.uses || []).length > 10)
+    if (
+      !text(s.source === undefined ? "" : s.source, 500) ||
+      (s.uses || []).length > 10
+    )
       throw new Error("Presentation source or dependencies too large");
     if (s.type === "poll") {
       s.poll = validatePoll(s.poll);
-      if (!/^[a-z0-9-]{1,80}$/.test(s.room ?? ""))
+      if (typeof s.room !== "string" || !/^[a-z0-9-]{1,80}$/.test(s.room))
         throw new Error("Poll requires a prepared room ID");
     }
   }
@@ -223,7 +230,7 @@ export class PresentationSession {
       );
     });
     return {
-      prompt: [s.body || "", ...additions].join("\n\n"),
+      prompt: [s.body === undefined ? "" : s.body, ...additions].join("\n\n"),
       missing,
       inputs,
     };
