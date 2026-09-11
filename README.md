@@ -281,6 +281,12 @@ local fixtures and do not submit votes to the public lecture.
 
 Additional checks:
 
+- `npm run test:a11y`: axe scans for automatically detectable WCAG A/AA issues
+  through WCAG 2.2, plus keyboard navigation, menu focus restoration, and audience
+  vote/feedback submission. These checks also run in the normal browser suite.
+  Scan reports are attached to Playwright results. This covers the tested fixture
+  states; it does not replace manual accessibility assessment of lecture content.
+
 - `npm run lint`: type-aware Oxlint, enforced in the fast gate. Run `npm run typegen` first in a fresh checkout so Worker bindings are available.
 - `npm run diagnostics:codebase`, `diagnostics:health`, `diagnostics:map`: advisory
   Fallow analysis; the map is written to `.fallow/codebase-map.html`.

@@ -33,7 +33,8 @@
     "lighthouse": "node --import tsx scripts/run-lighthouse.ts",
     "lighthouse:check": "npm run lighthouse -- --enforce",
     "ci:local": "local-ci run --quiet --pause-on-failure --workflow .github/workflows/check.yml",
-    "ci:local:retry": "local-ci retry"
+    "ci:local:retry": "local-ci retry",
+    "test:a11y": "npm run build && playwright test browser-tests/accessibility.spec.ts"
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "1.30.0",
@@ -43,6 +44,7 @@
     "valibot": "1.5.0"
   },
   "devDependencies": {
+    "@axe-core/playwright": "4.13.0",
     "@playwright/test": "1.62.1",
     "@stryker-mutator/core": "10.0.0",
     "@stryker-mutator/tap-runner": "10.0.0",
