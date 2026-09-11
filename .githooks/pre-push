@@ -1,4 +1,4 @@
 #!/bin/sh
 set -eu
 cd "$(git rev-parse --show-toplevel)"
-npm run quality:gate:fast
+node --import tsx scripts/run-affected-guardrails.ts --pre-push

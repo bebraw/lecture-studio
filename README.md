@@ -288,3 +288,11 @@ Additional checks:
 
 TypeScript 7 remains the project compiler. The TypeScript 6 compatibility package
 supplies the compiler API required by Stryker and its compile-error checker.
+
+Changed-file checks: `npm run quality:affected` inspects unpushed commits and
+working changes. The pre-push hook uses the actual ref updates from Git.
+Documentation-only changes run formatting; source changes run strict typing,
+lint, architecture, and coverage, plus browser/Worker checks where relevant.
+Configuration changes, new branches, and unavailable remote history run
+`npm run check`. Deletions and renames count as changes. CI always runs the full
+baseline. Use `npm run quality:affected -- --dry-run` to inspect the plan.

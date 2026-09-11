@@ -28,7 +28,8 @@
     "quality:architecture": "node --import tsx scripts/check-architecture.ts",
     "mutation": "stryker run",
     "mutation:incremental": "stryker run --incremental",
-    "quality:gate:deep": "npm run check && npm run mutation"
+    "quality:gate:deep": "npm run check && npm run mutation",
+    "quality:affected": "node --import tsx scripts/run-affected-guardrails.ts"
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "1.30.0",
