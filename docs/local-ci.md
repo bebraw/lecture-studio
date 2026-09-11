@@ -10,8 +10,10 @@ The workflow installs Node from `.nvmrc`, both dependency trees and Chromium,
 then runs `npm run check`: formatting, lint, import boundaries, strict types,
 coverage, runtime audits, the Worker dry run and browser tests. Its coverage and browser
 diagnostics artifact steps run in the same workflow. It does not deploy and needs no
-Cloudflare token. Mutation testing remains a separate `npm run mutation` or
-GitHub workflow; Lighthouse remains a separate advisory measurement.
+Cloudflare token. Mutation testing runs locally with `npm run mutation` or
+`npm run mutation:incremental`; it is excluded from GitHub Actions because hosted
+runs exceeded the 20-minute job limit. Lighthouse remains a separate advisory
+measurement.
 
 A failed job is retained for inspection. Use the runner name printed in the log:
 `npm run ci:local:retry -- --name <runner-name>`.

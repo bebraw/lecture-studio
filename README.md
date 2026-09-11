@@ -302,8 +302,10 @@ Additional checks:
   `reports/coverage/index.html`, enforced in the fast gate.
 - `npm run mutation`: focused mutation analysis of voting, decisions and audience
   privacy; `npm run mutation:incremental` reuses prior results for explicit local runs.
-  Reports are written to `reports/mutation/index.html`. Mutation is a separate CI
-  job and is intentionally outside the pre-push gate.
+  Reports are written to `reports/mutation/index.html`. Mutation testing runs locally
+  and is outside CI and the pre-push gate: hosted runs exceeded the 20-minute job
+  limit without producing a report. Use `npm run quality:gate:deep` to run the full
+  checks followed by mutation testing locally.
 
 TypeScript 7 remains the project compiler. The TypeScript 6 compatibility package
 supplies the compiler API required by Stryker and its compile-error checker.
