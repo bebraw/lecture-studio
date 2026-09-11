@@ -14,7 +14,7 @@ function backend() {
  }});
  return {proc,sent};
 }
-test("Codex uses reviewed text, workspace sandbox, bounded approvals and one active turn",async()=>{
+test("Codex uses reviewed text, workspace sandbox, automatic approval review and one active turn",async()=>{
  const {proc,sent}=backend(); let spawnArgs;
  const bridge=new CodexBridge({spawnProcess:(...args)=>{spawnArgs=args;return proc}});
  try{
@@ -25,6 +25,9 @@ test("Codex uses reviewed text, workspace sandbox, bounded approvals and one act
    await bridge.start("EXACT reviewed brief","test-model");
    assert.equal(sent.find(x=>x.method==="thread/start").params.sandbox,"workspace-write");
    assert.equal(sent.find(x=>x.method==="thread/start").params.approvalPolicy,"on-request");
+   assert.equal(sent.find(x=>x.method==="thread/start").params.approvalsReviewer,"auto_review");
+   assert.equal(sent.find(x=>x.method==="turn/start").params.approvalsReviewer,"auto_review");
+   assert.equal(sent.find(x=>x.method==="turn/start").params.approvalPolicy,"on-request");
    assert.deepEqual(sent.find(x=>x.method==="turn/start").params.input,[{type:"text",text:"EXACT reviewed brief"}]);
    await assert.rejects(()=>bridge.start("Duplicate"));
    bridge.receive({id:"approval",method:"item/commandExecution/requestApproval",params:{command:"test"}});
