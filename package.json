@@ -12,19 +12,20 @@
     "test:browser": "npm run build && playwright test",
     "check": "npm run quality:gate:fast && npm run build:worker && npm run test:browser",
     "build": "node --import tsx scripts/build-browser.ts",
-    "typecheck": "npm run typegen && tsc -p tsconfig.json && tsc -p tsconfig.worker.json",
+    "typecheck": "npm run typegen && node node_modules/typescript-7/bin/tsc -p tsconfig.json && node node_modules/typescript-7/bin/tsc -p tsconfig.worker.json",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "typegen": "npm run types --prefix audience",
     "audit:runtime": "npm audit --omit=dev --audit-level=high && npm audit --prefix audience --omit=dev --audit-level=high",
-    "quality:gate:fast": "npm run format:check && npm run lint && npm run typecheck && npm run test:coverage && npm run audit:runtime",
+    "quality:gate:fast": "npm run format:check && npm run lint && npm run quality:architecture && npm run typecheck && npm run test:coverage && npm run audit:runtime",
     "build:worker": "npm run build --prefix audience",
     "hooks:install": "git config core.hooksPath .githooks",
     "lint": "oxlint --max-warnings 0",
     "diagnostics:codebase": "fallow dead-code --type-aware --type-aware-require best-effort --no-cache",
     "diagnostics:health": "fallow health --score --hotspots --targets --no-cache",
     "diagnostics:map": "fallow viz --out .fallow/codebase-map.html --no-open --no-cache",
-    "test:coverage": "c8 node --import tsx --test tests/*.test.ts"
+    "test:coverage": "c8 node --import tsx --test tests/*.test.ts",
+    "quality:architecture": "node --import tsx scripts/check-architecture.ts"
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "1.30.0",
@@ -36,6 +37,7 @@
     "@playwright/test": "1.62.1",
     "@stryker-mutator/core": "10.0.0",
     "@stryker-mutator/tap-runner": "10.0.0",
+    "@stryker-mutator/typescript-checker": "10.0.0",
     "@types/markdown-it": "14.2.0",
     "@types/node": "24.13.4",
     "c8": "11.0.0",
@@ -44,6 +46,7 @@
     "oxlint": "1.80.0",
     "prettier": "3.9.6",
     "tsx": "4.23.13",
-    "typescript": "7.0.2"
+    "typescript": "npm:@typescript/typescript6@6.0.2",
+    "typescript-7": "npm:typescript@7.0.2"
   }
 }

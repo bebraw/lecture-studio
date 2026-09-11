@@ -54,3 +54,12 @@ including unloaded files. Type-only contracts have no executable coverage.
 Browser behavior is checked separately by Playwright; this report does not claim
 Worker or browser coverage. Initial measured result after transport fixes: 85.24%
 lines, 75.35% branches, 91.74% functions across 36 tests.
+
+## Runtime architecture boundaries
+
+`npm run quality:architecture` enforces Fallow zones for the browser, local Node
+service, Cloudflare Worker and shared contracts. Runtime imports cannot cross from
+browser to server or Worker, nor between local and Worker runtimes. Shared API
+contracts may derive local types through erased type-only imports. Diagnostics
+remain advisory; forbidden imports alone block this gate. A deliberately injected
+browser-to-server import was rejected, then removed before committing.

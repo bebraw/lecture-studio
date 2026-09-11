@@ -45,5 +45,50 @@
         "unused-class-members": "warn"
       }
     }
-  ]
+  ],
+  "boundaries": {
+    "zones": [
+      {
+        "name": "browser",
+        "patterns": ["public/**/*.ts", "audience/audience.ts"]
+      },
+      {
+        "name": "shared",
+        "patterns": ["shared/**/*.ts"]
+      },
+      {
+        "name": "local",
+        "patterns": ["server.ts", "lib/**/*.ts"]
+      },
+      {
+        "name": "worker",
+        "patterns": [
+          "audience/worker.ts",
+          "audience/room-*.ts",
+          "audience/stage-state.ts",
+          "audience/feedback-http.ts"
+        ]
+      }
+    ],
+    "rules": [
+      {
+        "from": "browser",
+        "allow": ["browser", "shared"]
+      },
+      {
+        "from": "shared",
+        "allow": ["shared"],
+        "allowTypeOnly": ["local"]
+      },
+      {
+        "from": "local",
+        "allow": ["local", "shared"]
+      },
+      {
+        "from": "worker",
+        "allow": ["worker", "shared"]
+      }
+    ]
+  },
+  "ignoreDependencies": ["typescript-7"]
 }
