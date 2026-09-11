@@ -51,6 +51,7 @@ export class RoomState extends DurableObject<Env> {
     super(ctx, env);
     ctx.blockConcurrencyWhile(async () => {
       this.ctx.storage.sql.exec(`
+        CREATE TABLE IF NOT EXISTS lecture_session (singleton INTEGER PRIMARY KEY CHECK (singleton = 1), id TEXT NOT NULL);
         CREATE TABLE IF NOT EXISTS choices (
           id TEXT PRIMARY KEY,
           label TEXT NOT NULL,
@@ -98,6 +99,22 @@ export class RoomState extends DurableObject<Env> {
     }
 
     return { ok: true, snapshot: this.readSnapshot(voterKey) };
+  }
+
+  async openSession(sessionId: string): Promise<RoomSnapshot> {
+    if (!/^[a-zA-Z0-9-]{1,80}$/.test(sessionId)) throw new TypeError("Invalid lecture session");
+    this.ctx.storage.transactionSync(() => {
+      const current = this.ctx.storage.sql.exec("SELECT id FROM lecture_session WHERE singleton = 1").toArray()[0]?.id;
+      if (current !== sessionId) {
+        this.ctx.storage.sql.exec("DELETE FROM votes");
+        this.ctx.storage.sql.exec("INSERT INTO lecture_session (singleton, id) VALUES (1, ?) ON CONFLICT(singleton) DO UPDATE SET id = excluded.id", sessionId);
+        this.incrementRevision();
+      }
+      if (this.readMetadata().status !== "open") {
+        this.ctx.storage.sql.exec("UPDATE room_metadata SET status = 'open', revision = revision + 1 WHERE singleton = 1");
+      }
+    });
+    return this.readSnapshot();
   }
 
   async resetVotes(): Promise<RoomSnapshot> {

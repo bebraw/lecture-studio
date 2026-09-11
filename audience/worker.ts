@@ -64,9 +64,10 @@ export default {
      response.headers.set("x-content-type-options","nosniff");
      return response;
    }
-   const match=/^\/(rooms|api\/rooms|presenter\/rooms)\/([a-z0-9-]+)(?:\/(seed|open|lock))?$/.exec(url.pathname);
+   const match=/^\/(rooms|api\/rooms|presenter\/rooms)\/([a-z0-9-]+)(?:\/(seed|open|open-session|lock))?$/.exec(url.pathname);
    if(!match||!Object.hasOwn(rooms,match[2]))return new Response("Not found",{status:404});
-   const [,kind,id,operation]=match,definition=rooms[id];
+   const [,kind,id,requestedOperation]=match,definition=rooms[id];
+   const operation=requestedOperation==="open-session"?"open":requestedOperation;
    const room=env.ROOM_STATE.getByName(id);
    if(kind==="presenter/rooms"){
      if(request.method!=="POST")return new Response("Method not allowed",{status:405});
@@ -79,6 +80,10 @@ export default {
      if(operation==="seed"){
        // Only initialize an empty room. Repeated setup never resets existing votes.
        await room.initializeChoices(definition.choices);
+     }else if(requestedOperation==="open-session"){
+       const session=request.headers.get("X-Lecture-Session")||"";
+       if(!/^[a-zA-Z0-9-]{1,80}$/.test(session))return new Response("Invalid lecture session",{status:400});
+       await room.openSession(session);
      }else await room.setStatus(operation==="open"?"open":"locked");
    }else if(operation)return new Response("Not found",{status:404});
    else if(kind==="rooms"){

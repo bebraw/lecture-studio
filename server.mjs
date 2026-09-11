@@ -119,6 +119,7 @@ export function createStudio({
           fetcher: poll.fetcher,
         });
         p.configure(s.poll);
+          sessionId: poll.sessionId,
         graphPolls.set(s.id, p);
       }
       graphPoll = graphPolls.get(s.id);
@@ -461,6 +462,7 @@ export function createStudio({
                 if (op !== "show") presentation.move(op, body.id);
                 showGraph();
               } else if (op === "defaults") {
+              poll.reset();
                 presentation.defaults.add(presentation.current);
                 showGraph();
               } else if (
@@ -492,6 +494,7 @@ export function createStudio({
                 )
                   throw new Error("Close the current vote first");
                 await graphPoll.act(
+                    sessionId: poll.sessionId,
                   op === "poll-open"
                     ? "open"
                     : op === "poll-close"

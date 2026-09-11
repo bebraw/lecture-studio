@@ -6,7 +6,7 @@ test("only published slides sync; polling never replaces another projected slide
  const writes=[];let status="locked",revision=1;
  const poll=new AudiencePoll({origin:"https://audience.invalid",token:"private",fetcher:async(url,init)=>{
    if(url.endsWith("/presenter/stage")){writes.push(JSON.parse(init.body));return new Response(null,{status:204});}
-   if(url.endsWith("/open"))status="open";
+   if(url.endsWith("/open-session"))status="open";
    if(url.endsWith("/lock"))status="locked";
    return Response.json({status,revision:revision++,totalVotes:0,choices:themePoll().options.map(o=>({...o,votes:0}))});
  }});

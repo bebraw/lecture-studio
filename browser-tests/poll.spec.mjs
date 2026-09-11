@@ -4,7 +4,7 @@ import {fixture} from "../tests/fixture.mjs";
 test("audience result is projected deliberately and added only after freeze",async({browser})=>{
  let snapshot={status:"locked",revision:1,totalVotes:5,choices:themePoll().options.map((o,i)=>({...o,votes:[1,3,1][i]}))};
  const poll=new AudiencePoll({origin:"https://audience.example",token:"private-secret",fetcher:async(url)=>{
-   if(url.endsWith("/open"))snapshot={...snapshot,status:"open",revision:2};
+   if(url.endsWith("/open-session"))snapshot={...snapshot,status:"open",revision:2};
    if(url.endsWith("/lock"))snapshot={...snapshot,status:"locked",revision:3};
    return new Response(JSON.stringify(snapshot));
  }});

@@ -146,10 +146,10 @@ This is an adapter to the existing lecture room API, not a second public voting 
 The public app must already expose:
 
 - `GET /api/rooms/{room}`: `{status:"open"|"locked", revision, totalVotes, choices:[{id,label,votes}]}`.
-- Authenticated `POST /presenter/rooms/{room}/open` and `.../lock`, returning that same aggregate.
+- Authenticated `POST /presenter/rooms/{room}/open-session` with an `X-Lecture-Session` header, and `.../lock`, returning that same aggregate. A new session clears previous votes atomically on opening; retrying or reopening the same session preserves them.
 - `GET /rooms/{room}`: the audience's native form, posting back to the room. Keep its existing same-origin checks, predefined-choice validation, and replaceable anonymous vote semantics.
 
-For the default theme poll, seed the public app with exactly `editorial|Editorial`, `retro-web|Retro web`, and `playful|Playful` in a designated rehearsal room. **The pinned starter currently seeds seminar interests, not these themes.** Configure the app's choices first, or configure the studio to match its existing interests. The studio checks IDs and labels before opening or locking and refuses a mismatch; it never calls seed or reset. No public deployment or vote mutation was performed while implementing this feature.
+For the default theme poll, seed the public app with exactly `editorial|Editorial`, `retro-web|Retro web`, and `playful|Playful` in a designated rehearsal room. **The pinned starter currently seeds seminar interests, not these themes.** Configure the app's choices first, or configure the studio to match its existing interests. The studio checks IDs and labels before opening or locking and refuses a mismatch; it never seeds choices. Loading/restarting a presentation, resetting the lecture, or restarting the server creates a fresh voting session.
 
 Reuse the audience join link/your existing QR. Closing the poll must succeed before a result can be used; failures display an error and retain last-known counts. Resetting the lecture is refused while a known vote is open. A studio restart does not close the public room. Cookie-based deduplication is a convenience, not strong identity or protection against determined multiple voting; retain the public app's anti-abuse controls.
 

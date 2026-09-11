@@ -5,7 +5,7 @@ test("separate narrative votes become explicit build requirements",async({browse
  const poll=new AudiencePoll({origin:"https://audience.example",token:"secret",fetcher:async url=>{
    const id=url.includes("-friction")?"friction":url.includes("-priority")?"priority":"theme";
    const options=lecturePolls[id].options;
-   return new Response(JSON.stringify({status:url.endsWith("/open")?"open":"locked",revision:3,totalVotes:4,choices:options.map((o,i)=>({...o,votes:i===1?4:0}))}));
+   return new Response(JSON.stringify({status:url.endsWith("/open-session")?"open":"locked",revision:3,totalVotes:4,choices:options.map((o,i)=>({...o,votes:i===1?4:0}))}));
  }});
  const {studio,address,bridge}=await fixture({poll});
  const context=await browser.newContext();
