@@ -44,3 +44,13 @@ Explicit entries cover built browser assets and local verification tools. Genera
 URLs are excluded from unresolved-import findings. Cloudflare RPC methods and
 interface-injected adapters remain advisory: static analysis cannot establish all
 of their callers. They must not be deleted based on an unused-member report.
+
+## Branch coverage
+
+`npm run test:coverage` generates HTML, LCOV and JSON reports under
+`reports/coverage` and enforces 80% lines, 70% branches and 85% functions.
+The measured scope is local runtime code (`server.ts`, `lib`, shared error helpers),
+including unloaded files. Type-only contracts have no executable coverage.
+Browser behavior is checked separately by Playwright; this report does not claim
+Worker or browser coverage. Initial measured result after transport fixes: 85.24%
+lines, 75.35% branches, 91.74% functions across 36 tests.

@@ -28,7 +28,9 @@ export async function feedbackRequest(
     await response.body?.cancel();
     throw new Error("Deploy the updated audience Worker to enable responses");
   }
-  const reader = response.body!.getReader();
+  if (!response.body)
+    throw new Error("Feedback service returned an empty response");
+  const reader = response.body.getReader();
   let size = 0;
   const chunks = [];
   while (true) {

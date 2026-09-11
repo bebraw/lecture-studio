@@ -1,0 +1,10 @@
+{
+  "all": true,
+  "include": ["lib/**/*.ts", "shared/errors.ts", "server.ts"],
+  "reporter": ["text", "html", "json", "lcov"],
+  "reports-dir": "reports/coverage",
+  "check-coverage": true,
+  "lines": 80,
+  "branches": 70,
+  "functions": 85
+}
