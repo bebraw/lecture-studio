@@ -279,6 +279,13 @@ Pull requests and branch pushes run the full check. The production workflow runs
 that same check before deploying the audience Worker. Browser tests use isolated
 local fixtures and do not submit votes to the public lecture.
 
+Browser failures retain a Playwright trace and screenshots on the first failure;
+no retry is required. Both CI workflows upload `browser-report` for 14 days,
+including the HTML report, axe attachments and failure diagnostics. Open a local
+report with `npx playwright show-report`, or inspect a downloaded trace with
+`npx playwright show-trace path/to/trace.zip`. Browser tests use Playwright's
+managed contexts so screenshots are captured before pages are closed.
+
 Additional checks:
 
 - `npm run test:a11y`: axe scans for automatically detectable WCAG A/AA issues

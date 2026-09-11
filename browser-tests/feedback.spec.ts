@@ -6,7 +6,7 @@ import { fixture } from "../tests/fixture.ts";
 import { AudiencePoll } from "../lib/audience-poll.ts";
 import { initialDraft } from "../lib/narrative.ts";
 test("desk review publishes only selected questions or approved cloud snapshots", async ({
-  browser,
+  context,
 }) => {
   let snapshot = {
     config: {
@@ -50,7 +50,6 @@ test("desk review publishes only selected questions or approved cloud snapshots"
     },
   });
   const { studio, address } = await fixture({ poll });
-  const context = await browser.newContext();
   try {
     const desk = await context.newPage(),
       stage = await context.newPage();
@@ -109,7 +108,6 @@ test("desk review publishes only selected questions or approved cloud snapshots"
     });
     await stage.screenshot({ path: "test-results/feedback-cloud.png" });
   } finally {
-    await context.close();
     await new Promise((resolve) => studio.server.close(resolve));
   }
 });

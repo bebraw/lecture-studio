@@ -8,8 +8,8 @@ uncommitted changes. There is no separate local copy of the workflow.
 
 The workflow installs Node from `.nvmrc`, both dependency trees and Chromium,
 then runs `npm run check`: formatting, lint, import boundaries, strict types,
-coverage, runtime audits, the Worker dry run and browser tests. Its coverage
-artifact step runs in the same workflow. It does not deploy and needs no
+coverage, runtime audits, the Worker dry run and browser tests. Its coverage and browser
+diagnostics artifact steps run in the same workflow. It does not deploy and needs no
 Cloudflare token. Mutation testing remains a separate `npm run mutation` or
 GitHub workflow; Lighthouse remains a separate advisory measurement.
 

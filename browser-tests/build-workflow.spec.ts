@@ -2,7 +2,7 @@ import { test, expect } from "@playwright/test";
 import { fixture } from "../tests/fixture.ts";
 import { AudiencePoll, themePoll } from "../lib/audience-poll.ts";
 test("a frozen vote feeds the explicit build without launching during navigation", async ({
-  browser,
+  context,
 }) => {
   const path = "Lectures/Web Development 2026/Presentations/Build.md";
   const definition = {
@@ -74,7 +74,6 @@ test("a frozen vote feeds the explicit build without launching during navigation
     close: async () => {},
   };
   const { studio, address, bridge } = await fixture({ poll, library });
-  const context = await browser.newContext();
   try {
     const desk = await context.newPage();
     await desk.goto(address.deskUrl);
@@ -93,7 +92,6 @@ test("a frozen vote feeds the explicit build without launching during navigation
     await expect.poll(() => bridge.lastPrompt).toContain("Use retro styling.");
     await expect(desk.locator("#graph-build")).toBeDisabled();
   } finally {
-    await context.close();
     await new Promise((resolve) => studio.server.close(resolve));
   }
 });

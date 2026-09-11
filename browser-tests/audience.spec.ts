@@ -9,77 +9,80 @@ const roomSchema = v.object({
   choices: v.array(v.object({ id: v.string(), votes: v.number() })),
 });
 
-for (const room of rooms) {
-  test(`${room}: native voting, authorization, replacement and lecture reset`, async ({
-    audience,
-    browser,
-  }) => {
-    const endpoint = `/presenter/rooms/${room}/`;
-    const admin = async (operation: string, session?: string) =>
-      v.parse(
-        roomSchema,
-        await (
-          await audience.admin(
-            endpoint + operation,
-            undefined,
-            session ? { "X-Lecture-Session": session } : {},
-          )
-        ).json(),
-      );
-    const send = (
-      choice: string,
-      origin = new URL(audience.url).origin,
-      cookie = "",
-    ) =>
-      fetch(new URL(`/rooms/${room}`, audience.url), {
-        method: "POST",
-        redirect: "manual",
-        headers: {
-          origin,
-          cookie,
-          "content-type": "application/x-www-form-urlencoded",
-        },
-        body: new URLSearchParams({ choice }),
-      });
-    const seeded = await admin("seed");
-    const first = seeded.choices[0]?.id;
-    const second = seeded.choices[1]?.id;
-    expect(first).toBeTruthy();
-    expect(second).toBeTruthy();
-    if (!first || !second) throw new Error("Fixture requires two choices");
-    expect(
-      (
-        await fetch(new URL(endpoint + "open", audience.url), {
+test.describe("Native forms", () => {
+  test.use({ javaScriptEnabled: false });
+  for (const room of rooms) {
+    test(`${room}: native voting, authorization, replacement and lecture reset`, async ({
+      audience,
+      page,
+    }) => {
+      const endpoint = `/presenter/rooms/${room}/`;
+      const admin = async (operation: string, session?: string) =>
+        v.parse(
+          roomSchema,
+          await (
+            await audience.admin(
+              endpoint + operation,
+              undefined,
+              session ? { "X-Lecture-Session": session } : {},
+            )
+          ).json(),
+        );
+      const send = (
+        choice: string,
+        origin = new URL(audience.url).origin,
+        cookie = "",
+      ) =>
+        fetch(new URL(`/rooms/${room}`, audience.url), {
           method: "POST",
-        })
-      ).status,
-    ).toBe(401);
-    expect(
-      (await fetch(new URL("/rooms/not-allowed", audience.url))).status,
-    ).toBe(404);
-    expect((await send(first)).status).toBe(409);
-    await admin("open-session", "first-lecture");
-    expect((await send(first, "https://unrelated.invalid")).status).toBe(403);
-    expect((await send("invalid-option")).status).toBe(400);
-    const vote = await send(first);
-    expect(vote.status).toBe(303);
-    const cookie = vote.headers.get("set-cookie")?.split(";")[0];
-    expect(cookie).toBeTruthy();
-    expect((await send(second, undefined, cookie)).status).toBe(303);
-    const result = await admin("lock");
-    expect(result.totalVotes).toBe(1);
-    expect(result.choices.find((choice) => choice.id === first)?.votes).toBe(0);
-    expect(result.choices.find((choice) => choice.id === second)?.votes).toBe(
-      1,
-    );
-    expect(await admin("seed")).toEqual(result);
-    expect((await admin("open-session", "first-lecture")).totalVotes).toBe(1);
-    expect((await admin("open-session", "first-lecture")).totalVotes).toBe(1);
-    expect((await admin("open-session", "second-lecture")).totalVotes).toBe(0);
+          redirect: "manual",
+          headers: {
+            origin,
+            cookie,
+            "content-type": "application/x-www-form-urlencoded",
+          },
+          body: new URLSearchParams({ choice }),
+        });
+      const seeded = await admin("seed");
+      const first = seeded.choices[0]?.id;
+      const second = seeded.choices[1]?.id;
+      expect(first).toBeTruthy();
+      expect(second).toBeTruthy();
+      if (!first || !second) throw new Error("Fixture requires two choices");
+      expect(
+        (
+          await fetch(new URL(endpoint + "open", audience.url), {
+            method: "POST",
+          })
+        ).status,
+      ).toBe(401);
+      expect(
+        (await fetch(new URL("/rooms/not-allowed", audience.url))).status,
+      ).toBe(404);
+      expect((await send(first)).status).toBe(409);
+      await admin("open-session", "first-lecture");
+      expect((await send(first, "https://unrelated.invalid")).status).toBe(403);
+      expect((await send("invalid-option")).status).toBe(400);
+      const vote = await send(first);
+      expect(vote.status).toBe(303);
+      const cookie = vote.headers.get("set-cookie")?.split(";")[0];
+      expect(cookie).toBeTruthy();
+      expect((await send(second, undefined, cookie)).status).toBe(303);
+      const result = await admin("lock");
+      expect(result.totalVotes).toBe(1);
+      expect(result.choices.find((choice) => choice.id === first)?.votes).toBe(
+        0,
+      );
+      expect(result.choices.find((choice) => choice.id === second)?.votes).toBe(
+        1,
+      );
+      expect(await admin("seed")).toEqual(result);
+      expect((await admin("open-session", "first-lecture")).totalVotes).toBe(1);
+      expect((await admin("open-session", "first-lecture")).totalVotes).toBe(1);
+      expect((await admin("open-session", "second-lecture")).totalVotes).toBe(
+        0,
+      );
 
-    const context = await browser.newContext({ javaScriptEnabled: false });
-    try {
-      const page = await context.newPage();
       await page.goto(new URL(`/rooms/${room}`, audience.url).href);
       await page.getByRole("radio").first().check();
       await Promise.all([
@@ -87,11 +90,9 @@ for (const room of rooms) {
         page.getByRole("button", { name: "Vote", exact: true }).click(),
       ]);
       expect((await admin("lock")).totalVotes).toBe(1);
-    } finally {
-      await context.close();
-    }
-  });
-}
+    });
+  }
+});
 
 test("students follow the stage without losing their poll selection", async ({
   audience,

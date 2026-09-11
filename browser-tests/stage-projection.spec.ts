@@ -3,7 +3,7 @@ import { fixture } from "../tests/fixture.ts";
 import { AudiencePoll } from "../lib/audience-poll.ts";
 
 test("desk previews actual poll projection and long questions fit the stage", async ({
-  browser,
+  context,
 }) => {
   const title =
     "When you use the web today, what feels unnecessarily difficult?";
@@ -56,8 +56,7 @@ test("desk previews actual poll projection and long questions fit the stage", as
     }),
     close: async () => {},
   };
-  const { studio, address } = await fixture({ library, poll }),
-    context = await browser.newContext();
+  const { studio, address } = await fixture({ library, poll });
   try {
     const desk = await context.newPage(),
       stage = await context.newPage();
@@ -111,7 +110,6 @@ test("desk previews actual poll projection and long questions fit the stage", as
     await stage.screenshot({ path: "test-results/stage-long-question.png" });
     await desk.screenshot({ path: "test-results/desk-projection.png" });
   } finally {
-    await context.close();
     await new Promise((resolve) => studio.server.close(resolve));
   }
 });

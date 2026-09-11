@@ -1,7 +1,7 @@
 import { test, expect } from "@playwright/test";
 import { fixture } from "../tests/fixture.ts";
 test("Obsidian snapshot loads privately and detours return without changing the definition", async ({
-  browser,
+  context,
 }) => {
   const path = "Lectures/Web Development 2026/Presentations/Test.md";
   const definition = {
@@ -49,7 +49,6 @@ test("Obsidian snapshot loads privately and detours return without changing the 
     close: async () => {},
   };
   const { studio, address, bridge } = await fixture({ library });
-  const context = await browser.newContext();
   try {
     const desk = await context.newPage(),
       stage = await context.newPage();
@@ -296,7 +295,6 @@ test("Obsidian snapshot loads privately and detours return without changing the 
       .click();
     await expect(stage.locator("h1")).toHaveText("Audience question");
   } finally {
-    await context.close();
     await new Promise((resolve) => studio.server.close(resolve));
   }
 });
