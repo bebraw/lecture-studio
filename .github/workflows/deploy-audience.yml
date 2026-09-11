@@ -28,7 +28,7 @@ jobs:
       - run: npm ci --prefix audience
       - run: npm test
       - run: npx playwright install --with-deps chromium
-      - run: npm run test:browser -- browser-tests/presentation.spec.mjs browser-tests/stage-projection.spec.mjs browser-tests/feedback.spec.mjs
+      - run: npm run test:browser
       - name: Deploy existing audience Worker
         working-directory: audience
         env:
