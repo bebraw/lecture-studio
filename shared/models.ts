@@ -136,7 +136,6 @@ export interface BuildRun {
   inputs: BuildInput[];
   model?: string;
   startedAt: string;
-  [key: string]: unknown;
 }
 export interface ApprovalQuestion {
   id: string;
@@ -150,7 +149,6 @@ export interface ApprovalParams {
   command?: string;
   reason?: string;
   questions?: ApprovalQuestion[];
-  [key: string]: unknown;
 }
 export interface ApprovalRequest {
   id: string | number;

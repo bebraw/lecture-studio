@@ -53,7 +53,7 @@ export function mountExplorer({
 }: {
   host: HTMLElement;
   call: ApiClient;
-  onShow: (value: Partial<Draft>) => unknown;
+  onShow: (value: Partial<Draft>) => void | Promise<void>;
   getScope: () => string;
 }) {
   const panel = document.createElement("section");

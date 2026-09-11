@@ -43,7 +43,7 @@ function notice(text: string, error = false) {
   $("notice").textContent = text;
   $("notice").classList.toggle("error", error);
 }
-function action(id: string, run: () => unknown) {
+function action(id: string, run: () => void | Promise<void>) {
   $(id).addEventListener("click", async () => {
     ($(id) as HTMLButtonElement).disabled = true;
     try {

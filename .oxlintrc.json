@@ -91,6 +91,22 @@
           }
         ]
       }
+    },
+    {
+      "files": ["shared/models.ts"],
+      "rules": {
+        "typescript/no-restricted-types": [
+          "error",
+          {
+            "types": {
+              "unknown": "Shared domain models must describe known fields. Keep unknown at unvalidated input boundaries."
+            }
+          }
+        ]
+      }
     }
-  ]
+  ],
+  "rules": {
+    "typescript/no-explicit-any": "error"
+  }
 }

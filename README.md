@@ -246,6 +246,12 @@ Quick Tunnels are temporary demo infrastructure, with a 200 concurrent request l
 ## TypeScript development
 
 All maintained runtime code, browser modules, tests, and tools use TypeScript.
+Oxlint rejects explicit `any` throughout maintained code and `unknown` in
+`shared/models.ts`, where domain contracts must name their supported fields.
+Keep `unknown` for unvalidated JSON, external protocol results, and caught errors;
+narrow it before use. Do not replace it with an assertion merely to satisfy lint.
+Callbacks whose results are ignored declare `void | Promise<void>`.
+
 Run `npm ci` and `npm ci --prefix audience` before development.
 `npm run typecheck` generates Worker bindings and checks both runtime environments
 with strict typing, unused-code checks, complete returns, and switch-fallthrough checks.
