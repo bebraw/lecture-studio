@@ -299,3 +299,6 @@ baseline. Use `npm run quality:affected -- --dry-run` to inspect the plan.
 
 Performance: `npm run lighthouse` records repeatable local audience/stage
 measurements. See [the baseline and budgets](docs/performance.md).
+
+Local GitHub Actions: `npm run ci:local` runs the existing check workflow in
+Docker. See [setup and retry instructions](docs/local-ci.md).

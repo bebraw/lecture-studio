@@ -31,7 +31,9 @@
     "quality:gate:deep": "npm run check && npm run mutation",
     "quality:affected": "node --import tsx scripts/run-affected-guardrails.ts",
     "lighthouse": "node --import tsx scripts/run-lighthouse.ts",
-    "lighthouse:check": "npm run lighthouse -- --enforce"
+    "lighthouse:check": "npm run lighthouse -- --enforce",
+    "ci:local": "local-ci run --quiet --pause-on-failure --workflow .github/workflows/check.yml",
+    "ci:local:retry": "local-ci retry"
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "1.30.0",
@@ -53,6 +55,7 @@
     "lighthouse": "13.4.1",
     "oxlint": "1.80.0",
     "prettier": "3.9.6",
+    "run-local-ci": "0.18.1",
     "tsx": "4.23.13",
     "typescript": "npm:@typescript/typescript6@6.0.2",
     "typescript-7": "npm:typescript@7.0.2"

@@ -10,3 +10,6 @@ audience/.dev.vars
 .fallow/
 reports/
 .stryker-tmp/
+
+.env.local-ci
+.env.agent-ci

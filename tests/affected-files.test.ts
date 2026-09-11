@@ -38,11 +38,11 @@ test("push detection includes deletions, both sides of renames, spaces and worki
     writeFileSync(join(root, "old.ts"), "export {};\n");
     git("add", ".");
     git("-c", "core.hooksPath=/dev/null", "commit", "-m", "Initial");
-    const base = git("rev-parse", "HEAD");
+    const base = git("rev-parse", "HEAD^{commit}");
     renameSync(join(root, "old.ts"), join(root, "new file.ts"));
     git("add", "-A");
     git("-c", "core.hooksPath=/dev/null", "commit", "-m", "Rename");
-    const head = git("rev-parse", "HEAD");
+    const head = git("rev-parse", "HEAD^{commit}");
     const input = `refs/heads/main ${head} refs/heads/main ${base}\n`;
     writeFileSync(join(root, "untracked.ts"), "export {};\n");
     assert.deepEqual(affectedFiles(root, input), [

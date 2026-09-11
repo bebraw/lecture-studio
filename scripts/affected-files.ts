@@ -22,7 +22,7 @@ export function affectedFiles(
       const [, local, , remote] = line.trim().split(/\s+/);
       if (!local || !remote) throw new Error("Malformed pre-push input");
       if (zero.test(local)) continue; // Deleting a remote ref publishes no code.
-      if (local !== git("rev-parse", "HEAD").trim())
+      if (local !== git("rev-parse", "HEAD^{commit}").trim())
         throw new Error(
           "Check out the commit being pushed before running its quality checks",
         );

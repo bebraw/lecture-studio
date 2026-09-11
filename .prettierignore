@@ -12,3 +12,6 @@ audience/package-lock.json
 .fallow/
 reports/
 .stryker-tmp/
+
+.env.local-ci
+.env.agent-ci
