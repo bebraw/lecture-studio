@@ -61,12 +61,11 @@ async function authorized(request: Request, secret: string) {
   const supplied = request.headers.get("authorization") || "";
   if (supplied.length > 4096) return false;
   const encoder = new TextEncoder();
-  const hashes = await Promise.all(
-    [supplied, "Bearer " + secret].map((value) =>
-      crypto.subtle.digest("SHA-256", encoder.encode(value)),
-    ),
-  );
-  return crypto.subtle.timingSafeEqual(hashes[0], hashes[1]);
+  const [suppliedHash, expectedHash] = await Promise.all([
+    crypto.subtle.digest("SHA-256", encoder.encode(supplied)),
+    crypto.subtle.digest("SHA-256", encoder.encode("Bearer " + secret)),
+  ]);
+  return crypto.subtle.timingSafeEqual(suppliedHash, expectedHash);
 }
 export default {
   async fetch(request: Request, env: Env): Promise<Response> {
@@ -169,7 +168,7 @@ export default {
           poll: active
             ? {
                 id: active.id,
-                question: rooms[active.id].question,
+                question: rooms[active.id]?.question ?? "",
                 html: renderRoomFragment({
                   roomId: active.id,
                   snapshot: active.snapshot,
@@ -211,10 +210,12 @@ export default {
       /^\/(rooms|api\/rooms|presenter\/rooms)\/([a-z0-9-]+)(?:\/(seed|open|open-session|lock))?$/.exec(
         url.pathname,
       );
-    if (!match || !Object.hasOwn(rooms, match[2]))
+    if (!match?.[2] || !Object.hasOwn(rooms, match[2]))
       return new Response("Not found", { status: 404 });
-    const [, kind, id, requestedOperation] = match,
-      definition = rooms[id];
+    const [, kind, , requestedOperation] = match;
+    const id = match[2];
+    const definition = rooms[id];
+    if (!definition) return new Response("Not found", { status: 404 });
     const operation =
       requestedOperation === "open-session" ? "open" : requestedOperation;
     const room = env.ROOM_STATE.getByName(id);

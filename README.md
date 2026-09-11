@@ -254,7 +254,8 @@ Callbacks whose results are ignored declare `void | Promise<void>`.
 
 Run `npm ci` and `npm ci --prefix audience` before development.
 `npm run typecheck` generates Worker bindings and checks both runtime environments
-with strict typing, unused-code checks, complete returns, and switch-fallthrough checks.
+with strict typing, checked array/dictionary lookups, exact optional properties,
+unused-code checks, complete returns, and switch-fallthrough checks.
 `npm run build` compiles browser entry points into ignored `.local/browser` assets.
 `npm start` and the browser tests build those assets automatically. Run standalone
 TypeScript tools with `node --import tsx path/to/tool.ts`.

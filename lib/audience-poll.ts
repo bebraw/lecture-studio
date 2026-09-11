@@ -111,7 +111,7 @@ export class AudiencePoll {
   sessionId: string;
   openedRooms: Set<string>;
   fetcher: Fetcher;
-  token?: string;
+  token: string | undefined;
   config: PollDefinition;
   snapshot: PollSnapshot | null;
   frozen: FrozenPoll | null;

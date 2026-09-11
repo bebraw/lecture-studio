@@ -24,7 +24,7 @@ export function sections(markdown: string): Note {
   return {
     title,
     sections: matches.map((match, i) => ({
-      heading: match[1],
+      heading: match[1] ?? "Note",
       body: body
         .slice(
           match.index + match[0].length,
@@ -66,8 +66,9 @@ export function renderMarkdown(
   md.validateLink = (url) => /^https:\/\//i.test(url);
   const escape = md.utils.escapeHtml;
   md.renderer.rules.image = (tokens, index) => {
-    const token = tokens[index],
-      src = String(token.attrGet("src") ?? ""),
+    const token = tokens[index];
+    if (!token) throw new Error("Missing Markdown image token");
+    const src = String(token.attrGet("src") ?? ""),
       alt = escape(token.content || "Source image");
     if (allowRemoteImages && /^https:\/\//i.test(src))
       return (
@@ -85,8 +86,10 @@ export function renderMarkdown(
   };
   const baseLink = md.renderer.rules.link_open;
   md.renderer.rules.link_open = (tokens, idx, opts, env, self) => {
-    tokens[idx].attrSet("target", "_blank");
-    tokens[idx].attrSet("rel", "noopener noreferrer");
+    const token = tokens[idx];
+    if (!token) throw new Error("Missing Markdown link token");
+    token.attrSet("target", "_blank");
+    token.attrSet("rel", "noopener noreferrer");
     return baseLink
       ? baseLink(tokens, Number(idx), opts, env, self)
       : self.renderToken(tokens, Number(idx), opts);

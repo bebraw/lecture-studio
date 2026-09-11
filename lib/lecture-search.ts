@@ -24,6 +24,7 @@ export class LectureSearch {
         Array.from({ length: Math.min(4, files.length) }, async () => {
           while (cursor < files.length) {
             const file = files[cursor++];
+            if (!file) break;
             try {
               const note = await this.library.read(file.path);
               notes.push(note);
@@ -62,7 +63,7 @@ export class LectureSearch {
         if (!terms.every((term) => text.toLowerCase().includes(term))) continue;
         const offset = Math.max(
           0,
-          section.body.toLowerCase().indexOf(terms[0]) - 60,
+          section.body.toLowerCase().indexOf(terms[0] ?? "") - 60,
         );
         matches.push({
           path: note.path,

@@ -36,7 +36,10 @@ export function pollFixture() {
       snapshot = {
         ...snapshot,
         revision: snapshot.revision + 1,
-        choices: snapshot.choices.map((c, i) => ({ ...c, votes: counts[i] })),
+        choices: snapshot.choices.map((c, i) => ({
+          ...c,
+          votes: counts[i] ?? 0,
+        })),
         totalVotes: counts.reduce((a, b) => a + b, 0),
       };
     },
@@ -94,7 +97,7 @@ test("mismatched room is refused before mutation", async () => {
   });
   await assert.rejects(() => poll.act("open"), /match/);
   assert.equal(calls.length, 1);
-  assert.equal(calls[0].init.method, "GET");
+  assert.equal(calls[0]?.init.method, "GET");
 });
 
 test("lecture reset rotates the session; reopen retains it and refresh hides old counts", async () => {

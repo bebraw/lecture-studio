@@ -44,7 +44,7 @@ test("audience sync serializes writes and coalesces intermediate slides", async 
       while (sent.length < 2 && Date.now() < deadline)
         await new Promise((resolve) => setTimeout(resolve, 10));
       assert.equal(sent.length, 2);
-      assert.equal(sent[1].title, "Three");
+      assert.equal(sent[1]?.title, "Three");
     });
   } finally {
     releases.shift()?.();

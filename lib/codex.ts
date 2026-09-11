@@ -74,7 +74,7 @@ export class CodexBridge extends EventEmitter {
   approvals: Map<string | number, ApprovalRequest>;
   sequence: number;
   state: BridgeState;
-  proc?: ChildProcess;
+  proc: ChildProcess | undefined;
   connecting = false;
   busy = false;
 
@@ -308,7 +308,7 @@ export class CodexBridge extends EventEmitter {
     }
     if (method === "turn/completed") {
       this.state.finishedAt = Date.now();
-      this.state.outcome = params.turn?.status;
+      this.state.outcome = params.turn?.status ?? null;
       this.state.turnId = null;
       this.state.status = params.turn?.status === "failed" ? "failed" : "ready";
       this.state.activity =

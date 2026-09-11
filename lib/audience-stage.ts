@@ -45,8 +45,8 @@ export function audienceStage(state: Partial<Stage>): Partial<Stage> {
 }
 
 export class AudienceStageSync {
-  origin?: string;
-  token?: string;
+  origin: string | undefined;
+  token: string | undefined;
   fetcher: Fetcher;
   sent: string;
   pending: string;
@@ -59,7 +59,11 @@ export class AudienceStageSync {
     origin,
     token,
     fetcher = fetch,
-  }: { origin?: string; token?: string; fetcher?: Fetcher } = {}) {
+  }: {
+    origin?: string | undefined;
+    token?: string | undefined;
+    fetcher?: Fetcher;
+  } = {}) {
     this.origin = origin;
     this.token = token;
     this.fetcher = fetcher;

@@ -20,7 +20,7 @@ export async function feedbackRequest(
       authorization: "Bearer " + poll.token,
       "content-type": "application/json",
     },
-    body: body ? JSON.stringify(body) : undefined,
+    ...(body ? { body: JSON.stringify(body) } : {}),
     redirect: "error",
     signal: AbortSignal.timeout(8000),
   });
@@ -74,8 +74,9 @@ export function feedbackSlide(snapshot: FeedbackSnapshot, id?: string) {
   const words = [...counts]
     .sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]))
     .slice(0, 40);
-  if (!words.length) throw new Error("Approve some words first");
-  const max = words[0][1];
+  const first = words[0];
+  if (!first) throw new Error("Approve some words first");
+  const max = first[1];
   return {
     mode: "material",
     title: snapshot.config!.prompt,

@@ -114,7 +114,9 @@ export function mountExplorer({
         (result.sections.find((s) => s.heading === "Presenter cue")?.body ||
           "");
       note.credit =
-        result.sections.find((s) => s.heading === "Source")?.body || note.path;
+        result.sections.find((s) => s.heading === "Source")?.body ||
+        note.path ||
+        "";
       $("explore-sections").innerHTML = note.sections
         .map(
           (s, i) =>
@@ -136,7 +138,7 @@ export function mountExplorer({
   function select() {
     if (!note) return;
     section = note.sections[Number($("explore-sections").value)];
-    $("explore-excerpt").innerHTML = section.html ?? "";
+    $("explore-excerpt").innerHTML = section?.html ?? "";
     void renderDiagrams($("explore-excerpt"));
     $("explore-source").textContent = note.credit ?? "";
   }
@@ -217,7 +219,7 @@ export function mountExplorer({
     $("explore-show").disabled = true;
     try {
       await onShow({
-        title: note.title,
+        title: note.title ?? "",
         body: section.body,
         source: (note.credit ?? "").slice(0, 500),
       });

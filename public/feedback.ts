@@ -89,7 +89,7 @@ export function mountFeedback({ call, update }: MountOptions) {
     ["close", "close"],
     ["show", "show-cloud"],
     ["return", "return"],
-  ])
+  ] as const)
     $("feedback-" + id).onclick = () => void act(action);
   $("feedback-items").onclick = (e) => {
     const button = (e.target as Element).closest<HTMLButtonElement>(

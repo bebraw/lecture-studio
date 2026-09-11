@@ -90,7 +90,10 @@ async function saveDraft() {
   return data;
 }
 function beat() {
-  return state.acts.find((a) => a.id === state.activeAct) || state.acts[0];
+  const current =
+    state.acts.find((a) => a.id === state.activeAct) || state.acts[0];
+  if (!current) throw new Error("The lecture has no acts");
+  return current;
 }
 function drawPlot() {
   explorer?.setCue(beat());
@@ -177,7 +180,7 @@ function listNotes() {
 function selectSection() {
   if (!note) return;
   selected = note.sections[Number($("sections").value)];
-  $("note-content").innerHTML = selected.html ?? "";
+  $("note-content").innerHTML = selected?.html ?? "";
   void renderDiagrams($("note-content"));
   $("selected-note").textContent = note.title ?? "";
   $("selected-note").hidden = false;
@@ -327,7 +330,7 @@ function drawRequests(requests: ApprovalRequest[]) {
         }
       }
     }
-    const choices =
+    const choices: [string, string][] =
       request.method === "item/tool/requestUserInput"
         ? [["answer", "Send answers"]]
         : request.method === "item/permissions/requestApproval"
@@ -512,7 +515,7 @@ async function autoConnect() {
   const failures = results.flatMap((result, i) =>
     result.status === "rejected" &&
     !(i === 1 && state.codex.status !== "disconnected")
-      ? [attempts[i][0] + ": " + result.reason.message]
+      ? [(attempts[i]?.[0] ?? "Connection") + ": " + result.reason.message]
       : [],
   );
   if (failures.length)
@@ -545,7 +548,7 @@ function setupConnections() {
     '<span class="sr-only">Connections</span><span class="connection-signals"><span id="notes-signal" data-state="offline" title="Obsidian: offline" aria-label="Obsidian: offline">Obsidian</span><span id="codex-signal" data-state="disconnected" title="Codex: disconnected" aria-label="Codex: disconnected">Codex</span></span>';
   const content = document.createElement("div");
   content.className = "connections-panel";
-  while (panel.children.length > 1) content.append(panel.children[1]);
+  while (panel.children[1]) content.append(panel.children[1]);
   const notes = document.createElement("section");
   notes.append($("library-status"), $("load-library"));
   const hint = document.createElement("p");
@@ -606,7 +609,7 @@ function setupModes() {
     '<div><span class="section-label">ON STAGE NOW</span><h2 id="live-now">Opening question</h2><p id="live-progress" role="status">Not connected</p></div><div><span class="section-label">DISCUSSION CUE · PRIVATE</span><h2 id="live-next"></h2><p id="live-question"></p><div class="button-row"><button id="previous-beat">← Previous cue</button><button id="next-beat">Next cue →</button><button id="use-question">Draft this question</button></div><p class="small muted">Browsing cues does not change the stage or start a build.</p></div>';
   query(".desk-grid", document).before(live);
   live.firstElementChild!.remove();
-  const audienceSlides = [
+  const audienceSlides: [string, string, string][] = [
     [
       "Opening · title",
       "Web development: past, present, and possible futures",
@@ -761,7 +764,9 @@ function setupModes() {
     );
   }
   const voteSlides = new Map();
-  audienceSlides[1][0] = "Vote · friction";
+  const frictionSlide = audienceSlides[1];
+  if (!frictionSlide) throw new Error("Missing friction slide");
+  frictionSlide[0] = "Vote · friction";
   const themeIndex = audienceSlides.findIndex((s) => s[0] === "Live build");
   audienceSlides.splice(themeIndex, 0, [
     "Vote · theme",
@@ -903,7 +908,9 @@ function setupModes() {
     }
     if (slideActs[slideIndex] !== state.activeAct)
       slideIndex = Math.max(0, slideActs.indexOf(state.activeAct));
-    const [label, title, body] = audienceSlides[slideIndex];
+    const slide = audienceSlides[slideIndex];
+    if (!slide) throw new Error("Missing lecture slide");
+    const [label, title, body] = slide;
     query(".section-label", live).textContent =
       "LECTURE · " +
       (slideIndex + 1) +
@@ -922,7 +929,9 @@ function setupModes() {
     if (slideBusy) return;
     slideBusy = true;
     try {
-      const [, title, body] = audienceSlides[index];
+      const slide = audienceSlides[index];
+      if (!slide) throw new Error("Missing lecture slide");
+      const [, title, body] = slide;
       if (voteSlides.has(index)) {
         updateRuntime(await call("poll/select", { id: voteSlides.get(index) }));
       }
@@ -1110,7 +1119,7 @@ function setupPoll() {
           .value.split("\n")
           .filter(Boolean)
           .map((line) => {
-            const [id, ...label] = line.split("|");
+            const [id = "", ...label] = line.split("|");
             return { id: id.trim(), label: label.join("|").trim() };
           }),
         defaultId: $("poll-default").value.trim(),
@@ -1196,7 +1205,7 @@ function setupRehearsals() {
       "new-rehearsal",
       "Create a fresh numbered checkout from lecture-start-v10? Once ready, this resets the lecture and disconnects the previous Codex session. Existing checkouts and saved material are kept.",
     ],
-  ])
+  ] as const)
     action(id, async () => {
       if (!window.confirm(question)) return;
       updateRuntime(await call(id, { confirm: true }));

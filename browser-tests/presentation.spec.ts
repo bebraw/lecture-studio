@@ -230,7 +230,8 @@ test("Obsidian snapshot loads privately and detours return without changing the 
     await expect(desk.locator("#current-stage h1")).toHaveText(
       "Snapshot title",
     );
-    definition.steps[0].title = "Edited in vault";
+    expect(definition.steps[0]).toBeDefined();
+    definition.steps[0]!.title = "Edited in vault";
     library.status = "Unavailable";
     await desk.locator("#live-toggle").click();
     await expect(desk.locator("#presentation-name")).toBeDisabled();

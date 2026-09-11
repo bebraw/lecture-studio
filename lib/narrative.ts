@@ -1,6 +1,16 @@
+interface Act {
+  id: string;
+  era: string;
+  time: string;
+  title: string;
+  question: string;
+  note: string;
+  transition: string;
+  brief: string;
+}
 import type { Draft } from "../shared/models.ts";
 export const scope = "Lectures/Web Development 2026";
-export const acts = [
+export const acts: [Act, ...Act[]] = [
   {
     id: "opening",
     era: "Opening",

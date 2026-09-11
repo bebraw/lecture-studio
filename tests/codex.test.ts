@@ -118,7 +118,7 @@ test("Codex uses reviewed text, workspace sandbox, automatic approval review and
       params: { turn: { status: "completed" } },
     });
     assert.equal(bridge.state.status, "ready");
-    assert.equal(bridge.state.messages[0].text, "Finished");
+    assert.equal(bridge.state.messages[0]?.text, "Finished");
   } finally {
     bridge.close();
   }

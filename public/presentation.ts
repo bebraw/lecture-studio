@@ -246,6 +246,7 @@ export function mountPresentations({ call, update }: MountOptions) {
       const selected = offsets.sort(
         (a, b) => Math.abs(a.offset) - Math.abs(b.offset),
       )[0];
+      if (!selected) return;
       selected.button.focus({ preventScroll: true });
       outline.scrollTop += selected.offset;
     }
@@ -332,7 +333,7 @@ export function mountPresentations({ call, update }: MountOptions) {
   for (const [id, label, op] of [
     ["question", "Project question", "poll-question"],
     ["results", "Project results", "poll-results"],
-  ]) {
+  ] as const) {
     const button = document.createElement("button");
     button.id = "graph-" + id;
     button.textContent = label;
@@ -349,7 +350,7 @@ export function mountPresentations({ call, update }: MountOptions) {
     ["defaults", "defaults"],
     ["open", "poll-open"],
     ["close", "poll-close"],
-  ])
+  ] as const)
     $("graph-" + id).onclick = () => run(op);
   $("graph-next").onclick = () => navigate("next");
   $("graph-previous").onclick = () => navigate("previous");

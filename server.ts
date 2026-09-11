@@ -137,9 +137,9 @@ export function createStudio({
     let selected = graphPolls.get(step.id);
     if (!selected) {
       selected = new AudiencePoll({
-        origin: poll.origin,
-        token: poll.token,
-        room: step.room,
+        origin: poll.origin ?? "",
+        token: poll.token ?? "",
+        ...(step.room === undefined ? {} : { room: step.room }),
         sessionId: poll.sessionId,
         fetcher: poll.fetcher,
       });
@@ -304,15 +304,15 @@ export function createStudio({
           ? "results"
           : "question"
         : stage.mode,
-      theme: stage.theme,
+      ...(stage.theme === undefined ? {} : { theme: stage.theme }),
       blank,
       build: {
-        activity,
+        ...(activity === undefined ? {} : { activity }),
         status: c.status,
         outcome: ["completed", "failed", "interrupted"].includes(
           c.outcome ?? "",
         )
-          ? c.outcome
+          ? (c.outcome ?? null)
           : null,
         startedAt: c.startedAt || null,
         finishedAt: c.finishedAt || null,
@@ -822,13 +822,12 @@ export function createStudio({
         "/explore.mjs": "explore.mjs",
         "/presentation.mjs": "presentation.mjs",
       };
-      if (staticFiles[url.pathname])
+      const staticFile = staticFiles[url.pathname];
+      if (staticFile)
         path = resolve(
           root,
-          staticFiles[url.pathname].endsWith(".mjs")
-            ? ".local/browser/public"
-            : "public",
-          staticFiles[url.pathname],
+          staticFile.endsWith(".mjs") ? ".local/browser/public" : "public",
+          staticFile,
         );
       else if (url.pathname.startsWith("/vendor/mermaid/")) {
         const vendorRoot = await realpath(

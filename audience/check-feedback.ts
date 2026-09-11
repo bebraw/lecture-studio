@@ -16,7 +16,7 @@ const admin = async (body?: Record<string, unknown>) => {
   const response = await fetch(origin + "/presenter/feedback", {
     method: body ? "POST" : "GET",
     headers,
-    body: body ? JSON.stringify(body) : undefined,
+    ...(body ? { body: JSON.stringify(body) } : {}),
   });
   assert.equal(response.status, 200, await response.clone().text());
   return response.json();
@@ -63,6 +63,7 @@ assert.equal((await submit("x".repeat(401))).status, 400);
 let response = await submit("PRIVATE question <script>alert(1)</script>");
 assert.equal(response.status, 201);
 const cookie = response.headers.get("set-cookie")!.split(";")[0];
+assert.ok(cookie);
 assert.equal((await submit("Too soon", { cookie })).status, 429);
 assert.doesNotMatch(
   await (await fetch(origin + "/api/feedback")).text(),

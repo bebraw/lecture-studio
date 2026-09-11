@@ -13,7 +13,7 @@ test("desk previews actual poll projection and long questions fit the stage", as
     "Navigating interfaces",
     "Knowing what to trust",
   ].map((label, i) => ({ id: "option-" + i, label }));
-  const config = { question: title, options, defaultId: options[0].id };
+  const config = { question: title, options, defaultId: "option-0" };
   const poll = new AudiencePoll({
     origin: "https://lecture-votes-20260909-bfbeb2745cce.survivejs.workers.dev",
     token: "fixture",

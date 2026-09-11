@@ -28,7 +28,7 @@ test("lecture search matches section bodies, shares its index and reports missin
     search.search("server"),
     search.search("HTTP browser"),
   ]);
-  assert.equal(a.matches[0].section, "Mechanism");
+  assert.equal(a.matches[0]?.section, "Mechanism");
   assert.equal(b.matches.length, 1);
   assert.equal(a.unavailable, 1);
   assert.equal(reads, 2);

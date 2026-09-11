@@ -39,13 +39,13 @@ test("local API rejects wrong content types, invalid JSON and oversized bodies",
     ["text/plain", "{}"],
     ["application/json", "{"],
     ["application/json", JSON.stringify({ brief: "x".repeat(100001) })],
-  ]) {
+  ] as const) {
     const response = await fetch(address.origin + "/api/brief", {
       method: "POST",
       headers: {
         origin: address.origin,
         authorization: "Bearer " + address.deskToken,
-        "content-type": type!,
+        "content-type": type,
       },
       body,
     });

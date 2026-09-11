@@ -1,3 +1,4 @@
+import type { Transport } from "@modelcontextprotocol/sdk/shared/transport.js";
 import type { CallToolResult } from "@modelcontextprotocol/sdk/types.js";
 import { record } from "../shared/errors.ts";
 interface CodexConfig {
@@ -69,8 +70,8 @@ function payload(result: CallToolResult): unknown {
   }
 }
 export class ObsidianLibrary {
-  client?: Client;
-  connecting?: Promise<Client>;
+  client: Client | undefined;
+  connecting: Promise<Client> | undefined;
   status = "Not connected";
   async connect() {
     if (this.client) return this.client;
@@ -83,7 +84,9 @@ export class ObsidianLibrary {
         fetch: (url, init) => fetch(url, { ...init, redirect: "error" }),
       });
       try {
-        await client.connect(transport, { timeout: 10000 });
+        // SDK 1.30 declares sessionId?: string on Transport, but its own
+        // HTTP transport getter returns string | undefined before initialization.
+        await client.connect(transport as Transport, { timeout: 10000 });
         this.client = client;
         this.status = "Connected · read-only lecture folder";
         return client;

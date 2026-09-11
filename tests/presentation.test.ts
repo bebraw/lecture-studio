@@ -100,6 +100,7 @@ test("remote slide images require an explicit boolean opt-in", () => {
     new PresentationSession(parsePresentation(note(d)), "test").state().preview
       .html;
   assert.doesNotMatch(preview(), /<img /);
+  assert.ok(d.steps[0]);
   d.steps[0].allowRemoteImages = true;
   assert.match(preview(), /<img referrerpolicy="no-referrer"/);
   d.steps[0].allowRemoteImages = "true";
@@ -130,6 +131,7 @@ test("presentation snapshot, detour return and explicit defaults", () => {
     parsePresentation(note(definition)),
     "test",
   );
+  assert.ok(definition.steps[0]);
   definition.steps[0].title = "Changed";
   assert.equal(p.step().title, "Question");
   p.move("detour", "aside");
@@ -151,7 +153,7 @@ test("presentation snapshot, detour return and explicit defaults", () => {
     choices: [{ id: "two", label: "Two", votes: 1 }],
   };
   assert.match(p.resolve().prompt, /Use two/);
-  assert.equal(p.resolve().inputs[0].revision, 7);
+  assert.equal(p.resolve().inputs[0]?.revision, 7);
 });
 test("invalid graph links are rejected", () => {
   assert.throws(
