@@ -48,7 +48,7 @@ test("desk, projector and presenter menus expose accessible controls and restore
       },
     ],
   };
-  const { studio, address } = await fixture({
+  const { stop, address } = await fixture({
     library: {
       status: "Connected · fixture",
       list: async () => [{ path, label: "Accessible lecture" }],
@@ -116,7 +116,7 @@ test("desk, projector and presenter menus expose accessible controls and restore
     await expect(stage.locator("h1")).toBeVisible();
     await accessible(stage, info, "projector");
   } finally {
-    await studio.server[Symbol.asyncDispose]();
+    await stop();
   }
 });
 

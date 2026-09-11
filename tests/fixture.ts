@@ -85,5 +85,16 @@ export async function fixture(options: StudioOptions = {}) {
     persist: false,
     ...options,
   });
-  return { studio, bridge, address: await studio.start() };
+  return {
+    studio,
+    bridge,
+    address: await studio.start(),
+    stop: async () => {
+      // Browser pages stay open for failure diagnostics. End their fixture-only
+      // keep-alive connections so Node 24 cannot wait for the next polling cycle.
+      const closing = studio.server[Symbol.asyncDispose]();
+      studio.server.closeAllConnections();
+      await closing;
+    },
+  };
 }

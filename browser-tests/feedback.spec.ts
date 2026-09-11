@@ -49,7 +49,7 @@ test("desk review publishes only selected questions or approved cloud snapshots"
       return Response.json(snapshot);
     },
   });
-  const { studio, address } = await fixture({ poll });
+  const { stop, address } = await fixture({ poll });
   try {
     const desk = await context.newPage(),
       stage = await context.newPage();
@@ -108,6 +108,6 @@ test("desk review publishes only selected questions or approved cloud snapshots"
     });
     await stage.screenshot({ path: "test-results/feedback-cloud.png" });
   } finally {
-    await new Promise((resolve) => studio.server.close(resolve));
+    await stop();
   }
 });

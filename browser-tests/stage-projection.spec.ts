@@ -56,7 +56,7 @@ test("desk previews actual poll projection and long questions fit the stage", as
     }),
     close: async () => {},
   };
-  const { studio, address } = await fixture({ library, poll });
+  const { stop, address } = await fixture({ library, poll });
   try {
     const desk = await context.newPage(),
       stage = await context.newPage();
@@ -110,6 +110,6 @@ test("desk previews actual poll projection and long questions fit the stage", as
     await stage.screenshot({ path: "test-results/stage-long-question.png" });
     await desk.screenshot({ path: "test-results/desk-projection.png" });
   } finally {
-    await new Promise((resolve) => studio.server.close(resolve));
+    await stop();
   }
 });

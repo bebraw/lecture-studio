@@ -73,7 +73,7 @@ test("a frozen vote feeds the explicit build without launching during navigation
     }),
     close: async () => {},
   };
-  const { studio, address, bridge } = await fixture({ poll, library });
+  const { stop, address, bridge } = await fixture({ poll, library });
   try {
     const desk = await context.newPage();
     await desk.goto(address.deskUrl);
@@ -92,6 +92,6 @@ test("a frozen vote feeds the explicit build without launching during navigation
     await expect.poll(() => bridge.lastPrompt).toContain("Use retro styling.");
     await expect(desk.locator("#graph-build")).toBeDisabled();
   } finally {
-    await new Promise((resolve) => studio.server.close(resolve));
+    await stop();
   }
 });

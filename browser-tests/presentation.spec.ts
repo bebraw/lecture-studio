@@ -48,7 +48,7 @@ test("Obsidian snapshot loads privately and detours return without changing the 
     }),
     close: async () => {},
   };
-  const { studio, address, bridge } = await fixture({ library });
+  const { stop, address, bridge } = await fixture({ library });
   try {
     const desk = await context.newPage(),
       stage = await context.newPage();
@@ -295,6 +295,6 @@ test("Obsidian snapshot loads privately and detours return without changing the 
       .click();
     await expect(stage.locator("h1")).toHaveText("Audience question");
   } finally {
-    await new Promise((resolve) => studio.server.close(resolve));
+    await stop();
   }
 });
