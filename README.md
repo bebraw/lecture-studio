@@ -232,3 +232,13 @@ Known first-pass limits: one presenter, one fixed rehearsal checkout, one active
 The local companion architecture is informed by [Kirjolab at ac72a526](https://github.com/bebraw/kirjolab/tree/ac72a52670c537a4f468f994f4ed6ba855392733), especially its Codex backend and ADR-234. Its tool-free generation backend is not copied: this prototype needs implementation tools and interactive approvals, so it uses the [official Codex app-server protocol](https://learn.chatgpt.com/docs/app-server).
 
 The local browser wrapper is intentionally independent of the audience app. Electron packaging can wait until rehearsal shows a reason for it.
+
+Local bookmarks: http://127.0.0.1:4317/desk and http://127.0.0.1:4317/stage. The loopback-only server supplies role-specific authorization in each page; no URL token is needed. These pages are accessible to local users.
+
+
+### Share a local build with the audience
+With Live on, **Show on stage** starts an owned Cloudflare Quick Tunnel for the selected local app port. The audience page embeds the resulting HTTPS app; the local projector keeps the local URL. Opening a preview privately does not start a tunnel. Leaving the app for slides, turning Live off, resetting the lecture, or stopping the studio closes the tunnel. The app’s entire selected port is public while shared, including its form/API routes.
+
+Install cloudflared (`brew install cloudflared` on macOS), or set LECTURE_CLOUDFLARED_BIN. A failed tunnel start is reported without replacing the projected slide. The studio’s own port cannot be tunneled. Students keep using https://live.scalableweb.dev; no audience Worker update is needed for this feature. Keep the app server and studio running. New tunnel hostnames may take time to appear in DNS; networks that block trycloudflare.com need an allowed network or a configured named tunnel.
+
+Quick Tunnels are temporary demo infrastructure, with a 200 concurrent request limit and no Server-Sent Events support. Apps that prohibit iframe embedding can be opened through the separate app link. See [Cloudflare Quick Tunnels](https://developers.cloudflare.com/cloudflare-one/networks/connectors/cloudflare-tunnel/do-more-with-tunnels/trycloudflare/).

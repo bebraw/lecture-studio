@@ -23,3 +23,20 @@ test("preview handoff preserves published material and an unrelated private draf
  assert.equal(restored.stage.title,first.stage.title);assert.equal(restored.draft.title,"Private unsent draft");
  assert.equal(restored.canReturnToMaterial,false);
 });
+
+test("live preview shares HTTPS with audience while keeping local stage URL",async t=>{
+ const {AudiencePoll}=await import("../lib/audience-poll.mjs");
+ const sent=[];let shared="",closed=false;
+ const tunnel={pending:null,async open(url){shared=url;},publicUrl(url){return shared===url?"https://demo.trycloudflare.com/":url;},close(){closed=true;shared="";}};
+ const poll=new AudiencePoll({origin:"https://audience.invalid",token:"test",fetcher:async(_url,init)=>{sent.push(JSON.parse(init.body));return new Response(null,{status:204});}});
+ const {studio,address}=await fixture({poll,previewTunnel:tunnel});t.after(()=>studio.server.close());
+ const call=async(path,body)=>{const r=await fetch(address.origin+"/api/"+path,{method:"POST",headers:{Origin:address.origin,Authorization:"Bearer "+address.deskToken,"content-type":"application/json"},body:JSON.stringify(body)});assert.equal(r.status,200);return r.json();};
+ await call("show-preview",{url:"http://localhost:8799/"});
+ const local=await(await fetch(address.origin+"/api/stage",{headers:{Authorization:"Bearer "+address.stageToken}})).json();
+ assert.equal(local.demoUrl,"http://localhost:8799/");
+ await new Promise(resolve=>setTimeout(resolve,1200));
+ assert.ok(sent.some(s=>s.demoUrl==="https://demo.trycloudflare.com/"));
+ await call("back-material",{});
+ await new Promise(resolve=>setTimeout(resolve,1200));
+ assert.equal(closed,true);
+});

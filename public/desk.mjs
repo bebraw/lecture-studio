@@ -386,7 +386,7 @@ async function refreshStageView() {
 
 function setupPreviewShortcuts() {
  const panel = document.createElement("section"); panel.id = "preview-shortcuts"; panel.hidden = true;
- panel.innerHTML = '<span class="section-label">PREVIEW FROM CODEX</span><p class="small muted">Agent-supplied link · availability not checked</p><label for="preview-choice" class="sr-only">Choose preview URL</label><select id="preview-choice"></select><div class="button-row"><a id="open-preview" target="_blank" rel="noopener noreferrer">Open privately ↗</a><button id="show-preview">Show on stage →</button></div>';
+ panel.innerHTML = '<span class="section-label">PREVIEW FROM CODEX</span><p class="small muted">Show on stage shares this app with the live audience</p><label for="preview-choice" class="sr-only">Choose preview URL</label><select id="preview-choice"></select><div class="button-row"><a id="open-preview" target="_blank" rel="noopener noreferrer">Open privately ↗</a><button id="show-preview">Show on stage →</button></div>';
  document.querySelector(".builder .section-heading").after(panel);
  $("preview-choice").onchange = () => { $("open-preview").href = $("preview-choice").value; };
  action("show-preview", async () => {

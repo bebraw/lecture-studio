@@ -9,6 +9,7 @@ import { ObsidianLibrary } from "./lib/obsidian.mjs";
 import { CodexBridge } from "./lib/codex.mjs";
 import { Rehearsals } from "./lib/rehearsals.mjs";
 import { AudiencePoll } from "./lib/audience-poll.mjs";
+import { PreviewTunnel } from "./lib/preview-tunnel.mjs";
 import { AudienceStageSync } from "./lib/audience-stage.mjs";
 import { LectureSearch } from "./lib/lecture-search.mjs";
 import { parsePresentation, PresentationSession } from "./lib/presentation.mjs";
@@ -56,15 +57,16 @@ export function createStudio({
   library = new ObsidianLibrary(),
   bridge = new CodexBridge(),
   poll = new AudiencePoll(),
+  previewTunnel = new PreviewTunnel(),
   workspace = resolve(root, "../lecture-studio"),
   rehearsals = new Rehearsals(resolve(root, ".local/rehearsals")),
   port = 4317,
   host = "127.0.0.1",
   persist = true,
 } = {}) {
+  if (!["127.0.0.1", "::1"].includes(host)) throw new Error("Lecture Studio must bind to loopback");
   const deskToken = randomBytes(32).toString("hex"),
     stageToken = randomBytes(32).toString("hex");
-  if (!["127.0.0.1", "::1"].includes(host)) throw new Error("Lecture Studio must bind to loopback");
   const lectureSearch = new LectureSearch(library);
   const audienceSync = new AudienceStageSync(poll);
   let origin,
@@ -117,10 +119,10 @@ export function createStudio({
           origin: poll.origin,
           token: poll.token,
           room: s.room,
+          sessionId: poll.sessionId,
           fetcher: poll.fetcher,
         });
         p.configure(s.poll);
-          sessionId: poll.sessionId,
         graphPolls.set(s.id, p);
       }
       graphPoll = graphPolls.get(s.id);
@@ -153,6 +155,7 @@ export function createStudio({
   };
   const resetLecture = () => {
     feedbackPrevious = null;
+    previewTunnel.close();
     live = false;
     poll.reset();
     pollOnStage = false;
@@ -286,8 +289,17 @@ export function createStudio({
       },
     };
   };
+  const audienceState = () => {
+    const state = publicState();
+    if (!previewTunnel.pending && (!state.live || state.mode !== "demo")) previewTunnel.close();
+    return state.mode === "demo" ? {...state,demoUrl:previewTunnel.publicUrl(state.demoUrl)} : state;
+  };
+  const sharePreview = async (url) => {
+    if (poll.origin && poll.token && new URL(url).protocol === "http:")
+      await previewTunnel.open(url, origin);
+  };
   const broadcastTimer = setInterval(() => {
-    if (!liveTransition) audienceSync.publish(publicState());
+    if (!liveTransition) audienceSync.publish(audienceState());
   }, 1000);
   broadcastTimer.unref();
   const server = createServer(async (req, res) => {
@@ -383,7 +395,7 @@ export function createStudio({
             }
             if (body.action === "start") {
               if (!live) throw new Error("Turn Live on first");
-              await audienceSync.deliver(publicState());
+              await audienceSync.deliver(audienceState());
             }
             return json(res, await feedbackRequest(poll, body));
           } finally {
@@ -403,7 +415,7 @@ export function createStudio({
                 if (!presentation) throw new Error("Load a presentation first");
                 showGraph();
                 live = true;
-                audienceSync.publish(publicState());
+                audienceSync.publish(audienceState());
               } else {
                 if (
                   [...graphPolls.values(), poll].some(
@@ -415,9 +427,10 @@ export function createStudio({
                 try {
                   await audienceSync.deliver(waitingStage());
                   live = false;
+                  previewTunnel.close();
                   version++;
                 } catch (error) {
-                  audienceSync.publish(publicState());
+                  audienceSync.publish(audienceState());
                   throw error;
                 } finally {
                   liveTransition = false;
@@ -449,6 +462,7 @@ export function createStudio({
                   body.path,
                 );
               }
+              poll.reset();
               presentation = next;
               graphPoll = null;
               graphPolls.clear();
@@ -463,7 +477,6 @@ export function createStudio({
                 if (op !== "show") presentation.move(op, body.id);
                 showGraph();
               } else if (op === "defaults") {
-              poll.reset();
                 presentation.defaults.add(presentation.current);
                 showGraph();
               } else if (
@@ -481,6 +494,7 @@ export function createStudio({
                     origin: poll.origin,
                     token: poll.token,
                     room: s.room,
+                    sessionId: poll.sessionId,
                     fetcher: poll.fetcher,
                   });
                   p.configure(s.poll);
@@ -495,7 +509,6 @@ export function createStudio({
                 )
                   throw new Error("Close the current vote first");
                 await graphPoll.act(
-                    sessionId: poll.sessionId,
                   op === "poll-open"
                     ? "open"
                     : op === "poll-close"
@@ -623,12 +636,13 @@ export function createStudio({
           stage = publicStage(publishedDraft, ++version, stage.brief);
           blank = false;
         } else if (url.pathname === "/api/show-preview") {
-          if (!presentation) live = true;
-          pollOnStage = false;
           if (typeof body.url !== "string" || body.url.length > 2048)
             throw new Error("Invalid preview URL");
           const demoUrl = validDemoUrl(body.url, origin);
           if (!demoUrl) throw new Error("Choose a preview URL");
+          if (live || !presentation) await sharePreview(demoUrl);
+          if (!presentation) live = true;
+          pollOnStage = false;
           if (!["demo", "brief"].includes(publishedDraft.mode))
             previousMaterial = { ...publishedDraft };
           publishedDraft = {
@@ -807,6 +821,7 @@ export function createStudio({
   server.on("close", () => {
     clearInterval(broadcastTimer);
     audienceSync.close();
+    previewTunnel.close();
     bridge.close();
     void library.close();
   });
