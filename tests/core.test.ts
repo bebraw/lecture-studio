@@ -1,3 +1,5 @@
+import type { ApiPath } from "../shared/api.ts";
+import { httpResult } from "./http-result.ts";
 import type { Bridge } from "../shared/models.ts";
 import test from "node:test";
 import assert from "node:assert/strict";
@@ -61,8 +63,8 @@ test("local connector and app URLs reject credential-bearing or remote insecure 
 test("stage is read-only; draft, note reads, and builds do not implicitly publish", async (t) => {
   const { studio, address, bridge } = await fixture();
   t.after(() => studio.server.close());
-  const req = async (
-    path: string,
+  const req = async <P extends ApiPath>(
+    path: P,
     value?: unknown,
     token = address.deskToken,
     extra = {},
@@ -78,7 +80,7 @@ test("stage is read-only; draft, note reads, and builds do not implicitly publis
         ? {}
         : { method: "POST", body: JSON.stringify(value) }),
     });
-    return { status: response.status, data: await response.json() };
+    return httpResult(path, response);
   };
   assert.equal((await req("desk", undefined, address.stageToken)).status, 401);
   assert.equal(
@@ -93,20 +95,20 @@ test("stage is read-only; draft, note reads, and builds do not implicitly publis
     ).status,
     403,
   );
-  const original = (await req("stage", undefined, address.stageToken)).data;
+  const original = (await req("stage", undefined, address.stageToken)).data();
   await req("library");
-  await req("note?path=" + encodeURIComponent(scope + "/Example.md"));
+  await req(`note?path=${encodeURIComponent(scope + "/Example.md")}`);
   await req("draft", { ...initialDraft(), body: "PRIVATE DRAFT" });
   await req("act", { act: "agents" });
   await req("codex/connect", {});
   await req("codex/start", { brief: "PRIVATE BUILD" });
   assert.deepEqual(
-    (await req("stage", undefined, address.stageToken)).data.html,
+    (await req("stage", undefined, address.stageToken)).data().html,
     original.html,
   );
   assert.equal(bridge.lastPrompt, "PRIVATE BUILD");
   const publicText = JSON.stringify(
-    (await req("stage", undefined, address.stageToken)).data,
+    (await req("stage", undefined, address.stageToken)).data(),
   );
   for (const text of [
     "PRIVATE DRAFT",
@@ -117,7 +119,7 @@ test("stage is read-only; draft, note reads, and builds do not implicitly publis
   ])
     assert.ok(!publicText.includes(text));
   assert.equal(
-    (await req("note?path=" + encodeURIComponent("Personal/private.md")))
+    (await req(`note?path=${encodeURIComponent("Personal/private.md")}`))
       .status,
     400,
   );
@@ -127,7 +129,7 @@ test("stage is read-only; draft, note reads, and builds do not implicitly publis
     body: "Now visible",
   });
   assert.match(
-    (await req("stage", undefined, address.stageToken)).data.html,
+    (await req("stage", undefined, address.stageToken)).data().html,
     /Now visible/,
   );
   assert.equal((await req("save", {})).status, 400);

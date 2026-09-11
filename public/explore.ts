@@ -1,3 +1,4 @@
+import * as v from "valibot";
 import type { ApiClient } from "../shared/api.ts";
 import type { Note, NoteFile, Draft } from "../shared/models.ts";
 type Shortcut = [string, string, string?];
@@ -76,8 +77,12 @@ export function mountExplorer({
     searchRequest = 0,
     custom: Record<string, Shortcut[]> = {};
   try {
-    custom = JSON.parse(
-      localStorage.getItem("lecture-projection-shortcuts") || "{}",
+    custom = v.parse(
+      v.record(
+        v.string(),
+        v.array(v.tuple([v.string(), v.string(), v.exactOptional(v.string())])),
+      ),
+      JSON.parse(localStorage.getItem("lecture-projection-shortcuts") || "{}"),
     );
   } catch {}
   if (!custom || typeof custom !== "object" || Array.isArray(custom))

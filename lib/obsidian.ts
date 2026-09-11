@@ -129,7 +129,7 @@ export class ObsidianLibrary {
       throw new Error("Unexpected Obsidian file-list response");
     return files
       .filter(
-        (p) =>
+        (p: unknown): p is string =>
           typeof p === "string" &&
           p.startsWith(scope + "/") &&
           p.endsWith(".md"),

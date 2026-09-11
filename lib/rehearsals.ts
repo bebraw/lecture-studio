@@ -1,3 +1,4 @@
+import { record } from "../shared/errors.ts";
 import type { ExecFileOptions } from "node:child_process";
 type Run = (
   command: string,
@@ -67,8 +68,8 @@ export class Rehearsals {
   }
   async current(fallback: string) {
     try {
-      const { workspace } = JSON.parse(
-        await readFile(join(this.root, "current.json"), "utf8"),
+      const { workspace } = record(
+        JSON.parse(await readFile(join(this.root, "current.json"), "utf8")),
       );
       if (
         typeof workspace !== "string" ||

@@ -1,3 +1,7 @@
+import { parseApiResponse } from "../shared/api.ts";
+import { parse } from "valibot";
+import { audienceStageSchema } from "../shared/audience-schemas.ts";
+import { stringValue } from "../shared/errors.ts";
 import type { Stage } from "../shared/models.ts";
 import test from "node:test";
 import assert from "node:assert/strict";
@@ -12,7 +16,12 @@ test("only published slides sync; polling never replaces another projected slide
     token: "private",
     fetcher: async (url, init) => {
       if (url.endsWith("/presenter/stage")) {
-        writes.push(JSON.parse(String(init.body)));
+        writes.push(
+          parse(
+            audienceStageSchema,
+            JSON.parse(stringValue(init.body, "stage body")),
+          ),
+        );
         return new Response(null, { status: 204 });
       }
       if (url.endsWith("/open-session")) status = "open";
@@ -74,9 +83,9 @@ test("only published slides sync; polling never replaces another projected slide
       },
       body: JSON.stringify(body),
     });
-    const value = await response.json();
+    const value: unknown = await response.json();
     assert.equal(response.status, 200, JSON.stringify(value));
-    return value;
+    return parseApiResponse("desk", value);
   };
   const wait = () => new Promise((resolve) => setTimeout(resolve, 1100));
   try {

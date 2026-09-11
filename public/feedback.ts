@@ -1,3 +1,4 @@
+import { asyncHandler } from "../shared/errors.ts";
 import type { ApiBody } from "../shared/api.ts";
 import type { MountOptions } from "../shared/api.ts";
 import type { FeedbackSnapshot } from "../shared/models.ts";
@@ -23,7 +24,7 @@ export function mountFeedback({ call, update }: MountOptions) {
   };
   const render = (value: FeedbackSnapshot) => {
     snapshot = value;
-    const { config, items = [] } = value;
+    const { config, items } = value;
     query("summary", menu).textContent =
       "Responses · " + items.filter((x) => x.status === "pending").length;
     $("feedback-state").textContent = config
@@ -122,7 +123,7 @@ export function mountFeedback({ call, update }: MountOptions) {
       const e = asError(caught);
       if (menu.open) $("feedback-error").textContent = e.message;
     } finally {
-      setTimeout(refresh, 5000);
+      setTimeout(asyncHandler(refresh), 5000);
     }
   }
   void refresh();

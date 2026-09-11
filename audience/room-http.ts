@@ -119,8 +119,11 @@ async function readUrlEncodedForm(
   let receivedBytes = 0;
 
   while (true) {
-    const { done, value } = await reader.read();
+    const chunk: { done: boolean; value?: unknown } = await reader.read();
+    const { done, value } = chunk;
     if (done) break;
+    if (!(value instanceof Uint8Array))
+      throw new Error("Expected request bytes");
     receivedBytes += value.byteLength;
     if (receivedBytes > maximumBodyBytes) {
       await reader.cancel();

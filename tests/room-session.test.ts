@@ -1,3 +1,4 @@
+import type { RoomOperations } from "../shared/room.ts";
 import { asError } from "../shared/errors.ts";
 import test from "node:test";
 import assert from "node:assert/strict";
@@ -13,7 +14,7 @@ test("new lecture clears votes atomically; reopen and retry preserve them", asyn
     'import { DurableObject } from "cloudflare:workers";',
     "class DurableObject { constructor(ctx) { this.ctx=ctx; } }",
   );
-  const { RoomState } = await import(
+  const loaded: unknown = await import(
     "data:text/javascript;base64," +
       Buffer.from(stripTypeScriptTypes(source)).toString("base64")
   );
@@ -46,6 +47,10 @@ test("new lecture clears votes atomically; reopen and retry preserve them", asyn
       },
     },
   };
+  // The source is our own instrumented module, with only its host base class replaced.
+  const { RoomState } = loaded as {
+    RoomState: new (context: typeof ctx, env: object) => RoomOperations;
+  };
   try {
     const room = new RoomState(ctx, {});
     await room.seedChoices([
@@ -59,7 +64,9 @@ test("new lecture clears votes atomically; reopen and retry preserve them", asyn
     assert.equal((await room.openSession("lecture-one")).totalVotes, 1);
     assert.equal((await room.openSession("lecture-one")).totalVotes, 1);
     assert.equal((await room.openSession("lecture-two")).totalVotes, 0);
-    assert.equal((await room.castVote("voter", "a")).snapshot.totalVotes, 1);
+    const firstVote = await room.castVote("voter", "a");
+    assert.ok(firstVote.ok);
+    assert.equal(firstVote.snapshot.totalVotes, 1);
     const selected = await room.getSnapshot("voter");
     assert.equal(selected.currentSelection, "a");
     assert.equal(selected.status, "open");
@@ -68,9 +75,10 @@ test("new lecture clears votes atomically; reopen and retry preserve them", asyn
       { id: "b", label: "B", votes: 0 },
     ]);
     const repeated = await room.castVote("voter", "a");
-    assert.equal(repeated.ok, true);
+    assert.ok(repeated.ok);
     assert.equal(repeated.snapshot.revision, selected.revision);
     const replaced = await room.castVote("voter", "b");
+    assert.ok(replaced.ok);
     assert.equal(replaced.snapshot.totalVotes, 1);
     assert.equal(replaced.snapshot.currentSelection, "b");
     assert.equal(replaced.snapshot.revision, selected.revision + 1);
@@ -98,6 +106,7 @@ test("new lecture clears votes atomically; reopen and retry preserve them", asyn
     assert.equal(reset.totalVotes, 0);
     assert.equal(reset.revision, locked.revision + 1);
     assert.equal((await room.resetVotes()).revision, reset.revision);
+    // @ts-expect-error Exercise runtime rejection of untyped callers.
     await assert.rejects(() => room.setStatus("invalid"));
     for (const choices of [
       [],

@@ -1,3 +1,4 @@
+import { record } from "../shared/errors.ts";
 import test from "node:test";
 import assert from "node:assert/strict";
 import { fixture } from "./fixture.ts";
@@ -50,7 +51,7 @@ test("local API rejects wrong content types, invalid JSON and oversized bodies",
       body,
     });
     assert.equal(response.status, 400);
-    const result = await response.json();
+    const result = record(await response.json());
     assert.equal(typeof result.error, "string");
   }
 });

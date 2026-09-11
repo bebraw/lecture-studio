@@ -1,27 +1,13 @@
 import { DurableObject } from "cloudflare:workers";
 
-export interface RoomChoice {
-  id: string;
-  label: string;
-}
-
-export interface RoomChoiceCount extends RoomChoice {
-  votes: number;
-}
-
-export type RoomStatus = "locked" | "open";
-
-export interface RoomSnapshot {
-  choices: RoomChoiceCount[];
-  currentSelection: string | null;
-  revision: number;
-  status: RoomStatus;
-  totalVotes: number;
-}
-
-export type RoomVoteResult =
-  | { ok: true; snapshot: RoomSnapshot }
-  | { ok: false; code: "invalid-voter-key" | "room-locked" | "unknown-choice" };
+import type {
+  RoomChoice,
+  RoomStatus,
+  RoomSnapshot,
+  RoomVoteResult,
+  RoomOperations,
+} from "../shared/room.ts";
+export type { RoomSnapshot } from "../shared/room.ts";
 
 interface ChoiceRow extends Record<string, SqlStorageValue> {
   id: string;
@@ -47,10 +33,10 @@ const maximumChoices = 20;
 const maximumIdentifierLength = 128;
 const maximumLabelLength = 200;
 
-export class RoomState extends DurableObject<Env> {
+export class RoomState extends DurableObject<Env> implements RoomOperations {
   constructor(ctx: DurableObjectState, env: Env) {
     super(ctx, env);
-    ctx.blockConcurrencyWhile(async () => {
+    void ctx.blockConcurrencyWhile(async () => {
       this.ctx.storage.sql.exec(`
         CREATE TABLE IF NOT EXISTS lecture_session (singleton INTEGER PRIMARY KEY CHECK (singleton = 1), id TEXT NOT NULL);
         CREATE TABLE IF NOT EXISTS choices (

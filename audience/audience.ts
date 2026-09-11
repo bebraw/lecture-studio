@@ -1,3 +1,10 @@
+import * as v from "valibot";
+import { errorSchema } from "../shared/schemas.ts";
+import {
+  audienceResponseSchema,
+  publicFeedbackSchema,
+} from "../shared/audience-schemas.ts";
+import { asyncHandler } from "../shared/errors.ts";
 import type { FeedbackConfig } from "../shared/models.ts";
 import { query } from "../public/dom.ts";
 import { asError } from "../shared/errors.ts";
@@ -28,7 +35,7 @@ async function refreshFeedback() {
       signal: AbortSignal.timeout(8000),
     });
     if (!response.ok) throw new Error();
-    const config = await response.json();
+    const config = v.parse(publicFeedbackSchema, await response.json());
     if (config?.round !== feedbackConfig?.round) {
       query("form", feedback).reset();
       query("#feedback-notice", feedback).textContent = "";
@@ -45,7 +52,7 @@ async function refreshFeedback() {
   } catch {
     feedback.hidden = true;
   } finally {
-    setTimeout(refreshFeedback, 3000);
+    setTimeout(asyncHandler(refreshFeedback), 3000);
   }
 }
 query("form", feedback).onsubmit = async (event) => {
@@ -64,8 +71,10 @@ query("form", feedback).onsubmit = async (event) => {
       }),
       signal: AbortSignal.timeout(8000),
     });
-    const result = await response.json();
-    if (!response.ok) throw new Error(result.error || "Not confirmed");
+    if (!response.ok) {
+      const result = v.safeParse(errorSchema, await response.json());
+      throw new Error(result.success ? result.output.error : "Not confirmed");
+    }
     query("textarea", feedback).value = "";
     query("#feedback-notice", feedback).textContent =
       "Sent privately. The lecturer chooses what to show.";
@@ -85,7 +94,10 @@ async function refresh() {
       signal: AbortSignal.timeout(8000),
     });
     if (!response.ok) throw new Error();
-    const { stage, poll } = await response.json();
+    const { stage, poll } = v.parse(
+      audienceResponseSchema,
+      await response.json(),
+    );
     const next = poll
       ? "poll:" + poll.id
       : JSON.stringify(stage && { ...stage, build: undefined });
@@ -115,34 +127,40 @@ async function refresh() {
     notice.textContent = "Connection lost · holding the last view";
   }
 }
-main.addEventListener("submit", async (event) => {
-  event.preventDefault();
-  if (submitting) return;
-  const form = event.target as HTMLFormElement,
-    button = query("button", form);
-  submitting = true;
-  button.disabled = true;
-  try {
-    const response = await fetch(form.action, {
-      method: "POST",
-      body: new URLSearchParams(
-        [...new FormData(form)].map(([key, value]) => [key, String(value)]),
-      ),
-      signal: AbortSignal.timeout(8000),
-    });
-    if (!response.ok) throw new Error();
-    voteError = "";
-    button.textContent = "Vote saved · change vote";
-  } catch {
-    voteError = "Vote not confirmed. Try again.";
-    notice.textContent = voteError;
-  } finally {
-    submitting = false;
-    button.disabled = false;
-  }
-});
+main.addEventListener(
+  "submit",
+  asyncHandler(async (event) => {
+    event.preventDefault();
+    if (submitting) return;
+    const form = event.target as HTMLFormElement,
+      button = query("button", form);
+    submitting = true;
+    button.disabled = true;
+    try {
+      const response = await fetch(form.action, {
+        method: "POST",
+        body: new URLSearchParams(
+          [...new FormData(form)].map(([key, value]) => [
+            key,
+            typeof value === "string" ? value : value.name,
+          ]),
+        ),
+        signal: AbortSignal.timeout(8000),
+      });
+      if (!response.ok) throw new Error();
+      voteError = "";
+      button.textContent = "Vote saved · change vote";
+    } catch {
+      voteError = "Vote not confirmed. Try again.";
+      notice.textContent = voteError;
+    } finally {
+      submitting = false;
+      button.disabled = false;
+    }
+  }),
+);
 async function tick() {
   await refresh();
-  setTimeout(tick, 1500);
+  setTimeout(asyncHandler(tick), 1500);
 }
 void tick();

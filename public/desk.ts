@@ -1,3 +1,4 @@
+import { asyncHandler } from "../shared/errors.ts";
 import type { DeskState, ApiClient } from "../shared/api.ts";
 import type {
   Note,
@@ -44,18 +45,21 @@ function notice(text: string, error = false) {
   $("notice").classList.toggle("error", error);
 }
 function action(id: string, run: () => void | Promise<void>) {
-  $(id).addEventListener("click", async () => {
-    ($(id) as HTMLButtonElement).disabled = true;
-    try {
-      await run();
-    } catch (caught) {
-      const e = asError(caught);
-      notice(e.message, true);
-    } finally {
-      ($(id) as HTMLButtonElement).disabled = false;
-      if (state) updateRuntime(state);
-    }
-  });
+  $(id).addEventListener(
+    "click",
+    asyncHandler(async () => {
+      ($(id) as HTMLButtonElement).disabled = true;
+      try {
+        await run();
+      } catch (caught) {
+        const e = asError(caught);
+        notice(e.message, true);
+      } finally {
+        ($(id) as HTMLButtonElement).disabled = false;
+        if (state) updateRuntime(state);
+      }
+    }),
+  );
 }
 function draft() {
   return {
@@ -398,8 +402,11 @@ async function init() {
     "demo-url",
     "remote-images",
   ])
-    $(id).addEventListener("change", () =>
-      saveDraft().catch((e) => notice(e.message, true)),
+    $(id).addEventListener(
+      "change",
+      asyncHandler(() =>
+        saveDraft().catch((e: unknown) => notice(asError(e).message, true)),
+      ),
     );
   action("publish", async () => {
     const data = await call("publish", draft());
@@ -479,10 +486,10 @@ async function init() {
         true,
       );
     } finally {
-      setTimeout(poll, 1200);
+      setTimeout(asyncHandler(poll), 1200);
     }
   }
-  setTimeout(poll, 1200);
+  setTimeout(asyncHandler(poll), 1200);
   // One attempt per authorized page load, never from the polling loop.
   // Connecting does not load a presentation, publish, or submit a build.
   void autoConnect();
@@ -515,7 +522,11 @@ async function autoConnect() {
   const failures = results.flatMap((result, i) =>
     result.status === "rejected" &&
     !(i === 1 && state.codex.status !== "disconnected")
-      ? [(attempts[i]?.[0] ?? "Connection") + ": " + result.reason.message]
+      ? [
+          (attempts[i]?.[0] ?? "Connection") +
+            ": " +
+            asError(result.reason).message,
+        ]
       : [],
   );
   if (failures.length)
@@ -591,9 +602,9 @@ explorer = mountExplorer({
 });
 updatePresentation = mountPresentations({ call, update: updateRuntime });
 mountFeedback({ call, update: updateRuntime });
-init().catch((e) => {
+init().catch((e: unknown) => {
   $("auth-error").hidden = false;
-  notice(e.message, true);
+  notice(asError(e).message, true);
 });
 
 function setupModes() {
@@ -748,7 +759,7 @@ function setupModes() {
     "83–88 · Return to the examples students gave. Invite a counterexample to the shared-capability hypothesis.",
     "88–90+ · Leave space for students. Offer the free SDLCAI tickets as an optional continuation, not a required action. Use slack up to 105 minutes for discussion.",
   ];
-  const buildSlides = new Map();
+  const buildSlides = new Map<number, string>();
   for (const [after, act, title] of [
     [13, "agents", "Build · Compose a constrained interface"],
     [9, "application", "Build · Make the room interactive"],
@@ -763,7 +774,7 @@ function setupModes() {
       "Review the prompt with the audience. Start explicitly, then continue the discussion while the agent works. Inspect the result when ready; do not wait on this slide.",
     );
   }
-  const voteSlides = new Map();
+  const voteSlides = new Map<number, string>();
   const frictionSlide = audienceSlides[1];
   if (!frictionSlide) throw new Error("Missing friction slide");
   frictionSlide[0] = "Vote · friction";
@@ -794,7 +805,8 @@ function setupModes() {
     "Open the prepared priority vote. Close it before starting composition.",
   );
   audienceSlides.forEach((slide, index) => {
-    if (slide[0] === "Live build") buildSlides.set(index, slideActs[index]);
+    if (slide[0] === "Live build")
+      buildSlides.set(index, slideActs[index] ?? "");
     if (slide[0].startsWith("Vote · "))
       voteSlides.set(index, slide[0].slice(7));
   });
@@ -874,7 +886,7 @@ function setupModes() {
   };
   action("slide-vote-open", async () => {
     updateRuntime(
-      await call("poll/select", { id: voteSlides.get(slideIndex) }),
+      await call("poll/select", { id: voteSlides.get(slideIndex) ?? "" }),
     );
     updateRuntime(await call("poll/open", {}));
     updateRuntime(await call("poll/show", {}));
@@ -935,7 +947,9 @@ function setupModes() {
       const act = slideActs[index];
       if (!act) throw new Error("Missing lecture act");
       if (voteSlides.has(index)) {
-        updateRuntime(await call("poll/select", { id: voteSlides.get(index) }));
+        updateRuntime(
+          await call("poll/select", { id: voteSlides.get(index) ?? "" }),
+        );
       }
       const data = await call("publish", {
         ...draft(),

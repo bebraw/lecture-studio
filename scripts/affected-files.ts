@@ -82,9 +82,9 @@ export function affectedChecks(files: string[] | null): string[] {
     return ["check"];
   const checks = [
     "format:check",
+    "typecheck",
     "lint",
     "quality:architecture",
-    "typecheck",
     "test:coverage",
   ];
   if (files.some((path) => path.startsWith("audience/")))

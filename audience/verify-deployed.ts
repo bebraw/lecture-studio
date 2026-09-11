@@ -1,3 +1,6 @@
+import { snapshotSchema } from "../shared/schemas.ts";
+import * as v from "valibot";
+import { deploymentSchema, secretsSchema } from "./tool-schemas.ts";
 import { asError } from "../shared/errors.ts";
 import { readFile, writeFile } from "node:fs/promises";
 import assert from "node:assert/strict";
@@ -5,16 +8,18 @@ import { chromium } from "@playwright/test";
 import { AudiencePoll, lecturePolls } from "../lib/audience-poll.ts";
 import { PresentationSession, parsePresentation } from "../lib/presentation.ts";
 const local = new URL("../.local/audience/", import.meta.url);
-const target = JSON.parse(
-  (await readFile(new URL("deployment.json", local))).toString(),
+const target = v.parse(
+  deploymentSchema,
+  JSON.parse((await readFile(new URL("deployment.json", local))).toString()),
 );
 assert.equal(target.status, "deployed");
 assert.equal(
   new URL(target.origin).hostname,
   target.workerName + ".survivejs.workers.dev",
 );
-const token = JSON.parse(
-  (await readFile(new URL("secrets.json", local))).toString(),
+const token = v.parse(
+  secretsSchema,
+  JSON.parse((await readFile(new URL("secrets.json", local))).toString()),
 ).PRESENTER_TOKEN;
 for (const id of [
   "webdev-2026-friction",
@@ -26,7 +31,7 @@ for (const id of [
     { method: "POST", headers: { authorization: "Bearer " + token } },
   );
   assert.equal(response.status, 200);
-  const snapshot = await response.json();
+  const snapshot = v.parse(snapshotSchema, await response.json());
   assert.equal(snapshot.status, "locked");
   console.log(
     id + ": provisioned and locked, " + snapshot.totalVotes + " votes",

@@ -1,3 +1,4 @@
+import { asyncHandler } from "../shared/errors.ts";
 import type { PresentationCommand } from "../shared/api.ts";
 import type { MountOptions, DeskState } from "../shared/api.ts";
 import { query, all, byId } from "./dom.ts";
@@ -167,25 +168,28 @@ export function mountPresentations({ call, update }: MountOptions) {
     previewKey = "";
   let refreshing = false,
     initialListRequested = false;
-  setInterval(async () => {
-    if (
-      preparing() ||
-      refreshing ||
-      data?.presentation?.step.type !== "poll" ||
-      data.graphPoll?.snapshot?.status !== "open" ||
-      data.graphPoll?.frozen
-    )
-      return;
-    refreshing = true;
-    try {
-      update(await call("presentation/poll-refresh", {}));
-    } catch (caught) {
-      const e = asError(caught);
-      $("graph-status").textContent = e.message;
-    } finally {
-      refreshing = false;
-    }
-  }, 3000);
+  setInterval(
+    asyncHandler(async () => {
+      if (
+        preparing() ||
+        refreshing ||
+        data?.presentation?.step.type !== "poll" ||
+        data.graphPoll?.snapshot?.status !== "open" ||
+        data.graphPoll?.frozen
+      )
+        return;
+      refreshing = true;
+      try {
+        update(await call("presentation/poll-refresh", {}));
+      } catch (caught) {
+        const e = asError(caught);
+        $("graph-status").textContent = e.message;
+      } finally {
+        refreshing = false;
+      }
+    }),
+    3000,
+  );
   async function run(...[path, ...args]: PresentationCommand) {
     try {
       const result = await call(path, ...args);
@@ -367,7 +371,7 @@ export function mountPresentations({ call, update }: MountOptions) {
     syncNotice.textContent = data.audienceSync?.error || "";
     if (!initialListRequested && data.libraryStatus?.startsWith("Connected")) {
       initialListRequested = true;
-      void $("presentations-list").click();
+      $("presentations-list").click();
     }
     for (const id of ["question", "results"])
       $("graph-" + id).hidden = p?.step.type !== "poll";

@@ -1,3 +1,5 @@
+import * as v from "valibot";
+import { questionSchema } from "../shared/schemas.ts";
 import type { ChildProcess, SpawnOptions } from "node:child_process";
 import type {
   BridgeState,
@@ -26,19 +28,64 @@ interface RpcResults {
 }
 interface ProtocolParams extends ApprovalParams {
   threadId?: string;
-  turn?: { id?: string; status?: string; error?: { message?: string } };
+  turn?: { id?: string; status?: string; error?: { message?: string } | null };
   itemId?: string;
   delta?: string;
   item?: { id: string; type: string; text?: string };
-  error?: { message?: string };
+  error?: { message?: string } | null;
 }
 interface ProtocolMessage {
   id?: string | number;
   method?: string;
   params?: ProtocolParams;
   result?: unknown;
-  error?: { message?: string };
+  error?: { message?: string } | null;
 }
+const messageSchema = v.object({
+  id: v.exactOptional(v.union([v.string(), v.number()])),
+  method: v.exactOptional(v.string()),
+  result: v.exactOptional(v.unknown()),
+  error: v.exactOptional(
+    v.nullable(v.object({ message: v.exactOptional(v.string()) })),
+  ),
+  params: v.exactOptional(
+    v.object({
+      // Codex uses null for absent command/reason/options; normalize at the boundary.
+      command: v.nullish(v.string(), ""),
+      reason: v.nullish(v.string(), ""),
+      questions: v.exactOptional(
+        v.array(
+          v.object({
+            ...questionSchema.entries,
+            options: v.nullish(questionSchema.entries.options.wrapped, []),
+          }),
+        ),
+      ),
+      threadId: v.exactOptional(v.string()),
+      itemId: v.exactOptional(v.string()),
+      delta: v.exactOptional(v.string()),
+      turn: v.exactOptional(
+        v.object({
+          id: v.exactOptional(v.string()),
+          status: v.exactOptional(v.string()),
+          error: v.exactOptional(
+            v.nullable(v.object({ message: v.exactOptional(v.string()) })),
+          ),
+        }),
+      ),
+      item: v.exactOptional(
+        v.object({
+          id: v.string(),
+          type: v.string(),
+          text: v.exactOptional(v.string()),
+        }),
+      ),
+      error: v.exactOptional(
+        v.nullable(v.object({ message: v.exactOptional(v.string()) })),
+      ),
+    }),
+  ),
+}) satisfies v.GenericSchema<unknown, ProtocolMessage>;
 import { asError } from "../shared/errors.ts";
 import { spawn } from "node:child_process";
 import { EventEmitter } from "node:events";
@@ -169,7 +216,7 @@ export class CodexBridge extends EventEmitter {
           const line = buffer.slice(0, end);
           buffer = buffer.slice(end + 1);
           try {
-            this.receive(JSON.parse(line));
+            this.receive(v.parse(messageSchema, JSON.parse(line)));
           } catch {
             /* Ignore non-protocol diagnostics; never project raw output. */
           }

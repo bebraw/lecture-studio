@@ -1,3 +1,5 @@
+import { parseApiResponse } from "../shared/api.ts";
+import { httpResult } from "./http-result.ts";
 import test from "node:test";
 import assert from "node:assert/strict";
 import { mkdtemp, access } from "node:fs/promises";
@@ -47,14 +49,17 @@ test("reset and fresh rehearsal are confirmed, private, and preserve the workspa
       },
       body: JSON.stringify(body),
     });
-    return { status: res.status, data: await res.json() };
+    return httpResult("desk", res);
   };
   const desk = async () =>
-    (
-      await fetch(address.origin + "/api/desk", {
-        headers: { Authorization: "Bearer " + address.deskToken },
-      })
-    ).json();
+    parseApiResponse(
+      "desk",
+      await (
+        await fetch(address.origin + "/api/desk", {
+          headers: { Authorization: "Bearer " + address.deskToken },
+        })
+      ).json(),
+    );
   assert.equal((await post("reset-lecture", {})).status, 400);
   assert.equal(
     (await post("new-rehearsal", { confirm: true }, address.stageToken)).status,
@@ -63,7 +68,7 @@ test("reset and fresh rehearsal are confirmed, private, and preserve the workspa
   const old = await desk();
   await post("act", { act: "agents" });
   bridge.state.messages = [{ id: "old", text: "http://localhost:8799/" }];
-  const reset = (await post("reset-lecture", { confirm: true })).data;
+  const reset = (await post("reset-lecture", { confirm: true })).data();
   assert.equal(reset.workspace, old.workspace);
   assert.equal(reset.activeAct, "opening");
   assert.equal(reset.codex.messages.length, 0);

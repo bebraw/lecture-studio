@@ -1,3 +1,8 @@
+import { parse } from "valibot";
+import { audienceStageSchema } from "../shared/audience-schemas.ts";
+import { stringValue } from "../shared/errors.ts";
+import { parseApiResponse } from "../shared/api.ts";
+import { httpResult } from "./http-result.ts";
 import type { Stage } from "../shared/models.ts";
 import test from "node:test";
 import assert from "node:assert/strict";
@@ -32,13 +37,16 @@ test("preview handoff preserves published material and an unrelated private draf
       },
       body: JSON.stringify(body),
     });
-    return { status: res.status, data: await res.json() };
+    return httpResult("desk", res);
   };
-  const first = await (
-    await fetch(address.origin + "/api/desk", {
-      headers: { Authorization: "Bearer " + address.deskToken },
-    })
-  ).json();
+  const first = parseApiResponse(
+    "desk",
+    await (
+      await fetch(address.origin + "/api/desk", {
+        headers: { Authorization: "Bearer " + address.deskToken },
+      })
+    ).json(),
+  );
   await call("draft", { ...first.draft, title: "Private unsent draft" });
   assert.equal(
     (
@@ -50,12 +58,13 @@ test("preview handoff preserves published material and an unrelated private draf
     ).status,
     401,
   );
-  const shown = (await call("show-preview", { url: "http://localhost:8799/" }))
-    .data;
+  const shown = (
+    await call("show-preview", { url: "http://localhost:8799/" })
+  ).data();
   assert.equal(shown.stage.mode, "demo");
   assert.equal(shown.draft.title, "Private unsent draft");
   await call("show-preview", { url: "http://localhost:8799/another" });
-  const restored = (await call("back-material", {})).data;
+  const restored = (await call("back-material", {})).data();
   assert.equal(restored.stage.title, first.stage.title);
   assert.equal(restored.draft.title, "Private unsent draft");
   assert.equal(restored.canReturnToMaterial, false);
@@ -84,7 +93,12 @@ test("live preview shares HTTPS with audience while keeping local stage URL", as
     origin: "https://audience.invalid",
     token: "test",
     fetcher: async (_url, init) => {
-      sent.push(JSON.parse(String(init.body)));
+      sent.push(
+        parse(
+          audienceStageSchema,
+          JSON.parse(stringValue(init.body, "stage body")),
+        ),
+      );
       return new Response(null, { status: 204 });
     },
   });
@@ -101,14 +115,17 @@ test("live preview shares HTTPS with audience while keeping local stage URL", as
       body: JSON.stringify(body),
     });
     assert.equal(r.status, 200);
-    return r.json();
+    return parseApiResponse("desk", await r.json());
   };
   await call("show-preview", { url: "http://localhost:8799/" });
-  const local = await (
-    await fetch(address.origin + "/api/stage", {
-      headers: { Authorization: "Bearer " + address.stageToken },
-    })
-  ).json();
+  const local = parseApiResponse(
+    "stage",
+    await (
+      await fetch(address.origin + "/api/stage", {
+        headers: { Authorization: "Bearer " + address.stageToken },
+      })
+    ).json(),
+  );
   assert.equal(local.demoUrl, "http://localhost:8799/");
   await new Promise((resolve) => setTimeout(resolve, 1200));
   assert.ok(sent.some((s) => s.demoUrl === "https://demo.trycloudflare.com/"));

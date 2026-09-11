@@ -252,7 +252,11 @@ Oxlint rejects explicit `any` throughout maintained code and `unknown` in
 `shared/models.ts`, where domain contracts must name their supported fields.
 Keep `unknown` for unvalidated JSON, external protocol results, and caught errors;
 narrow it before use. Do not replace it with an assertion merely to satisfy lint.
-Callbacks whose results are ignored declare `void | Promise<void>`.
+Type-aware Oxlint also rejects floating/misused promises and unsafe assignments,
+returns, arguments, member access and calls. The only known-safe promise call is
+Node's `test` registration, whose lifecycle belongs to the test runner. DOM events,
+timers and Node callbacks use `asyncHandler` when their caller cannot observe a
+returned promise. Valibot validates JSON before it becomes application data.
 
 Run `npm ci` and `npm ci --prefix audience` before development.
 `npm run typecheck` generates Worker bindings and checks both runtime environments
@@ -277,7 +281,7 @@ local fixtures and do not submit votes to the public lecture.
 
 Additional checks:
 
-- `npm run lint`: Oxlint, enforced in the fast gate.
+- `npm run lint`: type-aware Oxlint, enforced in the fast gate. Run `npm run typegen` first in a fresh checkout so Worker bindings are available.
 - `npm run diagnostics:codebase`, `diagnostics:health`, `diagnostics:map`: advisory
   Fallow analysis; the map is written to `.fallow/codebase-map.html`.
 - `npm run quality:architecture`: reject forbidden imports between runtime zones.

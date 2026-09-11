@@ -1,24 +1,26 @@
+import * as v from "valibot";
 import { ChildProcess } from "node:child_process";
 import type { SpawnOptions } from "node:child_process";
 import test from "node:test";
 import assert from "node:assert/strict";
 import { PassThrough, Writable } from "node:stream";
 import { CodexBridge } from "../lib/codex.ts";
+const sentSchema = v.object({
+  id: v.exactOptional(v.union([v.string(), v.number()])),
+  method: v.exactOptional(v.string()),
+  params: v.exactOptional(v.record(v.string(), v.unknown())),
+  result: v.exactOptional(v.unknown()),
+  error: v.exactOptional(v.object({ code: v.number() })),
+});
 function backend() {
   const proc = new ChildProcess(),
-    sent: {
-      id?: number | string;
-      method: string;
-      params: Record<string, unknown>;
-      result?: unknown;
-      error?: { code: number };
-    }[] = [];
+    sent: v.InferOutput<typeof sentSchema>[] = [];
   proc.stdout = new PassThrough();
   proc.stderr = new PassThrough();
   proc.kill = () => true;
   proc.stdin = new Writable({
-    write(chunk, _encoding, done) {
-      const message = JSON.parse(chunk.toString());
+    write(chunk: Buffer, _encoding, done) {
+      const message = v.parse(sentSchema, JSON.parse(chunk.toString()));
       sent.push(message);
       const result =
         message.method === "initialize"
@@ -61,27 +63,27 @@ test("Codex uses reviewed text, workspace sandbox, automatic approval review and
     assert.ok(!spawnArgs![1].some((s) => s.includes('mcp_servers."')));
     await bridge.start("EXACT reviewed brief", "test-model");
     assert.equal(
-      sent.find((x) => x.method === "thread/start")!.params.sandbox,
+      sent.find((x) => x.method === "thread/start")!.params!.sandbox,
       "workspace-write",
     );
     assert.equal(
-      sent.find((x) => x.method === "thread/start")!.params.approvalPolicy,
+      sent.find((x) => x.method === "thread/start")!.params!.approvalPolicy,
       "on-request",
     );
     assert.equal(
-      sent.find((x) => x.method === "thread/start")!.params.approvalsReviewer,
+      sent.find((x) => x.method === "thread/start")!.params!.approvalsReviewer,
       "auto_review",
     );
     assert.equal(
-      sent.find((x) => x.method === "turn/start")!.params.approvalsReviewer,
+      sent.find((x) => x.method === "turn/start")!.params!.approvalsReviewer,
       "auto_review",
     );
     assert.equal(
-      sent.find((x) => x.method === "turn/start")!.params.approvalPolicy,
+      sent.find((x) => x.method === "turn/start")!.params!.approvalPolicy,
       "on-request",
     );
     assert.deepEqual(
-      sent.find((x) => x.method === "turn/start")!.params.input,
+      sent.find((x) => x.method === "turn/start")!.params!.input,
       [{ type: "text", text: "EXACT reviewed brief" }],
     );
     await assert.rejects(() => bridge.start("Duplicate"));
@@ -113,9 +115,33 @@ test("Codex uses reviewed text, workspace sandbox, automatic approval review and
       method: "item/agentMessage/delta",
       params: { threadId: "thread-one", itemId: "m", delta: "Finished" },
     });
-    bridge.receive({
+    const incoming = (message: unknown) =>
+      proc.stdout?.emit("data", JSON.stringify(message) + "\n");
+    incoming({
+      id: "nullable",
+      method: "item/commandExecution/requestApproval",
+      params: { command: null, reason: null },
+    });
+    assert.equal(bridge.state.status, "waiting");
+    assert.equal(bridge.snapshot().requests[0]?.params.command, "");
+    bridge.answer("nullable", "accept");
+    incoming({
+      id: "free-text",
+      method: "item/tool/requestUserInput",
+      params: {
+        questions: [
+          { id: "q", header: "Continue", question: "Why?", options: null },
+        ],
+      },
+    });
+    assert.deepEqual(
+      bridge.snapshot().requests[0]?.params.questions?.[0]?.options,
+      [],
+    );
+    bridge.answer("free-text", "answer", { q: "Continue the lecture" });
+    incoming({
       method: "turn/completed",
-      params: { turn: { status: "completed" } },
+      params: { turn: { status: "completed", error: null } },
     });
     assert.equal(bridge.state.status, "ready");
     assert.equal(bridge.state.messages[0]?.text, "Finished");

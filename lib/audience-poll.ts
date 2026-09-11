@@ -1,3 +1,5 @@
+import { parse } from "valibot";
+import { snapshotSchema } from "../shared/schemas.ts";
 import type { Fetcher } from "../shared/models.ts";
 import type {
   PollDefinition,
@@ -250,23 +252,15 @@ export class AudiencePoll {
       throw new Error("Audience room returned " + response.status);
     const raw = await response.text();
     if (raw.length > 30000) throw new Error("Room response too large");
-    const s: PollSnapshot = JSON.parse(raw);
+    const s = parse(snapshotSchema, JSON.parse(raw));
     if (
-      !["open", "locked"].includes(s.status) ||
       !Number.isSafeInteger(s.revision) ||
-      s.revision < 0 ||
-      !Array.isArray(s.choices) ||
       s.choices.length !== this.config.options.length
     )
       throw new Error("Room options do not match the prepared poll");
     const choices = this.config.options.map((o) => {
       const c = s.choices.find((c) => c.id === o.id);
-      if (
-        !c ||
-        c.label !== o.label ||
-        !Number.isSafeInteger(c.votes) ||
-        c.votes < 0
-      )
+      if (!c || c.label !== o.label || !Number.isSafeInteger(c.votes))
         throw new Error(
           "Room options do not match. Configure the public app first; existing votes were not reset.",
         );

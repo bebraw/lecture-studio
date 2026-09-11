@@ -1,3 +1,5 @@
+import { parse, object, string } from "valibot";
+import { stringValue } from "../shared/errors.ts";
 import type { Stage } from "../shared/models.ts";
 import test from "node:test";
 import assert from "node:assert/strict";
@@ -28,7 +30,12 @@ test("audience sync serializes writes and coalesces intermediate slides", async 
     origin: "https://audience.invalid",
     token: "test",
     fetcher: async (_url, options) => {
-      sent.push(JSON.parse(String(options.body)));
+      sent.push(
+        parse(
+          object({ title: string() }),
+          JSON.parse(stringValue(options.body, "stage body")),
+        ),
+      );
       await new Promise<void>((resolve) => releases.push(resolve));
       return new Response(null, { status: 204 });
     },

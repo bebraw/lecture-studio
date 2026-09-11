@@ -1,5 +1,6 @@
+import { asyncHandler } from "./shared/errors.ts";
 import { validateApiRequest, type DeskState } from "./shared/api.ts";
-import type { ServerResponse } from "node:http";
+import type { IncomingMessage, ServerResponse } from "node:http";
 import type { AddressInfo } from "node:net";
 import type {
   Library,
@@ -336,7 +337,7 @@ export function createStudio({
     if (!liveTransition) audienceSync.publish(audienceState());
   }, 1000);
   broadcastTimer.unref();
-  const server = createServer(async (req, res) => {
+  const handleRequest = async (req: IncomingMessage, res: ServerResponse) => {
     res.setHeader("cache-control", "no-store");
     res.setHeader("referrer-policy", "no-referrer");
     res.setHeader("x-content-type-options", "nosniff");
@@ -877,7 +878,8 @@ export function createStudio({
         400,
       );
     }
-  });
+  };
+  const server = createServer(asyncHandler(handleRequest));
   server.on("close", () => {
     clearInterval(broadcastTimer);
     audienceSync.close();

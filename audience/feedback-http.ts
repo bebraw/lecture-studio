@@ -5,8 +5,11 @@ async function readBody(request: Request) {
   const chunks: Uint8Array[] = [];
   let size = 0;
   while (true) {
-    const { done, value } = await reader.read();
+    const chunk: { done: boolean; value?: unknown } = await reader.read();
+    const { done, value } = chunk;
     if (done) break;
+    if (!(value instanceof Uint8Array))
+      throw new Error("Expected request bytes");
     size += value.length;
     if (size > 4096) {
       await reader.cancel();
@@ -20,7 +23,7 @@ async function readBody(request: Request) {
     bytes.set(chunk, offset);
     offset += chunk.length;
   }
-  const body = JSON.parse(new TextDecoder().decode(bytes));
+  const body: unknown = JSON.parse(new TextDecoder().decode(bytes));
   if (!body || typeof body !== "object" || Array.isArray(body))
     throw new Error("Expected JSON object");
   return body as Record<string, unknown>;

@@ -1,13 +1,17 @@
+import * as v from "valibot";
+import { deploymentSchema, secretsSchema } from "./tool-schemas.ts";
 import { asError } from "../shared/errors.ts";
 import { readFile, writeFile } from "node:fs/promises";
 const local = new URL("../.local/audience/", import.meta.url);
-const target = JSON.parse(
-  (await readFile(new URL("deployment.json", local))).toString(),
+const target = v.parse(
+  deploymentSchema,
+  JSON.parse((await readFile(new URL("deployment.json", local))).toString()),
 );
 if (target.status !== "deployed")
   throw new Error("Deploy and verify the audience target first.");
-const token = JSON.parse(
-  (await readFile(new URL("secrets.json", local))).toString(),
+const token = v.parse(
+  secretsSchema,
+  JSON.parse((await readFile(new URL("secrets.json", local))).toString()),
 ).PRESENTER_TOKEN;
 const path = new URL("../.env", import.meta.url);
 let env = "";

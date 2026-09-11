@@ -80,7 +80,7 @@ export const pollDefinitionSchema = v.object({
   options: v.array(optionSchema),
   defaultId: text,
 });
-const snapshotSchema = v.object({
+export const snapshotSchema = v.object({
   status: v.picklist(["open", "locked"]),
   revision: count,
   totalVotes: count,
@@ -108,7 +108,7 @@ const pollSchema = v.object({
   error: text,
   joinUrl: text,
 });
-const stepSchema = v.object({
+export const stepSchema = v.object({
   id: text,
   type: text,
   title: text,
@@ -121,7 +121,7 @@ const stepSchema = v.object({
   uses: v.exactOptional(
     v.array(v.object({ poll: text, instructions: stringMap })),
   ),
-  allowRemoteImages: v.exactOptional(v.boolean()),
+  allowRemoteImages: v.exactOptional(v.boolean("Invalid remote image setting")),
   poll: v.exactOptional(pollDefinitionSchema),
   room: optionalText,
 });
@@ -160,7 +160,7 @@ const presentationSchema = v.object({
     }),
   ),
 });
-const questionSchema = v.object({
+export const questionSchema = v.object({
   id: text,
   header: optionalText,
   question: text,

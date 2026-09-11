@@ -1,3 +1,6 @@
+import { parse } from "valibot";
+import { asError } from "../shared/errors.ts";
+import { secretsSchema } from "./tool-schemas.ts";
 import { mkdir, writeFile, access, readFile } from "node:fs/promises";
 import { randomBytes } from "node:crypto";
 const directory = new URL("../.local/audience/", import.meta.url);
@@ -13,11 +16,14 @@ try {
   );
 }
 console.log("Private presenter credentials prepared; values not displayed.");
-const token = JSON.parse(await readFile(secrets, "utf8")).PRESENTER_TOKEN;
+const token = parse(
+  secretsSchema,
+  JSON.parse(await readFile(secrets, "utf8")),
+).PRESENTER_TOKEN;
 await writeFile(
   new URL(".dev.vars", import.meta.url),
   "PRESENTER_TOKEN=" + token + "\n",
   { mode: 0o600, flag: "wx" },
-).catch((error) => {
-  if (error.code !== "EEXIST") throw error;
+).catch((error: unknown) => {
+  if (asError(error).code !== "EEXIST") throw error;
 });

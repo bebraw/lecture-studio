@@ -1,3 +1,4 @@
+import { asyncHandler } from "../shared/errors.ts";
 import { query } from "./dom.ts";
 import {
   auth,
@@ -48,7 +49,7 @@ async function poll() {
     query("#stage-connection", document).textContent =
       "Stage connection lost · holding the last view";
   } finally {
-    setTimeout(poll, 1000);
+    setTimeout(asyncHandler(poll), 1000);
   }
 }
 void poll();

@@ -1,3 +1,4 @@
+import * as v from "valibot";
 import lighthouse from "lighthouse";
 import { launch } from "chrome-launcher";
 import { chromium } from "@playwright/test";
@@ -9,10 +10,19 @@ import {
   type PerformanceMetrics,
 } from "./performance-budgets.ts";
 
-const budgets: Record<"audience" | "stage", PerformanceMetrics> = JSON.parse(
-  await readFile(
-    new URL("../performance-budgets.json", import.meta.url),
-    "utf8",
+const metricsSchema = v.object({
+  lcpMs: v.number(),
+  cls: v.number(),
+  tbtMs: v.number(),
+  transferBytes: v.number(),
+});
+const budgets = v.parse(
+  v.object({ audience: metricsSchema, stage: metricsSchema }),
+  JSON.parse(
+    await readFile(
+      new URL("../performance-budgets.json", import.meta.url),
+      "utf8",
+    ),
   ),
 );
 const output = new URL("../reports/performance/", import.meta.url);
@@ -77,7 +87,7 @@ try {
           `${name} ${run}/3: LCP ${Math.round(metric("largest-contentful-paint"))}ms, CLS ${metric("cumulative-layout-shift")}, bytes ${metric("total-byte-weight")}`,
         );
       } finally {
-        await chrome.kill();
+        chrome.kill();
       }
     }
     const median = (key: keyof (typeof runs)[number]) => {

@@ -2,6 +2,15 @@ export function asError(value: unknown): Error & { code?: string } {
   if (value instanceof Error) return value;
   return new Error(String(value));
 }
+// DOM events, timers and Node callbacks do not observe returned promises.
+export function asyncHandler<Args extends unknown[]>(
+  run: (...args: Args) => Promise<unknown>,
+  report: (error: Error) => void = console.error,
+): (...args: Args) => void {
+  return (...args) => {
+    void run(...args).catch((error: unknown) => report(asError(error)));
+  };
+}
 export function record(value: unknown): Record<string, unknown> {
   if (!value || typeof value !== "object" || Array.isArray(value))
     throw new Error("Expected an object");

@@ -1,3 +1,4 @@
+import { parseApiResponse } from "../shared/api.ts";
 import test from "node:test";
 import assert from "node:assert/strict";
 import { LectureSearch } from "../lib/lecture-search.ts";
@@ -46,12 +47,13 @@ test("search is private and never changes the projected stage", async (t) => {
     fetch(address.origin + "/api/" + path, {
       headers: { Authorization: "Bearer " + token },
     });
-  const before = await (await get("stage", address.stageToken)).json();
+  const before: unknown = await (await get("stage", address.stageToken)).json();
   assert.equal((await get("search?q=private", address.stageToken)).status, 401);
-  const result = await (
-    await get("search?q=private", address.deskToken)
-  ).json();
-  assert.equal(result.matches[0].section, "Presenter");
-  const after = await (await get("stage", address.stageToken)).json();
+  const result = parseApiResponse(
+    "search?q=private",
+    await (await get("search?q=private", address.deskToken)).json(),
+  );
+  assert.equal(result.matches[0]?.section, "Presenter");
+  const after: unknown = await (await get("stage", address.stageToken)).json();
   assert.deepEqual(after, before);
 });

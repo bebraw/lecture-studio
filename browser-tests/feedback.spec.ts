@@ -1,3 +1,6 @@
+import { parse } from "valibot";
+import { requestSchemas } from "../shared/api.ts";
+import { stringValue } from "../shared/errors.ts";
 import { test, expect } from "@playwright/test";
 import { fixture } from "../tests/fixture.ts";
 import { AudiencePoll } from "../lib/audience-poll.ts";
@@ -20,12 +23,17 @@ test("desk review publishes only selected questions or approved cloud snapshots"
     fetcher: async (url, init) => {
       if (url.endsWith("/presenter/stage"))
         return new Response(null, { status: 204 });
-      const body = init.body && JSON.parse(String(init.body));
+      const body = init.body
+        ? parse(
+            requestSchemas.feedback,
+            JSON.parse(stringValue(init.body, "feedback body")),
+          )
+        : null;
       if (body?.action === "start")
         snapshot = {
           config: {
-            mode: body.mode,
-            prompt: body.prompt,
+            mode: body.mode ?? "questions",
+            prompt: body.prompt ?? "Questions",
             round: "two",
             open: true,
           },

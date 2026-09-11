@@ -1,3 +1,5 @@
+import * as v from "valibot";
+import { stepSchema } from "../shared/schemas.ts";
 import type {
   Theme,
   Note,
@@ -38,33 +40,30 @@ export function parseTheme(input: unknown = {}) {
 }
 export function parsePresentation(note: Note): PresentationDefinition {
   const raw = note.sections.find((s) => s.heading === "Presentation")?.body;
-  const value: PresentationDefinition = JSON.parse(
-    raw?.match(/^\s*```json\s*\n([\s\S]*?)\n```\s*$/)?.[1] || "null",
+  const parsed = v.parse(
+    v.object({
+      version: v.literal(1),
+      title: v.string(),
+      start: v.string(),
+      steps: v.array(stepSchema),
+      theme: v.exactOptional(v.unknown()),
+    }),
+    JSON.parse(
+      raw?.match(/^\s*```json\s*\n([\s\S]*?)\n```\s*$/)?.[1] || "null",
+    ),
   );
+  const value = { ...parsed, theme: parseTheme(parsed.theme) };
   const text = (v: unknown, n: number) =>
     typeof v === "string" && v.length <= n;
   if (
-    !value ||
-    value.version !== 1 ||
-    typeof value.start !== "string" ||
     !text(value.title, 200) ||
-    !Array.isArray(value.steps) ||
     !value.steps.length ||
     value.steps.length > 100
   )
     throw new Error("Invalid presentation v1");
   const ids = new Set();
-  value.theme = parseTheme(value.theme);
   for (const s of value.steps) {
-    if (!s || typeof s !== "object" || Array.isArray(s))
-      throw new Error("Invalid presentation step");
     if (
-      s.allowRemoteImages !== undefined &&
-      typeof s.allowRemoteImages !== "boolean"
-    )
-      throw new Error("Invalid remote image setting");
-    if (
-      typeof s.id !== "string" ||
       !/^[a-z0-9-]{1,60}$/.test(s.id) ||
       ids.has(s.id) ||
       !text(s.title, 200) ||
@@ -90,17 +89,12 @@ export function parsePresentation(note: Note): PresentationDefinition {
   if (!ids.has(value.start)) throw new Error("Missing start step");
   for (const s of value.steps) {
     if (s.next && !ids.has(s.next)) throw new Error("Missing next step");
-    if (s.related && !Array.isArray(s.related))
-      throw new Error("Invalid detours");
     for (const id of s.related || [])
       if (!ids.has(id)) throw new Error("Missing detour");
-    if (s.uses && !Array.isArray(s.uses))
-      throw new Error("Invalid build dependencies");
     for (const dep of s.uses || []) {
       const p = value.steps.find((x) => x.id === dep.poll && x.type === "poll");
       if (
         !p ||
-        !dep.instructions ||
         p.poll!.options.some((o) => !text(dep.instructions[o.id], 2000))
       )
         throw new Error("Each poll option needs an implementation instruction");

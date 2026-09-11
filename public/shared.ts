@@ -86,7 +86,7 @@ export function buildLabel(build: BuildState) {
       : labels[build.status] || "Idle") + timer
   );
 }
-export const escape = (text: unknown) =>
+export const escape = (text: string | number | boolean | null | undefined) =>
   String(text ?? "").replace(
     /[&<>"']/g,
     (c) =>

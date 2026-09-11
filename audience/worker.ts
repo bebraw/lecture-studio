@@ -1,3 +1,5 @@
+import { parse } from "valibot";
+import { audienceStageSchema } from "../shared/audience-schemas.ts";
 import { handleRoomRequest, readRoomSnapshot } from "./room-http";
 import { renderRoomFragment } from "./room-view";
 import { feedbackRequest } from "./feedback-http";
@@ -87,8 +89,11 @@ export default {
       if (!request.body) return new Response("Expected stage", { status: 400 });
       const reader = request.body.getReader();
       while (true) {
-        const { done, value } = await reader.read();
+        const chunk: { done: boolean; value?: unknown } = await reader.read();
+        const { done, value } = chunk;
         if (done) break;
+        if (!(value instanceof Uint8Array))
+          throw new Error("Expected request bytes");
         bytes += value.length;
         if (bytes > 100000) {
           await reader.cancel();
@@ -103,7 +108,10 @@ export default {
           buffer.set(chunk, offset);
           offset += chunk.length;
         }
-        const input = JSON.parse(new TextDecoder().decode(buffer));
+        const input = parse(
+          audienceStageSchema,
+          JSON.parse(new TextDecoder().decode(buffer)),
+        );
         if (
           !input ||
           typeof input.title !== "string" ||
@@ -135,7 +143,7 @@ export default {
           "theme",
           "blank",
           "build",
-        ])
+        ] as const)
           if (input[key] !== undefined) stage[key] = input[key];
         await env.STAGE_STATE.getByName("lecture").publish(stage);
         return Response.json({ ok: true });
