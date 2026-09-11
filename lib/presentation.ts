@@ -10,7 +10,7 @@ import type {
 import { validatePoll } from "./audience-poll.ts";
 import { publicStage } from "./material.ts";
 import { initialDraft } from "./narrative.ts";
-export const defaultTheme = {
+const defaultTheme = {
   background: "#ffffff",
   text: "#202020",
   muted: "#616161",

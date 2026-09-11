@@ -32,3 +32,15 @@ The local API reads JSON into unknown-valued records and validates command field
 before use. Its transport reader is separate from lecture orchestration. Invalid
 build/approval payloads have regression coverage. No framework or test-runner rewrite
 is required for this baseline.
+
+## Codebase diagnostics
+
+Fallow is advisory. Run `diagnostics:codebase`, `diagnostics:health`, and
+`diagnostics:map` to inspect dead code, complexity, and `.fallow/codebase-map.html`.
+Its first pass removed five unnecessary exports and identified duplicate poll
+construction, now shared by projection and voting. Large orchestration functions
+remain refactoring candidates; health scores are evidence, not acceptance criteria.
+Explicit entries cover built browser assets and local verification tools. Generated
+URLs are excluded from unresolved-import findings. Cloudflare RPC methods and
+interface-injected adapters remain advisory: static analysis cannot establish all
+of their callers. They must not be deleted based on an unused-member report.

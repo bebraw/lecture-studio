@@ -19,7 +19,7 @@ const voterCookieName = "room_voter";
 const voterIdPattern =
   /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/;
 
-export class RoomAdministrationUnauthorizedError extends Error {
+class RoomAdministrationUnauthorizedError extends Error {
   constructor() {
     super("Room administration requires explicit authorization.");
     this.name = "RoomAdministrationUnauthorizedError";
@@ -92,7 +92,7 @@ export async function readRoomSnapshot(
     : await room.getSnapshot();
 }
 
-export async function seedRoom(
+async function seedRoom(
   request: Request,
   env: RoomEnvironment,
   roomId: string,
@@ -104,7 +104,7 @@ export async function seedRoom(
   return await env.ROOM_STATE.getByName(roomId).seedChoices(choices);
 }
 
-export async function resetRoom(
+async function resetRoom(
   request: Request,
   env: RoomEnvironment,
   roomId: string,
@@ -115,7 +115,7 @@ export async function resetRoom(
   return await env.ROOM_STATE.getByName(roomId).resetVotes();
 }
 
-export async function setRoomStatus(
+async function setRoomStatus(
   request: Request,
   env: RoomEnvironment,
   roomId: string,

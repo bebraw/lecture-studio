@@ -6,6 +6,7 @@ import type {
   Draft,
   Stage,
   NoteFile,
+  Step,
 } from "./shared/models.ts";
 export interface StudioOptions {
   library?: Library;
@@ -132,23 +133,27 @@ export function createStudio({
     graphPoll: AudiencePoll | null = null,
     graphBusy = false;
   const graphPolls = new Map<string, AudiencePoll>();
+  const getGraphPoll = (step: Step) => {
+    let selected = graphPolls.get(step.id);
+    if (!selected) {
+      selected = new AudiencePoll({
+        origin: poll.origin,
+        token: poll.token,
+        room: step.room,
+        sessionId: poll.sessionId,
+        fetcher: poll.fetcher,
+      });
+      selected.configure(step.poll);
+      graphPolls.set(step.id, selected);
+    }
+    return selected;
+  };
   const showGraph = () => {
     if (!presentation) throw new Error("Load a presentation first");
     feedbackPrevious = null;
     const s = presentation.step();
     if (s.type === "poll") {
-      if (!graphPolls.has(s.id)) {
-        const p = new AudiencePoll({
-          origin: poll.origin,
-          token: poll.token,
-          room: s.room,
-          sessionId: poll.sessionId,
-          fetcher: poll.fetcher,
-        });
-        p.configure(s.poll);
-        graphPolls.set(s.id, p);
-      }
-      graphPoll = graphPolls.get(s.id)!;
+      graphPoll = getGraphPoll(s);
       projectedPoll = graphPoll;
       pollOnStage = true;
       pollResults = false;
@@ -525,18 +530,7 @@ export function createStudio({
                 if (presentation.step().type !== "poll")
                   throw new Error("Choose a poll step");
                 const s = presentation.step();
-                if (!graphPolls.has(s.id)) {
-                  const p = new AudiencePoll({
-                    origin: poll.origin,
-                    token: poll.token,
-                    room: s.room,
-                    sessionId: poll.sessionId,
-                    fetcher: poll.fetcher,
-                  });
-                  p.configure(s.poll);
-                  graphPolls.set(s.id, p);
-                }
-                graphPoll = graphPolls.get(s.id)!;
+                graphPoll = getGraphPoll(s);
                 if (
                   op === "poll-open" &&
                   [...graphPolls.values(), poll].some(

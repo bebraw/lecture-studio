@@ -8,3 +8,7 @@ test-results
 playwright-report
 package-lock.json
 audience/package-lock.json
+
+.fallow/
+reports/
+.stryker-tmp/

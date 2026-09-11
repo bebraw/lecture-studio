@@ -20,7 +20,10 @@
     "quality:gate:fast": "npm run format:check && npm run lint && npm run typecheck && npm test && npm run audit:runtime",
     "build:worker": "npm run build --prefix audience",
     "hooks:install": "git config core.hooksPath .githooks",
-    "lint": "oxlint --max-warnings 0"
+    "lint": "oxlint --max-warnings 0",
+    "diagnostics:codebase": "fallow dead-code --type-aware --type-aware-require best-effort --no-cache",
+    "diagnostics:health": "fallow health --score --hotspots --targets --no-cache",
+    "diagnostics:map": "fallow viz --out .fallow/codebase-map.html --no-open --no-cache"
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "1.30.0",
@@ -30,8 +33,11 @@
   },
   "devDependencies": {
     "@playwright/test": "1.62.1",
+    "@stryker-mutator/core": "10.0.0",
+    "@stryker-mutator/tap-runner": "10.0.0",
     "@types/markdown-it": "14.2.0",
     "@types/node": "24.13.4",
+    "c8": "11.0.0",
     "esbuild": "0.28.2",
     "fallow": "3.21.0",
     "oxlint": "1.80.0",

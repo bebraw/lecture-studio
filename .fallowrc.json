@@ -1,0 +1,49 @@
+{
+  "$schema": "./node_modules/fallow/schema.json",
+  "entry": [
+    "server.ts",
+    "public/desk.ts",
+    "public/stage.ts",
+    "audience/audience.ts",
+    "audience/worker.ts",
+    "audience/check-*.ts",
+    "audience/setup-local.ts",
+    "audience/connect-studio.ts",
+    "audience/verify-deployed.ts",
+    "document-a/check.ts",
+    "tests/*.test.ts",
+    "browser-tests/*.spec.ts",
+    "scripts/*.ts",
+    "audience/build-assets.ts",
+    "audience/audience.css",
+    "document-a/style.css"
+  ],
+  "ignorePatterns": [
+    ".local/**",
+    "audience/.wrangler/**",
+    "audience/worker-configuration.d.ts",
+    "reports/**",
+    ".stryker-tmp/**"
+  ],
+  "ignoreUnresolvedImports": [
+    "../.local/audience/secrets.json",
+    "../test-results/*.png",
+    "/audience.mjs",
+    "/desk.mjs",
+    "/stage.mjs",
+    "/vendor/mermaid/mermaid.esm.min.mjs"
+  ],
+  "overrides": [
+    {
+      "files": [
+        "audience/room-state.ts",
+        "audience/stage-state.ts",
+        "lib/codex.ts",
+        "lib/obsidian.ts"
+      ],
+      "rules": {
+        "unused-class-members": "warn"
+      }
+    }
+  ]
+}
