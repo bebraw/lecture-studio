@@ -91,11 +91,11 @@ Present keeps the published title, selected private discussion cue, preview, bri
 Both windows show observed activity and elapsed build time, not estimated percentages. The stage uses only allowlisted activity labels, never commands, paths, or approval text. Finished means the turn ended, not that the result has been certified. There is no verification checkbox. The optional change-summary reveal is not implemented.
 
 ```sh
-cd "/Users/juhovepsalainen/.codex/visualizations/2026/09/03/01a06689-0610-72c3-a04c-c133d728b75f/lecture-studio"
+cd "/Users/juhovepsalainen/Projects/lecture-studio"
 npm start
 ```
 
-Open the **Private desk** link printed by the server. Keep that link and window private. Use **Open projected stage** for the projector, ideally on a separate display rather than screen mirroring. The two links carry different access tokens; they change whenever the server restarts.
+Open the **Private desk** link printed by the server. Keep that link and window private. Use **Open projected stage** for the projector, ideally on a separate display rather than screen mirroring. The stable /desk and /stage URLs load their own role-specific authorization from the loopback server. Bookmark either URL; reloading after a server restart refreshes authorization.
 
 The implementation checkout is a fresh sibling folder:
 

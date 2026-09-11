@@ -64,6 +64,7 @@ export function createStudio({
 } = {}) {
   const deskToken = randomBytes(32).toString("hex"),
     stageToken = randomBytes(32).toString("hex");
+  if (!["127.0.0.1", "::1"].includes(host)) throw new Error("Lecture Studio must bind to loopback");
   const lectureSearch = new LectureSearch(library);
   const audienceSync = new AudienceStageSync(poll);
   let origin,
@@ -320,7 +321,7 @@ export function createStudio({
             return json(res, await feedbackRequest(poll));
           if (url.pathname === "/api/stage") return json(res, publicState());
           if (url.pathname === "/api/stage-link")
-            return json(res, { url: origin + "/stage#" + stageToken });
+            return json(res, { url: origin + "/stage" });
           if (url.pathname === "/api/library") {
             libraryFiles = await library.list();
             lectureSearch.clear();
@@ -781,7 +782,11 @@ export function createStudio({
       } else if (url.pathname === "/feedback.mjs")
         path = resolve(root, "public/feedback.mjs");
       else return json(res, { error: "Not found" }, 404);
-      const content = await readFile(path);
+      let content = await readFile(path);
+      if (["/", "/desk", "/stage"].includes(url.pathname)) {
+        const token = url.pathname === "/stage" ? stageToken : deskToken;
+        content = content.toString().replace("</head>", '<meta name="lecture-token" content="' + token + '"></head>');
+      }
       const type = {
         ".html": "text/html; charset=utf-8",
         ".css": "text/css",
@@ -815,11 +820,11 @@ export function createStudio({
         server.once("error", reject);
         server.listen(port, host, resolve);
       });
-      origin = "http://" + host + ":" + server.address().port;
+      origin = "http://" + (host === "::1" ? "[::1]" : host) + ":" + server.address().port;
       return {
         origin,
-        deskUrl: origin + "/desk#" + deskToken,
-        stageUrl: origin + "/stage#" + stageToken,
+        deskUrl: origin + "/desk",
+        stageUrl: origin + "/stage",
         deskToken,
         stageToken,
       };

@@ -28,7 +28,7 @@ export function buildLabel(build) {
 export const escape = text => String(text ?? "").replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
 export function auth(role) {
  const key = "lecture-studio-" + role;
- const token = location.hash.slice(1) || sessionStorage.getItem(key) || "";
+ const token = document.querySelector('meta[name="lecture-token"]')?.content || location.hash.slice(1) || sessionStorage.getItem(key) || "";
  if (location.hash) { sessionStorage.setItem(key, token); history.replaceState(null, "", location.pathname); }
  return token;
 }
