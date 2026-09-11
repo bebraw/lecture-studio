@@ -1,3 +1,5 @@
+import { parse, safeParse } from "valibot";
+import { feedbackSchema, errorSchema } from "../shared/schemas.ts";
 import type { FeedbackSnapshot } from "../shared/models.ts";
 import type { AudiencePoll } from "./audience-poll.ts";
 const escape = (value: unknown) =>
@@ -43,10 +45,14 @@ export async function feedbackRequest(
     }
     chunks.push(value);
   }
-  const result = JSON.parse(Buffer.concat(chunks).toString());
-  if (!response.ok)
-    throw new Error(result.error || "Feedback service unavailable");
-  return result;
+  const result: unknown = JSON.parse(Buffer.concat(chunks).toString());
+  if (!response.ok) {
+    const error = safeParse(errorSchema, result);
+    throw new Error(
+      error.success ? error.output.error : "Feedback service unavailable",
+    );
+  }
+  return parse(feedbackSchema, result);
 }
 export function feedbackSlide(snapshot: FeedbackSnapshot, id?: string) {
   if (id) {

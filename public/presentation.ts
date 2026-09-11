@@ -1,3 +1,4 @@
+import type { PresentationCommand } from "../shared/api.ts";
 import type { MountOptions, DeskState } from "../shared/api.ts";
 import { query, all, byId } from "./dom.ts";
 import { asError } from "../shared/errors.ts";
@@ -42,7 +43,7 @@ export function mountPresentations({ call, update }: MountOptions) {
     liveChanging = true;
     liveToggle.disabled = true;
     try {
-      await run("live", { live: !data?.live });
+      await run("presentation/live", { live: !data?.live });
     } finally {
       liveChanging = false;
       liveToggle.disabled = !data?.presentation;
@@ -154,7 +155,8 @@ export function mountPresentations({ call, update }: MountOptions) {
       )
     )
       return;
-    if (await run("load", { path: data.presentation.path })) closePicker();
+    if (await run("presentation/load", { path: data.presentation.path }))
+      closePicker();
   };
   $("presentation-choice").hidden = true;
   $("presentation-load").hidden = true;
@@ -184,9 +186,9 @@ export function mountPresentations({ call, update }: MountOptions) {
       refreshing = false;
     }
   }, 3000);
-  async function run(op: string, body: unknown = {}) {
+  async function run(...[path, ...args]: PresentationCommand) {
     try {
-      const result = await call("presentation/" + op, body);
+      const result = await call(path, ...args);
       update(result);
       return true;
     } catch (caught) {
@@ -218,9 +220,9 @@ export function mountPresentations({ call, update }: MountOptions) {
     relatedParent = parent || "";
     try {
       if (!preparing() && parent === data.presentation!.current)
-        await run("detour", { id });
-      else if (await run("select", { id })) {
-        if (!preparing()) await run("show");
+        await run("presentation/detour", { id });
+      else if (await run("presentation/select", { id })) {
+        if (!preparing()) await run("presentation/show");
       }
     } finally {
       navigating = false;
@@ -257,12 +259,13 @@ export function mountPresentations({ call, update }: MountOptions) {
     try {
       if (preparing()) {
         const id = neighbour(direction);
-        if (id) await run("select", { id });
+        if (id) await run("presentation/select", { id });
       } else if (direction === "previous" && data.presentation!.canPrevious)
-        await run("previous");
+        await run("presentation/previous");
       else {
         const id = neighbour(direction);
-        if (id && (await run("select", { id }))) await run("show");
+        if (id && (await run("presentation/select", { id })))
+          await run("presentation/show");
       }
     } finally {
       if (keyboard) revealSelectedSlide();
@@ -325,7 +328,9 @@ export function mountPresentations({ call, update }: MountOptions) {
     }
   };
   $("presentation-load").onclick = async () => {
-    if (await run("load", { path: $("presentation-choice").value })) {
+    if (
+      await run("presentation/load", { path: $("presentation-choice").value })
+    ) {
       closePicker();
       name.focus({ preventScroll: true });
     }
@@ -338,7 +343,7 @@ export function mountPresentations({ call, update }: MountOptions) {
     button.id = "graph-" + id;
     button.textContent = label;
     $("graph-close").after(button);
-    button.onclick = () => run(op);
+    button.onclick = () => run(`presentation/${op}`);
   }
   const syncNotice = document.createElement("span");
   syncNotice.role = "status";
@@ -351,10 +356,11 @@ export function mountPresentations({ call, update }: MountOptions) {
     ["open", "poll-open"],
     ["close", "poll-close"],
   ] as const)
-    $("graph-" + id).onclick = () => run(op);
+    $("graph-" + id).onclick = () => run(`presentation/${op}`);
   $("graph-next").onclick = () => navigate("next");
   $("graph-previous").onclick = () => navigate("previous");
-  $("graph-build").onclick = () => run("build", { model: $("model").value });
+  $("graph-build").onclick = () =>
+    run("presentation/build", { model: $("model").value });
   return (value: DeskState) => {
     data = value;
     const p = data.presentation;

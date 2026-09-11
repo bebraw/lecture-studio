@@ -70,6 +70,7 @@ test("slide numbering includes detours while progress follows the lecture path",
     ],
   };
   const session = new PresentationSession(parsePresentation(note(d)), "test");
+  assert.deepEqual(session.state().outline, d.steps);
   assert.deepEqual(session.position(), { number: 1, total: 4, progress: 0.5 });
   session.move("detour", "aside");
   assert.equal(session.position().progress, 0.5);

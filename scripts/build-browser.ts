@@ -11,6 +11,7 @@ await build({
   outdir: ".local/browser",
   outbase: ".",
   bundle: true,
+  minify: true,
   format: "esm",
   platform: "browser",
   target: "es2022",

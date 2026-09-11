@@ -1,5 +1,14 @@
 import type { Stage, Theme, BuildState } from "../shared/models.ts";
-import type { ApiResponse } from "../shared/api.ts";
+import {
+  parseApiResponse,
+  validateApiRequest,
+  requestSchemas,
+  type ApiResponse,
+  type ApiPath,
+  type ApiArgs,
+} from "../shared/api.ts";
+import { safeParse } from "valibot";
+import { errorSchema } from "../shared/schemas.ts";
 import type { Mermaid } from "mermaid";
 import { all } from "./dom.ts";
 export function applyTheme(element: HTMLElement, theme: Partial<Theme> = {}) {
@@ -99,11 +108,17 @@ export function auth(role: string) {
   }
   return token;
 }
-export async function api<P extends string>(
+export async function api<P extends ApiPath>(
   token: string,
   path: P,
-  value?: unknown,
+  ...args: ApiArgs<P>
 ): Promise<ApiResponse<P>> {
+  const value =
+    args[0] ??
+    (path !== "feedback" && Object.hasOwn(requestSchemas, path)
+      ? {}
+      : undefined);
+  if (value !== undefined) validateApiRequest(path, value);
   const response = await fetch("/api/" + path, {
     signal: AbortSignal.timeout(65000),
     headers: {
@@ -114,9 +129,12 @@ export async function api<P extends string>(
       ? {}
       : { method: "POST", body: JSON.stringify(value) }),
   });
-  const data = await response.json();
-  if (!response.ok) throw new Error(data.error || "Request failed");
-  return data;
+  const data: unknown = await response.json();
+  if (!response.ok) {
+    const error = safeParse(errorSchema, data);
+    throw new Error(error.success ? error.output.error : "Request failed");
+  }
+  return parseApiResponse(path, data);
 }
 const diagrams: Record<string, string> = {
   ages: '<div class="diagram ages"><div><span class="diagram-number">01</span><h3>Document</h3><p>Address it.<br>Link to it.<br>Act through a form.</p></div><b aria-hidden="true">→</b><div><span class="diagram-number">02</span><h3>Application</h3><p>Share state.<br>Improve feedback.<br>Keep the core.</p></div><b aria-hidden="true">→</b><div><span class="diagram-number">03</span><h3>Agentic</h3><p>Expose actions.<br>Compose context.<br>Verify the result.</p></div><footer>The capability survives. The interface changes.</footer></div>',

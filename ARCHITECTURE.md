@@ -22,7 +22,10 @@ an explicit allowlist and excludes the desk, saved material and configuration.
 
 `quality:architecture` enforces runtime import directions. Browser and Worker code
 can import shared contracts, but cannot import the local Node runtime. Shared API
-contracts may derive local types using erased type-only imports. Scripts and test
+contracts use Valibot schemas to validate incoming commands and browser responses;
+the endpoint map ties each request body to its response type. Desk response types
+are inferred from the same schemas and checked against the server implementation.
+Unvalidated input remains `unknown` until parsing succeeds. Scripts and test
 fixtures can coordinate multiple runtimes without becoming production imports.
 
 ## State and publication

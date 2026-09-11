@@ -1,3 +1,4 @@
+import type { ApiBody } from "../shared/api.ts";
 import type { MountOptions } from "../shared/api.ts";
 import type { FeedbackSnapshot } from "../shared/models.ts";
 import { query, byId } from "./dom.ts";
@@ -57,7 +58,7 @@ export function mountFeedback({ call, update }: MountOptions) {
         )
         .join("") || "<p>No responses.</p>";
   };
-  const act = async (action: string, id?: string) => {
+  const act = async (action: ApiBody<"feedback">["action"], id?: string) => {
     if (busy) return;
     if (
       action === "start" &&
@@ -70,7 +71,7 @@ export function mountFeedback({ call, update }: MountOptions) {
     try {
       const result = await call("feedback", {
         action,
-        id,
+        ...(id === undefined ? {} : { id }),
         mode: $("feedback-mode").value,
         prompt: $("feedback-prompt").value,
       });
@@ -95,7 +96,9 @@ export function mountFeedback({ call, update }: MountOptions) {
     const button = (e.target as Element).closest<HTMLButtonElement>(
       "button[data-action]",
     );
-    if (button) void act(button.dataset.action ?? "", button.dataset.id);
+    const action = button?.dataset.action;
+    if (action === "approve" || action === "done" || action === "show-question")
+      void act(action, button?.dataset.id);
   };
   document.addEventListener("keydown", (e) => {
     if (e.key === "Escape" && menu.open) {

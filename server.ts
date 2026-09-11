@@ -1,3 +1,4 @@
+import { validateApiRequest, type DeskState } from "./shared/api.ts";
 import type { ServerResponse } from "node:http";
 import type { AddressInfo } from "node:net";
 import type {
@@ -216,7 +217,7 @@ export function createStudio({
     res.writeHead(status, { "content-type": "application/json" });
     res.end(JSON.stringify(value));
   };
-  const deskState = () => ({
+  const deskState = (): DeskState => ({
     live,
     projection: publicState(),
     audienceSync: { error: audienceSync.error },
@@ -397,6 +398,7 @@ export function createStudio({
         if (req.method !== "POST" || req.headers.origin !== origin)
           return json(res, { error: "Same-origin POST required" }, 403);
         const body = await readJson(req);
+        validateApiRequest(url.pathname.slice("/api/".length), body);
         if (url.pathname === "/api/feedback") {
           if (graphBusy || liveTransition)
             throw new Error("Wait for the current stage update");

@@ -37,7 +37,7 @@ let explorer: ReturnType<typeof mountExplorer>;
 let updatePresentation: ReturnType<typeof mountPresentations>;
 let syncLectureSlide: (() => void) | undefined;
 let updateBuildSlide: ((state: BridgeState) => void) | undefined;
-const call: ApiClient = (path, value) => api(token, path, value);
+const call: ApiClient = (path, ...args) => api(token, path, ...args);
 function notice(text: string, error = false) {
   $("notice").hidden = false;
   $("notice").textContent = text;
@@ -126,7 +126,7 @@ function drawPlot() {
       (button) =>
         (button.onclick = async () => {
           try {
-            state = await call("act", { act: button.dataset.act });
+            state = await call("act", { act: button.dataset.act ?? "" });
             drawPlot();
             $("beat-title").textContent = beat().title;
             $("beat-question").textContent = beat().question;
@@ -330,7 +330,7 @@ function drawRequests(requests: ApprovalRequest[]) {
         }
       }
     }
-    const choices: [string, string][] =
+    const choices: ["accept" | "answer" | "decline", string][] =
       request.method === "item/tool/requestUserInput"
         ? [["answer", "Send answers"]]
         : request.method === "item/permissions/requestApproval"
@@ -932,18 +932,20 @@ function setupModes() {
       const slide = audienceSlides[index];
       if (!slide) throw new Error("Missing lecture slide");
       const [, title, body] = slide;
+      const act = slideActs[index];
+      if (!act) throw new Error("Missing lecture act");
       if (voteSlides.has(index)) {
         updateRuntime(await call("poll/select", { id: voteSlides.get(index) }));
       }
       const data = await call("publish", {
         ...draft(),
-        act: slideActs[index],
+        act,
         mode: buildSlides.has(index) ? "brief" : "question",
         title,
         body: buildSlides.has(index) ? promptFor(index) : body,
         source: "",
       });
-      state = await call("act", { act: slideActs[index] });
+      state = await call("act", { act });
       slideIndex = index;
       fields(data.draft);
       preview(data);
@@ -1126,9 +1128,9 @@ function setupPoll() {
       }),
     ),
   );
-  for (const op of ["open", "lock", "show"])
+  for (const op of ["open", "lock", "show"] as const)
     action("poll-" + op, async () =>
-      updateRuntime(await call("poll/" + op, {})),
+      updateRuntime(await call(`poll/${op}`, {})),
     );
   action("poll-add", async () => {
     const { text } = await call("poll/receipt", {});
