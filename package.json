@@ -25,7 +25,10 @@
     "diagnostics:health": "fallow health --score --hotspots --targets --no-cache",
     "diagnostics:map": "fallow viz --out .fallow/codebase-map.html --no-open --no-cache",
     "test:coverage": "c8 node --import tsx --test tests/*.test.ts",
-    "quality:architecture": "node --import tsx scripts/check-architecture.ts"
+    "quality:architecture": "node --import tsx scripts/check-architecture.ts",
+    "mutation": "stryker run",
+    "mutation:incremental": "stryker run --incremental",
+    "quality:gate:deep": "npm run check && npm run mutation"
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "1.30.0",

@@ -5,6 +5,6 @@
   "reports-dir": "reports/coverage",
   "check-coverage": true,
   "lines": 80,
-  "branches": 70,
+  "branches": 75,
   "functions": 85
 }

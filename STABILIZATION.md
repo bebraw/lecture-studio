@@ -48,7 +48,7 @@ of their callers. They must not be deleted based on an unused-member report.
 ## Branch coverage
 
 `npm run test:coverage` generates HTML, LCOV and JSON reports under
-`reports/coverage` and enforces 80% lines, 70% branches and 85% functions.
+`reports/coverage` and enforces 80% lines, 75% branches and 85% functions.
 The measured scope is local runtime code (`server.ts`, `lib`, shared error helpers),
 including unloaded files. Type-only contracts have no executable coverage.
 Browser behavior is checked separately by Playwright; this report does not claim
@@ -63,3 +63,22 @@ browser to server or Worker, nor between local and Worker runtimes. Shared API
 contracts may derive local types through erased type-only imports. Diagnostics
 remain advisory; forbidden imports alone block this gate. A deliberately injected
 browser-to-server import was rejected, then removed before committing.
+
+## Mutation testing
+
+Stryker uses the TAP runner with the existing Node tests and TypeScript checker.
+The full scope is `lib/audience-poll.ts`, `lib/audience-stage.ts`,
+`lib/presentation.ts`, `lib/feedback.ts`, and `audience/room-state.ts`.
+The initial score was 48.70%; stronger validation/privacy/vote assertions raised it
+to 70.57% (voting store: 80.92%). The enforced floor is 70%. No mutation categories
+were excluded to increase this score. The report retains 284 surviving and 23
+uncovered mutants for follow-up, including message/content changes and remaining
+validation cases; compile-error mutants are filtered by the TypeScript checker.
+
+`npm run mutation` runs a fresh full pass. `mutation:incremental` is opt-in locally.
+Local concurrency uses 50% of available parallelism. CI runs mutation separately
+from the deployment and pre-push gates and retains the HTML/JSON reports for 14 days.
+The TAP runner measures coverage per test file and has limited static-mutant
+coverage; this is a targeted assertion-strength signal, not a proof of correctness.
+Final local runtime coverage: 86.25% lines, 81.12% branches, 92.66% functions;
+44 unit/integration tests and 12 browser tests pass.

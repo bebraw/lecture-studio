@@ -265,3 +265,19 @@ CI uses the baseline in `.nvmrc`. Dependency versions are pinned in both lockfil
 Pull requests and branch pushes run the full check. The production workflow runs
 that same check before deploying the audience Worker. Browser tests use isolated
 local fixtures and do not submit votes to the public lecture.
+
+Additional checks:
+
+- `npm run lint`: Oxlint, enforced in the fast gate.
+- `npm run diagnostics:codebase`, `diagnostics:health`, `diagnostics:map`: advisory
+  Fallow analysis; the map is written to `.fallow/codebase-map.html`.
+- `npm run quality:architecture`: reject forbidden imports between runtime zones.
+- `npm run test:coverage`: local-runtime branch coverage and reports in
+  `reports/coverage/index.html`, enforced in the fast gate.
+- `npm run mutation`: focused mutation analysis of voting, decisions and audience
+  privacy; `npm run mutation:incremental` reuses prior results for explicit local runs.
+  Reports are written to `reports/mutation/index.html`. Mutation is a separate CI
+  job and is intentionally outside the pre-push gate.
+
+TypeScript 7 remains the project compiler. The TypeScript 6 compatibility package
+supplies the compiler API required by Stryker and its compile-error checker.

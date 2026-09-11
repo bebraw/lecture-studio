@@ -9,6 +9,8 @@ const result = spawnSync(
   { encoding: "utf8", maxBuffer: 10 * 1024 * 1024 },
 );
 if (result.error) throw result.error;
+if (result.status !== 0 && result.status !== 1)
+  throw new Error("Fallow analysis failed: " + result.stderr);
 const report = record(JSON.parse(result.stdout));
 const violations = [
   "boundary_violations",

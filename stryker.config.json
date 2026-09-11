@@ -1,0 +1,40 @@
+{
+  "$schema": "./node_modules/@stryker-mutator/core/schema/stryker-schema.json",
+  "testRunner": "tap",
+  "tap": {
+    "testFiles": [
+      "tests/audience-poll.test.ts",
+      "tests/audience-stage.test.ts",
+      "tests/presentation.test.ts",
+      "tests/feedback.test.ts",
+      "tests/feedback-request.test.ts",
+      "tests/room-session.test.ts"
+    ],
+    "nodeArgs": ["--import", "tsx", "--test-reporter=tap"]
+  },
+  "mutate": [
+    "lib/audience-poll.ts",
+    "lib/audience-stage.ts",
+    "lib/presentation.ts",
+    "lib/feedback.ts",
+    "audience/room-state.ts"
+  ],
+  "coverageAnalysis": "perTest",
+  "concurrency": "50%",
+  "reporters": ["clear-text", "progress", "html", "json"],
+  "htmlReporter": {
+    "fileName": "reports/mutation/index.html"
+  },
+  "jsonReporter": {
+    "fileName": "reports/mutation/mutation.json"
+  },
+  "incrementalFile": "reports/mutation/incremental.json",
+  "tempDirName": ".stryker-tmp",
+  "cleanTempDir": "always",
+  "thresholds": {
+    "high": 90,
+    "low": 80,
+    "break": 70
+  },
+  "checkers": ["typescript"]
+}
