@@ -302,3 +302,7 @@ measurements. See [the baseline and budgets](docs/performance.md).
 
 Local GitHub Actions: `npm run ci:local` runs the existing check workflow in
 Docker. See [setup and retry instructions](docs/local-ci.md).
+
+Architecture: [runtime boundaries](ARCHITECTURE.md) and
+[accepted decisions](docs/adrs/README.md) describe privacy, voting and build
+behavior that refactoring must preserve.

@@ -82,3 +82,21 @@ The TAP runner measures coverage per test file and has limited static-mutant
 coverage; this is a targeted assertion-strength signal, not a proof of correctness.
 Final local runtime coverage: 86.25% lines, 81.12% branches, 92.66% functions;
 44 unit/integration tests and 12 browser tests pass.
+
+## Additional template practices
+
+The compiler now enables `noUncheckedIndexedAccess` and
+`exactOptionalPropertyTypes`. Array lookups are guarded, fixed UI rows use tuples,
+and absent optional values are omitted or modeled as explicit lifecycle state.
+The post-change mutation score is 70.58%, above the existing 70% floor.
+
+Changed-file checks retain the full CI baseline and conservatively fall back for
+configuration changes or unknown history. Lighthouse records three-run medians
+and initial advisory budgets for the audience and stage. The existing check
+workflow also passes through Local CI on Linux with Node 24, including all
+47 unit/integration tests and 12 browser tests.
+
+See [architecture](ARCHITECTURE.md), [decisions](docs/adrs/README.md),
+[local CI](docs/local-ci.md), and [performance baselines](docs/performance.md) for
+the current contracts and operational details. Earlier measurements above record
+the migration stages rather than current test counts.
