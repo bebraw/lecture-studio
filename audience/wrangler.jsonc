@@ -1,6 +1,8 @@
 {
   "$schema":"node_modules/wrangler/config-schema.json",
-  "name":"lecture-studio-audience",
+  "name":"lecture-votes-20260909-bfbeb2745cce",
+  "account_id":"3118f9560af77a0819ba24e1a14bcc9e",
+  "routes":[{"pattern":"live.scalableweb.dev","zone_name":"scalableweb.dev","custom_domain":true}],
   "main":"worker.ts",
   "compatibility_date":"2026-09-04",
   "workers_dev":true,
