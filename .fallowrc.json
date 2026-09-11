@@ -6,7 +6,6 @@
     "public/stage.ts",
     "audience/audience.ts",
     "audience/worker.ts",
-    "audience/check-*.ts",
     "audience/setup-local.ts",
     "audience/connect-studio.ts",
     "audience/verify-deployed.ts",

@@ -27,8 +27,10 @@ No names or raw IP addresses are stored. The queue and hashed limiter data expir
 after 24 hours; already projected snapshots remain until you change the stage.
 Cloudflare's storage recovery window may retain recoverable data beyond deletion.
 
-Run `node --import tsx audience/check-feedback.ts` against an isolated Worker on port 8796
-for the local-only acceptance test. It never targets the public lecture.
+Run `npm run test:browser -- browser-tests/audience.spec.ts` for the audience acceptance tests.
+They start disposable local Workers with generated credentials and random ports,
+exercise real Durable Object storage, and never target the public lecture.
+These tests also run in CI as part of `npm run check`.
 
 Students join at **https://live.scalableweb.dev**. The projected stage keeps this
 address in its footer on every slide, alongside attribution and build progress.

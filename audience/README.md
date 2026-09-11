@@ -20,8 +20,14 @@ The dedicated rehearsal was deployed on 2026-09-09. Its identity/version is save
 
 Local HTTP checks cover allowlisted rooms, auth, origin rejection, vote replacement, seed idempotence and locking. A real local browser verifies native form submission. The first public smoke submission was rejected with HTTP 403 because a no-referrer policy stripped its origin. The fix uses same-origin and was deployed; a read-only public check confirms the corrected header. No second public vote was sent. Public end-to-end submission and prompt-impact verification remain pending a manual test or explicit retry authorization.
 
-Run check-local.ts and check-browser.ts only against the hardcoded local test port 8796. verify-deployed.ts records a public attempt before submitting and refuses to repeat an existing attempt; do not delete that receipt to retry. connect-studio.ts saves private configuration without printing secrets.
-
-check-stage.ts tests stage following, privacy filtering, independent voting, preserved form selection, native cookie-backed submission, and return to stage at mobile size. It only mutates the isolated local runtime. The studio unit suite also verifies that private navigation does not broadcast and poll refresh does not replace an unrelated projection.
+Run `npm run test:browser -- browser-tests/audience.spec.ts` from the repository root.
+Each test starts an isolated Worker with real SQLite-backed Durable Objects, generated
+credentials, random ports, and no persisted data. CI runs the same tests. They cover
+all three rooms, JavaScript-disabled native submission, same-browser replacement,
+lecture-session reset/retry, stage following, privacy filtering, retained selection,
+feedback moderation and submission limits. No local secret files or deployed
+resources are needed. `verify-deployed.ts` remains a separate, deliberate public
+smoke test that records each attempt; do not delete its receipt to retry.
+`connect-studio.ts` saves private configuration without printing secrets.
 
 The pinned Wrangler development dependency currently reports three high-severity advisories through Miniflare's sharp image-decoder dependency. No image decoding is used here, and that dependency is not bundled into the deployed Worker. Do not use this dev toolchain to process untrusted images; dependency remediation remains a tooling follow-up.
