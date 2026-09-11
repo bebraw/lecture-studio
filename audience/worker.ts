@@ -10,7 +10,6 @@ const rooms:Record<string,{question:string;choices:{id:string;label:string}[]}>=
  "webdev-2026":{question:"Which visual theme should shape our app?",choices:[{id:"editorial",label:"Editorial"},{id:"retro-web",label:"Retro web"},{id:"playful",label:"Playful"}]},
  "webdev-2026-priority":{question:"What should the seminar view prioritize?",choices:[{id:"overview",label:"Quick overview"},{id:"learning",label:"Learning outcomes"},{id:"practical",label:"Practical details"}]}
 };
-const css="body{font:18px/1.5 system-ui,sans-serif;max-width:42rem;margin:2rem auto;padding:0 1rem;color:#202020;background:white}h1{font-size:1.6rem}fieldset{border:1px solid #aaa;padding:1rem}fieldset div{padding:.6rem 0}button{font:inherit;padding:.6rem 1.2rem;margin-top:1rem}a{color:inherit}input{margin-right:.5rem}";
 function html(title:string,body:string){return new Response('<!doctype html><html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>'+title+'</title><link rel="stylesheet" href="/style.css"><main><h1>'+title+'</h1>'+body+'</main></html>',{headers:{"content-type":"text/html;charset=utf-8","cache-control":"no-store","content-security-policy":"default-src 'none'; style-src 'self'; form-action 'self'; base-uri 'none'; frame-ancestors 'none'","x-content-type-options":"nosniff","referrer-policy":"same-origin"}});}
 async function authorized(request:Request,secret:string){
  if(!secret||secret.length<32)return false;

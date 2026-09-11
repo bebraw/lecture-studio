@@ -27,7 +27,7 @@ No names or raw IP addresses are stored. The queue and hashed limiter data expir
 after 24 hours; already projected snapshots remain until you change the stage.
 Cloudflare's storage recovery window may retain recoverable data beyond deletion.
 
-Run `node audience/check-feedback.mjs` against an isolated Worker on port 8796
+Run `node --import tsx audience/check-feedback.ts` against an isolated Worker on port 8796
 for the local-only acceptance test. It never targets the public lecture.
 
 Students join at **https://live.scalableweb.dev**. The projected stage keeps this
@@ -242,3 +242,13 @@ With Live on, **Show on stage** starts an owned Cloudflare Quick Tunnel for the 
 Install cloudflared (`brew install cloudflared` on macOS), or set LECTURE_CLOUDFLARED_BIN. A failed tunnel start is reported without replacing the projected slide. The studio’s own port cannot be tunneled. Students keep using https://live.scalableweb.dev; no audience Worker update is needed for this feature. Keep the app server and studio running. New tunnel hostnames may take time to appear in DNS; networks that block trycloudflare.com need an allowed network or a configured named tunnel.
 
 Quick Tunnels are temporary demo infrastructure, with a 200 concurrent request limit and no Server-Sent Events support. Apps that prohibit iframe embedding can be opened through the separate app link. See [Cloudflare Quick Tunnels](https://developers.cloudflare.com/cloudflare-one/networks/connectors/cloudflare-tunnel/do-more-with-tunnels/trycloudflare/).
+
+## TypeScript development
+
+All maintained runtime code, browser modules, tests, and tools use TypeScript.
+Run `npm ci` and `npm ci --prefix audience` before development.
+`npm run typecheck` generates Worker bindings and checks both runtime environments
+with strict typing, unused-code checks, complete returns, and switch-fallthrough checks.
+`npm run build` compiles browser entry points into ignored `.local/browser` assets.
+`npm start` and the browser tests build those assets automatically. Run standalone
+TypeScript tools with `node --import tsx path/to/tool.ts`.

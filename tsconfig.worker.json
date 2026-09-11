@@ -1,0 +1,17 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "lib": [
+      "ES2023"
+    ],
+    "types": []
+  },
+  "include": [
+    "audience/worker.ts",
+    "audience/room-*.ts",
+    "audience/stage-state.ts",
+    "audience/feedback-http.ts",
+    "audience/worker-configuration.d.ts"
+  ],
+  "exclude": []
+}

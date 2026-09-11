@@ -1,3 +1,4 @@
+import {asError} from "../shared/errors.ts";
 async function readBody(request:Request){
  const reader=request.body?.getReader();if(!reader)throw new Error("Expected JSON");
  const chunks:Uint8Array[]=[];let size=0;
@@ -24,5 +25,5 @@ export async function feedbackRequest(request:Request,env:Env,admin:boolean){
    const result=await object.feedbackSubmit(body.round,body.text,await hash(id),await hash(request.headers.get("cf-connecting-ip")||"local"));
    const cookie=existing?{}:{"set-cookie":"lecture_feedback="+id+"; Path=/; HttpOnly; SameSite=Strict; Max-Age=86400"+(url.protocol==="https:"?"; Secure":"")};
    return json(result.error?{error:result.error}:{ok:true},result.status,cookie);
- }catch(error){return json({error:error instanceof Error?error.message:"Feedback unavailable"},400);}
+ }catch (caught) { const error = asError(caught);return json({error:error instanceof Error?error.message:"Feedback unavailable"},400);}
 }

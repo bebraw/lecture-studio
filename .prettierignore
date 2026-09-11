@@ -1,0 +1,10 @@
+node_modules
+.local
+.git
+audience/node_modules
+audience/.wrangler
+audience/worker-configuration.d.ts
+test-results
+playwright-report
+package-lock.json
+audience/package-lock.json

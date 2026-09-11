@@ -8,7 +8,7 @@
   "workers_dev":true,
   "preview_urls":false,
   "secrets":{"required":["PRESENTER_TOKEN"]},
-  "build":{"command":"node build-assets.mjs"},
+  "build":{"command":"node --import tsx build-assets.ts"},
   "assets":{"directory":"../.local/audience/assets","binding":"ASSETS","run_worker_first":true},
   "durable_objects":{"bindings":[{"name":"ROOM_STATE","class_name":"RoomState"},{"name":"STAGE_STATE","class_name":"StageState"}]},
   "migrations":[{"tag":"v1","new_sqlite_classes":["RoomState"]},{"tag":"v2","new_sqlite_classes":["StageState"]}]

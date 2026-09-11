@@ -1,0 +1,45 @@
+{
+  "compilerOptions": {
+    "target": "ES2023",
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "lib": [
+      "ES2023",
+      "DOM",
+      "DOM.Iterable"
+    ],
+    "types": [
+      "node"
+    ],
+    "strict": true,
+    "noEmit": true,
+    "skipLibCheck": true,
+    "allowImportingTsExtensions": true,
+    "verbatimModuleSyntax": true,
+    "noImplicitOverride": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noFallthroughCasesInSwitch": true,
+    "noImplicitReturns": true
+  },
+  "include": [
+    "server.ts",
+    "playwright.config.ts",
+    "lib/**/*.ts",
+    "shared/**/*.ts",
+    "public/**/*.ts",
+    "scripts/**/*.ts",
+    "tests/**/*.ts",
+    "browser-tests/**/*.ts",
+    "document-a/**/*.ts",
+    "audience/*-*.ts",
+    "audience/audience.ts"
+  ],
+  "exclude": [
+    "audience/worker.ts",
+    "audience/room-*.ts",
+    "audience/stage-state.ts",
+    "audience/feedback-http.ts",
+    "audience/worker-configuration.d.ts"
+  ]
+}

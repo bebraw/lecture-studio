@@ -52,7 +52,7 @@ export class StageState extends DurableObject<Env> {
    sql.exec("INSERT INTO feedback_items VALUES (?,?,?,?,?,?,?)",crypto.randomUUID(),round,text,"pending",voter,network,now);
    return {status:201};
  }
- async alarm(){
+ override async alarm(){
    const row=this.ctx.storage.sql.exec<{expires:number}>("SELECT expires FROM feedback_meta WHERE id=1").toArray()[0];
    if(row&&row.expires>Date.now()){await this.ctx.storage.setAlarm(row.expires);return;}
    this.ctx.storage.sql.exec("DELETE FROM feedback_items");
