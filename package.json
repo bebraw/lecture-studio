@@ -10,12 +10,16 @@
     "start": "npm run build && node --import tsx --env-file-if-exists=.env server.ts",
     "test": "node --import tsx --test tests/*.test.ts",
     "test:browser": "npm run build && playwright test",
-    "check": "npm run typecheck && npm test && npm run test:browser",
+    "check": "npm run quality:gate:fast && npm run build:worker && npm run test:browser",
     "build": "node --import tsx scripts/build-browser.ts",
     "typecheck": "npm run typegen && tsc -p tsconfig.json && tsc -p tsconfig.worker.json",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
-    "typegen": "npm run types --prefix audience"
+    "typegen": "npm run types --prefix audience",
+    "audit:runtime": "npm audit --omit=dev --audit-level=high && npm audit --prefix audience --omit=dev --audit-level=high",
+    "quality:gate:fast": "npm run format:check && npm run typecheck && npm test && npm run audit:runtime",
+    "build:worker": "npm run build --prefix audience",
+    "hooks:install": "git config core.hooksPath .githooks"
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "1.30.0",

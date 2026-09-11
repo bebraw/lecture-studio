@@ -20,3 +20,15 @@ has its own runtime configuration and generated Cloudflare bindings. Browser ass
 are compiled with esbuild; the local service runs through the tsx loader.
 
 Validation: strict checks, 32 unit/integration tests, and all 12 browser tests pass.
+
+## Quality gates
+
+Use the template's separate fast and full checks with the existing Node test runner.
+The fast gate checks formatting, both strict TypeScript environments, unit/integration
+behavior, and production dependency advisories. The full gate adds a Worker dry run
+and all browser tests. Local pre-push checks and CI use these same scripts.
+
+The local API reads JSON into unknown-valued records and validates command fields
+before use. Its transport reader is separate from lecture orchestration. Invalid
+build/approval payloads have regression coverage. No framework or test-runner rewrite
+is required for this baseline.

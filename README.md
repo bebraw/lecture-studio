@@ -252,3 +252,16 @@ with strict typing, unused-code checks, complete returns, and switch-fallthrough
 `npm run build` compiles browser entry points into ignored `.local/browser` assets.
 `npm start` and the browser tests build those assets automatically. Run standalone
 TypeScript tools with `node --import tsx path/to/tool.ts`.
+
+The development baseline is Node 24 (`nvm use`). Newer Node releases are allowed;
+CI uses the baseline in `.nvmrc`. Dependency versions are pinned in both lockfiles.
+
+- `npm run quality:gate:fast`: formatting, strict types, unit/integration tests,
+  and production dependency audits (high/critical advisories fail the gate).
+- `npm run check`: the fast gate, a non-deploying Worker build, and all browser tests.
+- `npm run hooks:install`: install the repository's pre-push hook, which runs the
+  fast gate. Run this once in each checkout after installing dependencies.
+
+Pull requests and branch pushes run the full check. The production workflow runs
+that same check before deploying the audience Worker. Browser tests use isolated
+local fixtures and do not submit votes to the public lecture.
