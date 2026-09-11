@@ -1,10 +1,7 @@
-import type { RoomChoice, RoomSnapshot, RoomStatus } from "./room-state";
+import type { RoomSnapshot } from "./room-state";
 import { renderRoomDocument } from "./room-view";
 
 type RoomEnvironment = Pick<Env, "ROOM_STATE">;
-type AuthorizeRoomAdministration = (
-  request: Request,
-) => Promise<boolean> | boolean;
 
 export interface RoomRequestOptions {
   allowedOrigins?: readonly string[];
@@ -18,13 +15,6 @@ const minimumCookieMaxAgeSeconds = 60;
 const voterCookieName = "room_voter";
 const voterIdPattern =
   /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/;
-
-class RoomAdministrationUnauthorizedError extends Error {
-  constructor() {
-    super("Room administration requires explicit authorization.");
-    this.name = "RoomAdministrationUnauthorizedError";
-  }
-}
 
 export async function handleRoomRequest(
   request: Request,
@@ -90,41 +80,6 @@ export async function readRoomSnapshot(
   return voterId
     ? await room.getSnapshot(await hashVoterKey(roomId, voterId))
     : await room.getSnapshot();
-}
-
-async function seedRoom(
-  request: Request,
-  env: RoomEnvironment,
-  roomId: string,
-  choices: RoomChoice[],
-  authorize: AuthorizeRoomAdministration,
-): Promise<RoomSnapshot> {
-  if (!(await authorize(request)))
-    throw new RoomAdministrationUnauthorizedError();
-  return await env.ROOM_STATE.getByName(roomId).seedChoices(choices);
-}
-
-async function resetRoom(
-  request: Request,
-  env: RoomEnvironment,
-  roomId: string,
-  authorize: AuthorizeRoomAdministration,
-): Promise<RoomSnapshot> {
-  if (!(await authorize(request)))
-    throw new RoomAdministrationUnauthorizedError();
-  return await env.ROOM_STATE.getByName(roomId).resetVotes();
-}
-
-async function setRoomStatus(
-  request: Request,
-  env: RoomEnvironment,
-  roomId: string,
-  status: RoomStatus,
-  authorize: AuthorizeRoomAdministration,
-): Promise<RoomSnapshot> {
-  if (!(await authorize(request)))
-    throw new RoomAdministrationUnauthorizedError();
-  return await env.ROOM_STATE.getByName(roomId).setStatus(status);
 }
 
 function parseRoomId(pathname: string): string | undefined {
