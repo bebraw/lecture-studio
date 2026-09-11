@@ -267,7 +267,7 @@ CI uses the baseline in `.nvmrc`. Dependency versions are pinned in both lockfil
   and production dependency audits (high/critical advisories fail the gate).
 - `npm run check`: the fast gate, a non-deploying Worker build, and all browser tests.
 - `npm run hooks:install`: install the repository's pre-push hook, which runs the
-  fast gate. Run this once in each checkout after installing dependencies.
+  affected-file checks. Run this once in each checkout after installing dependencies.
 
 Pull requests and branch pushes run the full check. The production workflow runs
 that same check before deploying the audience Worker. Browser tests use isolated
@@ -296,3 +296,6 @@ lint, architecture, and coverage, plus browser/Worker checks where relevant.
 Configuration changes, new branches, and unavailable remote history run
 `npm run check`. Deletions and renames count as changes. CI always runs the full
 baseline. Use `npm run quality:affected -- --dry-run` to inspect the plan.
+
+Performance: `npm run lighthouse` records repeatable local audience/stage
+measurements. See [the baseline and budgets](docs/performance.md).

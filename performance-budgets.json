@@ -1,0 +1,9 @@
+{
+  "audience": {
+    "lcpMs": 2000,
+    "cls": 0.05,
+    "tbtMs": 100,
+    "transferBytes": 22000
+  },
+  "stage": { "lcpMs": 2200, "cls": 0.05, "tbtMs": 100, "transferBytes": 75000 }
+}

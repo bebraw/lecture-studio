@@ -29,7 +29,9 @@
     "mutation": "stryker run",
     "mutation:incremental": "stryker run --incremental",
     "quality:gate:deep": "npm run check && npm run mutation",
-    "quality:affected": "node --import tsx scripts/run-affected-guardrails.ts"
+    "quality:affected": "node --import tsx scripts/run-affected-guardrails.ts",
+    "lighthouse": "node --import tsx scripts/run-lighthouse.ts",
+    "lighthouse:check": "npm run lighthouse -- --enforce"
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "1.30.0",
@@ -45,8 +47,10 @@
     "@types/markdown-it": "14.2.0",
     "@types/node": "24.13.4",
     "c8": "11.0.0",
+    "chrome-launcher": "1.2.1",
     "esbuild": "0.28.2",
     "fallow": "3.21.0",
+    "lighthouse": "13.4.1",
     "oxlint": "1.80.0",
     "prettier": "3.9.6",
     "tsx": "4.23.13",
