@@ -3,17 +3,16 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import { audienceStage, AudienceStageSync } from "../lib/audience-stage.ts";
 test("audience publication omits private fields and explains local demos", () => {
-  const stage = audienceStage({
-    ...{
-      title: "Demo",
-      mode: "demo",
-      demoUrl: "http://localhost:5173/",
-      brief: "PRIVATE",
-      notes: "PRIVATE",
-      codex: { messages: ["PRIVATE"] },
-      workspace: "PRIVATE",
-    },
-  });
+  const privateStage = {
+    title: "Demo",
+    mode: "demo",
+    demoUrl: "http://localhost:5173/",
+    brief: "PRIVATE",
+    notes: "PRIVATE",
+    codex: { messages: ["PRIVATE"] },
+    workspace: "PRIVATE",
+  };
+  const stage = audienceStage(privateStage);
   assert.equal(stage.mode, "material");
   assert.equal(stage.demoUrl, "");
   assert.doesNotMatch(JSON.stringify(stage), /PRIVATE|localhost/);

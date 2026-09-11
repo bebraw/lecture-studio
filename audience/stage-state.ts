@@ -105,6 +105,8 @@ export class StageState extends DurableObject<Env> {
       return { status: 409, error: "Collection is closed" };
     text = text
       .normalize("NFKC")
+      // Remove control and bidi characters from audience submissions.
+      // oxlint-disable-next-line no-control-regex
       .replace(/[\u0000-\u001f\u007f-\u009f\u202a-\u202e\u2066-\u2069]/g, " ")
       .replace(/\s+/g, " ")
       .trim();

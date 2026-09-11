@@ -66,7 +66,8 @@ export class PreviewTunnel {
         const finish = (error?: Error) => {
           clearTimeout(timer);
           this.cancel = null;
-          error ? reject(error) : resolve(publicOrigin);
+          if (error) reject(error);
+          else resolve(publicOrigin);
         };
         this.cancel = () => finish(new Error("Preview sharing cancelled"));
         proc = this.spawnProcess(

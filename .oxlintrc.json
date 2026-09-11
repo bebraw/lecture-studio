@@ -1,0 +1,10 @@
+{
+  "$schema": "./node_modules/oxlint/configuration_schema.json",
+  "ignorePatterns": [
+    ".local/**",
+    "audience/.wrangler/**",
+    "audience/worker-configuration.d.ts",
+    "reports/**",
+    ".stryker-tmp/**"
+  ]
+}

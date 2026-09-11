@@ -95,7 +95,7 @@ export function renderMarkdown(
     /!?\[\[([^\]]+)\]\]/g,
     (_all: string, target: string) => {
       const label = (target.split("|").at(-1) ?? "").split("/").at(-1) ?? "";
-      return label.replace(/[<>*_\[\]]/g, "");
+      return label.replace(/[<>*_[\]]/g, "");
     },
   );
   return md.render(text);
