@@ -21,8 +21,15 @@ test("prepared checkpoints support native replacement, shared updates and an hon
     await document
       .getByLabel("Experience", { exact: true })
       .selectOption("new");
-    await document.getByLabel("learning", { exact: true }).check();
     await document.getByLabel("talk", { exact: true }).check();
+    await document.getByRole("button", { name: "Submit response" }).click();
+    await expect(document.getByRole("alert")).toContainText(
+      "at least one listed topic",
+    );
+    await expect(
+      document.getByLabel("Experience", { exact: true }),
+    ).toHaveValue("new");
+    await document.getByLabel("learning", { exact: true }).check();
     await document.getByRole("button", { name: "Submit response" }).click();
     await expect(document).toHaveURL(/\/results$/);
     await expect(document.locator("#prepared-aggregate")).toContainText(
