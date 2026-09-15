@@ -89,9 +89,7 @@ const messageSchema = v.object({
 import { asError } from "../shared/errors.ts";
 import { spawn } from "node:child_process";
 import { EventEmitter } from "node:events";
-import { realpath, stat } from "node:fs/promises";
-import { resolve, parse as parsePath } from "node:path";
-import { homedir } from "node:os";
+import { validateWorkspace } from "./rehearsals.ts";
 import { readCodexConfig } from "./obsidian.ts";
 
 function stopOwnedProcess(proc: ChildProcess | undefined | null) {
@@ -110,6 +108,7 @@ function stopOwnedProcess(proc: ChildProcess | undefined | null) {
 export class CodexBridge extends EventEmitter {
   binary: string;
   spawnProcess: SpawnProcess;
+  validateWorkspace: typeof validateWorkspace;
   pending: Map<
     string | number,
     {
@@ -128,10 +127,16 @@ export class CodexBridge extends EventEmitter {
   constructor({
     binary = process.env.LECTURE_CODEX_BIN || "codex",
     spawnProcess = spawn,
-  }: { binary?: string; spawnProcess?: SpawnProcess } = {}) {
+    validateWorkspace: validate = validateWorkspace,
+  }: {
+    binary?: string;
+    spawnProcess?: SpawnProcess;
+    validateWorkspace?: typeof validateWorkspace;
+  } = {}) {
     super();
     this.binary = binary;
     this.spawnProcess = spawnProcess;
+    this.validateWorkspace = validate;
     this.pending = new Map();
     this.approvals = new Map();
     this.sequence = 1;
@@ -165,12 +170,7 @@ export class CodexBridge extends EventEmitter {
       throw new Error("Codex is already connected or connecting");
     this.connecting = true;
     try {
-      const path = await realpath(resolve(workspace));
-      if (
-        !(await stat(path)).isDirectory() ||
-        [homedir(), parsePath(path).root].includes(path)
-      )
-        throw new Error("Select a specific rehearsal project");
+      const path = await this.validateWorkspace(workspace);
       const config = await readCodexConfig();
       // The builder keeps project instructions, but has no automatic vault connector.
       const args = [

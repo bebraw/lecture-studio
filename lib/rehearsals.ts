@@ -6,12 +6,39 @@ type Run = (
   options: ExecFileOptions,
 ) => Promise<{ stdout: string | Buffer }>;
 import { asError } from "../shared/errors.ts";
-import { mkdir, readFile, writeFile } from "node:fs/promises";
+import { mkdir, readFile, writeFile, realpath } from "node:fs/promises";
+import { fileURLToPath } from "node:url";
 import { resolve, join } from "node:path";
 import { execFile } from "node:child_process";
 import { promisify } from "node:util";
 const exec = promisify(execFile);
 export const START_COMMIT = "6a5dae4e7bf7b0b510c525a91497cd6620869bbc";
+export async function validateWorkspace(workspace: string, run: Run = exec) {
+  const path = await realpath(resolve(workspace));
+  const controller = await realpath(
+    fileURLToPath(new URL("..", import.meta.url)),
+  );
+  if (path === controller || controller.startsWith(path + "/"))
+    throw new Error(
+      "The builder cannot use the studio checkout or its parent. Create a New rehearsal first.",
+    );
+  try {
+    await run("git", ["merge-base", "--is-ancestor", START_COMMIT, "HEAD"], {
+      cwd: path,
+      timeout: 5000,
+    });
+    const manifest = record(
+      JSON.parse(await readFile(join(path, "package.json"), "utf8")),
+    );
+    if (!record(manifest.scripts).dev)
+      throw new Error("Missing starter dev command");
+  } catch {
+    throw new Error(
+      "Select a checkout based on the reviewed lecture starter, or create a New rehearsal first.",
+    );
+  }
+  return path;
+}
 export class Rehearsals {
   root: string;
   run: Run;

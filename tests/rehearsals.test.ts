@@ -5,7 +5,11 @@ import assert from "node:assert/strict";
 import { mkdtemp, access } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { Rehearsals, START_COMMIT } from "../lib/rehearsals.ts";
+import {
+  Rehearsals,
+  START_COMMIT,
+  validateWorkspace,
+} from "../lib/rehearsals.ts";
 import { fixture } from "./fixture.ts";
 
 test("numbered checkouts retain earlier attempts and verify the pinned starter", async () => {
@@ -87,4 +91,16 @@ test("reset and fresh rehearsal are confirmed, private, and preserve the workspa
   const failed = await desk();
   assert.equal(failed.rehearsalJob.status, "failed");
   assert.equal(failed.workspace, "/fresh/rehearsal-001");
+});
+
+test("builder rejects the controller and unrelated workspaces", async () => {
+  await assert.rejects(
+    () => validateWorkspace(process.cwd()),
+    /studio checkout/,
+  );
+  const unrelated = await mkdtemp(join(tmpdir(), "unrelated-app-"));
+  await assert.rejects(
+    () => validateWorkspace(unrelated),
+    /reviewed lecture starter/,
+  );
 });

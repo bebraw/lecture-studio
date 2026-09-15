@@ -49,6 +49,7 @@ test("Codex uses reviewed text, workspace sandbox, automatic approval review and
   const { proc, sent } = backend();
   let spawnArgs: [string, string[], SpawnOptions] | undefined;
   const bridge = new CodexBridge({
+    validateWorkspace: async (path) => path,
     spawnProcess: (...args) => {
       spawnArgs = args;
       return proc;

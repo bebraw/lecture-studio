@@ -81,7 +81,7 @@ export function createStudio({
   bridge = new CodexBridge(),
   poll = new AudiencePoll(),
   previewTunnel = new PreviewTunnel(),
-  workspace = resolve(root, "../lecture-studio"),
+  workspace = resolve(root, "../lecture-demo"),
   rehearsals = new Rehearsals(resolve(root, ".local/rehearsals")),
   port = 4317,
   host = "127.0.0.1",
@@ -1067,7 +1067,7 @@ if (
     port: Number(process.env.LECTURE_PORT || 4317),
     workspace: resolve(
       root,
-      process.env.LECTURE_WORKSPACE || "../lecture-studio",
+      process.env.LECTURE_WORKSPACE || "../lecture-demo",
     ),
   });
   const address = await studio.start();
