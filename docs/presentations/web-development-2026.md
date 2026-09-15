@@ -159,6 +159,15 @@ Versioned export of the Obsidian lecture at `Lectures/Web Development 2026/Prese
         ],
         "defaultId": "editorial"
       },
+      "next": "lecture-architecture"
+    },
+    {
+      "id": "lecture-architecture",
+      "type": "material",
+      "chapter": "Past",
+      "title": "Which system is doing what?",
+      "body": "```mermaid\nflowchart LR\n L[Lecturer and audience] --> S[Studio: slides and moderated inputs]\n S -->|Lecturer starts build| C[Implementation agent: edits rehearsal code]\n C --> D[Demo app: browser and server]\n D -->|Future only: bounded data| M[Runtime model: proposes a view]\n M -->|Validate before rendering| D\n```\n\nThe implementation agent builds the app. The runtime model operates inside the app’s narrower contract.",
+      "notes": "Point out the separate systems before the first launch. The studio’s polls guide the implementation; the demo app collects a different seminar-interest survey. The runtime model is introduced later, not running during the native-form example.",
       "next": "build-document"
     },
     {
@@ -852,6 +861,26 @@ Versioned export of the Obsidian lecture at `Lectures/Web Development 2026/Prese
         ],
         "defaultId": "overview"
       },
+      "next": "detour-4-0"
+    },
+    {
+      "id": "detour-4-0",
+      "type": "material",
+      "title": "Before composition: define the boundary",
+      "body": "- **Inputs:** reviewed seminar facts, source links, and one frozen aggregate revision; no questions or identifiers.\n- **Output:** a view assembled from allowed components and source-backed text.\n- **Actions:** existing allowlisted links and controls only; no new booking, purchase, code execution, or authority.\n- **Validation:** check the output structure, URLs and claims before rendering.\n- **Fallback:** retain the fixed view when the model times out or validation fails.\n\nA **context receipt** records the inputs, destination, revision and result.",
+      "notes": "Explain these constraints before showing the Future prompt. Output validation checks shape and allowed actions; checking a claim against a source remains necessary. A context receipt is an audit aid proposed for this lecture, not a security guarantee.",
+      "source": "Context receipt · Lecture proposal",
+      "chapter": "Future",
+      "next": "detour-4-1"
+    },
+    {
+      "id": "detour-4-1",
+      "type": "material",
+      "title": "From selected inputs to a generated view",
+      "body": "```mermaid\nflowchart LR\n F[Reviewed seminar facts] --> C[Frozen context and receipt]\n R[Predefined-field counts] --> C\n C --> M[Runtime model]\n M --> V[Validate output and allowed actions]\n V -->|Valid| G[Generated view]\n V -->|Invalid or unavailable| B[Fixed fallback]\n```\n\nBoth views must answer the same task using the same source revision.",
+      "notes": "What useful personal information would you refuse to send? This receipt is a proposed design pattern, not a standard.\nSource keys resolve to the References slides at the end. Unquoted explanations are lecture paraphrases; diagrams are not archival reproductions.\nFull attribution: Original diagram · Lecture context-receipt proposal",
+      "source": "Context receipt · Teaching diagram",
+      "chapter": "Future",
       "next": "build-agents"
     },
     {
@@ -859,8 +888,8 @@ Versioned export of the Obsidian lecture at `Lectures/Web Development 2026/Prese
       "type": "build",
       "chapter": "Future",
       "title": "Build · Compose a constrained interface",
-      "body": "Advance to Future under our composition contract. Reuse the reviewed material and locked aggregate revision. Show the context receipt and deterministic fallback. Do not widen model authority or deploy unless requested. Include a frozen aggregate of the new seminar-interest responses alongside the lecture priority. Use only predefined-field counts; exclude free-text questions and browser identifiers. State which counts informed the view and show their revision in the context receipt. If no new responses exist, label the fallback rather than inventing preferences.",
-      "notes": "Review the approved audience responses in the resolved prompt before starting. Start explicitly, then continue discussing while the agent works. Inspect the app using Preview from Codex when ready.\n62–65 · Show the actual resolved build prompt, including the frozen audience priority. Explain that the coding agent builds the application; the runtime composition model has a different, constrained role. No real booking, purchase or personal profile is needed.",
+      "body": "Advance to Future under our composition contract. Reuse the reviewed material and locked aggregate revision. Show the context receipt and deterministic fallback. Do not widen model authority or deploy unless requested. Include a frozen aggregate of the new seminar-interest responses alongside the lecture priority. Use only predefined-field counts; exclude free-text questions and browser identifiers. State which counts informed the view and show their revision in the context receipt. If no new responses exist, label the fallback rather than inventing preferences. Implement an explicit runtime input/output schema and allowlist components and URLs. Reject malformed or unsupported output before rendering; keep the fixed view available on timeout or rejection. Compare the fixed and composed views using the same task and frozen source revision: find one supported seminar detail, follow its source, and identify the next permitted action. Show both views and their receipt. Do not claim this demonstrates arbitrary autonomous service use.",
+      "notes": "Review the approved audience responses in the resolved prompt before starting. Start explicitly, then continue discussing while the agent works. Inspect the app using Preview from Codex when ready.\n62–65 · Show the actual resolved build prompt, including the frozen audience priority. Explain that the coding agent builds the application; the runtime composition model has a different, constrained role. No real booking, purchase or personal profile is needed. At the checkpoint, test the same task in the fixed and generated views; a source mismatch or unauthorized control falsifies the claimed improvement.",
       "uses": [
         {
           "poll": "vote-friction",
@@ -1000,26 +1029,6 @@ Versioned export of the Obsidian lecture at `Lectures/Web Development 2026/Prese
       "body": "```mermaid\nflowchart TB\n C[Shared capability and constraints] --> H[Human interface]\n C --> T[Assistive tools]\n C --> A[Agent interaction]\n```",
       "notes": "Ask for a counterexample. Shared semantics do not guarantee accessibility or better agent performance.\nSource keys resolve to the References slides at the end. Unquoted explanations are lecture paraphrases; diagrams are not archival reproductions.\nFull attribution: Original diagram of a hypothesis · [13] Approved, unpublished position paper (2026)",
       "source": "[13] Lecture hypothesis · Unpublished paper, 2026",
-      "chapter": "Future",
-      "next": "detour-4-0"
-    },
-    {
-      "id": "detour-4-0",
-      "type": "material",
-      "title": "What a context receipt records",
-      "body": "For a generated seminar view, record:\n\n- Which source material and audience result were used\n- Where that information was sent\n- What output or action followed",
-      "notes": "What useful personal information would you refuse to send? This receipt is a proposed design pattern, not a standard.\nSource keys resolve to the References slides at the end. Unquoted explanations are lecture paraphrases; diagrams are not archival reproductions.\nFull attribution: Lecture design proposal · Context receipt is not an established standard",
-      "source": "Context receipt · Lecture proposal",
-      "chapter": "Future",
-      "next": "detour-4-1"
-    },
-    {
-      "id": "detour-4-1",
-      "type": "material",
-      "title": "From selected inputs to a generated view",
-      "body": "```mermaid\nflowchart LR\n R[Aggregate room choices] --> B[Declared context boundary]\n N[Curated lecture notes] --> B\n B --> A[Agent selection]\n A --> V[Rendered view]\n```",
-      "notes": "What useful personal information would you refuse to send? This receipt is a proposed design pattern, not a standard.\nSource keys resolve to the References slides at the end. Unquoted explanations are lecture paraphrases; diagrams are not archival reproductions.\nFull attribution: Original diagram · Lecture context-receipt proposal",
-      "source": "Context receipt · Teaching diagram",
       "chapter": "Future",
       "next": "step-17"
     },
