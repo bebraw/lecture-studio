@@ -27,21 +27,23 @@ Versioned export of the Obsidian lecture at `Lectures/Web Development 2026/Prese
       "title": "Today’s route",
       "body": "1. **Past** — Finding knowledge; documents, links and native forms\n2. **Present** — Browser interaction; AJAX and shared state\n3. **Future** — What people might delegate to agents\n4. **References** — Sources and further reading",
       "notes": "Introduce the route before the CERN example. Across the sections, we build and inspect one application together.",
-      "next": "demo-background"
+      "next": "step-4"
     },
     {
-      "id": "demo-background",
-      "type": "material",
-      "chapter": "Opening",
-      "title": "Our example: a seminar information app",
-      "body": "Imagine you are considering attending the SDLCAI seminar.\n\nYou want to understand what it covers, find practical details, and follow the source links.\n\nIn our demo, you can also share your experience, interests, preferred session format, and a question. The room sees aggregate preferences, and later we generate a view around its chosen priority.",
-      "notes": "Introduce the scenario before asking the audience to shape the app. Show the prepared seminar material and identify it as the source the builds will use. The visitor is someone considering the seminar; the shared display lets the room see aggregate preferences. Walk through one example: look for practical details, choose a priority, then inspect the resulting view. The lecture’s polls shape the build requirements; the form inside the demo is the application we test. Distinguish those two interfaces when showing them. Keep this introduction to about one minute.",
-      "next": "cern-problem"
+      "id": "step-4",
+      "type": "title",
+      "chapter": "Past",
+      "title": "Past",
+      "body": "Finding and connecting knowledge",
+      "notes": "Begin Past with CERN’s information problem, then connect it to the audience’s own experience. Introduce the seminar app immediately before collecting its design choices and starting the first build.",
+      "next": "cern-problem",
+      "related": ["detour-0-1"],
+      "source": "Historical framing · [1–5]"
     },
     {
       "id": "cern-problem",
       "type": "material",
-      "chapter": "Opening",
+      "chapter": "Past",
       "title": "CERN: finding shared knowledge (1989)",
       "body": "![Tim Berners-Lee beside a computer at CERN, photographed in 1994](https://home.cern/wp-content/uploads/2026/05/9407011_31.jpg)\n\n> Often, the information has been recorded, it just cannot be found.\n\nTim Berners-Lee · Information Management: A Proposal",
       "source": "[5, 24] Berners-Lee · Photo: CERN, 1994",
@@ -58,25 +60,44 @@ Versioned export of the Obsidian lecture at `Lectures/Web Development 2026/Prese
       "source": "[5] © Tim Berners-Lee, 1989/1990 · W3C archive",
       "notes": "Historical artifact, not a teaching reconstruction. Trace one connection rather than reading every label. Notice the mixture of systems, concepts and relationships. Requires network access.\nFull attribution: [5] Tim Berners-Lee © 1989/1990 · Original proposal diagram, W3C archive",
       "allowRemoteImages": true,
-      "chapter": "Opening",
+      "chapter": "Past",
       "next": "knowledge-experience"
     },
     {
       "id": "knowledge-experience",
       "type": "question",
-      "chapter": "Opening",
+      "chapter": "Past",
       "title": "Where is information hardest to find?",
       "body": "Name one place: a course platform, chat, shared drive…\n\n**Word cloud · 45 seconds**\n\nOn live.scalableweb.dev, open **Add words** and send one short response (up to 32 characters).\n\nWe’ll review the approved cloud and discuss two contrasting suggestions.",
       "notes": "04–07 · Hear two examples: course platforms, shared drives, chat histories, project handovers. Keep their wording for the closing discussion. Do not solve the examples yet.\n\nModerated word cloud: while Live is on, open Responses, choose Word cloud, enter “Where is information hardest to find?”, and click Open new collection. Allow 45 seconds. Close collection, review submissions privately, approve relevant responses, then Show approved cloud. Read out two contrasting contributions and ask their authors to explain; frequency is not a vote or a measure of correctness. Use Back to slide before continuing. If collection is unavailable, take three spoken responses and discuss two. Never project unreviewed submissions.",
-      "next": "vote-friction"
+      "next": "demo-background"
+    },
+    {
+      "id": "demo-background",
+      "type": "material",
+      "chapter": "Past",
+      "title": "Our example: a seminar information app",
+      "body": "Imagine you are considering attending the SDLCAI seminar.\n\nYou want to understand what it covers, find practical details, and follow the source links.\n\nIn our demo, you can also share your experience, interests, preferred session format, and a question. The room sees aggregate preferences, and later we generate a view around its chosen priority.",
+      "notes": "Introduce the scenario before asking the audience to shape the app. Show the prepared seminar material and identify it as the source the builds will use. The visitor is someone considering the seminar; the shared display lets the room see aggregate preferences. Walk through one example: look for practical details, choose a priority, then inspect the resulting view. The lecture’s polls shape the build requirements; the form inside the demo is the application we test. Distinguish those two interfaces when showing them. Keep this introduction to about one minute.",
+      "next": "step-3"
+    },
+    {
+      "id": "step-3",
+      "type": "material",
+      "chapter": "Past",
+      "title": "One seminar app, three stages",
+      "body": "1. **Past:** read the seminar information and submit a native form.\n2. **Present:** submit without leaving the page; watch shared results update.\n3. **Future:** generate a seminar view around the room’s chosen priority.\n\nYour votes shape the requirements. We inspect each result before moving on.",
+      "notes": "Explain the three stages using the seminar scenario on the preceding slide. We develop the same app across three lecture sections. Past has two build steps: the document, then its native form. Present enhances that form and adds shared updates. Future adds constrained view composition using the reviewed seminar material. Explain that the coding agent implements the app; the later composition model generates a view inside it. Show the starter context before the first build.",
+      "next": "vote-friction",
+      "related": ["detour-0-1"]
     },
     {
       "id": "vote-friction",
       "type": "poll",
-      "chapter": "Opening",
+      "chapter": "Past",
       "title": "When you use the web today, what feels unnecessarily difficult?",
       "body": "Which difficulty should our application address?",
-      "notes": "07–09 · Map the examples just discussed to one predefined choice. Freeze the result; this still feeds the build prompts. Do not repeat the pair discussion.",
+      "notes": "Map the earlier audience examples to one predefined choice for the seminar app just introduced. Close voting to freeze the requirement, then collect the theme choice before starting the build.",
       "room": "webdev-2026-friction",
       "poll": {
         "question": "When you use the web today, what feels unnecessarily difficult?",
@@ -100,28 +121,7 @@ Versioned export of the Obsidian lecture at `Lectures/Web Development 2026/Prese
         ],
         "defaultId": "finding"
       },
-      "next": "step-3"
-    },
-    {
-      "id": "step-3",
-      "type": "material",
-      "chapter": "Opening",
-      "title": "One seminar app, three stages",
-      "body": "1. **Past:** read the seminar information and submit a native form.\n2. **Present:** submit without leaving the page; watch shared results update.\n3. **Future:** generate a seminar view around the room’s chosen priority.\n\nYour votes shape the requirements. We inspect each result before moving on.",
-      "notes": "09–11 · Return to the seminar scenario introduced at the beginning. We develop the same app across three lecture sections. Past has two build steps: the document, then its native form. Present enhances that form and adds shared updates. Future adds constrained view composition using the reviewed seminar material. Explain that the coding agent implements the app; the later composition model generates a view inside it. Show the starter context before the first build.",
-      "next": "step-4",
-      "related": ["detour-0-1"]
-    },
-    {
-      "id": "step-4",
-      "type": "title",
-      "chapter": "Past",
-      "title": "Past",
-      "body": "Finding and connecting knowledge",
-      "notes": "11–14 · Take the theme vote and start Document A, then rewind through four visions while it builds. Spend about 6–8 minutes across the four, not 6–8 minutes each.\nSource keys resolve to the References slides at the end. Unquoted explanations are lecture paraphrases; diagrams are not archival reproductions.",
-      "next": "vote-theme",
-      "related": ["detour-0-1"],
-      "source": "Historical framing · [1–5]"
+      "next": "vote-theme"
     },
     {
       "id": "vote-theme",
@@ -157,7 +157,7 @@ Versioned export of the Obsidian lecture at `Lectures/Web Development 2026/Prese
       "chapter": "Past",
       "title": "Build · Create the seminar document",
       "body": "Build Document A: a readable SDLCAI seminar document with our chosen defaults and real links. Show a local preview, finish the relevant checks, and stop before the form.",
-      "notes": "Start explicitly, then continue discussing while the agent works. Inspect the app using Preview from Codex when ready.",
+      "notes": "Start explicitly after the app introduction and its two design votes. Continue through the historical visions while the build runs. Spend about 6–8 minutes across the four visions, then inspect the output at the document checkpoint.",
       "uses": [
         {
           "poll": "vote-friction",

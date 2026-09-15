@@ -155,13 +155,16 @@ export function createStudio({
   const openGraphPoll = async () => {
     if (!presentation || presentation.step().type !== "poll") return;
     const selected = getGraphPoll(presentation.step());
+    for (const [id, activePoll] of graphPolls) {
+      if (activePoll === selected || activePoll.snapshot?.status !== "open")
+        continue;
+      await activePoll.act("lock");
+      if (activePoll.frozen)
+        presentation.decisions[id] = structuredClone(activePoll.frozen);
+    }
+    if (poll !== selected && poll.snapshot?.status === "open")
+      await poll.act("lock");
     if (selected.frozen || selected.snapshot?.status === "open") return;
-    if (
-      [...graphPolls.values(), poll].some(
-        (p) => p !== selected && p.snapshot?.status === "open",
-      )
-    )
-      throw new Error("Close the current vote first");
     await selected.act("open");
   };
   const buildPreviews = new Map<string, string>();

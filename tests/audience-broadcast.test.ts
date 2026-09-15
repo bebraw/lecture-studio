@@ -59,6 +59,14 @@ test("only published slides sync; polling never replaces another projected slide
         title: "Theme",
         room: "webdev-2026",
         poll: themePoll(),
+        next: "vote-next",
+      },
+      {
+        id: "vote-next",
+        type: "poll",
+        title: "Next poll",
+        room: "webdev-2026-priority",
+        poll: { ...themePoll(), question: "What next?" },
       },
     ],
   };
@@ -121,6 +129,16 @@ test("only published slides sync; polling never replaces another projected slide
     await call("poll-results");
     await wait();
     assert.match(writes.at(-1)!.html!, /Editorial: 0/);
+    const nextPoll = await call("next");
+    assert.equal(nextPoll.graphPoll?.snapshot?.status, "open");
+    assert.equal(nextPoll.projection.projectionKind, "question");
+    await wait();
+    assert.equal(writes.at(-1)!.title, "What next?");
+    // Returning shows the saved results, without reopening the earlier poll.
+    const previousPoll = await call("previous");
+    assert.ok(previousPoll.graphPoll?.frozen);
+    assert.equal(previousPoll.projection.projectionKind, "results");
+    await call("poll-open");
     // The open vote is no longer the selected slide when broadcasting stops.
     await call("select", { id: "title" });
     await call("show");
