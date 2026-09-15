@@ -109,20 +109,22 @@ test("Obsidian snapshot uses a flat list and consecutive arrow navigation", asyn
     await expect(desk.locator("#connections #activity")).toHaveCount(1);
     await expect(desk.locator("#connections #interrupt")).toHaveCount(1);
     await expect(desk.locator("#graph-title")).toHaveText("Snapshot title");
-    await expect(desk.locator("#current-stage h1")).toHaveText(
-      "Snapshot title",
-    );
-    await expect(desk.locator(".preview-slide-position")).toHaveText("1/3");
-    await expect(desk.locator(".preview-slide-progress")).toHaveAttribute(
-      "value",
-      String(1 / 3),
-    );
+    await expect(
+      desk.frameLocator("#current-stage > iframe").locator("h1"),
+    ).toHaveText("Snapshot title");
+    await expect(
+      desk.frameLocator("#current-stage > iframe").locator("#slide-number"),
+    ).toHaveText("1/3");
+    await expect(
+      desk.frameLocator("#current-stage > iframe").locator("#slide-progress"),
+    ).toHaveAttribute("value", String(1 / 3));
     await expect(desk.locator("#current-stage")).toHaveCSS(
       "background-color",
       "rgb(255, 255, 255)",
     );
     const prepareHeadingSize = await desk
-      .locator("#current-stage h1")
+      .frameLocator("#current-stage > iframe")
+      .locator("h1")
       .evaluate((el) => getComputedStyle(el).fontSize);
     await expect(
       desk.locator("#graph-presentation>.button-row #live-progress"),
@@ -149,9 +151,9 @@ test("Obsidian snapshot uses a flat list and consecutive arrow navigation", asyn
     const pagePosition = await desk.evaluate(() => window.scrollY);
     const previewPosition = await desk.locator("#current-stage").boundingBox();
     await desk.keyboard.press("ArrowRight");
-    await expect(desk.locator("#current-stage h1")).toHaveText(
-      "Audience question",
-    );
+    await expect(
+      desk.frameLocator("#current-stage > iframe").locator("h1"),
+    ).toHaveText("Audience question");
     await expect(
       desk.locator('#presentation-outline [data-step-id="question"]'),
     ).toBeFocused();
@@ -175,9 +177,9 @@ test("Obsidian snapshot uses a flat list and consecutive arrow navigation", asyn
     );
     await expect(stage.locator("h1")).toHaveText("Waiting for the lecturer");
     await desk.keyboard.press("ArrowLeft");
-    await expect(desk.locator("#current-stage h1")).toHaveText(
-      "Snapshot title",
-    );
+    await expect(
+      desk.frameLocator("#current-stage > iframe").locator("h1"),
+    ).toHaveText("Snapshot title");
     await expect.poll(selectedVisible).toBe(true);
     await desk.locator("#presentation-outline").evaluate((el) => {
       el.style.removeProperty("max-height");
@@ -188,9 +190,9 @@ test("Obsidian snapshot uses a flat list and consecutive arrow navigation", asyn
     await desk.locator("#connections>summary").focus();
     await desk.keyboard.press("ArrowRight");
     await expect(desk.locator("#connections>summary")).toBeFocused();
-    await expect(desk.locator("#current-stage h1")).toHaveText(
-      "Snapshot title",
-    );
+    await expect(
+      desk.frameLocator("#current-stage > iframe").locator("h1"),
+    ).toHaveText("Snapshot title");
     expect(
       (await desk.locator(".topbar").boundingBox())!.height,
     ).toBeLessThanOrEqual(60);
@@ -217,9 +219,9 @@ test("Obsidian snapshot uses a flat list and consecutive arrow navigation", asyn
       '#presentation-outline [data-step-id="question"]',
     );
     await questionButton.click();
-    await expect(desk.locator("#current-stage h1")).toHaveText(
-      "Audience question",
-    );
+    await expect(
+      desk.frameLocator("#current-stage > iframe").locator("h1"),
+    ).toHaveText("Audience question");
     await expect(questionButton).toBeFocused();
     await expect(
       desk.locator('#presentation-outline [data-step-id="aside"]'),
@@ -231,18 +233,17 @@ test("Obsidian snapshot uses a flat list and consecutive arrow navigation", asyn
       previewBox!.height,
     );
     await desk.locator('#presentation-outline [data-step-id="title"]').click();
-    await expect(desk.locator("#current-stage h1")).toHaveText(
-      "Snapshot title",
-    );
+    await expect(
+      desk.frameLocator("#current-stage > iframe").locator("h1"),
+    ).toHaveText("Snapshot title");
     expect(definition.steps[0]).toBeDefined();
     definition.steps[0]!.title = "Edited in vault";
     library.status = "Unavailable";
     await desk.locator("#live-toggle").click();
     await expect(desk.locator("#presentation-name")).toBeDisabled();
-    await expect(desk.locator("#current-stage h1")).toHaveCSS(
-      "font-size",
-      prepareHeadingSize,
-    );
+    await expect(
+      desk.frameLocator("#current-stage > iframe").locator("h1"),
+    ).toHaveCSS("font-size", prepareHeadingSize);
     await expect(desk.locator(".builder")).toBeHidden();
     await expect(desk.locator(".material-column")).toBeHidden();
     await expect(desk.locator("#presentation-details")).toHaveAttribute(
@@ -273,10 +274,9 @@ test("Obsidian snapshot uses a flat list and consecutive arrow navigation", asyn
       "font-family",
       "Verdana, sans-serif",
     );
-    await expect(desk.locator("#current-stage h1")).toHaveCSS(
-      "font-family",
-      "Verdana, sans-serif",
-    );
+    await expect(
+      desk.frameLocator("#current-stage > iframe").locator("h1"),
+    ).toHaveCSS("font-family", "Verdana, sans-serif");
     await expect(desk.locator("#graph-presentation")).toBeVisible();
     await desk.locator("#graph-next").click();
     await expect(stage.locator("h1")).toHaveText("Audience question");
@@ -303,9 +303,9 @@ test("Obsidian snapshot uses a flat list and consecutive arrow navigation", asyn
       .filter({ hasText: "Snapshot title" })
       .click();
     await expect(desk.locator("#graph-title")).toHaveText("Snapshot title");
-    await expect(desk.locator("#current-stage h1")).toHaveText(
-      "Snapshot title",
-    );
+    await expect(
+      desk.frameLocator("#current-stage > iframe").locator("h1"),
+    ).toHaveText("Snapshot title");
     await expect(desk.locator("#graph-next")).toHaveText("Next →");
     await expect(stage.locator("h1")).toHaveText("Waiting for the lecturer");
     await expect(desk.locator("#graph-show")).toHaveCount(0);

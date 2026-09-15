@@ -83,6 +83,7 @@ export async function fixture(options: StudioOptions = {}) {
     library,
     port: 0,
     persist: false,
+    workspace: process.cwd(),
     ...options,
   });
   return {

@@ -972,6 +972,27 @@ export function createStudio({
           stage = publicStage(publishedDraft, ++version, text);
           blank = false;
         } else if (url.pathname === "/api/codex/connect") {
+          // Bootstrap only the absent default. Never replace a configured or
+          // existing checkout, and preserve the current lecture and responses.
+          if (workspace === resolve(root, "../lecture-demo")) {
+            const missing = await realpath(workspace).then(
+              () => false,
+              (error: NodeJS.ErrnoException) => {
+                if (error.code === "ENOENT") return true;
+                throw error;
+              },
+            );
+            if (missing) {
+              rehearsalJob = { status: "creating" };
+              try {
+                workspace = await rehearsals.create();
+                rehearsalJob = { status: "ready" };
+              } catch (error) {
+                rehearsalJob = { status: "failed" };
+                throw error;
+              }
+            }
+          }
           await bridge.connect(workspace);
         } else if (url.pathname === "/api/codex/start") {
           if (

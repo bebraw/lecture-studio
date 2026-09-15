@@ -1,3 +1,4 @@
+import { renderSlidePreview } from "./slide-preview.ts";
 import { asyncHandler } from "../shared/errors.ts";
 import type { DeskState, ApiClient } from "../shared/api.ts";
 import type {
@@ -14,7 +15,6 @@ import {
   auth,
   api,
   escape,
-  surface,
   renderDiagrams,
   buildLabel,
   previewCandidates,
@@ -80,8 +80,7 @@ function fields(value: Draft) {
   $("remote-images").checked = !!value.allowRemoteImages;
 }
 function preview(data: DeskState) {
-  $("preview").innerHTML = surface(data.draftPreview);
-  void renderDiagrams($("preview"));
+  renderSlidePreview($("preview"), data.draftPreview);
   $("word-count").textContent =
     draft().body.trim().split(/\s+/).filter(Boolean).length + " words";
   $("diagram-field").hidden = $("mode").value !== "diagram";
@@ -1057,16 +1056,7 @@ async function refreshStageView() {
     if (key !== stageKey) {
       stageKey = key;
       $("current-stage").classList.toggle("stage-blank-preview", shown.blank);
-      $("current-stage").innerHTML = shown.blank
-        ? "<p>Stage is blank</p>"
-        : shown.mode === "demo"
-          ? "<h1>" +
-            escape(shown.title) +
-            '</h1><p>Live app is on the projected stage.</p><p class="small">' +
-            escape(shown.demoUrl) +
-            "</p>"
-          : surface(shown);
-      void renderDiagrams($("current-stage"));
+      renderSlidePreview($("current-stage"), shown);
     }
   } catch {
     /* Keep the last stage view; the desk connection notice handles server failures. */

@@ -2416,6 +2416,22 @@ blockquote {
 .desk .stage-surface h1.section-title {
   font-size: 2.8em;
 }
+/* Keep the opening byline near the footer, separate from the lecture pitch. */
+.stage #stage-content:has(> .opening-title) {
+  position: relative;
+  padding-bottom: 10vh;
+}
+.stage #stage-content > .opening-title + .stage-copy > p:last-child {
+  position: absolute;
+  bottom: 2vh;
+  left: 0;
+  margin: 0;
+  font-size: 0.8em;
+}
+.desk .opening-title + .stage-copy > p:last-child {
+  margin-top: 3em;
+  font-size: 0.8em;
+}
 /* Chapter dividers mark a pause with an inverted, typographic canvas. */
 .stage:has(#stage-content > .chapter-divider),
 .desk #current-stage:has(> .chapter-divider) {
@@ -2545,4 +2561,18 @@ blockquote {
 /* Leave space for the historical claim when a source image has a caption. */
 .stage .stage-copy:has(> p + p):not(:has(blockquote)) img {
   max-height: 48vh;
+}
+.desk .slide-preview-host {
+  position: relative;
+  overflow: hidden;
+  padding: 0 !important;
+}
+.desk .slide-preview-host > .slide-preview-frame {
+  position: absolute;
+  width: 1920px;
+  height: 1080px;
+  max-width: none;
+  min-height: 0;
+  border: 0;
+  transform-origin: top left;
 }

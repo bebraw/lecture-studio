@@ -88,7 +88,8 @@ export async function api<P extends ApiPath>(
       : undefined);
   if (value !== undefined) validateApiRequest(path, value);
   const response = await fetch("/api/" + path, {
-    signal: AbortSignal.timeout(65000),
+    // First connection can clone the pinned starter and install dependencies.
+    signal: AbortSignal.timeout(path === "codex/connect" ? 360000 : 65000),
     headers: {
       Authorization: "Bearer " + token,
       ...(value === undefined ? {} : { "content-type": "application/json" }),
@@ -138,6 +139,7 @@ export function surface(stage: Partial<Stage>, previewPosition = false) {
     (stage.slideType === "title"
       ? ' class="section-title' +
         (stage.title === stage.act ? " chapter-divider" : "") +
+        (position?.number === 1 ? " opening-title" : "") +
         '"'
       : "") +
     ">" +
@@ -233,7 +235,7 @@ export async function renderDiagrams(container: HTMLElement) {
 }
 
 /** Shared presentation position and transient build status for both stage clients. */
-export function createStageStatus() {
+export function createStageStatus(document: Document = globalThis.document) {
   const number = document.createElement("span");
   number.id = "slide-number";
   query(".stage-bottom", document).append(number);

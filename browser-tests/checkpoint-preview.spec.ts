@@ -53,22 +53,29 @@ test("checkpoint projects its build preview and next returns to slides", async (
     await page.locator("#presentation-load").click();
     await page.locator("#live-toggle").click();
     await page.locator("#graph-next").click();
-    await expect(page.locator("#current-stage")).toContainText(
-      "not available yet",
-    );
+    await expect(
+      page.frameLocator("#current-stage > iframe").locator("body"),
+    ).toContainText("not available yet");
     await page.locator("#graph-previous").click();
     await page.locator("#graph-build").click();
     bridge.state.messages = [
       { id: "preview", text: "Preview: http://127.0.0.1:54321/" },
     ];
     await page.locator("#graph-next").click();
-    await expect(page.locator("#current-stage iframe")).toHaveAttribute(
-      "src",
-      "http://127.0.0.1:54321/",
-    );
+    await expect(
+      page
+        .frameLocator("#current-stage > iframe")
+        .locator("#stage-content iframe"),
+    ).toHaveAttribute("src", "http://127.0.0.1:54321/");
     await page.locator("#graph-next").click();
-    await expect(page.locator("#current-stage")).toContainText("Next topic");
-    await expect(page.locator("#current-stage iframe")).toHaveCount(0);
+    await expect(
+      page.frameLocator("#current-stage > iframe").locator("body"),
+    ).toContainText("Next topic");
+    await expect(
+      page
+        .frameLocator("#current-stage > iframe")
+        .locator("#stage-content iframe"),
+    ).toHaveCount(0);
   } finally {
     await stop();
   }

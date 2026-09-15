@@ -76,17 +76,17 @@ test("desk previews actual poll projection and long questions fit the stage", as
     await expect(desk.locator("#projection-status")).toHaveText(
       "On stage: Results",
     );
-    await expect(desk.locator("#current-stage")).toContainText(
-      "Finding information: 0",
-    );
+    await expect(
+      desk.frameLocator("#current-stage > iframe").locator("body"),
+    ).toContainText("Finding information: 0");
     await expect(desk.locator("#graph-results")).toHaveAttribute(
       "aria-pressed",
       "true",
     );
     await desk.locator("#graph-question").click();
-    await expect(desk.locator("#current-stage")).not.toContainText(
-      "Finding information: 0",
-    );
+    await expect(
+      desk.frameLocator("#current-stage > iframe").locator("body"),
+    ).not.toContainText("Finding information: 0");
     await expect(stage.locator("#stage-content h1")).toHaveText(title);
     for (const viewport of [
       { width: 1920, height: 1080 },

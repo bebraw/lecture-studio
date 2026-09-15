@@ -4,13 +4,56 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import { mkdtemp, access } from "node:fs/promises";
 import { tmpdir } from "node:os";
-import { join } from "node:path";
+import { join, resolve } from "node:path";
 import {
   Rehearsals,
   START_COMMIT,
   validateWorkspace,
 } from "../lib/rehearsals.ts";
 import { fixture } from "./fixture.ts";
+
+test("first connection prepares a missing default without resetting the lecture", async (t) => {
+  const root = await mkdtemp(join(tmpdir(), "studio-first-connect-"));
+  const defaultWorkspace = resolve(process.cwd(), "../lecture-demo");
+  try {
+    await access(defaultWorkspace);
+    t.skip("Default checkout already exists");
+    return;
+  } catch {}
+  let created = 0;
+  const local = await fixture({
+    workspace: defaultWorkspace,
+    rehearsals: {
+      current: async (path) => path,
+      create: async () => {
+        created++;
+        return join(root, "rehearsal-001");
+      },
+    },
+  });
+  t.after(local.stop);
+  const post = async (path: string, body = {}) => {
+    const res = await fetch(local.address.origin + "/api/" + path, {
+      method: "POST",
+      headers: {
+        Origin: local.address.origin,
+        Authorization: "Bearer " + local.address.deskToken,
+        "content-type": "application/json",
+      },
+      body: JSON.stringify(body),
+    });
+    assert.equal(res.status, 200);
+    return parseApiResponse("desk", await res.json());
+  };
+  await post("act", { act: "agents" });
+  const connected = await post("codex/connect");
+  assert.equal(created, 1);
+  assert.equal(connected.activeAct, "agents");
+  assert.equal(connected.codex.status, "ready");
+  assert.equal(connected.workspace, join(root, "rehearsal-001"));
+  await post("codex/connect");
+  assert.equal(created, 1);
+});
 
 test("numbered checkouts retain earlier attempts and verify the pinned starter", async () => {
   const root = await mkdtemp(join(tmpdir(), "studio-rehearsals-"));
@@ -94,6 +137,10 @@ test("reset and fresh rehearsal are confirmed, private, and preserve the workspa
 });
 
 test("builder rejects the controller and unrelated workspaces", async () => {
+  await assert.rejects(
+    () => validateWorkspace(join(tmpdir(), "missing-" + crypto.randomUUID())),
+    /workspace is missing or inaccessible/,
+  );
   await assert.rejects(
     () => validateWorkspace(process.cwd()),
     /studio checkout/,

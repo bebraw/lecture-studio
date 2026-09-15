@@ -3,7 +3,8 @@ import type { PresentationCommand } from "../shared/api.ts";
 import type { MountOptions, DeskState } from "../shared/api.ts";
 import { query, all, byId } from "./dom.ts";
 import { asError } from "../shared/errors.ts";
-import { surface, renderDiagrams, applyTheme } from "./shared.ts";
+import { applyTheme } from "./shared.ts";
+import { renderSlidePreview } from "./slide-preview.ts";
 export function mountPresentations({ call, update }: MountOptions) {
   const setup = document.createElement("section");
   setup.id = "presentation-setup";
@@ -443,10 +444,7 @@ export function mountPresentations({ call, update }: MountOptions) {
         "stage-blank-preview",
         !!preview.blank,
       );
-      $("current-stage").innerHTML = preview.blank
-        ? "<p>Stage is blank</p>"
-        : surface(preview, true);
-      void renderDiagrams($("current-stage"));
+      renderSlidePreview($("current-stage"), preview);
     }
     if (snapshot !== p.loadedAt) {
       snapshot = p.loadedAt;

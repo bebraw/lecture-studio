@@ -14,7 +14,11 @@ import { promisify } from "node:util";
 const exec = promisify(execFile);
 export const START_COMMIT = "6a5dae4e7bf7b0b510c525a91497cd6620869bbc";
 export async function validateWorkspace(workspace: string, run: Run = exec) {
-  const path = await realpath(resolve(workspace));
+  const path = await realpath(resolve(workspace)).catch(() => {
+    throw new Error(
+      "The builder workspace is missing or inaccessible. Create a New rehearsal in Prepare, then reconnect Codex.",
+    );
+  });
   const controller = await realpath(
     fileURLToPath(new URL("..", import.meta.url)),
   );

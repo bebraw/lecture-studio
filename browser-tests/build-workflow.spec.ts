@@ -87,18 +87,18 @@ test("a frozen vote feeds the explicit build without launching during navigation
     await expect(desk.locator("#graph-open")).toBeHidden();
     expect(sessions).toHaveLength(1);
     await desk.locator("#graph-close").click();
-    await expect(desk.locator("#current-stage")).toContainText(
-      "Selected: Retro web",
-    );
+    await expect(
+      desk.frameLocator("#current-stage > iframe").locator("body"),
+    ).toContainText("Selected: Retro web");
     await desk.locator("#graph-next").click();
     await expect(desk.locator("#graph-prompt")).toContainText(
       "Use retro styling.",
     );
     expect(bridge.lastPrompt).toBeUndefined();
     await desk.locator("#graph-previous").click();
-    await expect(desk.locator("#current-stage")).toContainText(
-      "Selected: Retro web",
-    );
+    await expect(
+      desk.frameLocator("#current-stage > iframe").locator("body"),
+    ).toContainText("Selected: Retro web");
     expect(sessions).toHaveLength(1);
     await desk.locator("#graph-next").click();
     await desk.locator("#graph-build").click();
