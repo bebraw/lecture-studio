@@ -16,7 +16,7 @@ Versioned export of the Obsidian lecture at `Lectures/Web Development 2026/Prese
       "chapter": "Opening",
       "title": "Web development: past, present, and possible futures",
       "body": "How do we organize, connect, and use knowledge?\n\nExplore the web’s history and possible futures while we build an application together.\n\nJuho Vepsäläinen · 16.9.26",
-      "notes": "00–02 · Two threads: how the web addresses an old knowledge problem, and how we develop for it with agents today. Participation shapes the application. Early visions are a lens for comparison, not a single inevitable lineage.",
+      "notes": "Two threads: how the web addresses an old knowledge problem, and how we develop for it with agents today. Participation shapes the application. Early visions are a lens for comparison, not a single inevitable lineage.",
       "next": "contents",
       "related": []
     },
@@ -46,7 +46,7 @@ Versioned export of the Obsidian lecture at `Lectures/Web Development 2026/Prese
       "body": "Finding and connecting knowledge",
       "notes": "Begin Past with CERN’s information problem, then connect it to the audience’s own experience. Introduce the seminar app immediately before collecting its design choices and starting the first build.",
       "next": "cern-problem",
-      "related": ["detour-0-1"],
+      "related": ["web-response"],
       "source": "Historical framing · [1–5]"
     },
     {
@@ -56,7 +56,7 @@ Versioned export of the Obsidian lecture at `Lectures/Web Development 2026/Prese
       "title": "CERN: finding shared knowledge (1989)",
       "body": "![Tim Berners-Lee beside a computer at CERN, photographed in 1994](https://home.cern/wp-content/uploads/2026/05/9407011_31.jpg)\n\n> Often, the information has been recorded, it just cannot be found.\n\nTim Berners-Lee · Information Management: A Proposal",
       "source": "[5, 24] Berners-Lee · Photo: CERN, 1994",
-      "notes": "02–04 · Explain changing projects, people leaving and information spread across incompatible systems. This is the problem behind the proposal, not a desire to invent another interface. The source is dated March 1989 and May 1990.\nSource keys resolve to the References slides at the end. Unquoted explanations are lecture paraphrases; diagrams are not archival reproductions. Photo dates from 1994, not the 1989 proposal. Photo source: https://home.cern/science/computing/the-birth-of-the-web/ ; CERN record 39437. Requires network access.\nFull attribution: [5, 24] Tim Berners-Lee · Proposal 1989/1990 · Photo: CERN, 1994",
+      "notes": "Explain changing projects, people leaving and information spread across incompatible systems. This is the problem behind the proposal, not a desire to invent another interface. The source is dated March 1989 and May 1990.\nSource keys resolve to the References slides at the end. Unquoted explanations are lecture paraphrases; diagrams are not archival reproductions. Photo dates from 1994, not the 1989 proposal. Photo source: https://home.cern/science/computing/the-birth-of-the-web/ ; CERN record 39437. Requires network access.\nFull attribution: [5, 24] Tim Berners-Lee · Proposal 1989/1990 · Photo: CERN, 1994",
       "next": "cern-connections",
       "related": ["cern-connections"],
       "allowRemoteImages": true
@@ -99,7 +99,7 @@ Versioned export of the Obsidian lecture at `Lectures/Web Development 2026/Prese
       "body": "1. **Past:** read the seminar information and submit a native form.\n2. **Present:** submit without leaving the page; watch shared results update.\n3. **Future:** generate a seminar view around the room’s chosen priority.\n\nYour votes shape the requirements. We inspect each result before moving on.",
       "notes": "Explain the three stages using the seminar scenario introduced before the word cloud. We develop the same app across three lecture sections. Past has two build steps: the document, then its native form. Present enhances that form and adds shared updates. Future adds constrained view composition using the reviewed seminar material. Explain that the coding agent implements the app; the later composition model generates a view inside it. Show the starter context before the first build.",
       "next": "vote-friction",
-      "related": ["detour-0-1"]
+      "related": ["web-response"]
     },
     {
       "id": "vote-friction",
@@ -197,7 +197,7 @@ Versioned export of the Obsidian lecture at `Lectures/Web Development 2026/Prese
         }
       ],
       "next": "vision-otlet",
-      "related": ["detour-0-1"],
+      "related": ["web-response"],
       "wordsFrom": "knowledge-experience"
     },
     {
@@ -207,7 +207,7 @@ Versioned export of the Obsidian lecture at `Lectures/Web Development 2026/Prese
       "title": "Otlet: organizing knowledge (1895)",
       "body": "![Catalogue drawers at the Mundaneum in Mons, photographed in 2011](https://upload.wikimedia.org/wikipedia/commons/9/96/Drawers.jpg)\n\nThe Universal Bibliographic Repertory: a shared catalogue of publications, organized for retrieval.",
       "source": "[1, 29] Mundaneum · Photo: fdecomite, 2011 · CC BY 2.0",
-      "notes": "14–16 · One ambition, not a biography: make knowledge discoverable beyond a local collection. Mention classification and the broader ideal of international cooperation. A conceptual precursor, not a claim of direct influence on Berners-Lee.\nSource keys resolve to the References slides at the end. Unquoted explanations are lecture paraphrases; diagrams are not archival reproductions.\nTitle year refers to the creation of the Universal Bibliographic Repertory (1895). Date source: Mundaneum, https://mundaneum.org/nl/collections/het-universele-bibliografische-repertorium/ .\nPhoto shows the catalogue drawers at the Mundaneum in Mons in 2011, not the institution in 1895. Point to the physical drawers to explain the scale and work of indexing. Photo: fdecomite, Drawers, 23 February 2011, via Wikimedia Commons; CC BY 2.0. Unmodified. Remote image requires network access.",
+      "notes": "One ambition, not a biography: make knowledge discoverable beyond a local collection. Mention classification and the broader ideal of international cooperation. A conceptual precursor, not a claim of direct influence on Berners-Lee.\nSource keys resolve to the References slides at the end. Unquoted explanations are lecture paraphrases; diagrams are not archival reproductions.\nTitle year refers to the creation of the Universal Bibliographic Repertory (1895). Date source: Mundaneum, https://mundaneum.org/nl/collections/het-universele-bibliografische-repertorium/ .\nPhoto shows the catalogue drawers at the Mundaneum in Mons in 2011, not the institution in 1895. Point to the physical drawers to explain the scale and work of indexing. Photo: fdecomite, Drawers, 23 February 2011, via Wikimedia Commons; CC BY 2.0. Unmodified. Remote image requires network access.",
       "next": "vision-bush",
       "related": ["vision-comparison"],
       "allowRemoteImages": true
@@ -219,7 +219,7 @@ Versioned export of the Obsidian lecture at `Lectures/Web Development 2026/Prese
       "title": "Bush: Memex and associative trails (1945)",
       "body": "![Conceptual sketch of the proposed Memex desk with side-by-side displays](https://images.computerhistory.org/revonline/images/500004817-03-01.jpg?w=600)",
       "source": "[2, 15] Memex sketch, c. 1945 · Computer History Museum",
-      "notes": "16–18 · Contrast associative trails with placing each item in a category. The memex was a proposed personal device, not an implemented web. Relate to following references during an assignment.\nSource keys resolve to the References slides at the end. Unquoted explanations are lecture paraphrases; diagrams are not archival reproductions. This is a proposed device, never built. Point to the two displays: how would you preserve the path between two records?\nFull attribution: [2, 15] Memex conceptual sketch · c. 1945 · Computer History Museum, object 500004817",
+      "notes": "Contrast associative trails with placing each item in a category. The memex was a proposed personal device, not an implemented web. Relate to following references during an assignment.\nSource keys resolve to the References slides at the end. Unquoted explanations are lecture paraphrases; diagrams are not archival reproductions. This is a proposed device, never built. Point to the two displays: how would you preserve the path between two records?\nFull attribution: [2, 15] Memex conceptual sketch · c. 1945 · Computer History Museum, object 500004817",
       "next": "bush-trail",
       "related": ["bush-trail", "vision-comparison"],
       "allowRemoteImages": true
@@ -241,7 +241,7 @@ Versioned export of the Obsidian lecture at `Lectures/Web Development 2026/Prese
       "title": "Nelson: hypertext and Xanadu (1965)",
       "body": "![Nelson’s diagram showing connections between parallel sequences of text](https://xanadu.com.au/ted/XUsurvey/HARTadj5in.JPG)",
       "source": "[16] Ted Nelson · 1965 diagram, reproduced 2000",
-      "notes": "18–20 · Hypertext term introduced in 1965. Distinguish basic non-sequential reading from Xanadu’s richer ambition: visible connections and reuse tied to origins. Do not imply the web implemented all of Xanadu. Existing vault clippings on Xanadu offer contrasting contemporary opinions, not historical proof.\nSource keys resolve to the References slides at the end. Unquoted explanations are lecture paraphrases; diagrams are not archival reproductions. Distinguish links between items from shared content (transclusion). This is a conceptual diagram, not a screenshot of a working 1965 system.\nFull attribution: [16] Ted Nelson · 1965 connection diagram reproduced in his 2000 survey, Fig. 1",
+      "notes": "OPTIONAL IF SHORT ON TIME: skip this discussion; keep the next build checkpoint and failure/transfer checks. Hypertext term introduced in 1965. Distinguish basic non-sequential reading from Xanadu’s richer ambition: visible connections and reuse tied to origins. Do not imply the web implemented all of Xanadu. Existing vault clippings on Xanadu offer contrasting contemporary opinions, not historical proof.\nSource keys resolve to the References slides at the end. Unquoted explanations are lecture paraphrases; diagrams are not archival reproductions. Distinguish links between items from shared content (transclusion). This is a conceptual diagram, not a screenshot of a working 1965 system.\nFull attribution: [16] Ted Nelson · 1965 connection diagram reproduced in his 2000 survey, Fig. 1",
       "next": "vision-engelbart",
       "related": ["vision-comparison"],
       "allowRemoteImages": true
@@ -253,7 +253,7 @@ Versioned export of the Obsidian lecture at `Lectures/Web Development 2026/Prese
       "title": "Engelbart: the NLS demonstration (1968)",
       "body": "![Doug Engelbart speaking beside a shared screen during his 1968 demonstration](https://dougengelbart.org/images/pix/img0029.jpg)",
       "source": "[4, 25] NLS, 1968 · Doug Engelbart Institute",
-      "notes": "20–22 · Emphasize augmentation rather than replacement. His later NLS work gives a concrete bridge to collaborative applications. Ask students to keep this ambition in mind as an agent helps us build. Avoid turning this into a mouse-invention anecdote.\nSource keys resolve to the References slides at the end. Unquoted explanations are lecture paraphrases; diagrams are not archival reproductions. The photo shows the 1968 demonstration, six years after his 1962 conceptual framework. Point to the shared display: people can work with information together. Source: https://dougengelbart.org/content/view/224/217/ , section 4b. Requires network access.\nFull attribution: [4, 25] NLS demonstration · 9 December 1968 · Doug Engelbart Institute archive",
+      "notes": "Emphasize augmentation rather than replacement. His later NLS work gives a concrete bridge to collaborative applications. Ask students to keep this ambition in mind as an agent helps us build. Avoid turning this into a mouse-invention anecdote.\nSource keys resolve to the References slides at the end. Unquoted explanations are lecture paraphrases; diagrams are not archival reproductions. The photo shows the 1968 demonstration, six years after his 1962 conceptual framework. Point to the shared display: people can work with information together. Source: https://dougengelbart.org/content/view/224/217/ , section 4b. Requires network access.\nFull attribution: [4, 25] NLS demonstration · 9 December 1968 · Doug Engelbart Institute archive",
       "next": "vision-comparison",
       "related": ["vision-comparison"],
       "allowRemoteImages": true
@@ -263,7 +263,7 @@ Versioned export of the Obsidian lecture at `Lectures/Web Development 2026/Prese
       "type": "question",
       "title": "Which ambition does your everyday software serve?",
       "body": "**Choose and explain · 60 seconds**\n\nPick one familiar application. Which ambition does it serve best?\n\n**Otlet:** organize knowledge · **Bush:** preserve trails\n\n**Nelson:** connect texts and sources · **Engelbart:** augment problem-solving\n\nShare the application, your choice, and one missing capability.",
-      "notes": "Give students 60 seconds to choose an application and a missing capability, then hear two examples. These are distinct ambitions, not a chain of direct influence. Continue to how the web connects information.\nSource keys resolve to the References slides at the end.",
+      "notes": "OPTIONAL IF SHORT ON TIME: skip this discussion; keep the next build checkpoint and failure/transfer checks. Give students 60 seconds to choose an application and a missing capability, then hear two examples. These are distinct ambitions, not a chain of direct influence. Continue to how the web connects information.\nSource keys resolve to the References slides at the end.",
       "source": "Lecture synthesis and discussion · [1–5]",
       "chapter": "Past",
       "next": "web-response"
@@ -275,19 +275,9 @@ Versioned export of the Obsidian lecture at `Lectures/Web Development 2026/Prese
       "title": "The web connects information without one central catalogue",
       "body": "```mermaid\nflowchart LR\n subgraph A[Server A]\n D[Document]\n M[Meeting minutes]\n end\n subgraph B[Server B]\n U[Equipment information]\n end\n D -->|Follow meeting link| M\n M -->|Follow equipment link| U\n```\n\nFollow links between documents—even when they live on different servers.",
       "source": "[6] Berners-Lee & Cailliau, 1990 · Adapted from Hypertext concepts",
-      "notes": "22–25 · Trace the path from a document to meeting minutes to equipment information. The 1990 proposal uses a GHI meeting and UPS information to explain following links, then states that nodes need not be on the same machine. The server grouping here illustrates that statement; it is not an original figure or a record of the documents’ actual hosting. No central catalogue is needed for this navigation. Connect this to the seminar app: a page can link to information maintained elsewhere.\nSource: [6] WorldWideWeb: Proposal for a HyperText Project, 12 November 1990, Hypertext concepts. https://www.w3.org/Proposal.html . Original teaching adaptation, not an archival reproduction.",
-      "next": "detour-0-1",
-      "related": ["cern-connections", "detour-0-1"]
-    },
-    {
-      "id": "detour-0-1",
-      "type": "material",
-      "title": "Documents connect through links",
-      "body": "```mermaid\nflowchart LR\n Document -->|link| Resource\n Resource -->|link| Another[Another resource]\n```",
-      "notes": "What survives when CSS and JavaScript are removed?\nSource keys resolve to the References slides at the end. Unquoted explanations are lecture paraphrases; diagrams are not archival reproductions.\nFull attribution: Original explanatory diagram · [6] Tim Berners-Lee and Robert Cailliau (1990)",
-      "source": "[6] Berners-Lee & Cailliau, 1990 · Teaching diagram",
-      "chapter": "Past",
-      "next": "worldwideweb-browser"
+      "notes": "Trace the path from a document to meeting minutes to equipment information. The 1990 proposal uses a GHI meeting and UPS information to explain following links, then states that nodes need not be on the same machine. The server grouping here illustrates that statement; it is not an original figure or a record of the documents’ actual hosting. No central catalogue is needed for this navigation. Connect this to the seminar app: a page can link to information maintained elsewhere.\nSource: [6] WorldWideWeb: Proposal for a HyperText Project, 12 November 1990, Hypertext concepts. https://www.w3.org/Proposal.html . Original teaching adaptation, not an archival reproduction.",
+      "next": "worldwideweb-browser",
+      "related": ["cern-connections"]
     },
     {
       "id": "worldwideweb-browser",
@@ -299,7 +289,7 @@ Versioned export of the Obsidian lecture at `Lectures/Web Development 2026/Prese
       "source": "[14] Berners-Lee / W3C · Screenshot, 1993",
       "notes": "Use the screenshot instead of explaining the interface in bullets. Point out the Link menu and editing. Ask: what changes when you can create links as well as follow them? This is the 1993 screenshot, not an image of the original 1990 release. Image requires network access.\nFull attribution: [14] Tim Berners-Lee / W3C · WorldWideWeb (written 1990); screenshot 1993",
       "next": "geocities-personal-page",
-      "related": ["detour-0-1"]
+      "related": ["web-response"]
     },
     {
       "id": "geocities-personal-page",
@@ -340,9 +330,9 @@ Versioned export of the Obsidian lecture at `Lectures/Web Development 2026/Prese
       "chapter": "Past",
       "title": "HTML: headings, paragraphs and links",
       "body": "```html\n<h1>SDLCAI seminar</h1>\n<p>Explore AI and software development.</p>\n<a href=\"https://www.sdlcai.org/\">Visit the seminar</a>\n```\n\n### SDLCAI seminar\nExplore AI and software development.\n\n[Visit the seminar](https://www.sdlcai.org/)",
-      "notes": "25–27 · Ask what each element tells the browser. Below the code is an illustrative rendered equivalent, not an executing HTML sandbox. Inspect the real app afterwards. This is sample copy, not a sourced seminar-program claim.\nFull attribution: [7, 18] Original teaching example · HTML text and link semantics",
+      "notes": "Ask what each element tells the browser. Below the code is an illustrative rendered equivalent, not an executing HTML sandbox. Inspect the real app afterwards. This is sample copy, not a sourced seminar-program claim.\nFull attribution: [7, 18] Original teaching example · HTML text and link semantics",
       "next": "check-document",
-      "related": ["detour-0-1"],
+      "related": ["web-response"],
       "source": "[7, 18] HTML semantics · Teaching example"
     },
     {
@@ -371,9 +361,9 @@ Versioned export of the Obsidian lecture at `Lectures/Web Development 2026/Prese
       "chapter": "Past",
       "title": "Demo · The document without CSS or JavaScript",
       "body": "Read the seminar information and follow a link without CSS or JavaScript.",
-      "notes": "27–30 · Demonstrate with the document build, which appears automatically. Show its styled version, then disable JavaScript and reload the demo browser. Disable the document’s stylesheets and remove inline styles in that demo context, then show the resulting page. Read a heading, find a practical detail, and follow a source link. Explain what changed in appearance and what still works. Restore JavaScript and reload afterwards. These browser changes are manual and apply only to the demo browser, not automatically to audience devices. Use a prepared plain-HTML version if needed and identify it as prepared. The native form has not been built yet; demonstrate form submission at the later native-form checkpoint.",
+      "notes": "Demonstrate with the document build, which appears automatically. Show its styled version, then disable JavaScript and reload the demo browser. Disable the document’s stylesheets and remove inline styles in that demo context, then show the resulting page. Read a heading, find a practical detail, and follow a source link. Explain what changed in appearance and what still works. Restore JavaScript and reload afterwards. These browser changes are manual and apply only to the demo browser, not automatically to audience devices. Use a prepared plain-HTML version if needed and identify it as prepared. The native form has not been built yet; demonstrate form submission at the later native-form checkpoint.",
       "next": "seminar-form-fields",
-      "related": ["detour-0-1"],
+      "related": ["web-response"],
       "previewOf": "build-document"
     },
     {
@@ -391,7 +381,7 @@ Versioned export of the Obsidian lecture at `Lectures/Web Development 2026/Prese
       "chapter": "Past",
       "title": "HTML forms",
       "body": "```html\n<form action=\"/responses\" method=\"post\">\n  <label for=\"experience\">Experience</label>\n  <select id=\"experience\" name=\"experience\" required>\n    <option value=\"\">Choose one</option>\n    <option value=\"new\">New to the subject</option>\n    <option value=\"some\">Some experience</option>\n    <option value=\"regular\">Regular use</option>\n  </select>\n  <button>Send response</button>\n</form>\n```\n\nOne field from the seminar-interest form.",
-      "notes": "30–31 · This excerpt shows one field; the build adds all four inputs. Selecting Some experience sends experience=some. Multiple interest checkboxes use the same name, topic, so the server must read all submitted values. Explain browser validation, then demonstrate that the server validates the same constraints. The /responses route is part of the demo app, separate from lecture voting rooms.\n[8] WHATWG HTML forms · Teaching example.",
+      "notes": "This excerpt shows one field; the build adds all four inputs. Selecting Some experience sends experience=some. Multiple interest checkboxes use the same name, topic, so the server must read all submitted values. Explain browser validation, then demonstrate that the server validates the same constraints. The /responses route is part of the demo app, separate from lecture voting rooms.\n[8] WHATWG HTML forms · Teaching example.",
       "next": "build-forms",
       "related": ["step-8"],
       "source": "[8] WHATWG HTML forms · Teaching example"
@@ -496,7 +486,7 @@ Versioned export of the Obsidian lecture at `Lectures/Web Development 2026/Prese
       "chapter": "Present",
       "title": "Present",
       "body": "What happens after your click?",
-      "notes": "38–41 · Gather audience opinions before revealing the build prompt: collect suggestions, discuss the approved cloud, then freeze a priority vote. Only then advance to the resolved prompt and start the Present build.",
+      "notes": "Gather audience opinions before revealing the build prompt: collect suggestions, discuss the approved cloud, then freeze a priority vote. Only then advance to the resolved prompt and start the Present build.",
       "next": "step-9",
       "related": ["rendering-location", "flow-html-4", "detour-2-1"],
       "source": "Paraphrase · [10] Jesse James Garrett (2005)"
@@ -507,7 +497,7 @@ Versioned export of the Obsidian lecture at `Lectures/Web Development 2026/Prese
       "chapter": "Present",
       "title": "What would make our form easier to use?",
       "body": "Name one improvement in 1–3 words.\n\n**Word cloud · 45 seconds**\n\nOn live.scalableweb.dev, open **Add words** and send one short response (up to 32 characters).\n\nWe’ll review the approved cloud and discuss two contrasting suggestions.",
-      "notes": "38–41 · Collect suggestions before showing the build prompt. Discuss two approved suggestions, then use the next priority vote to capture a concrete build requirement. The cloud itself is not automatically passed to the coding agent.\n\nModerated word cloud: Showing this slide while Live is on automatically opens its word collection. Allow 45 seconds. Close collection, review submissions privately, approve relevant responses, then Show approved cloud. Read out two contrasting contributions and ask their authors to explain; frequency is not a vote or a measure of correctness. Use Back to slide before continuing. If collection is unavailable, take three spoken responses and discuss two. Never project unreviewed submissions.",
+      "notes": "Collect suggestions before showing the build prompt. Discuss two approved suggestions, then use the next priority vote to capture a concrete build requirement. The cloud itself is not automatically passed to the coding agent.\n\nModerated word cloud: Showing this slide while Live is on automatically opens its word collection. Allow 45 seconds. Close collection, review submissions privately, approve relevant responses, then Show approved cloud. Read out two contrasting contributions and ask their authors to explain; frequency is not a vote or a measure of correctness. Use Back to slide before continuing. If collection is unavailable, take three spoken responses and discuss two. Never project unreviewed submissions.",
       "next": "vote-interaction",
       "related": ["step-8"],
       "wordCloud": true
@@ -545,7 +535,7 @@ Versioned export of the Obsidian lecture at `Lectures/Web Development 2026/Prese
       "type": "build",
       "chapter": "Present",
       "title": "Build · Make the room interactive",
-      "body": "Advance to Present. Enhance the same form and let the projected view receive aggregate changes. Preserve native submission. Verify in two browser contexts and stop before model composition. Preserve all four fields and field-level errors. Refresh aggregate counts for experience, interests and format without overwriting a partially completed form. Keep questions private. Verify that replacing a response changes the appropriate counts without increasing the respondent total.",
+      "body": "Advance to Present. Enhance the same form and let the projected view receive aggregate changes. Preserve native submission. Verify in two browser contexts and stop before model composition. Preserve all four fields and field-level errors. Refresh aggregate counts for experience, interests and format without overwriting a partially completed form. Keep questions private. Verify that replacing a response changes the appropriate counts without increasing the respondent total. The audience priority chooses the first acceptance test, not which baseline protections to omit. Put the selected test and its observed result at the top of the build summary.",
       "notes": "Review the approved audience responses in the resolved prompt before starting. After the audience priority vote is closed, show the resolved prompt and point out the requirement supplied by the frozen result. Start explicitly, then continue discussing while the agent works. Inspect the app using Preview from Codex when ready.",
       "uses": [
         {
@@ -568,9 +558,9 @@ Versioned export of the Obsidian lecture at `Lectures/Web Development 2026/Prese
         {
           "poll": "vote-interaction",
           "instructions": {
-            "confirmation": "Prioritize clear submission feedback: distinguish sending, confirmed success, and an unknown outcome after a connection failure. Do not report success without confirmation.",
-            "preserve": "Prioritize preserving the user's unsent choice while aggregate results refresh. Verify this with two browser contexts.",
-            "updates": "Prioritize keeping the projected aggregate up to date after another browser submits. Make a disconnected or stale view apparent."
+            "confirmation": "Run the confirmation test FIRST at the checkpoint: suppress a submission response, show unknown rather than success, then verify authoritative stored state before any retry. Label the test 'Audience priority: confirmation' and report the observed result.",
+            "preserve": "Run the preservation test FIRST at the checkpoint: type unsent values in browser A, submit from browser B, and verify every unsent field in A remains unchanged after the aggregate refresh. Label the test 'Audience priority: preserve input' and report the observed result.",
+            "updates": "Run the shared-update test FIRST at the checkpoint: submit in browser B and verify A's aggregate changes within 3 seconds without reload; disconnect updates and show a stale indicator. Label the test 'Audience priority: shared updates' and report the observed result."
           }
         }
       ],
@@ -606,7 +596,7 @@ Versioned export of the Obsidian lecture at `Lectures/Web Development 2026/Prese
       "title": "Cached HTML and regeneration",
       "body": "```mermaid\nflowchart LR\n R[Request] --> C[Cached HTML]\n C --> B[Browser]\n C -. Policy triggers regeneration .-> S[Server renders newer HTML]\n S --> C\n```",
       "source": "[19] Lecture adaptation · Web architecture lens",
-      "notes": "ISR is a framework/platform regeneration strategy, not a universal HTTP mode. Some policies serve stale content while regenerating; others differ. The public seminar description can tolerate different freshness from a vote confirmation. Do not imply a vote POST can be safely cached as a read.",
+      "notes": "OPTIONAL IF SHORT ON TIME: skip this discussion; keep the next build checkpoint and failure/transfer checks. ISR is a framework/platform regeneration strategy, not a universal HTTP mode. Some policies serve stale content while regenerating; others differ. The public seminar description can tolerate different freshness from a vote confirmation. Do not imply a vote POST can be safely cached as a read.",
       "related": ["rendering-location"],
       "chapter": "Present",
       "next": "activation-detour"
@@ -617,7 +607,7 @@ Versioned export of the Obsidian lecture at `Lectures/Web Development 2026/Prese
       "title": "Visible HTML is not the same as initialized JavaScript",
       "body": "Native links and forms can work before JavaScript initializes.\n\nFor a JavaScript-dependent control, the HTML may be visible before the control responds.\n\nIn our app, identify which controls still work while scripts load.",
       "source": "[20] Vepsäläinen · Client activation teaching model",
-      "notes": "Connect initial rendering to the form already tested. Explain that hydration attaches application behavior to existing HTML. Islands initialize selected regions; resumability aims to resume serialized state without replaying all initialization. Keep the focus on whether the user can complete the task. The linked source is for further exploration; opening another demo is not required.\nFull attribution: [20] Juho Vepsäläinen · Client activation lens · Teaching model",
+      "notes": "OPTIONAL IF SHORT ON TIME: skip this discussion; keep the next build checkpoint and failure/transfer checks. Connect initial rendering to the form already tested. Explain that hydration attaches application behavior to existing HTML. Islands initialize selected regions; resumability aims to resume serialized state without replaying all initialization. Keep the focus on whether the user can complete the task. The linked source is for further exploration; opening another demo is not required.\nFull attribution: [20] Juho Vepsäläinen · Client activation lens · Teaching model",
       "chapter": "Present",
       "next": "detour-2-1"
     },
@@ -735,7 +725,7 @@ Versioned export of the Obsidian lecture at `Lectures/Web Development 2026/Prese
       "chapter": "Present",
       "title": "Change a preference; watch the second view",
       "body": "Change a seminar preference. Watch its aggregate update.",
-      "notes": "41–49 · Open two real views. Submit one predefined choice and watch the aggregate. The second view needs its own update mechanism: inspect whether this app polls, uses server-sent events or WebSockets. Do not suggest that updating one browser automatically updates another.",
+      "notes": "Open two real views. Submit one predefined choice and watch the aggregate. The second view needs its own update mechanism: inspect whether this app polls, uses server-sent events or WebSockets. Do not suggest that updating one browser automatically updates another.",
       "next": "flow-shared",
       "related": ["flow-shared", "flow-html-4", "detour-2-1"],
       "previewOf": "build-application"
@@ -786,7 +776,7 @@ Versioned export of the Obsidian lecture at `Lectures/Web Development 2026/Prese
       "type": "question",
       "chapter": "Present",
       "title": "Did the interaction become easier?",
-      "body": "Compare the updated form with your requests.\n\nDemonstrate one improvement. Name one unresolved need and a way to test it.",
+      "body": "Start with the test chosen by the priority vote. State **expected → observed → passed or unresolved**.\n\nThen compare the form with the approved needs below. Name one remaining need and the next test.",
       "reviewWordsFrom": ["step-9"],
       "notes": "Revisit the approved responses after showing the app. Ask the room to distinguish observed behavior from assumptions. Keep one unresolved need for the closing discussion.",
       "next": "step-13"
@@ -797,7 +787,7 @@ Versioned export of the Obsidian lecture at `Lectures/Web Development 2026/Prese
       "chapter": "Present",
       "title": "A person can use this. What would another client need to understand it?",
       "body": "**Inspect in pairs · 60 seconds**\n\nPick one action in our app. Identify its required input and how a client can tell it succeeded.\n\nReport one detail that is explicit—and one the client would have to guess.",
-      "notes": "54–58 · Inspect the form or shared contract. Distinguish explicit actions from behavior that must be inferred.\nSource keys resolve to the References slides at the end. Unquoted explanations are lecture paraphrases; diagrams are not archival reproductions.\nFull attribution: Discussion informed by · [12] Petros, Gross, Shaffer and Revelle (2025)",
+      "notes": "Inspect the form or shared contract. Distinguish explicit actions from behavior that must be inferred.\nSource keys resolve to the References slides at the end. Unquoted explanations are lecture paraphrases; diagrams are not archival reproductions.\nFull attribution: Discussion informed by · [12] Petros, Gross, Shaffer and Revelle (2025)",
       "next": "step-14",
       "related": ["flow-native-4", "flow-html-4", "flow-json-4", "detour-2-1"],
       "source": "[12] Petros et al., 2025 · Discussion"
@@ -808,9 +798,9 @@ Versioned export of the Obsidian lecture at `Lectures/Web Development 2026/Prese
       "chapter": "Future",
       "title": "Future",
       "body": "What should we be able to delegate?",
-      "notes": "58–62 · Start constrained Future composition when inputs are ready. Explain that the agent building this app and an agent using it are different roles.\nSource keys resolve to the References slides at the end. Unquoted explanations are lecture paraphrases; diagrams are not archival reproductions.\nFull attribution: Hypothesis · [13] Approved, unpublished position paper (2026)",
+      "notes": "Start constrained Future composition when inputs are ready. Explain that the agent building this app and an agent using it are different roles.\nSource keys resolve to the References slides at the end. Unquoted explanations are lecture paraphrases; diagrams are not archival reproductions.\nFull attribution: Hypothesis · [13] Approved, unpublished position paper (2026)",
       "next": "future-visions",
-      "related": ["detour-3-0", "detour-3-1"],
+      "related": ["detour-3-1"],
       "source": "[13] Lecture hypothesis · Unpublished paper, 2026"
     },
     {
@@ -820,7 +810,7 @@ Versioned export of the Obsidian lecture at `Lectures/Web Development 2026/Prese
       "title": "What task would you give a software agent?",
       "body": "Name one task in 1–3 words: compare sources, trace decisions…\n\n**Word cloud · 45 seconds**\n\nOn live.scalableweb.dev, open **Add words** and send one short response (up to 32 characters).\n\nWe’ll review the approved cloud and discuss two contrasting suggestions.",
       "source": "Lecture synthesis · [1–5]",
-      "notes": "58–60 · Briefly recall Otlet, Bush, Nelson and Engelbart; use related images rather than repeat the biographies. Hear one task from the room. Keep the distinction between assistance and replacement.\n\nModerated word cloud: Showing this slide while Live is on automatically opens its word collection. Allow 45 seconds. Close collection, review submissions privately, approve relevant responses, then Show approved cloud. Read out two contrasting contributions and ask their authors to explain; frequency is not a vote or a measure of correctness. Use Back to slide before continuing. If collection is unavailable, take three spoken responses and discuss two. Never project unreviewed submissions.",
+      "notes": "Briefly recall Otlet, Bush, Nelson and Engelbart; use related images rather than repeat the biographies. Hear one task from the room. Keep the distinction between assistance and replacement.\n\nModerated word cloud: Showing this slide while Live is on automatically opens its word collection. Allow 45 seconds. Close collection, review submissions privately, approve relevant responses, then Show approved cloud. Read out two contrasting contributions and ask their authors to explain; frequency is not a vote or a measure of correctness. Use Back to slide before continuing. If collection is unavailable, take three spoken responses and discuss two. Never project unreviewed submissions.",
       "related": ["vision-bush", "vision-nelson", "vision-engelbart"],
       "next": "semantic-web-agents",
       "wordCloud": true
@@ -832,7 +822,7 @@ Versioned export of the Obsidian lecture at `Lectures/Web Development 2026/Prese
       "title": "Semantic Web agents (2001)",
       "body": "```mermaid\nflowchart LR\n Need[Arrange appointments] --> Agent[Software agent]\n Providers[Providers and availability] --> Agent\n Constraints[Preferences and schedules] --> Agent\n Agent --> Plan[Proposed plan]\n```",
       "source": "[21] Berners-Lee, Hendler & Lassila, 2001 · Teaching diagram",
-      "notes": "60–62 · The article’s fictional scenario coordinates care appointments, provider constraints and family schedules. It illustrates a proposed future, not a deployed system. Explicit data meanings and inference rules were central. Do not equate this with modern language models or claim the Semantic Web disappeared. The practical question remains: how can services communicate meaning well enough for useful delegation?\nFull attribution: [21] Berners-Lee, Hendler & Lassila · The Semantic Web (2001) · Paraphrase and original diagram",
+      "notes": "The article’s fictional scenario coordinates care appointments, provider constraints and family schedules. It illustrates a proposed future, not a deployed system. Explicit data meanings and inference rules were central. Do not equate this with modern language models or claim the Semantic Web disappeared. The practical question remains: how can services communicate meaning well enough for useful delegation?\nFull attribution: [21] Berners-Lee, Hendler & Lassila · The Semantic Web (2001) · Paraphrase and original diagram",
       "next": "vote-priority"
     },
     {
@@ -889,7 +879,7 @@ Versioned export of the Obsidian lecture at `Lectures/Web Development 2026/Prese
       "chapter": "Future",
       "title": "Build · Compose a constrained interface",
       "body": "Advance to Future under our composition contract. Reuse the reviewed material and locked aggregate revision. Show the context receipt and deterministic fallback. Do not widen model authority or deploy unless requested. Include a frozen aggregate of the new seminar-interest responses alongside the lecture priority. Use only predefined-field counts; exclude free-text questions and browser identifiers. State which counts informed the view and show their revision in the context receipt. If no new responses exist, label the fallback rather than inventing preferences. Implement an explicit runtime input/output schema and allowlist components and URLs. Reject malformed or unsupported output before rendering; keep the fixed view available on timeout or rejection. Compare the fixed and composed views using the same task and frozen source revision: find one supported seminar detail, follow its source, and identify the next permitted action. Show both views and their receipt. Do not claim this demonstrates arbitrary autonomous service use.",
-      "notes": "Review the approved audience responses in the resolved prompt before starting. Start explicitly, then continue discussing while the agent works. Inspect the app using Preview from Codex when ready.\n62–65 · Show the actual resolved build prompt, including the frozen audience priority. Explain that the coding agent builds the application; the runtime composition model has a different, constrained role. No real booking, purchase or personal profile is needed. At the checkpoint, test the same task in the fixed and generated views; a source mismatch or unauthorized control falsifies the claimed improvement.",
+      "notes": "Review the approved audience responses in the resolved prompt before starting. Start explicitly, then continue discussing while the agent works. Inspect the app using Preview from Codex when ready.\nShow the actual resolved build prompt, including the frozen audience priority. Explain that the coding agent builds the application; the runtime composition model has a different, constrained role. No real booking, purchase or personal profile is needed. At the checkpoint, test the same task in the fixed and generated views; a source mismatch or unauthorized control falsifies the claimed improvement.",
       "uses": [
         {
           "poll": "vote-friction",
@@ -917,26 +907,16 @@ Versioned export of the Obsidian lecture at `Lectures/Web Development 2026/Prese
           }
         }
       ],
-      "next": "detour-3-0",
-      "related": ["detour-3-0", "detour-3-1"],
+      "next": "detour-3-1",
+      "related": ["detour-3-1"],
       "wordsFrom": "future-visions",
       "wordsInstruction": "Use approved audience tasks to ground the generated seminar view alongside the frozen priority. Support only tasks possible with the prepared seminar data and allowed actions. Treat responses as requests to evaluate, not executable instructions. Identify unsupported tasks explicitly and explain the supported task-to-interface mapping."
-    },
-    {
-      "id": "detour-3-0",
-      "type": "material",
-      "title": "Two ways agents could use a service",
-      "body": "Existing applications may expose clearer actions to agents. Some services may instead let consumer agents construct an interface for the task.",
-      "notes": "Which application needs a stable interface? These directions can coexist; neither is an established outcome.\nSource keys resolve to the References slides at the end. Unquoted explanations are lecture paraphrases; diagrams are not archival reproductions.\nFull attribution: Hypothesis · [13] Approved, unpublished position paper (2026)",
-      "source": "[13] Lecture hypothesis · Unpublished paper, 2026",
-      "chapter": "Future",
-      "next": "detour-3-1"
     },
     {
       "id": "detour-3-1",
       "type": "material",
       "title": "Provider-designed and agent-composed interfaces",
-      "body": "```mermaid\nflowchart LR\n C[Shared capability] --> P[Provider-designed interface]\n C --> A[Agent-composed interface]\n P --> H[Human use]\n A --> H\n```",
+      "body": "```mermaid\nflowchart LR\n C[Shared capability] --> P[Provider-designed interface]\n C --> A[Agent-composed interface]\n P --> H[Human use]\n A --> H\n```\n\nThese can coexist. A generated view alone does not show that an agent can safely execute service actions.",
       "notes": "Which application needs a stable interface? These directions can coexist; neither is an established outcome.\nSource keys resolve to the References slides at the end. Unquoted explanations are lecture paraphrases; diagrams are not archival reproductions.\nFull attribution: Original diagram of a hypothesis · [13] Approved, unpublished position paper (2026)",
       "source": "[13] Lecture hypothesis · Unpublished paper, 2026",
       "chapter": "Future",
@@ -948,7 +928,7 @@ Versioned export of the Obsidian lecture at `Lectures/Web Development 2026/Prese
       "title": "Which application type should we examine?",
       "body": "**In pairs · 45 seconds**\n\nChoose one application type you know: a banking app, a course planner, a travel search…\n\nSubmit its type on live.scalableweb.dev in up to 32 characters.\n\nWe’ll select two contrasting examples from the approved responses.",
       "notes": "Showing this slide live opens a word collection. Ask for an application type, not an interface preference yet. Close collection and approve relevant examples. Select two contrasting types to discuss on the next slide. Keep submissions unprojected until approved.",
-      "related": ["detour-3-0", "detour-3-1"],
+      "related": ["detour-3-1"],
       "source": "[13] Lecture hypothesis · Unpublished paper, 2026",
       "chapter": "Future",
       "next": "application-interface-choice",
@@ -961,7 +941,7 @@ Versioned export of the Obsidian lecture at `Lectures/Web Development 2026/Prese
       "title": "For this application, which interface approach fits?",
       "body": "Choose one approved application type below and name a specific user task.\n\n**A · Stable:** the same controls and structure each time.\n\n**B · Generated:** a view composed for the task.\n\n**C · Mixed:** stable core actions with generated supporting views.\n\nReport: **application + task → A, B or C → reason**.",
       "reviewWordsFrom": ["step-15"],
-      "notes": "Take one application type at a time so answers refer to the same case. Ask a pair to name its task and choose A, B or C with a reason; invite another pair to challenge it. Repeat with a contrasting type. Discuss familiarity, error cost, accessibility and variation between tasks. This is a spoken comparison, not an aggregate poll across unrelated applications. These are design hypotheses, not forecasts.",
+      "notes": "OPTIONAL IF SHORT ON TIME: skip this discussion; keep the next build checkpoint and failure/transfer checks. Take one application type at a time so answers refer to the same case. Ask a pair to name its task and choose A, B or C with a reason; invite another pair to challenge it. Repeat with a contrasting type. Discuss familiarity, error cost, accessibility and variation between tasks. This is a spoken comparison, not an aggregate poll across unrelated applications. These are design hypotheses, not forecasts.",
       "source": "[13] Lecture hypothesis · Unpublished paper, 2026",
       "next": "meaning-and-action"
     },
@@ -972,7 +952,7 @@ Versioned export of the Obsidian lecture at `Lectures/Web Development 2026/Prese
       "title": "Discovering available actions",
       "body": "| Question | In our seminar app |\n|---|---|\n| What is this? | Seminar information and its source |\n| What can I do? | Choose a priority; request a view |\n| What input is valid? | The predefined choices |\n| What happened? | A result, rejection or unknown outcome |",
       "source": "Lecture synthesis · [8, 12, 13, 21]",
-      "notes": "65–69 · Inspect actual controls and responses. Semantic Web work also considered services and actions; this is not a claim that it only described nouns. The distinction helps explain behavioral affordances. Can the client discover the next action, or must it guess?",
+      "notes": "Inspect actual controls and responses. Semantic Web work also considered services and actions; this is not a claim that it only described nouns. The distinction helps explain behavioral affordances. Can the client discover the next action, or must it guess?",
       "next": "accessibility-parallels"
     },
     {
@@ -982,7 +962,7 @@ Versioned export of the Obsidian lecture at `Lectures/Web Development 2026/Prese
       "title": "Human accessibility and agent interaction",
       "body": "| Shared design | Human accessibility | Agent use |\n|---|---|---|\n| Named controls | Identify purpose | Identify action |\n| Explicit inputs | Understand choices | Construct valid input |\n| Exposed state | Perceive feedback | Check the outcome |\n| Stable structure | Navigate consistently | Locate relevant controls |",
       "source": "[22, 23] WAI guidance · [12, 13] Agent hypothesis",
-      "notes": "69–72 · Human accessibility is the goal in its own right, not a proxy for machine convenience. Assistive technology mediates human use; an autonomous agent is not a screen-reader user. Agent benefit depends on whether it reads the DOM, accessibility tree, pixels or a separate contract. Accessible names are not guaranteed agent success; native HTML still requires testing for keyboard, focus, contrast and understandable feedback. Explicit constraints need server validation. Do not give every static message an ARIA live region.\nFull attribution: Human guidance: [22, 23] · Agent parallels: lecture hypothesis [12, 13]",
+      "notes": "Human accessibility is the goal in its own right, not a proxy for machine convenience. Assistive technology mediates human use; an autonomous agent is not a screen-reader user. Agent benefit depends on whether it reads the DOM, accessibility tree, pixels or a separate contract. Accessible names are not guaranteed agent success; native HTML still requires testing for keyboard, focus, contrast and understandable feedback. Explicit constraints need server validation. Do not give every static message an ARIA live region.\nFull attribution: Human guidance: [22, 23] · Agent parallels: lecture hypothesis [12, 13]",
       "next": "accessibility-boundaries",
       "related": ["accessibility-boundaries"]
     },
@@ -994,40 +974,14 @@ Versioned export of the Obsidian lecture at `Lectures/Web Development 2026/Prese
       "source": "Lecture distinction · [11–13, 22, 23]",
       "notes": "After the accessibility parallels, separate usability from authority. Human accessibility includes perception, operation and understanding. Agent access also requires authorization, scope and verification. Compare a well-labeled destructive button with whether an agent should invoke it.",
       "chapter": "Future",
-      "next": "step-16"
-    },
-    {
-      "id": "step-16",
-      "type": "material",
-      "chapter": "Future",
-      "title": "Explicit affordances in HTML",
-      "body": "Make actions, inputs and outcomes explicit.",
-      "notes": "72–77 · The human-facing HTML page or application can also expose enough information for machines to act. People often infer how an interface works from visual conventions and context. Machines, especially when limited to screenshots, may have to guess. Explicit affordances can reduce that guesswork without requiring a separate interface. This is the lecture’s design argument, not a guarantee of agent reliability. Programmatically available information can help assistive technologies and agents, but their requirements are not identical. Inspect the actual controls, inputs and result feedback in our app. Distinguish an agent using this interface from one composing another view. Connect this inspection to the earlier stable-versus-generated discussion.\nFull attribution: Hypothesis · [13] Approved, unpublished position paper (2026)",
-      "next": "detour-5-0",
-      "related": [
-        "step-15",
-        "accessibility-boundaries",
-        "detour-3-0",
-        "detour-3-1"
-      ],
-      "source": "[13] Lecture hypothesis · Unpublished paper, 2026"
+      "next": "detour-5-0"
     },
     {
       "id": "detour-5-0",
       "type": "material",
       "title": "Describe an action once",
-      "body": "For our voting service: name the action, list valid choices, and describe the result.\n\nA shared description could support the human interface, assistive tools, and agent clients.",
+      "body": "For **submit seminar interests**, describe:\n\n- **Inputs:** allowed experience, topics and format\n- **Preconditions:** valid fields and an authorized submission\n- **Outcome:** stored response and explicit confirmation\n- **Failure:** preserved input and an honest unknown state\n\nShared semantics may help different clients. They do not by themselves guarantee accessibility or reliable agent action.",
       "notes": "Ask for a counterexample. Shared semantics do not guarantee accessibility or better agent performance.\nSource keys resolve to the References slides at the end. Unquoted explanations are lecture paraphrases; diagrams are not archival reproductions.\nFull attribution: Hypothesis · [13] Approved, unpublished position paper (2026)",
-      "source": "[13] Lecture hypothesis · Unpublished paper, 2026",
-      "chapter": "Future",
-      "next": "detour-5-1"
-    },
-    {
-      "id": "detour-5-1",
-      "type": "material",
-      "title": "Different clients, shared actions and constraints",
-      "body": "```mermaid\nflowchart TB\n C[Shared capability and constraints] --> H[Human interface]\n C --> T[Assistive tools]\n C --> A[Agent interaction]\n```",
-      "notes": "Ask for a counterexample. Shared semantics do not guarantee accessibility or better agent performance.\nSource keys resolve to the References slides at the end. Unquoted explanations are lecture paraphrases; diagrams are not archival reproductions.\nFull attribution: Original diagram of a hypothesis · [13] Approved, unpublished position paper (2026)",
       "source": "[13] Lecture hypothesis · Unpublished paper, 2026",
       "chapter": "Future",
       "next": "step-17"
@@ -1038,7 +992,7 @@ Versioned export of the Obsidian lecture at `Lectures/Web Development 2026/Prese
       "chapter": "Future",
       "title": "Pick one generated claim; find its source",
       "body": "**Check the evidence · 60 seconds**\n\nPick one claim in the generated output. Find the input that supports it in the context receipt.\n\nReport the claim and its evidence—or say what evidence is missing.",
-      "notes": "77–83 · Show actual inputs, source data and destination. Separate frozen aggregate priorities from personal information. Inspect the result against its sources. Return to Bush: a personal knowledge tool need not imply surrendering a personal profile. Do not invent a failure if none occurred; use a clearly labeled hypothetical case.\nFull attribution: Lecture design proposal · Context receipt is not an established standard",
+      "notes": "Show actual inputs, source data and destination. Separate frozen aggregate priorities from personal information. Inspect the result against its sources. Return to Bush: a personal knowledge tool need not imply surrendering a personal profile. Do not invent a failure if none occurred; use a clearly labeled hypothetical case.\nFull attribution: Lecture design proposal · Context receipt is not an established standard",
       "next": "check-composed-interface",
       "related": ["detour-4-0", "detour-4-1"],
       "source": "Context receipt · Lecture proposal",
@@ -1069,9 +1023,9 @@ Versioned export of the Obsidian lecture at `Lectures/Web Development 2026/Prese
       "chapter": "Closing",
       "title": "What we built and tested",
       "body": "| Stage | What we added | What we checked |\n|---|---|---|\n| Past | Seminar information and a native form | Reading, links and submission without JavaScript |\n| Present | Browser interaction and shared results | Two views, unsent choices and connection failures |\n| Future | A generated seminar view | Source inputs, the chosen priority and a fallback |",
-      "notes": "83–85 · Recap the same seminar app across the three sections. Point to one observed result from each checkpoint. Distinguish completed builds from prepared examples or unfinished work; describe a failed check as a finding, not a success. Recall one difficulty from the opening audience discussion and ask whether our app addressed it. The historical thread connected documents and links, browser interaction, and possible agent use; these approaches can coexist.",
+      "notes": "Recap the same seminar app across the three sections. Point to one observed result from each checkpoint. Distinguish completed builds from prepared examples or unfinished work; describe a failed check as a finding, not a success. Recall one difficulty from the opening audience discussion and ask whether our app addressed it. The historical thread connected documents and links, browser interaction, and possible agent use; these approaches can coexist.",
       "next": "closing-directions",
-      "related": ["vision-comparison", "detour-5-0", "detour-5-1"]
+      "related": ["vision-comparison", "detour-5-0"]
     },
     {
       "id": "closing-directions",
@@ -1079,7 +1033,7 @@ Versioned export of the Obsidian lecture at `Lectures/Web Development 2026/Prese
       "chapter": "Closing",
       "title": "Where could we take this next?",
       "body": "- **Improve the existing app:** test with seminar visitors and fix where they get stuck.\n- **Support another client:** expose actions, inputs and results so it can use the same service.\n- **Explore generated views:** compare a generated view with a fixed page on the same task.",
-      "notes": "85–86 · Present these as possible next experiments. For visitor testing, observe whether someone can find a practical detail and submit a preference. For another client, test a permitted action and verify its result. For generated views, compare task completion and factual accuracy against the fixed page using the same source material. Ask what evidence would justify each direction; do not imply that generation is the required next step.",
+      "notes": "Present these as possible next experiments. For visitor testing, observe whether someone can find a practical detail and submit a preference. For another client, test a permitted action and verify its result. For generated views, compare task completion and factual accuracy against the fixed page using the same source material. Ask what evidence would justify each direction; do not imply that generation is the required next step.",
       "next": "closing-app-question"
     },
     {
@@ -1088,7 +1042,7 @@ Versioned export of the Obsidian lecture at `Lectures/Web Development 2026/Prese
       "chapter": "Closing",
       "title": "What would you test next?",
       "body": "Suggest one next test for our seminar app in 1–3 words.\n\n**Word cloud · 45 seconds**\n\nOn live.scalableweb.dev, open **Add words** and send one response (up to 32 characters).\n\nWe’ll discuss two approved suggestions: what would each test help us decide?",
-      "notes": "86–89 · While Live is on, open Responses, choose Word cloud, enter “What would you test next?”, and open a new collection. Allow 45 seconds, close collection, review privately, approve relevant responses, then show the approved cloud. Pick two contrasting suggestions and ask what result would support or challenge the proposed direction. Frequency is not a vote. If collection is unavailable, take two spoken suggestions. Use Back to slide, then advance to the closing takeaway. Do not start another build.",
+      "notes": "While Live is on, open Responses, choose Word cloud, enter “What would you test next?”, and open a new collection. Allow 45 seconds, close collection, review privately, approve relevant responses, then show the approved cloud. Pick two contrasting suggestions and ask what result would support or challenge the proposed direction. Frequency is not a vote. If collection is unavailable, take two spoken suggestions. Use Back to slide, then advance to the closing takeaway. Do not start another build.",
       "next": "audience-evidence-recap",
       "related": ["accessibility-parallels", "meaning-and-action"],
       "wordCloud": true
@@ -1115,7 +1069,7 @@ Versioned export of the Obsidian lecture at `Lectures/Web Development 2026/Prese
       "title": "Transfer the three checks to another app",
       "body": "**In pairs · 2 minutes**\n\nA course-booking app shows no confirmation after you press Reserve. A generated view claims “You have a place.”\n\n1. Trace the request and response. What changes if the app uses AJAX?\n2. Give two server states consistent with the missing confirmation. What should the UI say and check next?\n3. What evidence supports the generated claim? Which action needs permission, and what should the fixed fallback show?",
       "notes": "Take one explanation per question, then reveal the answer verbally: AJAX changes the update mechanism, not the need to validate/store. The request may never arrive, or the write may succeed and the response be lost. Show unknown until authoritative status is checked; retries need duplicate handling. A place requires an actual confirmed reservation record, not inferred interest counts. Generated text cannot confer booking authority. The fallback should show verified status and a clearly authorized next action. Use the approved needs in the preceding recap to motivate the test.",
-      "related": ["detour-5-0", "detour-5-1"],
+      "related": ["detour-5-0"],
       "next": "references-title"
     },
     {
