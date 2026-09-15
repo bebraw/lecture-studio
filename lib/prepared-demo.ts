@@ -41,15 +41,31 @@ export function preparedDemo() {
     url: URL,
     origin: string,
   ) => {
+    const layers = /^\/teaching\/layers(?:\/(responses|results))?$/.exec(
+      url.pathname,
+    );
+    const layerMode =
+      layers && ["nojs", "html"].includes(url.searchParams.get("mode") || "")
+        ? url.searchParams.get("mode")!
+        : "full";
+    const suffix = layers ? "?mode=" + layerMode : "";
     const match =
       /^\/teaching\/checkpoint\/(build-[a-z]+)(?:\/(responses|results))?$/.exec(
-        url.pathname,
+        layers
+          ? "/teaching/checkpoint/build-application" +
+              (layers[1] ? "/" + layers[1] : "")
+          : url.pathname,
       );
     const build = match?.[1];
     if (!build || !builds.includes(build)) return false;
     res.setHeader("cache-control", "no-store");
     res.setHeader("referrer-policy", "same-origin");
-    const base = "/teaching/checkpoint/" + build;
+    const base = layers ? "/teaching/layers" : "/teaching/checkpoint/" + build;
+    if (layers)
+      res.setHeader(
+        "content-security-policy",
+        `default-src 'self'; script-src ${layerMode === "full" ? "'self'" : "'none'"}; style-src ${layerMode === "html" ? "'none'" : "'self'"}; form-action 'self'; frame-ancestors 'self'`,
+      );
     let voter = req.headers.cookie?.match(
       /(?:^|;\s*)teaching_browser=([a-f0-9-]{36})(?:;|$)/,
     )?.[1];
@@ -113,7 +129,7 @@ export function preparedDemo() {
       else {
         responses.set(voter, values);
         revision++;
-        res.writeHead(303, { location: base + "/results" });
+        res.writeHead(303, { location: base + "/results" + suffix });
         res.end();
         return true;
       }
@@ -122,8 +138,9 @@ export function preparedDemo() {
       res.end();
       return true;
     }
-    const banner =
-      "<p><strong>Prepared reference · live build preview unavailable</strong></p><p>This isolated example is not evidence that the live build succeeded. Records are in memory and disappear when the studio restarts. Do not enter personal information.</p>";
+    const banner = layers
+      ? `<nav aria-label="Enhancement layers"><a href="${base}?mode=full">Full: HTML + CSS + JavaScript</a> · <a href="${base}?mode=nojs">No JavaScript</a> · <a href="${base}?mode=html">HTML only</a></nav><h1>Remove the outer layers</h1><p><strong>Prepared teaching experiment · ${layerMode === "full" ? "all layers enabled" : layerMode === "nojs" ? "JavaScript blocked in this app" : "CSS and JavaScript blocked in this app"}</strong></p><p>These controls affect this app only. Submit a response and compare the confirmation and results. This is an isolated reference, not the generated build.</p>`
+      : "<p><strong>Prepared reference · live build preview unavailable</strong></p><p>This isolated example is not evidence that the live build succeeded. Records are in memory and disappear when the studio restarts. Do not enter personal information.</p>";
     if (build === "build-document") {
       const html = await readFile(
         new URL("../document-a/index.html", import.meta.url),
@@ -159,7 +176,7 @@ export function preparedDemo() {
       "content-type": "text/html; charset=utf-8",
     });
     res.end(
-      `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Prepared seminar checkpoint</title><link rel="stylesheet" href="/prepared-document.css">${build === "build-application" ? '<script type="module" src="/prepared-demo.mjs"></script>' : ""}</head><body><main class="page">${banner}${confirmation}${build === "build-agents" ? composition : ""}${form}${aggregate}</main></body></html>`,
+      `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Prepared seminar checkpoint</title>${layerMode !== "html" ? '<link rel="stylesheet" href="/prepared-document.css">' : ""}${build === "build-application" && layerMode === "full" ? '<script type="module" src="/prepared-demo.mjs"></script>' : ""}</head><body><main class="page">${banner}${confirmation}${build === "build-agents" ? composition : ""}${form.replace('action="' + base + '/responses"', 'action="' + base + "/responses" + suffix + '"')}${aggregate}</main></body></html>`,
     );
     return true;
   };

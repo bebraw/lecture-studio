@@ -210,6 +210,20 @@ export async function renderDiagrams(container: HTMLElement) {
         const holder = document.createElement("div");
         holder.className = "mermaid-graphic";
         holder.innerHTML = svg;
+        if (/^\s*sequenceDiagram\b/m.test(text)) {
+          holder.classList.add("sequence-diagram");
+          const diagram = holder.querySelector("svg");
+          if (diagram) {
+            // Reserve the same canvas for short and progressively longer flows.
+            const box = diagram.viewBox.baseVal;
+            const width = Math.max(800, box.width);
+            diagram.setAttribute(
+              "viewBox",
+              `${box.x - (width - box.width) / 2} ${box.y} ${width} ${Math.max(450, box.height)}`,
+            );
+            diagram.setAttribute("preserveAspectRatio", "xMidYMin meet");
+          }
+        }
         // Opt-in sequence reveals: counts of messages and notes already explained.
         const focus = text.match(/^\s*%% focus-after: (\d+),(\d+)\s*$/m);
         if (focus) {

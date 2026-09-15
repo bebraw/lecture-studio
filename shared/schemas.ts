@@ -125,6 +125,7 @@ export const stepSchema = v.object({
   ),
   previewOf: optionalText,
   teachingDemo: v.exactOptional(v.boolean()),
+  layersDemo: v.exactOptional(v.boolean()),
   wordCloud: v.exactOptional(v.boolean()),
   wordsFrom: optionalText,
   wordsInstruction: optionalText,

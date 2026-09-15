@@ -117,6 +117,7 @@ export interface Step {
   uses?: Dependency[];
   previewOf?: string;
   teachingDemo?: boolean;
+  layersDemo?: boolean;
   wordCloud?: boolean;
   wordsFrom?: string;
   wordsInstruction?: string;

@@ -158,8 +158,8 @@ Versioned export of the Obsidian lecture at `Lectures/Web Development 2026/Prese
       "type": "question",
       "chapter": "Past",
       "title": "When deciding whether to attend a seminar, what information do you need first?",
-      "body": "**Word cloud**\n\nOn live.scalableweb.dev, enter **one idea per line**.\n\nUse 1–3 words per idea, up to 32 characters. Submit up to five ideas together.\n\nFor example:\n```text\nTopic\nDate and location\nRequired background\n```",
-      "notes": "Showing this slide while Live is on automatically opens its word collection. Allow 45 seconds. Close collection, review submissions privately, approve relevant responses, then Show approved cloud. Discuss two or three needs, such as topic, date, location or prerequisites. Connect these needs to the first document’s headings and ordering; refer back to them when checking the build. Frequency is a discussion cue, not proof of importance. Use Back to slide before continuing. If collection is unavailable, take three spoken responses. Never project unreviewed submissions.",
+      "body": "**Word cloud**\n\nOn live.scalableweb.dev, enter **one idea per line**.\n\nUse 1–3 words per idea, up to 32 characters. Submit up to five ideas together.",
+      "notes": "Showing this slide while Live is on automatically opens its word collection. Close collection, review submissions privately, approve relevant responses, then Show approved cloud. Discuss two or three needs drawn from the students’ own contributions; do not seed the collection with examples. Connect these needs to the first document’s headings and ordering; refer back to them when checking the build. Frequency is a discussion cue, not proof of importance. Use Back to slide before continuing. If collection is unavailable, take three spoken responses. Never project unreviewed submissions.",
       "next": "vote-theme",
       "wordCloud": true
     },
@@ -354,7 +354,29 @@ Versioned export of the Obsidian lecture at `Lectures/Web Development 2026/Prese
       "type": "material",
       "chapter": "Past",
       "title": "Progressive enhancement (2003)",
-      "body": "```onion\nHTML | Read the content and submit the form\nCSS | Make the same content easier to scan\nJavaScript | Update results without navigating\n```\n\nPeel away the outer layers: the core still works.\n\n[Original presentation: Champeon & Finck, SXSW 2003](https://web.archive.org/web/20210226200650/http://www.hesketh.com/publications/inclusive_web_design_for_the_future/)",
+      "body": "```onion 1\nHTML | Read the content and submit the form\nCSS | Make the same content easier to scan\nJavaScript | Update results without navigating\n```\n\nHTML provides the core task: read and submit.\n\n[Original presentation: Champeon & Finck, SXSW 2003](https://web.archive.org/web/20210226200650/http://www.hesketh.com/publications/inclusive_web_design_for_the_future/)",
+      "notes": "Explain from the centre outward. HTML provides content and the native form; the server processes the submission. CSS enhances presentation. JavaScript enhances interaction. Remove either enhancement and the core task should remain available. This onion is an original teaching illustration, not a reproduction of the original presentation. The principle does not guarantee accessibility: still test labels, keyboard use, focus and feedback.\nOriginal source: Steven Champeon and Nick Finck, Inclusive Web Design for the Future, SXSW 2003. Original URL: http://www.hesketh.com/publications/inclusive_web_design_for_the_future/ . Archived link supplied because the original site is unavailable; archive retrieval could not be verified here. Attribution corroborated by Aaron Gustafson’s 2008 A List Apart article [9], which uses a Peanut M&M metaphor for nested HTML, CSS and JavaScript layers.",
+      "next": "enhancement-css",
+      "related": [],
+      "source": "[28] Champeon & Finck, 2003 · Onion diagram: teaching adaptation"
+    },
+    {
+      "id": "enhancement-css",
+      "type": "material",
+      "chapter": "Past",
+      "title": "Progressive enhancement (2003)",
+      "body": "```onion 2\nHTML | Read the content and submit the form\nCSS | Make the same content easier to scan\nJavaScript | Update results without navigating\n```\n\nCSS improves presentation; the same HTML still works.\n\n[Original presentation: Champeon & Finck, SXSW 2003](https://web.archive.org/web/20210226200650/http://www.hesketh.com/publications/inclusive_web_design_for_the_future/)",
+      "notes": "Explain from the centre outward. HTML provides content and the native form; the server processes the submission. CSS enhances presentation. JavaScript enhances interaction. Remove either enhancement and the core task should remain available. This onion is an original teaching illustration, not a reproduction of the original presentation. The principle does not guarantee accessibility: still test labels, keyboard use, focus and feedback.\nOriginal source: Steven Champeon and Nick Finck, Inclusive Web Design for the Future, SXSW 2003. Original URL: http://www.hesketh.com/publications/inclusive_web_design_for_the_future/ . Archived link supplied because the original site is unavailable; archive retrieval could not be verified here. Attribution corroborated by Aaron Gustafson’s 2008 A List Apart article [9], which uses a Peanut M&M metaphor for nested HTML, CSS and JavaScript layers.",
+      "next": "enhancement-js",
+      "related": [],
+      "source": "[28] Champeon & Finck, 2003 · Onion diagram: teaching adaptation"
+    },
+    {
+      "id": "enhancement-js",
+      "type": "material",
+      "chapter": "Past",
+      "title": "Progressive enhancement (2003)",
+      "body": "```onion 3\nHTML | Read the content and submit the form\nCSS | Make the same content easier to scan\nJavaScript | Update results without navigating\n```\n\nJavaScript improves interaction; the core task remains available.\n\n[Original presentation: Champeon & Finck, SXSW 2003](https://web.archive.org/web/20210226200650/http://www.hesketh.com/publications/inclusive_web_design_for_the_future/)",
       "notes": "Explain from the centre outward. HTML provides content and the native form; the server processes the submission. CSS enhances presentation. JavaScript enhances interaction. Remove either enhancement and the core task should remain available. This onion is an original teaching illustration, not a reproduction of the original presentation. The principle does not guarantee accessibility: still test labels, keyboard use, focus and feedback.\nOriginal source: Steven Champeon and Nick Finck, Inclusive Web Design for the Future, SXSW 2003. Original URL: http://www.hesketh.com/publications/inclusive_web_design_for_the_future/ . Archived link supplied because the original site is unavailable; archive retrieval could not be verified here. Attribution corroborated by Aaron Gustafson’s 2008 A List Apart article [9], which uses a Peanut M&M metaphor for nested HTML, CSS and JavaScript layers.",
       "next": "check-native-form",
       "related": [],
@@ -375,11 +397,11 @@ Versioned export of the Obsidian lecture at `Lectures/Web Development 2026/Prese
       "type": "material",
       "chapter": "Past",
       "title": "Demo · Remove the outer layers",
-      "body": "Without CSS and JavaScript, can we still read the seminar information and submit the form?",
-      "notes": "After the onion model and native-form checkpoint, predict what survives. Use the completed native-form app, not the earlier document-only build. Disable JavaScript and reload in the demo browser; disable stylesheets and inline styles there. Read a heading, follow a link, submit a valid response, and inspect confirmation and aggregate counts. Restore JavaScript and styles afterwards. These browser changes are manual and affect only the demo browser. If using the prepared reference, label it as prepared rather than evidence of build success.",
+      "body": "Compare Full, No JavaScript, and HTML only in this prepared app.",
+      "notes": "Use the embedded app’s layer links. Start with Full and submit; switch to No JavaScript and submit again; switch to HTML only and repeat. Compare confirmation and shared results. Only this prepared app blocks scripts or styles; the studio keeps working. This experiment illustrates the pattern and is not evidence that the generated build implements it. No browser settings changes are needed.",
       "next": "step-10",
       "related": [],
-      "previewOf": "build-forms"
+      "layersDemo": true
     },
     {
       "id": "step-10",
@@ -452,11 +474,23 @@ Versioned export of the Obsidian lecture at `Lectures/Web Development 2026/Prese
       "id": "early-spas",
       "type": "material",
       "chapter": "Present",
-      "title": "Early single-page applications (2000–2004)",
-      "body": "**Outlook Web Access · Exchange 2000**\nA browser-based mail interface built with dynamic HTML and XMLHTTP.\n\n**Gmail · 2004**\nA fast, dynamic mail interface that helped popularize AJAX.\n\nThe application updates the current document as you work.",
-      "source": "[32, 33] Hopmann; Buchheit · Firsthand accounts",
+      "title": "Outlook Web Access (2000)",
+      "body": "![Outlook Web Access for Exchange 2000 in Internet Explorer, from a 2002 tutorial](https://assets.serverwatch.com/uploads/2020/09/learn-exchange-server-2000-setting-up-outlook-web-access-to-use-ssl-page-2_5f5ee90733d9e.gif)\n\nMail interactions within a browser application, using dynamic HTML and XMLHTTP.",
+      "source": "[32, 38] Hopmann · Screenshot: ServerWatch, 2002; interface © Microsoft",
       "notes": "Introduce SPA as single-page application: the browser updates the current document for application interactions instead of fetching a whole new document for every action. These are documented early examples of the pattern, not a claim that either was the first SPA. Hopmann recalls XMLHTTP development around late 1998 and dates the Exchange 2000 OWA release to 2000; do not label the shipping app 1998. Paul Buchheit dates Gmail’s launch to 1 April 2004 and describes its role in popularizing AJAX. A single AJAX-enhanced form does not by itself make an entire application an SPA. Connect the mail example to preserving an unsent form in our app.",
-      "next": "rendering-location"
+      "next": "early-spa-gmail",
+      "allowRemoteImages": true
+    },
+    {
+      "id": "early-spa-gmail",
+      "type": "material",
+      "chapter": "Present",
+      "title": "Gmail (2004)",
+      "body": "![Gmail’s original 2004 inbox, published by Google](https://storage.googleapis.com/gweb-uniblog-publish-prod/images/2004_Gmail_UI.width-1200.format-webp.webp)\n\nA dynamic mail interface helped popularize AJAX.",
+      "source": "[33, 39] Buchheit · Screenshot: Google, original 2004 interface",
+      "notes": "Introduce SPA as single-page application: the browser updates the current document for application interactions instead of fetching a whole new document for every action. These are documented early examples of the pattern, not a claim that either was the first SPA. Hopmann recalls XMLHTTP development around late 1998 and dates the Exchange 2000 OWA release to 2000; do not label the shipping app 1998. Paul Buchheit dates Gmail’s launch to 1 April 2004 and describes its role in popularizing AJAX. A single AJAX-enhanced form does not by itself make an entire application an SPA. Connect the mail example to preserving an unsent form in our app.",
+      "next": "rendering-location",
+      "allowRemoteImages": true
     },
     {
       "id": "rendering-location",
@@ -472,10 +506,10 @@ Versioned export of the Obsidian lecture at `Lectures/Web Development 2026/Prese
     {
       "id": "rendering-cached",
       "type": "material",
-      "title": "Cached HTML and regeneration",
-      "body": "```mermaid\nflowchart LR\n R[Request] --> C[Cached HTML]\n C --> B[Browser]\n C -. Policy triggers regeneration .-> S[Server renders newer HTML]\n S --> C\n```",
+      "title": "Serving cached HTML",
+      "body": "```mermaid\nsequenceDiagram\n participant B as Browser\n participant C as Cache\n participant S as Server\n B->>C: GET /seminar\n alt Fresh cached HTML\n C-->>B: HTML response\n else Missing or expired\n C->>S: GET /seminar\n S-->>C: Rendered HTML\n Note over C: Store if cache policy permits\n C-->>B: HTML response\n end\n```",
       "source": "[19] Lecture adaptation · Web architecture lens",
-      "notes": "OPTIONAL IF SHORT ON TIME: skip this discussion; keep the next build checkpoint and failure/transfer checks. ISR is a framework/platform regeneration strategy, not a universal HTTP mode. Some policies serve stale content while regenerating; others differ. The public seminar description can tolerate different freshness from a vote confirmation. Do not imply a vote POST can be safely cached as a read.",
+      "notes": "Follow the same request/response direction as the native form diagram: browser initiates, response returns. This simplified read-only example uses a fresh cached response or waits for the server to produce one. Some systems can instead serve stale content while regenerating, but that is a separate policy. Do not cache a vote POST as a read. The seminar description and a submission confirmation need different freshness guarantees.",
       "related": ["rendering-location"],
       "chapter": "Present",
       "next": "activation-detour"
@@ -1027,7 +1061,7 @@ Versioned export of the Obsidian lecture at `Lectures/Web Development 2026/Prese
       "type": "material",
       "chapter": "References",
       "title": "References · Browser applications and frameworks",
-      "body": "- [32] Alex Hopmann. [The Story of XMLHTTP](https://www.alexhopmann.com/page/the-story-of-xmlhttp). Firsthand account of Outlook Web Access and XMLHTTP.\n- [33] Paul Buchheit (2005). [Guess what just turned 34?](https://googleblog.blogspot.com/2005/10/guess-what-just-turned-34.html). Gmail’s launch and dynamic interface.\n- [34] React. [React Versions](https://react.dev/versions). Open-source release: 29 May 2013.\n- [35] Evan You (2014). [First Week of Launching Vue.js](https://blog.evanyou.me/2014/02/11/first-week-of-launching-an-oss-project/).\n- [36] Google Open Source (2016). [Angular, version 2](https://opensource.googleblog.com/2016/09/angular-version-2-proprioception.html).\n- [37] Angular. [What is Angular?](https://angular.dev/docs); AngularJS. [Developer Guide](https://docs.angularjs.org/guide).",
+      "body": "- [32] Alex Hopmann. [The Story of XMLHTTP](https://www.alexhopmann.com/page/the-story-of-xmlhttp). Firsthand account of Outlook Web Access and XMLHTTP.\n- [33] Paul Buchheit (2005). [Guess what just turned 34?](https://googleblog.blogspot.com/2005/10/guess-what-just-turned-34.html). Gmail’s launch and dynamic interface.\n- [34] React. [React Versions](https://react.dev/versions). Open-source release: 29 May 2013.\n- [35] Evan You (2014). [First Week of Launching Vue.js](https://blog.evanyou.me/2014/02/11/first-week-of-launching-an-oss-project/).\n- [36] Google Open Source (2016). [Angular, version 2](https://opensource.googleblog.com/2016/09/angular-version-2-proprioception.html).\n- [37] Angular. [What is Angular?](https://angular.dev/docs); AngularJS. [Developer Guide](https://docs.angularjs.org/guide).\n- [38] ServerWatch (2002). [Exchange 2000 OWA tutorial, Figure 5](https://www.serverwatch.com/guides/learn-exchange-server-2000-setting-up-outlook-web-access-to-use-ssl-page-2/). Contemporary screenshot; interface © Microsoft.\n- [39] Google (2019). [Hitting send on the next 15 years of Gmail](https://blog.google/products-and-platforms/products/gmail/hitting-send-on-the-next-15-years-of-gmail/). Original 2004 inbox screenshot.",
       "notes": "Early application examples are drawn from their developers’ accounts. They establish examples and dates, not an exclusive invention claim."
     }
   ]

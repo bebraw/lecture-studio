@@ -230,10 +230,12 @@ export function createStudio({
     const capturedPreview = s.previewOf
       ? buildPreviews.get(s.previewOf)
       : undefined;
-    const demoUrl = s.teachingDemo
-      ? origin + "/teaching/failure"
-      : capturedPreview ||
-        (s.previewOf ? preparedPreview(s.previewOf, origin) : undefined);
+    const demoUrl = s.layersDemo
+      ? origin + "/teaching/layers"
+      : s.teachingDemo
+        ? origin + "/teaching/failure"
+        : capturedPreview ||
+          (s.previewOf ? preparedPreview(s.previewOf, origin) : undefined);
     if (capturedPreview) await sharePreview(capturedPreview);
     if (s.type === "poll") {
       graphPoll = getGraphPoll(s);

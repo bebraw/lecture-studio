@@ -52,10 +52,7 @@ async function refreshFeedback() {
         config.mode === "words"
           ? "One idea per line. Use 1–3 words and at most 32 characters per idea. Send up to five ideas together; commas do not separate ideas."
           : "Ask one question, up to 400 characters.";
-      query("textarea", feedback).placeholder =
-        config.mode === "words"
-          ? "Topic\nDate and location\nRequired background"
-          : "";
+      query("textarea", feedback).placeholder = "";
 
       query("textarea", feedback).maxLength =
         config.mode === "words" ? 164 : 400;

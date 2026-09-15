@@ -2645,3 +2645,11 @@ blockquote {
 .source-comment {
   color: #526b55;
 }
+.stage #stage-content:has(.sequence-diagram),
+.stage #stage-content:has(code.language-mermaid) {
+  justify-content: flex-start;
+}
+.stage .sequence-diagram svg {
+  width: 100%;
+  height: 55vh;
+}

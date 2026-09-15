@@ -44,6 +44,7 @@ test("native submission diagrams render within the projected slide", async ({
     await desk.locator("#presentation-name").click();
     await desk.locator("#presentation-load").click();
     await desk.locator("#live-toggle").click();
+    let actorTop: number | undefined;
     for (const [i, step] of steps.entries()) {
       if (i) await desk.locator("#graph-next").click();
       await expect(
@@ -54,6 +55,16 @@ test("native submission diagrams render within the projected slide", async ({
       const box = await svg.boundingBox();
       expect(box!.x).toBeGreaterThanOrEqual(0);
       expect(box!.y + box!.height).toBeLessThanOrEqual(720);
+      await expect(svg).toHaveAttribute("preserveAspectRatio", "xMidYMin meet");
+      await stage.waitForTimeout(400);
+      const top = await svg
+        .locator("rect.actor")
+        .evaluateAll((nodes) =>
+          Math.min(...nodes.map((node) => node.getBoundingClientRect().top)),
+        );
+      if (actorTop !== undefined)
+        expect(Math.abs(top - actorTop)).toBeLessThan(3);
+      actorTop = top;
       await stage.screenshot({ path: `.local/native-layout-${i + 1}.png` });
     }
   } finally {
