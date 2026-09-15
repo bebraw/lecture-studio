@@ -101,6 +101,20 @@ test("a frozen vote feeds the explicit build without launching during navigation
     await desk.locator("#graph-build").click();
     await expect.poll(() => bridge.lastPrompt).toContain("Use retro styling.");
     await expect(desk.locator("#graph-build")).toBeDisabled();
+    const original = bridge.lastPrompt;
+    bridge.state = {
+      ...bridge.state,
+      status: "ready",
+      outcome: "failed",
+      turnId: null,
+      requests: [],
+    };
+    await expect(
+      desk.getByRole("button", { name: "Retry this build" }),
+    ).toBeEnabled();
+    await desk.getByRole("button", { name: "Retry this build" }).click();
+    await expect(desk.locator("#graph-build")).toBeDisabled();
+    expect(bridge.lastPrompt).toBe(original);
   } finally {
     await stop();
   }

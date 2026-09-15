@@ -138,6 +138,7 @@ export interface BuildInput {
   revision: number | null;
 }
 export interface BuildRun {
+  status?: "running" | "completed" | "failed" | "interrupted";
   step: string;
   prompt: string;
   inputs: BuildInput[];

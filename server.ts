@@ -295,36 +295,55 @@ export function createStudio({
     res.writeHead(status, { "content-type": "application/json" });
     res.end(JSON.stringify(value));
   };
-  const deskState = (): DeskState => ({
-    live,
-    projection: publicState(),
-    audienceSync: { error: audienceSync.error },
-    presentation: presentation?.state() || null,
-    graphPoll: graphPoll?.state() || null,
-    acts,
-    scope,
-    draft,
-    draftPreview: publicStage(draft, version),
-    stage: pollOnStage
-      ? {
-          ...stage,
-          title: (projectedPoll || poll).config.question,
-          mode: "poll",
-        }
-      : stage,
-    blank,
-    canReturnToMaterial: !!previousMaterial,
-    activeAct,
-    brief,
-    lastBrief,
-    codex: bridge.snapshot(),
-    libraryStatus: library.status,
-    workspace,
-    savedAt,
-    rehearsalJob,
-    resetVersion,
-    poll: poll.state(),
-  });
+  const updateBuildRun = () => {
+    const run = presentation?.runs.at(-1);
+    const state = bridge.state;
+    if (
+      run?.status === "running" &&
+      !state.turnId &&
+      !["running", "waiting"].includes(state.status)
+    ) {
+      run.status =
+        state.outcome === "completed"
+          ? "completed"
+          : state.outcome === "failed"
+            ? "failed"
+            : "interrupted";
+    }
+  };
+  const deskState = (): DeskState => {
+    updateBuildRun();
+    return {
+      live,
+      projection: publicState(),
+      audienceSync: { error: audienceSync.error },
+      presentation: presentation?.state() || null,
+      graphPoll: graphPoll?.state() || null,
+      acts,
+      scope,
+      draft,
+      draftPreview: publicStage(draft, version),
+      stage: pollOnStage
+        ? {
+            ...stage,
+            title: (projectedPoll || poll).config.question,
+            mode: "poll",
+          }
+        : stage,
+      blank,
+      canReturnToMaterial: !!previousMaterial,
+      activeAct,
+      brief,
+      lastBrief,
+      codex: bridge.snapshot(),
+      libraryStatus: library.status,
+      workspace,
+      savedAt,
+      rehearsalJob,
+      resetVersion,
+      poll: poll.state(),
+    };
+  };
   const publicState = (): Stage => {
     if (!live) return waitingStage();
     const c = bridge.state;
@@ -709,24 +728,31 @@ export function createStudio({
                   throw new Error(
                     "Collect the required decisions or explicitly accept prepared defaults",
                   );
+                updateBuildRun();
+                const prior = presentation.runs.findLast(
+                  (r) => r.step === presentation!.current,
+                );
                 if (
-                  presentation.runs.some(
-                    (r) => r.step === presentation!.current,
-                  )
+                  prior &&
+                  !["failed", "interrupted"].includes(prior.status ?? "running")
                 )
+                  throw new Error("This build is running or has completed");
+                if (prior && body.retry !== true)
                   throw new Error(
-                    "This step has already started in this session",
+                    "Choose Retry this build to reuse its approved inputs",
                   );
+                const attempt = prior ?? resolved;
                 await showGraph();
                 await bridge.start(
-                  resolved.prompt,
+                  attempt.prompt,
                   optionalString(body.model, "model") ?? "",
                 );
-                lastBrief = brief = resolved.prompt;
+                lastBrief = brief = attempt.prompt;
                 presentation.runs.push({
                   step: presentation.current,
-                  prompt: resolved.prompt,
-                  inputs: structuredClone(resolved.inputs),
+                  prompt: attempt.prompt,
+                  inputs: structuredClone(attempt.inputs),
+                  status: "running",
                   startedAt: new Date().toISOString(),
                 });
               } else throw new Error("Unknown presentation operation");

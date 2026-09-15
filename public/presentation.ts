@@ -351,7 +351,10 @@ export function mountPresentations({ call, update }: MountOptions) {
   $("graph-next").onclick = () => navigate("next");
   $("graph-previous").onclick = () => navigate("previous");
   $("graph-build").onclick = () =>
-    run("presentation/build", { model: $("model").value });
+    run("presentation/build", {
+      model: $("model").value,
+      retry: $("graph-build").textContent === "Retry this build",
+    });
   return (value: DeskState) => {
     data = value;
     const p = data.presentation;
@@ -463,10 +466,17 @@ export function mountPresentations({ call, update }: MountOptions) {
     $("graph-return").hidden = true;
     $("graph-defaults").hidden = !p.resolved.missing.length;
     $("graph-build").hidden = p.step.type !== "build";
+    const latestRun = p.runs.findLast((r) => r.step === p.current);
+    const retryable =
+      latestRun &&
+      ["failed", "interrupted"].includes(latestRun.status ?? "running");
+    $("graph-build").textContent = retryable
+      ? "Retry this build"
+      : "Start this build";
     $("graph-build").disabled =
       p.resolved.missing.length > 0 ||
       data.codex.status !== "ready" ||
-      p.runs.some((r) => r.step === p.current);
+      (!!latestRun && !retryable);
     $("graph-open").textContent = data.graphPoll?.frozen
       ? "Reopen voting"
       : "Open voting";

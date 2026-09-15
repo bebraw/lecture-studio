@@ -164,6 +164,9 @@ const presentationSchema = v.object({
       inputs: v.array(inputSchema),
       model: optionalText,
       startedAt: text,
+      status: v.exactOptional(
+        v.picklist(["running", "completed", "failed", "interrupted"]),
+      ),
     }),
   ),
 });

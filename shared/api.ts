@@ -12,7 +12,10 @@ const empty = v.strictObject({});
 const text = v.string();
 const id = v.strictObject({ id: text });
 const brief = v.strictObject({ brief: text });
-const model = v.strictObject({ model: v.exactOptional(text) });
+const model = v.strictObject({
+  model: v.exactOptional(text),
+  retry: v.exactOptional(v.boolean()),
+});
 export const requestSchemas = {
   draft: draftSchema,
   publish: draftSchema,
