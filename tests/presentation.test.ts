@@ -318,8 +318,9 @@ test("later builds and reviews use their own approved audience input", async () 
   session.move("select", "check-document-review");
   assert.match(session.resolve().prompt, /date/);
   session.move("select", "audience-evidence-recap");
-  for (const term of ["date", "compare topics", "test offline"])
+  for (const term of ["date", "compare topics"])
     assert.ok(session.resolve().prompt.includes(term));
+  assert.doesNotMatch(session.resolve().prompt, /test offline/);
 });
 
 test("full-size approved collections remain readable and references must resolve", async () => {

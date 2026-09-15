@@ -937,6 +937,16 @@ Versioned export of the Obsidian lecture at `Lectures/Web Development 2026/Prese
       "title": "Where could we take this next?",
       "body": "- **Improve the existing app:** test with seminar visitors and fix where they get stuck.\n- **Support another client:** expose actions, inputs and results so it can use the same service.\n- **Explore generated views:** compare a generated view with a fixed page on the same task.",
       "notes": "Present these as possible next experiments. For visitor testing, observe whether someone can find a practical detail and submit a preference. For another client, test a permitted action and verify its result. For generated views, compare task completion and factual accuracy against the fixed page using the same source material. Ask what evidence would justify each direction; do not imply that generation is the required next step.",
+      "next": "audience-evidence-recap"
+    },
+    {
+      "id": "audience-evidence-recap",
+      "type": "material",
+      "chapter": "Closing",
+      "title": "What our audience evidence suggests next",
+      "body": "Choose one unmet need. Name a change and the observation that would show it helped.",
+      "reviewWordsFrom": ["knowledge-experience", "future-visions"],
+      "notes": "Review the earlier audience findings before asking what students would test next. These findings are not proof that the app implemented every request. Take one concrete unmet need and identify what observation would show an improvement.",
       "next": "closing-app-question"
     },
     {
@@ -945,23 +955,18 @@ Versioned export of the Obsidian lecture at `Lectures/Web Development 2026/Prese
       "chapter": "Closing",
       "title": "What would you test next?",
       "body": "**Word cloud**\n\nOn live.scalableweb.dev, enter **one idea per line**.\n\nUse 1–3 words per idea, up to 32 characters. Submit up to five ideas together.",
-      "notes": "This slide opens its word collection automatically while Live is on. Allow 45 seconds, close collection, review privately, approve relevant responses, then show the approved cloud. Pick two contrasting suggestions and ask what result would support or challenge the proposed direction. Frequency is not a vote. If collection is unavailable, take two spoken suggestions. Use Back to slide, then advance to the closing takeaway. Do not start another build.",
-      "next": "audience-evidence-recap",
+      "notes": "This slide opens its word collection automatically while Live is on. Close collection, review privately, approve relevant responses, then show the approved cloud. Pick two contrasting suggestions and ask what result would support or challenge the proposed direction. Frequency is not a vote. If collection is unavailable, take two spoken suggestions. Use Back to slide, then advance to Questions. Do not start another build.",
+      "next": "closing-questions",
       "related": ["accessibility-parallels", "meaning-and-action"],
       "wordCloud": true
     },
     {
-      "id": "audience-evidence-recap",
-      "type": "material",
+      "id": "closing-questions",
+      "type": "title",
       "chapter": "Closing",
-      "title": "What our audience evidence suggests next",
-      "body": "Choose one unmet need. Name a change and the observation that would show it helped.",
-      "reviewWordsFrom": [
-        "knowledge-experience",
-        "future-visions",
-        "closing-app-question"
-      ],
-      "notes": "Use these as audience findings, not proof that the app implemented every request. Take one concrete example before the transfer problem.",
+      "title": "Questions?",
+      "body": "",
+      "notes": "Invite questions from the room. Use the desk’s source inspector or revisit a relevant slide if helpful. Continue to the transfer exercise afterwards.",
       "next": "step-19"
     },
     {
