@@ -310,7 +310,7 @@ test("later builds and reviews use their own approved audience input", async () 
   session.approvedWords["future-visions"] = ["compare topics"];
   session.approvedWords["closing-app-question"] = ["test offline"];
   session.move("select", "build-application");
-  assert.match(session.resolve().prompt, /clear feedback/);
+  assert.doesNotMatch(session.resolve().prompt, /clear feedback/);
   assert.doesNotMatch(session.resolve().prompt, /compare topics/);
   session.move("select", "build-agents");
   assert.match(session.resolve().prompt, /compare topics/);
@@ -318,12 +318,7 @@ test("later builds and reviews use their own approved audience input", async () 
   session.move("select", "check-document-review");
   assert.match(session.resolve().prompt, /date/);
   session.move("select", "audience-evidence-recap");
-  for (const term of [
-    "date",
-    "clear feedback",
-    "compare topics",
-    "test offline",
-  ])
+  for (const term of ["date", "compare topics", "test offline"])
     assert.ok(session.resolve().prompt.includes(term));
 });
 

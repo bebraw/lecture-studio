@@ -214,7 +214,8 @@ test("invalid audience aggregates fail before opening voting", async () => {
     { ...valid, revision: -1 },
     { ...valid, revision: 1.5 },
     { ...valid, totalVotes: 1 },
-    { ...valid, choices: [] },
+    { ...valid, choices: [], totalVotes: 1 },
+    { ...valid, choices: [], status: "open" },
     ...[{ votes: -1 }, { votes: 0.5 }, { label: "Mismatch" }].map((change) => ({
       ...valid,
       choices: valid.choices.map((c, i) => (i === 0 ? { ...c, ...change } : c)),
@@ -235,4 +236,32 @@ test("invalid audience aggregates fail before opening voting", async () => {
     assert.equal(poll.busy, false);
     assert.ok(poll.error);
   }
+});
+
+test("opening an empty locked room initializes it before validating and opening", async () => {
+  const calls: string[] = [];
+  const poll = new AudiencePoll({
+    origin: "https://audience.example",
+    token: "private-presenter-secret",
+    fetcher: async (url) => {
+      calls.push(url);
+      return new Response(
+        JSON.stringify({
+          status: url.endsWith("open-session") ? "open" : "locked",
+          revision: 0,
+          totalVotes: 0,
+          choices:
+            calls.length === 1
+              ? []
+              : themePoll().options.map((o) => ({ ...o, votes: 0 })),
+        }),
+      );
+    },
+  });
+  await poll.act("open");
+  assert.deepEqual(
+    calls.map((url) => url.split("/").at(-1)),
+    ["webdev-2026", "seed", "open-session"],
+  );
+  assert.equal(poll.snapshot?.status, "open");
 });

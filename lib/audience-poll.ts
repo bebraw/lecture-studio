@@ -221,7 +221,10 @@ export class AudiencePoll {
       );
     this.config = validatePoll(config);
   }
-  async request(operation?: string): Promise<PollSnapshot> {
+  async request(
+    operation?: string,
+    initializeEmpty = false,
+  ): Promise<PollSnapshot> {
     if (!this.origin || !this.token)
       throw new Error(
         "Set LECTURE_POLL_ORIGIN and LECTURE_POLL_TOKEN before connecting the audience room",
@@ -253,6 +256,17 @@ export class AudiencePoll {
     const raw = await response.text();
     if (raw.length > 30000) throw new Error("Room response too large");
     const s = parse(snapshotSchema, JSON.parse(raw));
+    // The public GET is read-only. Initialize only on an explicit open, and
+    // only a valid, empty locked room; the seed endpoint preserves existing votes.
+    if (
+      initializeEmpty &&
+      !operation &&
+      s.choices.length === 0 &&
+      s.totalVotes === 0 &&
+      s.status === "locked" &&
+      Number.isSafeInteger(s.revision)
+    )
+      return this.request("seed");
     if (
       !Number.isSafeInteger(s.revision) ||
       s.choices.length !== this.config.options.length
@@ -279,7 +293,7 @@ export class AudiencePoll {
     this.error = "";
     try {
       // Validate the prepared options before opening a fresh lecture round.
-      const checked = await this.request();
+      const checked = await this.request(undefined, operation === "open");
       this.snapshot =
         operation === "refresh" ? checked : await this.request(operation);
       if (operation !== "open" && !this.openedRooms.has(this.room))
