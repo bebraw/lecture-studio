@@ -1,5 +1,6 @@
 // Central DOM contract for the static and mounted lecture controls.
 interface ElementIds {
+  "prepared-form": HTMLFormElement;
   connections: HTMLDetailsElement;
   activity: HTMLElementTagNameMap["p"];
   acts: HTMLElementTagNameMap["nav"];

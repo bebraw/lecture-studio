@@ -1,3 +1,4 @@
+import { preparedDemo, preparedPreview } from "./lib/prepared-demo.ts";
 import { compatibleAudience } from "./shared/audience-protocol.ts";
 import { previewCandidates } from "./shared/preview.ts";
 import { asyncHandler } from "./shared/errors.ts";
@@ -173,6 +174,7 @@ export function createStudio({
     await selected.act("open");
   };
   const teachingRecords = new Set<string>();
+  const servePreparedDemo = preparedDemo();
   const buildPreviews = new Map<string, string>();
   const captureBuildPreview = () => {
     const run = presentation?.runs.at(-1);
@@ -217,12 +219,14 @@ export function createStudio({
     if ((s.wordsFrom || s.reviewWordsFrom) && poll.origin && poll.token)
       captureWords(await feedbackRequest(poll));
     captureBuildPreview();
+    const capturedPreview = s.previewOf
+      ? buildPreviews.get(s.previewOf)
+      : undefined;
     const demoUrl = s.teachingDemo
       ? origin + "/teaching/failure"
-      : s.previewOf
-        ? buildPreviews.get(s.previewOf)
-        : undefined;
-    if (demoUrl && !s.teachingDemo) await sharePreview(demoUrl);
+      : capturedPreview ||
+        (s.previewOf ? preparedPreview(s.previewOf, origin) : undefined);
+    if (capturedPreview) await sharePreview(capturedPreview);
     if (s.type === "poll") {
       graphPoll = getGraphPoll(s);
       projectedPoll = graphPoll;
@@ -478,6 +482,7 @@ export function createStudio({
       if (req.headers["sec-fetch-site"] === "cross-site")
         return json(res, { error: "Cross-site request rejected" }, 403);
       const url = new URL(req.url ?? "/", origin);
+      if (await servePreparedDemo(req, res, url, origin)) return;
       if (
         ["/teaching/record", "/teaching/record/reset"].includes(url.pathname)
       ) {
@@ -1048,6 +1053,7 @@ export function createStudio({
         "/debug": "debug.html",
         "/teaching/failure": "failure-demo.html",
         "/failure-demo.mjs": "failure-demo.mjs",
+        "/prepared-demo.mjs": "prepared-demo.mjs",
         "/debug.css": "debug.css",
         "/debug.mjs": "debug.mjs",
         "/style.css": "style.css",
@@ -1064,6 +1070,8 @@ export function createStudio({
           staticFile.endsWith(".mjs") ? ".local/browser/public" : "public",
           staticFile,
         );
+      else if (url.pathname === "/prepared-document.css")
+        path = resolve(root, "document-a/style.css");
       else if (
         /^\/lecture-assets\/[a-z0-9-]+\.(jpg|png|gif)$/.test(url.pathname)
       )

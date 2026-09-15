@@ -18,7 +18,7 @@ This is the canonical operator guide. [Run of show](../LECTURE-NARRATIVE.md) sup
 - Questions and each slide cloud retain separate collections. Closing stops submissions without deleting responses. Use a new lecture for a complete reset.
 - **Live off** closes active voting and collection, then confirms the waiting screen. If delivery fails, the desk reports the failure instead of pretending the transition succeeded.
 - Navigation never starts implementation. Review the resolved prompt, then **Start this build**. Failed/interrupted builds expose **Retry this build**, preserving that attempt’s original inputs.
-- App checkpoints open the captured app preview automatically. Do not treat a preview URL or a completed turn as proof that tests passed. Run the vote-selected test first and report the observation.
+- App checkpoints open the captured app preview automatically. If no preview was captured, the four lecture builds open clearly labeled prepared reference views. These are local-only, volatile examples; public Live follows the projector. Direct recovery URLs are `/teaching/checkpoint/build-document`, `/teaching/checkpoint/build-forms`, `/teaching/checkpoint/build-application`, and `/teaching/checkpoint/build-agents`. The Future reference demonstrates the fixed fallback without a runtime model call. Do not treat a preview URL or a completed turn as proof that tests passed. Run the vote-selected test first and report the observation.
 
 ## Failure experiment
 
