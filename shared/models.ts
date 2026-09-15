@@ -115,6 +115,7 @@ export interface Step {
   related?: string[];
   uses?: Dependency[];
   previewOf?: string;
+  wordCloud?: boolean;
   allowRemoteImages?: boolean;
   poll?: PollDefinition;
   room?: string;

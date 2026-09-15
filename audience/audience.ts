@@ -38,6 +38,7 @@ async function refreshFeedback() {
     if (!response.ok) throw new Error();
     const config = v.parse(publicFeedbackSchema, await response.json());
     if (config?.round !== feedbackConfig?.round) {
+      feedback.open = config?.mode === "words" && config.open;
       query("form", feedback).reset();
       query("#feedback-notice", feedback).textContent = "";
     }

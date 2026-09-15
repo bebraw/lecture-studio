@@ -123,6 +123,7 @@ export const stepSchema = v.object({
     v.array(v.object({ poll: text, instructions: stringMap })),
   ),
   previewOf: optionalText,
+  wordCloud: v.exactOptional(v.boolean()),
   allowRemoteImages: v.exactOptional(v.boolean("Invalid remote image setting")),
   poll: v.exactOptional(pollDefinitionSchema),
   room: optionalText,

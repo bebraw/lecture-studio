@@ -61,25 +61,26 @@ Versioned export of the Obsidian lecture at `Lectures/Web Development 2026/Prese
       "notes": "Historical artifact, not a teaching reconstruction. Trace one connection rather than reading every label. Notice the mixture of systems, concepts and relationships. Requires network access.\nFull attribution: [5] Tim Berners-Lee © 1989/1990 · Original proposal diagram, W3C archive",
       "allowRemoteImages": true,
       "chapter": "Past",
-      "next": "knowledge-experience"
-    },
-    {
-      "id": "knowledge-experience",
-      "type": "question",
-      "chapter": "Past",
-      "title": "Where is information hardest to find?",
-      "body": "Name one place: a course platform, chat, shared drive…\n\n**Word cloud · 45 seconds**\n\nOn live.scalableweb.dev, open **Add words** and send one short response (up to 32 characters).\n\nWe’ll review the approved cloud and discuss two contrasting suggestions.",
-      "notes": "04–07 · Hear two examples: course platforms, shared drives, chat histories, project handovers. Keep their wording for the closing discussion. Do not solve the examples yet.\n\nModerated word cloud: while Live is on, open Responses, choose Word cloud, enter “Where is information hardest to find?”, and click Open new collection. Allow 45 seconds. Close collection, review submissions privately, approve relevant responses, then Show approved cloud. Read out two contrasting contributions and ask their authors to explain; frequency is not a vote or a measure of correctness. Use Back to slide before continuing. If collection is unavailable, take three spoken responses and discuss two. Never project unreviewed submissions.",
       "next": "demo-background"
     },
     {
       "id": "demo-background",
       "type": "material",
       "chapter": "Past",
-      "title": "Our example: a seminar information app",
-      "body": "Imagine you are considering attending the SDLCAI seminar.\n\nYou want to understand what it covers, find practical details, and follow the source links.\n\nIn our demo, you can also share your experience, interests, preferred session format, and a question. The room sees aggregate preferences, and later we generate a view around its chosen priority.",
-      "notes": "Introduce the scenario before asking the audience to shape the app. Show the prepared seminar material and identify it as the source the builds will use. The visitor is someone considering the seminar; the shared display lets the room see aggregate preferences. Walk through one example: look for practical details, choose a priority, then inspect the resulting view. The lecture’s polls shape the build requirements; the form inside the demo is the application we test. Distinguish those two interfaces when showing them. Keep this introduction to about one minute.",
-      "next": "step-3"
+      "title": "What we’ll build: a seminar information app",
+      "body": "We’ll build an app for someone considering the SDLCAI seminar.\n\nTheir first task: understand the topic, find practical details, and follow links to the original sources.\n\nWe’ll start with a readable information page. Then we’ll add a form, shared results, and a generated view as the lecture progresses.",
+      "notes": "Introduce the app here for the first time. It does not exist yet. Identify the prepared seminar material as the source for the first build. The visitor is someone deciding whether to attend. The next slide outlines the implementation stages; then the audience chooses requirements before we start building. Distinguish the lecture polls, which shape requirements, from the form we will later build inside the demo. Keep this introduction to about one minute.",
+      "next": "knowledge-experience"
+    },
+    {
+      "id": "knowledge-experience",
+      "type": "question",
+      "chapter": "Past",
+      "title": "When deciding whether to attend a seminar, what information do you need first?",
+      "body": "Think of yourself as a potential attendee.\n\n**Word cloud · 45 seconds**\n\nOn live.scalableweb.dev, send one short response (up to 32 characters).\n\nWe’ll use the approved responses to decide what the first information page should make easy to find.",
+      "notes": "Showing this slide while Live is on automatically opens its word collection. Allow 45 seconds. Close collection, review submissions privately, approve relevant responses, then Show approved cloud. Discuss two or three needs, such as topic, date, location or prerequisites. Connect these needs to the first document’s headings and ordering; refer back to them when checking the build. Frequency is a discussion cue, not proof of importance. Use Back to slide before continuing. If collection is unavailable, take three spoken responses. Never project unreviewed submissions.",
+      "next": "step-3",
+      "wordCloud": true
     },
     {
       "id": "step-3",
@@ -87,7 +88,7 @@ Versioned export of the Obsidian lecture at `Lectures/Web Development 2026/Prese
       "chapter": "Past",
       "title": "One seminar app, three stages",
       "body": "1. **Past:** read the seminar information and submit a native form.\n2. **Present:** submit without leaving the page; watch shared results update.\n3. **Future:** generate a seminar view around the room’s chosen priority.\n\nYour votes shape the requirements. We inspect each result before moving on.",
-      "notes": "Explain the three stages using the seminar scenario on the preceding slide. We develop the same app across three lecture sections. Past has two build steps: the document, then its native form. Present enhances that form and adds shared updates. Future adds constrained view composition using the reviewed seminar material. Explain that the coding agent implements the app; the later composition model generates a view inside it. Show the starter context before the first build.",
+      "notes": "Explain the three stages using the seminar scenario introduced before the word cloud. We develop the same app across three lecture sections. Past has two build steps: the document, then its native form. Present enhances that form and adds shared updates. Future adds constrained view composition using the reviewed seminar material. Explain that the coding agent implements the app; the later composition model generates a view inside it. Show the starter context before the first build.",
       "next": "vote-friction",
       "related": ["detour-0-1"]
     },
@@ -97,7 +98,7 @@ Versioned export of the Obsidian lecture at `Lectures/Web Development 2026/Prese
       "chapter": "Past",
       "title": "When you use the web today, what feels unnecessarily difficult?",
       "body": "Which difficulty should our application address?",
-      "notes": "Map the earlier audience examples to one predefined choice for the seminar app just introduced. Close voting to freeze the requirement, then collect the theme choice before starting the build.",
+      "notes": "Connect the audience’s information needs to a concrete design priority for the seminar page. Ask which difficulty the app should address. Moving to the theme poll closes this vote and freezes the requirement automatically.",
       "room": "webdev-2026-friction",
       "poll": {
         "question": "When you use the web today, what feels unnecessarily difficult?",
@@ -477,9 +478,10 @@ Versioned export of the Obsidian lecture at `Lectures/Web Development 2026/Prese
       "chapter": "Present",
       "title": "What would make our form easier to use?",
       "body": "Name one improvement in 1–3 words.\n\n**Word cloud · 45 seconds**\n\nOn live.scalableweb.dev, open **Add words** and send one short response (up to 32 characters).\n\nWe’ll review the approved cloud and discuss two contrasting suggestions.",
-      "notes": "38–41 · Collect suggestions before showing the build prompt. Discuss two approved suggestions, then use the next priority vote to capture a concrete build requirement. The cloud itself is not automatically passed to the coding agent.\n\nModerated word cloud: while Live is on, open Responses, choose Word cloud, enter “What would make our form easier to use?”, and click Open new collection. Allow 45 seconds. Close collection, review submissions privately, approve relevant responses, then Show approved cloud. Read out two contrasting contributions and ask their authors to explain; frequency is not a vote or a measure of correctness. Use Back to slide before continuing. If collection is unavailable, take three spoken responses and discuss two. Never project unreviewed submissions.",
+      "notes": "38–41 · Collect suggestions before showing the build prompt. Discuss two approved suggestions, then use the next priority vote to capture a concrete build requirement. The cloud itself is not automatically passed to the coding agent.\n\nModerated word cloud: Showing this slide while Live is on automatically opens its word collection. Allow 45 seconds. Close collection, review submissions privately, approve relevant responses, then Show approved cloud. Read out two contrasting contributions and ask their authors to explain; frequency is not a vote or a measure of correctness. Use Back to slide before continuing. If collection is unavailable, take three spoken responses and discuss two. Never project unreviewed submissions.",
       "next": "vote-interaction",
-      "related": ["step-8"]
+      "related": ["step-8"],
+      "wordCloud": true
     },
     {
       "id": "vote-interaction",
@@ -775,9 +777,10 @@ Versioned export of the Obsidian lecture at `Lectures/Web Development 2026/Prese
       "title": "What task would you give a software agent?",
       "body": "Name one task in 1–3 words: compare sources, trace decisions…\n\n**Word cloud · 45 seconds**\n\nOn live.scalableweb.dev, open **Add words** and send one short response (up to 32 characters).\n\nWe’ll review the approved cloud and discuss two contrasting suggestions.",
       "source": "Lecture synthesis · [1–5]",
-      "notes": "58–60 · Briefly recall Otlet, Bush, Nelson and Engelbart; use related images rather than repeat the biographies. Hear one task from the room. Keep the distinction between assistance and replacement.\n\nModerated word cloud: while Live is on, open Responses, choose Word cloud, enter “What task would you give a software agent?”, and click Open new collection. Allow 45 seconds. Close collection, review submissions privately, approve relevant responses, then Show approved cloud. Read out two contrasting contributions and ask their authors to explain; frequency is not a vote or a measure of correctness. Use Back to slide before continuing. If collection is unavailable, take three spoken responses and discuss two. Never project unreviewed submissions.",
+      "notes": "58–60 · Briefly recall Otlet, Bush, Nelson and Engelbart; use related images rather than repeat the biographies. Hear one task from the room. Keep the distinction between assistance and replacement.\n\nModerated word cloud: Showing this slide while Live is on automatically opens its word collection. Allow 45 seconds. Close collection, review submissions privately, approve relevant responses, then Show approved cloud. Read out two contrasting contributions and ask their authors to explain; frequency is not a vote or a measure of correctness. Use Back to slide before continuing. If collection is unavailable, take three spoken responses and discuss two. Never project unreviewed submissions.",
       "related": ["vision-bush", "vision-nelson", "vision-engelbart"],
-      "next": "semantic-web-agents"
+      "next": "semantic-web-agents",
+      "wordCloud": true
     },
     {
       "id": "semantic-web-agents",
@@ -1020,7 +1023,8 @@ Versioned export of the Obsidian lecture at `Lectures/Web Development 2026/Prese
       "body": "Suggest one next test for our seminar app in 1–3 words.\n\n**Word cloud · 45 seconds**\n\nOn live.scalableweb.dev, open **Add words** and send one response (up to 32 characters).\n\nWe’ll discuss two approved suggestions: what would each test help us decide?",
       "notes": "86–89 · While Live is on, open Responses, choose Word cloud, enter “What would you test next?”, and open a new collection. Allow 45 seconds, close collection, review privately, approve relevant responses, then show the approved cloud. Pick two contrasting suggestions and ask what result would support or challenge the proposed direction. Frequency is not a vote. If collection is unavailable, take two spoken suggestions. Use Back to slide, then advance to the closing takeaway. Do not start another build.",
       "next": "step-19",
-      "related": ["accessibility-parallels", "meaning-and-action"]
+      "related": ["accessibility-parallels", "meaning-and-action"],
+      "wordCloud": true
     },
     {
       "id": "step-19",

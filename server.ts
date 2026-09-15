@@ -173,10 +173,27 @@ export function createStudio({
     const url = previewCandidates(bridge.state.messages, origin).at(-1);
     if (run && url) buildPreviews.set(run.step, validDemoUrl(url, origin));
   };
+  let wordCloudStep: string | null = null;
+  const syncWordCloud = async (enabled: boolean) => {
+    const step = presentation?.step();
+    if (enabled && step?.wordCloud) {
+      if (wordCloudStep === step.id) return;
+      await feedbackRequest(poll, {
+        action: "start",
+        mode: "words",
+        prompt: step.title,
+      });
+      wordCloudStep = step.id;
+    } else if (wordCloudStep) {
+      await feedbackRequest(poll, { action: "close" });
+      wordCloudStep = null;
+    }
+  };
   const showGraph = async () => {
     if (!presentation) throw new Error("Load a presentation first");
     feedbackPrevious = null;
     const s = presentation.step();
+    if (live) await syncWordCloud(true);
     captureBuildPreview();
     const demoUrl = s.previewOf ? buildPreviews.get(s.previewOf) : undefined;
     if (demoUrl) await sharePreview(demoUrl);
@@ -507,6 +524,7 @@ export function createStudio({
                   audienceSessionStarted = true;
                 }
                 await openGraphPoll();
+                await syncWordCloud(true);
                 await showGraph();
                 live = true;
                 audienceSync.publish(audienceState());
@@ -526,6 +544,7 @@ export function createStudio({
                       );
                   }
                   if (poll.snapshot?.status === "open") await poll.act("lock");
+                  await syncWordCloud(false);
                   await audienceSync.deliver(waitingStage());
                   live = false;
                   previewTunnel.close();

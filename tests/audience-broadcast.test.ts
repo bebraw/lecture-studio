@@ -10,12 +10,17 @@ import { AudiencePoll, themePoll } from "../lib/audience-poll.ts";
 test("only published slides sync; polling never replaces another projected slide", async () => {
   const writes: Partial<Stage>[] = [];
   let cleanups = 0;
+  const collections: string[] = [];
   let status = "open",
     revision = 1;
   const poll = new AudiencePoll({
     origin: "https://audience.invalid",
     token: "private",
     fetcher: async (url, init) => {
+      if (url.endsWith("/presenter/feedback")) {
+        collections.push(stringValue(init.body, "feedback body"));
+        return Response.json({ config: null, items: [] });
+      }
       if (url.endsWith("/presenter/close-polls")) {
         cleanups++;
         status = "locked";
@@ -51,6 +56,7 @@ test("only published slides sync; polling never replaces another projected slide
         type: "title",
         title: "Public title",
         notes: "PRIVATE",
+        wordCloud: true,
         next: "vote",
       },
       {
@@ -109,16 +115,34 @@ test("only published slides sync; polling never replaces another projected slide
     assert.equal(writes.at(-1)!.title, "Waiting for the lecturer");
     await call("live", { live: true });
     assert.equal(cleanups, 1);
+    assert.deepEqual(JSON.parse(collections[0]!), {
+      action: "start",
+      mode: "words",
+      prompt: "Public title",
+    });
+    await call("show");
+    assert.equal(
+      collections.length,
+      1,
+      "Showing the same slide preserves responses",
+    );
     assert.equal(status, "locked");
     await wait();
     assert.equal(writes.at(-1)!.title, "Public title");
     await call("select", { id: "vote" });
     await wait();
     assert.equal(writes.at(-1)!.title, "Public title");
+    assert.equal(
+      collections.length,
+      1,
+      "Private selection leaves collection open",
+    );
     const opened = await call("show");
+    assert.deepEqual(JSON.parse(collections[1]!), { action: "close" });
     assert.equal(opened.graphPoll?.snapshot?.status, "open");
     await wait();
     assert.equal(writes.at(-1)!.title, themePoll().question);
+    assert.equal(writes.at(-1)!.projectionKind, "question");
     await call("poll-refresh");
     await wait();
     assert.equal(writes.at(-1)!.title, themePoll().question);
@@ -129,6 +153,7 @@ test("only published slides sync; polling never replaces another projected slide
     await call("poll-results");
     await wait();
     assert.match(writes.at(-1)!.html!, /Editorial: 0/);
+    assert.equal(writes.at(-1)!.projectionKind, "results");
     const nextPoll = await call("next");
     assert.equal(nextPoll.graphPoll?.snapshot?.status, "open");
     assert.equal(nextPoll.projection.projectionKind, "question");
