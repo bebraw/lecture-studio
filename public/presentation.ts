@@ -358,7 +358,8 @@ export function mountPresentations({ call, update }: MountOptions) {
   return (value: DeskState) => {
     data = value;
     const p = data.presentation;
-    syncNotice.textContent = data.audienceSync?.error || "";
+    syncNotice.textContent =
+      data.audienceSync?.error || data.audienceSync?.readiness || "";
     if (!initialListRequested && data.libraryStatus?.startsWith("Connected")) {
       initialListRequested = true;
       $("presentations-list").click();

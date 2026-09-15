@@ -1,3 +1,4 @@
+import { audienceProtocol } from "../shared/audience-protocol.ts";
 import { test, expect } from "@playwright/test";
 import { fixture } from "../tests/fixture.ts";
 import { AudiencePoll, themePoll } from "../lib/audience-poll.ts";
@@ -42,6 +43,8 @@ test("a frozen vote feeds the explicit build without launching during navigation
     origin: "https://audience.invalid",
     token: "test",
     fetcher: async (url, init) => {
+      if (url.endsWith("/api/capabilities"))
+        return Response.json(audienceProtocol);
       if (url.endsWith("/presenter/stage"))
         return new Response(null, { status: 204 });
       if (url.endsWith("/open-session")) {

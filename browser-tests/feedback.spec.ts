@@ -1,3 +1,4 @@
+import { audienceProtocol } from "../shared/audience-protocol.ts";
 import { parse } from "valibot";
 import { requestSchemas } from "../shared/api.ts";
 import { stringValue } from "../shared/errors.ts";
@@ -21,6 +22,8 @@ test("desk review publishes only selected questions or approved cloud snapshots"
     origin: "https://feedback.invalid",
     token: "test",
     fetcher: async (url, init) => {
+      if (url.endsWith("/api/capabilities"))
+        return Response.json(audienceProtocol);
       if (url.endsWith("/presenter/stage"))
         return new Response(null, { status: 204 });
       const body = init.body

@@ -1,3 +1,4 @@
+import { compatibleAudience } from "./shared/audience-protocol.ts";
 import { previewCandidates } from "./shared/preview.ts";
 import { asyncHandler } from "./shared/errors.ts";
 import { validateApiRequest, type DeskState } from "./shared/api.ts";
@@ -311,12 +312,34 @@ export function createStudio({
             : "interrupted";
     }
   };
+  let audienceReadiness = "Audience service not checked";
+  const checkAudience = async () => {
+    if (!poll.origin || !poll.token) {
+      audienceReadiness =
+        "Local projector only · audience service is not configured";
+      return true;
+    }
+    try {
+      const response = await poll.fetcher(poll.origin + "/api/capabilities", {
+        signal: AbortSignal.timeout(5000),
+        headers: { "cache-control": "no-cache" },
+      });
+      if (!response.ok || !compatibleAudience(await response.json()))
+        throw new Error("incompatible");
+      audienceReadiness = "Audience service ready · protocol 2";
+      return true;
+    } catch {
+      audienceReadiness =
+        "Audience service unavailable or incompatible. Deploy the matching Worker before Live on.";
+      return false;
+    }
+  };
   const deskState = (): DeskState => {
     updateBuildRun();
     return {
       live,
       projection: publicState(),
-      audienceSync: { error: audienceSync.error },
+      audienceSync: { error: audienceSync.error, readiness: audienceReadiness },
       presentation: presentation?.state() || null,
       graphPoll: graphPoll?.state() || null,
       acts,
@@ -547,6 +570,8 @@ export function createStudio({
           try {
             const op = url.pathname.slice("/api/presentation/".length);
             if (op === "live") {
+              if (body.live === true && !(await checkAudience()))
+                throw new Error(audienceReadiness);
               if (typeof body.live !== "boolean")
                 throw new Error("Choose Live on or off");
               if (body.live) {
@@ -656,6 +681,7 @@ export function createStudio({
                   stringValue(body.path, "presentation path"),
                 );
               }
+              if (next) await checkAudience();
               poll.reset();
               presentation = next;
               wordCloudRounds.clear();

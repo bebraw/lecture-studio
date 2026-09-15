@@ -162,6 +162,7 @@ test("students follow the stage without losing their poll selection", async ({
       act: "past",
       version: title,
       projectionKind,
+      ...(projectionKind === "poll" ? { pollId: "webdev-2026" } : {}),
       theme: { bodyFont: "Verdana, sans-serif" },
       notes: "PRIVATE",
     });
@@ -184,10 +185,10 @@ test("students follow the stage without losing their poll selection", async ({
   ).toBeVisible();
   await audience.admin("/presenter/rooms/webdev-2026/open");
   await expect(publish("Stopped", false)).rejects.toThrow("409");
-  await publish("Which visual theme should shape our app?", true, "question");
+  await publish("Which visual theme should shape our app?", true, "poll");
   const choice = page.getByLabel("Editorial", { exact: true });
   await choice.check();
-  await publish("Which visual theme should shape our app?", true, "question");
+  await publish("Which visual theme should shape our app?", true, "poll");
   // Wait for a complete audience refresh before checking retained form state.
   await page.waitForResponse(
     (response) => response.url().endsWith("/api/audience") && response.ok(),
@@ -208,7 +209,7 @@ test("students follow the stage without losing their poll selection", async ({
     "Verdana, sans-serif",
   );
   // Returning to the poll permits an unsubmitted choice, but leaving still follows the stage.
-  await publish("Which visual theme should shape our app?", true, "question");
+  await publish("Which visual theme should shape our app?", true, "poll");
   await expect(choice).toBeVisible();
   await choice.check();
   await publish("Next slide without another vote");
@@ -444,4 +445,19 @@ test("shared-network vote admission caps fresh identities but permits updates", 
   for (let i = 1; i < 300; i++) expect((await vote()).status).toBe(303);
   expect((await vote()).status).toBe(429);
   expect((await vote(cookie)).status).toBe(303);
+});
+
+test("public capabilities describe required rooms without activating a lecture", async ({
+  audience,
+}) => {
+  const response = await fetch(new URL("/api/capabilities", audience.url));
+  expect(response.status).toBe(200);
+  expect(await response.json()).toMatchObject({
+    version: 2,
+    rooms,
+    features: ["lecture-reset", "poll-identity", "persistent-collections"],
+  });
+  expect(
+    await (await fetch(new URL("/api/audience", audience.url))).json(),
+  ).toEqual({ stage: null, poll: null });
 });

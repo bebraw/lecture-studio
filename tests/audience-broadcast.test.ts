@@ -1,7 +1,8 @@
+import { audienceProtocol } from "../shared/audience-protocol.ts";
 import { parseApiResponse } from "../shared/api.ts";
 import { parse } from "valibot";
 import { audienceStageSchema } from "../shared/audience-schemas.ts";
-import { stringValue } from "../shared/errors.ts";
+import { stringValue, record } from "../shared/errors.ts";
 import type { Stage } from "../shared/models.ts";
 import test from "node:test";
 import assert from "node:assert/strict";
@@ -17,9 +18,11 @@ test("only published slides sync; polling never replaces another projected slide
     origin: "https://audience.invalid",
     token: "private",
     fetcher: async (url, init) => {
+      if (url.endsWith("/api/capabilities"))
+        return Response.json(audienceProtocol);
       if (url.endsWith("/presenter/feedback")) {
         const body = stringValue(init.body, "feedback body");
-        if (JSON.parse(body).action === "start")
+        if (record(JSON.parse(body)).action === "start")
           assert.equal(
             writes.at(-1)?.live,
             true,

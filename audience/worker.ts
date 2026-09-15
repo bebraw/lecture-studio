@@ -1,3 +1,4 @@
+import { audienceProtocol } from "../shared/audience-protocol.ts";
 import { audienceRooms as rooms } from "../shared/audience-rooms.ts";
 import { parse } from "valibot";
 import { audienceStageSchema } from "../shared/audience-schemas.ts";
@@ -46,6 +47,10 @@ async function authorized(request: Request, secret: string) {
 export default {
   async fetch(request: Request, env: Env): Promise<Response> {
     const url = new URL(request.url);
+    if (url.pathname === "/api/capabilities" && request.method === "GET")
+      return Response.json(audienceProtocol, {
+        headers: { "cache-control": "no-store" },
+      });
     if (url.pathname === "/api/feedback")
       return feedbackRequest(request, env, false);
     if (url.pathname === "/presenter/feedback") {

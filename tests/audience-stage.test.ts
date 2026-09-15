@@ -1,3 +1,7 @@
+import {
+  audienceProtocol,
+  compatibleAudience,
+} from "../shared/audience-protocol.ts";
 import { parse, object, string } from "valibot";
 import { stringValue } from "../shared/errors.ts";
 import type { Stage } from "../shared/models.ts";
@@ -151,4 +155,17 @@ test("audience delivery reports failure and closed sync never publishes", async 
   });
   await disconnected.deliver({ title: "Private" });
   assert.equal(disconnected.pending, "");
+});
+
+test("readiness rejects stale protocols and missing prepared rooms", () => {
+  assert.equal(compatibleAudience(audienceProtocol), true);
+  assert.equal(compatibleAudience({ ...audienceProtocol, version: 1 }), false);
+  assert.equal(
+    compatibleAudience({
+      ...audienceProtocol,
+      rooms: audienceProtocol.rooms.slice(1),
+    }),
+    false,
+  );
+  assert.equal(compatibleAudience({}), false);
 });

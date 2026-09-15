@@ -140,7 +140,8 @@ test("audience voting and feedback work with a keyboard and survive background u
   await audience.admin("/presenter/stage", {
     live: true,
     title: "Choose a theme",
-    projectionKind: "question",
+    projectionKind: "poll",
+    pollId: "webdev-2026",
     html: "<p>Vote</p>",
   });
   const editorial = page.getByRole("radio", { name: "Editorial", exact: true });
@@ -151,7 +152,8 @@ test("audience voting and feedback work with a keyboard and survive background u
   await audience.admin("/presenter/stage", {
     live: true,
     title: "Choose a theme",
-    projectionKind: "question",
+    projectionKind: "poll",
+    pollId: "webdev-2026",
     html: "<p>The vote stays open</p>",
   });
   await page.waitForResponse(
@@ -182,7 +184,7 @@ test("audience voting and feedback work with a keyboard and survive background u
   await accessible(page, info, "audience-feedback");
   await page.keyboard.press("Tab");
   await expect(
-    page.getByRole("button", { name: "Send privately" }),
+    page.getByRole("button", { name: "Send for review" }),
   ).toBeFocused();
   await page.keyboard.press("Enter");
   await expect(
