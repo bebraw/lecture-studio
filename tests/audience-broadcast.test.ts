@@ -18,7 +18,14 @@ test("only published slides sync; polling never replaces another projected slide
     token: "private",
     fetcher: async (url, init) => {
       if (url.endsWith("/presenter/feedback")) {
-        collections.push(stringValue(init.body, "feedback body"));
+        const body = stringValue(init.body, "feedback body");
+        if (JSON.parse(body).action === "start")
+          assert.equal(
+            writes.at(-1)?.live,
+            true,
+            "Broadcast must be confirmed before collection starts",
+          );
+        collections.push(body);
         return Response.json({ config: null, items: [] });
       }
       if (url.endsWith("/presenter/reset-lecture")) {

@@ -550,11 +550,26 @@ export function createStudio({
                   feedbackPrevious = null;
                   audienceSessionStarted = true;
                 }
-                await openGraphPoll();
-                await syncWordCloud(true);
-                await showGraph();
-                live = true;
-                audienceSync.publish(audienceState());
+                liveTransition = true;
+                try {
+                  await openGraphPoll();
+                  await showGraph();
+                  live = true;
+                  await audienceSync.deliver(audienceState());
+                  await syncWordCloud(true);
+                } catch (caught) {
+                  // Confirm rollback before reporting that the broadcast is off.
+                  for (const active of [...graphPolls.values(), poll]) {
+                    if (active.snapshot?.status === "open")
+                      await active.act("lock");
+                  }
+                  await syncWordCloud(false);
+                  await audienceSync.deliver(waitingStage());
+                  live = false;
+                  throw caught;
+                } finally {
+                  liveTransition = false;
+                }
               } else {
                 if ([...graphPolls.values(), poll].some((p) => p.busy))
                   throw new Error(
