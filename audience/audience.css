@@ -98,3 +98,36 @@
   font: inherit;
   padding: 8px 12px;
 }
+
+/* Audience-only controls flow below the shared slide layout. */
+.audience.stage > .stage-bottom:has(#slide-number) {
+  grid-template-columns: minmax(0, 1fr) auto auto;
+}
+.audience.stage > .stage-bottom:has(#build-signal[hidden]):has(#slide-number) {
+  grid-template-columns: minmax(0, 1fr) auto;
+}
+@media (max-width: 600px) {
+  .audience.stage {
+    --slide-unit: 8px;
+    padding: 12px 20px;
+  }
+  .audience.stage #stage-content > h1 {
+    font-size: 2rem;
+  }
+  .audience.stage #stage-content > h1.chapter-divider {
+    font-size: 4rem;
+  }
+  .audience.stage .chapter-divider + .stage-copy {
+    max-width: none;
+  }
+  .audience.stage .stage-copy:has(pre code):has(> h3),
+  .audience.stage .stage-copy:has(> p > img):has(> blockquote) {
+    display: block;
+  }
+  .audience.stage .stage-copy pre:has(code) {
+    overflow-x: auto;
+  }
+  .audience.stage .stage-copy > p:only-child > img {
+    height: auto;
+  }
+}

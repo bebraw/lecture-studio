@@ -905,7 +905,7 @@ blockquote {
   width: 100%;
   height: auto;
 }
-.stage:not(.audience) .mermaid-graphic svg {
+.stage .mermaid-graphic svg {
   max-width: none !important;
   height: 55vh;
 }
@@ -2055,12 +2055,12 @@ blockquote {
     padding: 6px 8px;
   }
 }
-.stage:not(.audience) {
+.stage {
   height: 100dvh;
   min-height: 0;
   padding: clamp(16px, 4vh, 44px) 6vw clamp(12px, 3vh, 30px);
 }
-.stage:not(.audience) #stage-content {
+.stage #stage-content {
   min-height: 0;
   overflow: auto;
   padding: 2vh 0;
@@ -2199,15 +2199,15 @@ blockquote {
   padding-right: 0;
 }
 /* Projection scale: 1920×1080 reference, shared by stage previews. */
-.stage:not(.audience) {
+.stage {
   --slide-unit: min(1vw, 1.7778vh);
   padding: 3vh 4vw 2.5vh;
 }
-.stage:not(.audience) #stage-content {
+.stage #stage-content {
   justify-content: center;
   padding: 2vh 0;
 }
-.stage:not(.audience) #stage-content > h1 {
+.stage #stage-content > h1 {
   font-family: var(--body-font, Arial, sans-serif);
   font-weight: 600;
   font-size: calc(var(--slide-unit) * 3.5);
@@ -2216,38 +2216,38 @@ blockquote {
   max-width: none;
   margin-bottom: 3vh;
 }
-.stage:not(.audience) .stage-copy {
+.stage .stage-copy {
   font-size: calc(var(--slide-unit) * 2.15);
   line-height: 1.35;
   max-width: none;
 }
-.stage:not(.audience) #stage-content:has(table) > h1,
-.stage:not(.audience) #stage-content:has(pre code) > h1,
-.stage:not(.audience) #stage-content:has(img) > h1 {
+.stage #stage-content:has(table) > h1,
+.stage #stage-content:has(pre code) > h1,
+.stage #stage-content:has(img) > h1 {
   font-size: calc(var(--slide-unit) * 2.95);
   margin-bottom: 2vh;
 }
-.stage:not(.audience) .stage-copy pre:has(code) {
+.stage .stage-copy pre:has(code) {
   font-size: calc(var(--slide-unit) * 2.05);
   line-height: 1.3;
   padding: 0;
 }
-.stage:not(.audience) .stage-copy:has(pre code):has(> h3) {
+.stage .stage-copy:has(pre code):has(> h3) {
   display: grid;
   grid-template-columns: 3fr 2fr;
   column-gap: 3vw;
 }
-.stage:not(.audience) .stage-copy:has(pre code):has(> h3) > pre {
+.stage .stage-copy:has(pre code):has(> h3) > pre {
   grid-column: 1;
   grid-row: 1 / span 5;
 }
-.stage:not(.audience) .stage-copy:has(pre code):has(> h3) > :not(pre) {
+.stage .stage-copy:has(pre code):has(> h3) > :not(pre) {
   grid-column: 2;
 }
-.stage:not(.audience) .stage-copy:has(pre code):has(> h3) pre {
+.stage .stage-copy:has(pre code):has(> h3) pre {
   font-size: calc(var(--slide-unit) * 1.9);
 }
-.stage:not(.audience) .stage-copy table {
+.stage .stage-copy table {
   font-size: calc(var(--slide-unit) * 1.95);
 }
 .stage-copy table:has(th:nth-child(3)) th:first-child {
@@ -2256,24 +2256,24 @@ blockquote {
 .stage-copy table:not(:has(th:nth-child(3))) th:first-child {
   width: 32%;
 }
-.stage:not(.audience) .stage-copy img {
+.stage .stage-copy img {
   display: block;
   margin: auto;
   max-height: 65vh;
   max-width: 100%;
   object-fit: contain;
 }
-.stage:not(.audience) #source-credit {
+.stage #source-credit {
   font-size: calc(var(--slide-unit) * 1.25);
   line-height: 1.25;
 }
-.stage:not(.audience) #student-link {
+.stage #student-link {
   font-size: calc(var(--slide-unit) * 1.4);
 }
-.stage:not(.audience) #build-signal {
+.stage #build-signal {
   font-size: calc(var(--slide-unit) * 0.9);
 }
-.stage:not(.audience) > .stage-bottom:has(#slide-number) {
+.stage > .stage-bottom:has(#slide-number) {
   grid-template-columns: auto minmax(0, 1fr) auto auto;
 }
 #slide-number {
@@ -2302,10 +2302,10 @@ blockquote {
 .stage.blank #slide-progress {
   visibility: hidden;
 }
-.stage:not(.audience) .stage-copy:has(> ul):not(:has(pre)) {
+.stage .stage-copy:has(> ul):not(:has(pre)) {
   font-size: calc(var(--slide-unit) * 1.85);
 }
-.stage:not(.audience) .stage-copy li {
+.stage .stage-copy li {
   margin-bottom: 0.4em;
 }
 .stage-surface .stage-copy > ol {
@@ -2342,7 +2342,7 @@ blockquote {
 .word-size-4 {
   font-size: 1.9em;
 }
-.stage:not(.audience) > .stage-bottom {
+.stage > .stage-bottom {
   display: grid;
   grid-template-columns: auto minmax(0, 1fr) auto;
   align-items: center;
@@ -2360,21 +2360,21 @@ blockquote {
   text-decoration: underline;
   text-underline-offset: 4px;
 }
-.stage:not(.audience) #source-credit {
+.stage #source-credit {
   max-width: none;
   text-align: right;
 }
 @media (max-width: 700px) {
-  .stage:not(.audience) > .stage-bottom {
+  .stage > .stage-bottom {
     grid-template-columns: 1fr auto;
     gap: 8px;
   }
-  .stage:not(.audience) #source-credit {
+  .stage #source-credit {
     grid-column: 1/-1;
     grid-row: 2;
     text-align: left;
   }
-  .stage:not(.audience) #build-signal {
+  .stage #build-signal {
     padding: 4px 8px;
   }
 }
@@ -2410,26 +2410,26 @@ blockquote {
 .preview-slide-progress::-moz-progress-bar {
   background: var(--muted);
 }
-.stage:not(.audience) #stage-content > h1.section-title {
+.stage #stage-content > h1.section-title {
   font-size: calc(var(--slide-unit) * 5.5);
 }
 .desk .stage-surface h1.section-title {
   font-size: 2.8em;
 }
 /* Chapter dividers mark a pause with an inverted, typographic canvas. */
-.stage:not(.audience):has(#stage-content > .chapter-divider),
+.stage:has(#stage-content > .chapter-divider),
 .desk #current-stage:has(> .chapter-divider) {
   background: var(--ink);
   color: var(--paper);
 }
-.stage:not(.audience):has(#stage-content > .chapter-divider) > header {
+.stage:has(#stage-content > .chapter-divider) > header {
   border-color: color-mix(in srgb, var(--paper) 30%, transparent);
 }
-.stage:not(.audience) #stage-content:has(> .chapter-divider) {
+.stage #stage-content:has(> .chapter-divider) {
   justify-content: flex-end;
   padding: 6vh 0 12vh;
 }
-.stage:not(.audience) #stage-content > h1.chapter-divider {
+.stage #stage-content > h1.chapter-divider {
   font-family: var(--heading-font);
   font-size: calc(var(--slide-unit) * 11);
   font-weight: 400;
@@ -2442,39 +2442,37 @@ blockquote {
   padding-top: 1em;
   color: color-mix(in srgb, var(--paper) 80%, var(--ink));
 }
-.stage:not(.audience) .chapter-divider + .stage-copy {
+.stage .chapter-divider + .stage-copy {
   font-size: calc(var(--slide-unit) * 2.1);
   max-width: 70%;
 }
-.stage:not(.audience):has(.chapter-divider) .stage-bottom,
-.stage:not(.audience):has(.chapter-divider) #source-credit,
-.stage:not(.audience):has(.chapter-divider) #student-link,
-.stage:not(.audience):has(.chapter-divider) #slide-number {
+.stage:has(.chapter-divider) .stage-bottom,
+.stage:has(.chapter-divider) #source-credit,
+.stage:has(.chapter-divider) #student-link,
+.stage:has(.chapter-divider) #slide-number {
   color: color-mix(in srgb, var(--paper) 70%, var(--ink));
   border-color: color-mix(in srgb, var(--paper) 20%, transparent);
 }
-.stage:not(.audience):has(.chapter-divider) #build-signal {
+.stage:has(.chapter-divider) #build-signal {
   background: transparent;
   color: color-mix(in srgb, var(--paper) 70%, var(--ink));
   border-color: color-mix(in srgb, var(--paper) 20%, transparent);
 }
-.stage:not(.audience):has(.chapter-divider) #slide-progress,
-.stage:not(.audience):has(.chapter-divider)
-  #slide-progress::-webkit-progress-bar,
+.stage:has(.chapter-divider) #slide-progress,
+.stage:has(.chapter-divider) #slide-progress::-webkit-progress-bar,
 .desk #current-stage:has(.chapter-divider) .preview-slide-progress,
 .desk
   #current-stage:has(.chapter-divider)
   .preview-slide-progress::-webkit-progress-bar {
   background: color-mix(in srgb, var(--paper) 15%, var(--ink));
 }
-.stage:not(.audience):has(.chapter-divider)
-  #slide-progress::-webkit-progress-value,
+.stage:has(.chapter-divider) #slide-progress::-webkit-progress-value,
 .desk
   #current-stage:has(.chapter-divider)
   .preview-slide-progress::-webkit-progress-value {
   background: color-mix(in srgb, var(--paper) 65%, var(--ink));
 }
-.stage:not(.audience):has(.chapter-divider) #slide-progress::-moz-progress-bar,
+.stage:has(.chapter-divider) #slide-progress::-moz-progress-bar,
 .desk
   #current-stage:has(.chapter-divider)
   .preview-slide-progress::-moz-progress-bar {
@@ -2516,10 +2514,10 @@ blockquote {
   font-size: 0.65em;
   color: var(--muted);
 }
-.stage:not(.audience) .stage-copy:has(> blockquote) img {
+.stage .stage-copy:has(> blockquote) img {
   max-height: 52vh;
 }
-.stage:not(.audience) .stage-copy > p:only-child > img {
+.stage .stage-copy > p:only-child > img {
   width: 100%;
   height: 62vh;
   max-height: 62vh;
@@ -2535,13 +2533,11 @@ blockquote {
 .stage #build-signal[hidden] {
   display: none;
 }
-.stage:not(.audience)
-  > .stage-bottom:has(#build-signal[hidden]):has(#slide-number) {
+.stage > .stage-bottom:has(#build-signal[hidden]):has(#slide-number) {
   grid-template-columns: auto minmax(0, 1fr) auto;
 }
 @media (max-width: 700px) {
-  .stage:not(.audience)
-    > .stage-bottom:has(#build-signal[hidden]):has(#slide-number) {
+  .stage > .stage-bottom:has(#build-signal[hidden]):has(#slide-number) {
     grid-template-columns: 1fr auto;
   }
 }

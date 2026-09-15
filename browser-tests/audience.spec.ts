@@ -106,7 +106,7 @@ test("students follow the stage without losing their poll selection", async ({
       mode: "material",
       act: "past",
       version: title,
-      theme: { headingFont: "Verdana, sans-serif" },
+      theme: { bodyFont: "Verdana, sans-serif" },
       notes: "PRIVATE",
     });
   expect(
@@ -250,4 +250,49 @@ test("feedback remains private and enforces moderation, origin and submission li
     await (await fetch(new URL("/api/feedback", audience.url))).json(),
   ).toMatchObject({ open: false });
   await expect(page.locator("#student-feedback")).toBeHidden();
+});
+
+test("audience shares chapter styling, position and transient build status", async ({
+  audience,
+  page,
+}) => {
+  const stage = {
+    live: true,
+    title: "Past",
+    slideType: "title",
+    act: "Past",
+    mode: "material",
+    html: "<p>How we got here</p>",
+    version: 1,
+    slidePosition: { number: 7, total: 78, progress: 0.08 },
+    build: { status: "ready", startedAt: 1, finishedAt: 2 },
+  };
+  await audience.admin("/presenter/stage", stage);
+  await page.setViewportSize({ width: 1280, height: 720 });
+  await page.goto(audience.url);
+  await expect(page.locator("#slide-number")).toHaveText("7/78");
+  await expect(page.locator("#slide-progress")).toHaveAttribute(
+    "value",
+    "0.08",
+  );
+  await expect(page.locator("#build-signal")).toBeHidden();
+  await expect(page.locator("h1.chapter-divider")).toHaveCSS(
+    "font-size",
+    "140.8px",
+  );
+  await audience.admin("/presenter/stage", {
+    ...stage,
+    build: { status: "working", startedAt: 1 },
+  });
+  await expect(page.locator("#build-signal")).toBeVisible();
+  await page.setViewportSize({ width: 390, height: 844 });
+  await expect(page.locator("h1.chapter-divider")).toHaveCSS(
+    "font-size",
+    "56px",
+  );
+  expect(
+    await page.evaluate(
+      () => document.documentElement.scrollWidth <= window.innerWidth,
+    ),
+  ).toBe(true);
 });

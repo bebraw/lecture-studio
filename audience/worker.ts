@@ -146,6 +146,8 @@ export default {
           "theme",
           "blank",
           "build",
+          "slidePosition",
+          "slideType",
         ] as const)
           if (input[key] !== undefined) stage[key] = input[key];
         await env.STAGE_STATE.getByName("lecture").publish(stage);

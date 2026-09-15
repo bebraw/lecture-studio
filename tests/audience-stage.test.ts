@@ -70,6 +70,8 @@ test("audience projection preserves only published fields and clones nested stat
     diagram: "ages",
     demoUrl: "",
     version: 7,
+    slidePosition: { number: 7, total: 78, progress: 0.08 },
+    slideType: "material",
     theme: { text: "#123456" },
     blank: false,
     build: { status: "ready" },

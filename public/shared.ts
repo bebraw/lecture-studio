@@ -10,7 +10,7 @@ import {
 import { safeParse } from "valibot";
 import { errorSchema } from "../shared/schemas.ts";
 import type { Mermaid } from "mermaid";
-import { all } from "./dom.ts";
+import { all, query } from "./dom.ts";
 export function applyTheme(element: HTMLElement, theme: Partial<Theme> = {}) {
   for (const [key, variable] of Object.entries({
     background: "paper",
@@ -262,4 +262,33 @@ export async function renderDiagrams(container: HTMLElement) {
   } catch {
     /* Keep the readable source when a diagram cannot render. */
   }
+}
+
+/** Shared presentation position and transient build status for both stage clients. */
+export function createStageStatus() {
+  const number = document.createElement("span");
+  number.id = "slide-number";
+  query(".stage-bottom", document).append(number);
+  const progress = document.createElement("progress");
+  progress.id = "slide-progress";
+  progress.max = 1;
+  progress.hidden = true;
+  progress.setAttribute("aria-label", "Lecture progress");
+  document.body.append(progress);
+  return (state: Pick<Stage, "slidePosition" | "build"> | null) => {
+    const position = state?.slidePosition;
+    number.textContent = position ? position.number + "/" + position.total : "";
+    number.setAttribute(
+      "aria-label",
+      position ? "Slide " + position.number + " of " + position.total : "",
+    );
+    progress.hidden = position?.progress == null;
+    progress.value = position?.progress ?? 0;
+    const building = ["working", "waiting"].includes(
+      state?.build?.status || "",
+    );
+    const signal = query("#build-signal", document);
+    signal.hidden = !building;
+    signal.textContent = building ? buildLabel(state!.build!) : "";
+  };
 }

@@ -12,11 +12,12 @@ import {
   surface,
   applyTheme,
   renderDiagrams,
-  buildLabel,
+  createStageStatus,
   escape,
 } from "../public/shared.ts";
 const main = query("#stage-content", document),
   notice = query("#stage-connection", document);
+const updateStatus = createStageStatus();
 let key = "",
   submitting = false,
   voteError = "";
@@ -119,9 +120,7 @@ async function refresh() {
         : stage?.source || "";
       void renderDiagrams(main);
     }
-    query("#build-signal", document).textContent = stage?.build?.startedAt
-      ? buildLabel(stage.build)
-      : "";
+    updateStatus(poll ? null : stage);
     notice.textContent = voteError;
   } catch {
     notice.textContent = "Connection lost · holding the last view";
