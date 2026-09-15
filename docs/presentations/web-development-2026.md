@@ -372,7 +372,7 @@ Versioned export of the Obsidian lecture at `Lectures/Web Development 2026/Prese
       "type": "material",
       "chapter": "Past",
       "title": "What would you like from the seminar?",
-      "body": "- **Experience:** new to the subject, some experience, or regular use\n- **Interests:** choose one or more topics—learning, practical use, or evaluation\n- **Session format:** talk, live demo, or discussion\n- **Question for the speaker:** optional, up to 200 characters\n\nSubmit a fresh response in the demo app. We’ll compare the room’s preferences.",
+      "body": "- **Experience:** new to the subject, some experience, or regular use\n- **Interests:** choose one or more topics—learning, practical use, or evaluation\n- **Session format:** talk, live demo, or discussion\n- **Question for the speaker:** optional, up to 200 characters\n\nNext we will build this survey. After the build, we’ll submit fresh responses and compare the room’s preferences.",
       "notes": "Introduce this as a seminar-interest survey, not a registration or booking. These are new answers collected in the app; earlier lecture votes only shape its design. Explain that the shared display shows counts for the predefined choices. Free-text questions stay out of the shared display and model inputs. Use the variety of controls to demonstrate labels, repeated field names, required choices, server validation and preserving a partially completed form.",
       "next": "step-7"
     },
@@ -392,8 +392,8 @@ Versioned export of the Obsidian lecture at `Lectures/Web Development 2026/Prese
       "type": "build",
       "chapter": "Past",
       "title": "Build · Add the seminar-interest form",
-      "body": "Build Document B: a native seminar-interest form with fresh audience submissions. Collect experience (required select: new, some, regular), topic (checkboxes: learning, practical, evaluation; at least one), format (required radio: talk, demo, discussion), and question (optional textarea, maximum 200 characters). Use visible labels, fieldsets and legends. Implement POST /responses with server-side allowlist and length validation; preserve entered values and show field errors on invalid submission. Save a structured response and redirect to a confirmation showing the submitted values. Use a demo-browser identifier so resubmission replaces that browser’s response. Show aggregate counts only for predefined fields. Store questions for presenter review, never in the public aggregate or model context. Extend the demo app’s data model; the prepared lecture poll backend only accepts a single choice and is not this form’s storage. Verify submission, invalid input and replacement without JavaScript. Do not deploy until requested. Stop before browser enhancement.",
-      "notes": "Start explicitly, then continue discussing while the agent works. Inspect the app using Preview from Codex when ready.",
+      "body": "Build Document B: a native seminar-interest form with fresh audience submissions. Collect experience (required select: new, some, regular), topic (checkboxes: learning, practical, evaluation; at least one), format (required radio: talk, demo, discussion), and question (optional textarea, maximum 200 characters). Use visible labels, fieldsets and legends. Implement POST /responses with server-side allowlist and length validation; preserve entered values and show field errors on invalid submission. Save a structured response, then return a 303 redirect to GET /results. That page confirms this browser’s predefined submitted values and shows aggregate counts. Exclude the free-text question from shared pages. Use a demo-browser identifier so resubmission replaces that browser’s response. Show aggregate counts only for predefined fields. Store questions for presenter review, never in the public aggregate or model context. Extend the demo app’s data model; the prepared lecture poll backend only accepts a single choice and is not this form’s storage. Verify submission, invalid input and replacement without JavaScript. Do not deploy until requested. Stop before browser enhancement.",
+      "notes": "Start explicitly; the next automatic app checkpoint is Check the native form. Trace POST /responses → validation → Database → 303 redirect → GET /results while the build runs.",
       "uses": [
         {
           "poll": "vote-friction",
@@ -474,9 +474,9 @@ Versioned export of the Obsidian lecture at `Lectures/Web Development 2026/Prese
     {
       "id": "check-native-form",
       "chapter": "Past",
-      "title": "Check the build · A working native form",
+      "title": "Submit the survey; inspect confirmation and counts",
       "body": "- Submit experience, interests and format without JavaScript.\n- Leave a required field empty; inspect the error and retained values.\n- Change an answer and resubmit; check the confirmation and counts.",
-      "notes": "The app appears automatically. Demonstrate a valid submission and an invalid submission, then correct the invalid field without re-entering the rest. Confirm a replacement response updates counts without adding a respondent. Restore JavaScript before Present.",
+      "notes": "Now submit a fresh response in the visible app. Check invalid input, preserved values and replacement. Inspect the POST /responses and GET /results requests. Verify the displayed aggregate excludes the optional question.",
       "type": "material",
       "next": "step-10",
       "previewOf": "build-forms"
@@ -724,11 +724,12 @@ Versioned export of the Obsidian lecture at `Lectures/Web Development 2026/Prese
       "id": "step-11",
       "type": "material",
       "chapter": "Present",
-      "title": "Submit here. Watch the other screen.",
+      "title": "Change a preference; watch the second view",
       "body": "Change a seminar preference. Watch its aggregate update.",
       "notes": "41–49 · Open two real views. Submit one predefined choice and watch the aggregate. The second view needs its own update mechanism: inspect whether this app polls, uses server-sent events or WebSockets. Do not suggest that updating one browser automatically updates another.",
       "next": "flow-shared",
-      "related": ["flow-shared", "flow-html-4", "detour-2-1"]
+      "related": ["flow-shared", "flow-html-4", "detour-2-1"],
+      "previewOf": "build-application"
     },
     {
       "id": "flow-shared",
@@ -1026,12 +1027,13 @@ Versioned export of the Obsidian lecture at `Lectures/Web Development 2026/Prese
       "id": "step-17",
       "type": "question",
       "chapter": "Future",
-      "title": "Inspect the model’s inputs and output",
+      "title": "Pick one generated claim; find its source",
       "body": "**Check the evidence · 60 seconds**\n\nPick one claim in the generated output. Find the input that supports it in the context receipt.\n\nReport the claim and its evidence—or say what evidence is missing.",
       "notes": "77–83 · Show actual inputs, source data and destination. Separate frozen aggregate priorities from personal information. Inspect the result against its sources. Return to Bush: a personal knowledge tool need not imply surrendering a personal profile. Do not invent a failure if none occurred; use a clearly labeled hypothetical case.\nFull attribution: Lecture design proposal · Context receipt is not an established standard",
       "next": "check-composed-interface",
       "related": ["detour-4-0", "detour-4-1"],
-      "source": "Context receipt · Lecture proposal"
+      "source": "Context receipt · Lecture proposal",
+      "previewOf": "build-agents"
     },
     {
       "id": "check-composed-interface",
