@@ -744,17 +744,18 @@ Versioned export of the Obsidian lecture at `Lectures/Web Development 2026/Prese
       "id": "step-12",
       "type": "question",
       "chapter": "Present",
-      "title": "Disconnect the browser. What can it tell us?",
-      "body": "**Observe → decide → explain**\n\nWe’ll disconnect the demo browser and submit a response.\n\nChoose: **recorded**, **not recorded**, or **unknown**. Point to the evidence on screen.\n\nThen we’ll reconnect and check the server’s state.",
-      "notes": "49–54 · Use the rehearsal app, not an unrelated production service. Browser DevTools offline mode affects that browser, not the whole server. Distinguish failure before send from a response lost after the server wrote the vote. Do not blindly retry an uncertain write: duplicate handling is an implementation concern. If offline reproduction is unreliable, discuss the failure diagram as a model. Compare native and enhanced feedback.",
+      "title": "Two failures: predict, run, inspect",
+      "body": "Run case A with transport disabled, inspect the server, reset, then run case B with the response connection dropped after the write.",
+      "notes": "Prepared local experiment: ask students to predict the stored count and browser knowledge separately. A sends no POST, so the record remains zero. Reset, then B sends a real POST: the server records one submission and destroys the response connection. The browser cannot know whether the write succeeded until it reads server state. This is isolated volatile teaching storage, not the generated app or student data. Inspect the generated app’s own failure behavior separately; do not infer it from this experiment.",
       "next": "flow-failure",
-      "related": ["flow-failure", "flow-html-4", "detour-2-1"]
+      "related": ["flow-failure", "flow-html-4", "detour-2-1"],
+      "teachingDemo": true
     },
     {
       "id": "flow-failure",
       "type": "material",
       "title": "Lost response after a recorded vote",
-      "body": "```mermaid\nsequenceDiagram\n participant B as Browser\n participant S as Server\n participant D as Stored responses\n B->>S: POST /responses\n S->>D: Save response\n S--xB: Response lost\n Note over B: Outcome unknown\n Note over S,D: Response may already be stored\n```",
+      "body": "```mermaid\nsequenceDiagram\n participant B as Browser\n participant S as Server\n participant D as Database\n B->>S: POST /responses\n S->>D: Save response\n S--xB: Confirmation connection lost\n Note over B: No confirmation: outcome unknown\n B->>S: Check authoritative status\n S->>D: Read recorded response\n S-->>B: Confirmed stored result\n```\n\nCase A never sent the request. Case B stored it before losing the response. A missing confirmation alone does not distinguish them.",
       "source": "Lost-response scenario · Teaching model",
       "notes": "Ask students what the UI should say. Separate pending, confirmed and unknown. Inspect how the actual demo handles repeated submissions; do not claim exactly-once delivery.\nFull attribution: Original failure scenario · Explanatory model, not an observed demo outcome",
       "chapter": "Present",

@@ -172,6 +172,7 @@ export function createStudio({
       return;
     await selected.act("open");
   };
+  const teachingRecords = new Set<string>();
   const buildPreviews = new Map<string, string>();
   const captureBuildPreview = () => {
     const run = presentation?.runs.at(-1);
@@ -216,8 +217,12 @@ export function createStudio({
     if ((s.wordsFrom || s.reviewWordsFrom) && poll.origin && poll.token)
       captureWords(await feedbackRequest(poll));
     captureBuildPreview();
-    const demoUrl = s.previewOf ? buildPreviews.get(s.previewOf) : undefined;
-    if (demoUrl) await sharePreview(demoUrl);
+    const demoUrl = s.teachingDemo
+      ? origin + "/teaching/failure"
+      : s.previewOf
+        ? buildPreviews.get(s.previewOf)
+        : undefined;
+    if (demoUrl && !s.teachingDemo) await sharePreview(demoUrl);
     if (s.type === "poll") {
       graphPoll = getGraphPoll(s);
       projectedPoll = graphPoll;
@@ -473,6 +478,32 @@ export function createStudio({
       if (req.headers["sec-fetch-site"] === "cross-site")
         return json(res, { error: "Cross-site request rejected" }, 403);
       const url = new URL(req.url ?? "/", origin);
+      if (
+        ["/teaching/record", "/teaching/record/reset"].includes(url.pathname)
+      ) {
+        res.setHeader("cache-control", "no-store");
+        if (req.method === "GET" && url.pathname === "/teaching/record") {
+          res.end(String(teachingRecords.size));
+          return;
+        }
+        if (req.method !== "POST" || req.headers.origin !== origin)
+          return json(res, { error: "Same-origin POST required" }, 403);
+        if (url.pathname.endsWith("/reset")) {
+          teachingRecords.clear();
+          res.end("0");
+          return;
+        }
+        const experimentId = req.headers["x-experiment-id"];
+        if (
+          typeof experimentId !== "string" ||
+          !/^[a-f0-9-]{36}$/.test(experimentId) ||
+          teachingRecords.size >= 1000
+        )
+          return json(res, { error: "Reset the experiment" }, 400);
+        teachingRecords.add(experimentId);
+        res.destroy();
+        return;
+      }
       if (url.pathname.startsWith("/api/")) {
         const token = (req.headers.authorization ?? "").replace(/^Bearer /, "");
         const isDesk = safeEqual(token, deskToken),
@@ -1014,6 +1045,8 @@ export function createStudio({
         "/desk": "desk.html",
         "/stage": "stage.html",
         "/debug": "debug.html",
+        "/teaching/failure": "failure-demo.html",
+        "/failure-demo.mjs": "failure-demo.mjs",
         "/debug.css": "debug.css",
         "/debug.mjs": "debug.mjs",
         "/style.css": "style.css",

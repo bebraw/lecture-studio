@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Two failure experiments</title>
+    <link rel="stylesheet" href="/style.css" />
+    <script type="module" src="/failure-demo.mjs"></script>
+  </head>
+  <body style="padding: 2rem; max-width: 65rem; margin: auto">
+    <p>Prepared experiment · isolated in-memory record, no student data</p>
+    <h1>Same browser uncertainty, different server states</h1>
+    <p>
+      Predict the stored count before each experiment. Reset to zero between
+      cases.
+    </p>
+    <h2>A · Request blocked before sending</h2>
+    <button id="before">Submit with transport disabled</button>
+    <h2>B · Write succeeds, connection closes before confirmation</h2>
+    <button id="after">Submit and drop the response</button>
+    <p id="browser-evidence" role="status">No submission attempted.</p>
+    <h2>Check the authoritative state</h2>
+    <button id="inspect">Read server record</button>
+    <button id="reset">Reset experiment</button>
+    <p id="server-evidence" role="status">Server state not inspected.</p>
+    <p>
+      The first button deliberately sends no request. The second sends a real
+      POST; the local server increments its record and destroys the response
+      connection. A request ID prevents transport retries from recording the
+      same submission twice. The server record is volatile and resets when the
+      studio restarts.
+    </p>
+  </body>
+</html>

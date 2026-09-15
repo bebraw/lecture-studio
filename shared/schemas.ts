@@ -124,6 +124,7 @@ export const stepSchema = v.object({
     v.array(v.object({ poll: text, instructions: stringMap })),
   ),
   previewOf: optionalText,
+  teachingDemo: v.exactOptional(v.boolean()),
   wordCloud: v.exactOptional(v.boolean()),
   wordsFrom: optionalText,
   wordsInstruction: optionalText,

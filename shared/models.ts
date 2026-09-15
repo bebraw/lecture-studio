@@ -116,6 +116,7 @@ export interface Step {
   related?: string[];
   uses?: Dependency[];
   previewOf?: string;
+  teachingDemo?: boolean;
   wordCloud?: boolean;
   wordsFrom?: string;
   wordsInstruction?: string;
