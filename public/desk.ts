@@ -22,6 +22,7 @@ import {
 import { mountExplorer } from "./explore.ts";
 import { mountPresentations } from "./presentation.ts";
 import { mountFeedback } from "./feedback.ts";
+import { mountSourceBrowser } from "./source-browser.ts";
 const $ = byId,
   token = auth("desk");
 let state: DeskState,
@@ -601,6 +602,7 @@ explorer = mountExplorer({
 });
 updatePresentation = mountPresentations({ call, update: updateRuntime });
 mountFeedback({ call, update: updateRuntime });
+mountSourceBrowser({ call, update: updateRuntime });
 init().catch((e: unknown) => {
   $("auth-error").hidden = false;
   notice(asError(e).message, true);

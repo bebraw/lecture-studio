@@ -27,6 +27,13 @@ export const requestSchemas = {
   "publish-brief": brief,
   "publish-sent-brief": empty,
   "show-preview": v.strictObject({ url: text }),
+  "source/show": v.strictObject({
+    path: text,
+    revision: text,
+    start: v.number(),
+    end: v.number(),
+  }),
+  "source/return": empty,
   "back-material": empty,
   "codex/connect": empty,
   "codex/disconnect": empty,
@@ -79,6 +86,8 @@ export const requestSchemas = {
 };
 export type PostPath = keyof typeof requestSchemas;
 type GetPath =
+  | "source/files"
+  | `source/file?path=${string}`
   | "desk"
   | "library"
   | "stage"
@@ -104,22 +113,31 @@ const librarySchema = v.object({
 });
 const stageLinkSchema = v.object({ url: text });
 const receiptSchema = v.object({ text });
+const sourceFilesSchema = v.object({
+  files: v.array(text),
+  truncated: v.boolean(),
+});
+const sourceFileSchema = v.object({ path: text, text, revision: text });
 const feedbackResponseSchema = v.union([feedbackSchema, deskSchema]);
-export type ApiResponse<P extends ApiPath> = P extends "library"
-  ? v.InferOutput<typeof librarySchema>
-  : P extends `note?${string}`
-    ? v.InferOutput<typeof noteSchema>
-    : P extends `search?${string}`
-      ? SearchResult
-      : P extends "stage"
-        ? v.InferOutput<typeof stageSchema>
-        : P extends "stage-link"
-          ? { url: string }
-          : P extends "poll/receipt"
-            ? { text: string }
-            : P extends "feedback"
-              ? v.InferOutput<typeof feedbackResponseSchema>
-              : DeskState;
+export type ApiResponse<P extends ApiPath> = P extends "source/files"
+  ? v.InferOutput<typeof sourceFilesSchema>
+  : P extends `source/file?${string}`
+    ? v.InferOutput<typeof sourceFileSchema>
+    : P extends "library"
+      ? v.InferOutput<typeof librarySchema>
+      : P extends `note?${string}`
+        ? v.InferOutput<typeof noteSchema>
+        : P extends `search?${string}`
+          ? SearchResult
+          : P extends "stage"
+            ? v.InferOutput<typeof stageSchema>
+            : P extends "stage-link"
+              ? { url: string }
+              : P extends "poll/receipt"
+                ? { text: string }
+                : P extends "feedback"
+                  ? v.InferOutput<typeof feedbackResponseSchema>
+                  : DeskState;
 export type ApiClient = <P extends ApiPath>(
   path: P,
   ...args: ApiArgs<P>
@@ -139,21 +157,25 @@ export function parseApiResponse<P extends ApiPath>(
   value: unknown,
 ): ApiResponse<P> {
   const schema =
-    path === "library"
-      ? librarySchema
-      : path.startsWith("note?")
-        ? noteSchema
-        : path.startsWith("search?")
-          ? searchSchema
-          : path === "stage"
-            ? stageSchema
-            : path === "stage-link"
-              ? stageLinkSchema
-              : path === "poll/receipt"
-                ? receiptSchema
-                : path === "feedback"
-                  ? feedbackResponseSchema
-                  : deskSchema;
+    path === "source/files"
+      ? sourceFilesSchema
+      : path.startsWith("source/file?")
+        ? sourceFileSchema
+        : path === "library"
+          ? librarySchema
+          : path.startsWith("note?")
+            ? noteSchema
+            : path.startsWith("search?")
+              ? searchSchema
+              : path === "stage"
+                ? stageSchema
+                : path === "stage-link"
+                  ? stageLinkSchema
+                  : path === "poll/receipt"
+                    ? receiptSchema
+                    : path === "feedback"
+                      ? feedbackResponseSchema
+                      : deskSchema;
   const result = v.safeParse(schema, value);
   if (!result.success)
     throw new Error("Invalid response from " + path.split("?")[0]);

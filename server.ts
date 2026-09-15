@@ -1,4 +1,5 @@
 import { preparedDemo, preparedPreview } from "./lib/prepared-demo.ts";
+import { listSource, readSource, sourceExcerpt } from "./lib/source-browser.ts";
 import { compatibleAudience } from "./shared/audience-protocol.ts";
 import { previewCandidates } from "./shared/preview.ts";
 import { asyncHandler } from "./shared/errors.ts";
@@ -107,6 +108,11 @@ export function createStudio({
     libraryFiles: NoteFile[] = [],
     savedAt: string | null = null;
   let previousMaterial: Draft | null = null;
+  let sourcePrevious: {
+    stage: Stage;
+    pollOnStage: boolean;
+    shownVersion: Stage["version"];
+  } | null = null;
   let feedbackPrevious: { stage: Stage; pollOnStage: boolean } | null = null;
   let rehearsalJob: { status: string; error?: string; workspace?: string } = {
       status: "idle",
@@ -521,6 +527,13 @@ export function createStudio({
         )
           return json(res, { error: "This window is not authorized" }, 401);
         if (req.method === "GET") {
+          if (url.pathname === "/api/source/files")
+            return json(res, await listSource(workspace));
+          if (url.pathname === "/api/source/file")
+            return json(
+              res,
+              await readSource(workspace, url.searchParams.get("path") || ""),
+            );
           if (url.pathname === "/api/desk") return json(res, deskState());
           if (url.pathname === "/api/feedback")
             return json(res, await feedbackRequest(poll));
@@ -906,6 +919,37 @@ export function createStudio({
           publishedDraft = { ...next };
           stage = publicStage(publishedDraft, ++version, stage.brief);
           blank = false;
+        } else if (url.pathname === "/api/source/show") {
+          if (!live) throw new Error("Turn Live on before sharing source");
+          const file = await readSource(workspace, String(body.path));
+          const excerpt = sourceExcerpt(
+            file,
+            String(body.revision),
+            Number(body.start),
+            Number(body.end),
+          );
+          if (!sourcePrevious || sourcePrevious.shownVersion !== stage.version)
+            sourcePrevious = { stage, pollOnStage, shownVersion: 0 };
+          stage = publicStage(
+            {
+              ...initialDraft(),
+              act: activeAct,
+              title: file.path,
+              mode: "material",
+              body: excerpt,
+              source: `Application source · lines ${String(body.start)}–${String(body.end)}`,
+            },
+            ++version,
+          );
+          sourcePrevious.shownVersion = stage.version;
+          pollOnStage = false;
+          blank = false;
+        } else if (url.pathname === "/api/source/return") {
+          if (!sourcePrevious || sourcePrevious.shownVersion !== stage.version)
+            throw new Error("The lecture has already moved on");
+          stage = { ...sourcePrevious.stage, version: ++version };
+          pollOnStage = sourcePrevious.pollOnStage;
+          sourcePrevious = null;
         } else if (url.pathname === "/api/show-preview") {
           if (typeof body.url !== "string" || body.url.length > 2048)
             throw new Error("Invalid preview URL");

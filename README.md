@@ -229,7 +229,7 @@ Verified here:
 
 **Not yet verified:** a real model-driven implementation through this wrapper, a deployed audience session, or long lecture-duration use. Those are the next rehearsal, not implied by a passing mock test.
 
-Known first-pass limits: one presenter, one fixed rehearsal checkout, one active build, no thread resume/history UI, no embedded terminal/diff viewer, no completion sound, and no offline vault snapshot. Use your editor for code inspection. Some sites disallow iframe embedding; **Open app separately** is the fallback. Long text can still make an overcrowded stage; select short sections.
+Known first-pass limits: one presenter, one fixed rehearsal checkout, one active build, no thread resume/history UI, no embedded terminal/diff viewer, no completion sound, and no offline vault snapshot. Use **Inspect source** in the desk for read-only source inspection and explicit excerpt projection. Some sites disallow iframe embedding; **Open app separately** is the fallback. Long text can still make an overcrowded stage; select short sections.
 
 ## Reference implementation
 
@@ -335,3 +335,11 @@ behavior that refactoring must preserve.
 Open `/debug` on the local studio (by default `http://127.0.0.1:4317/debug`) to see the private desk, local stage, and deployed live audience page in three columns. Each pane has independent reload and open controls. Reloading a pane can discard unsaved input. Use a wide browser window; narrower windows scroll horizontally.
 
 The debug page stays local and is excluded from audience deployment. The desk and stage allow same-origin embedding; the audience page permits localhost parents. After updating, restart the local studio and deploy the audience Worker so its embedding policy is current.
+
+### Inspect application source during the lecture
+
+Choose **Inspect source** in the desk toolbar. Select a file from the active app workspace; **Reload files** refreshes files changed by the builder. Browsing stays private.
+
+Select up to 12 lines and review the excerpt. **Show on stage** shares those lines with Stage and Live when the lecture is live. **Return to slide** restores the prior projection; moving to another slide also ends the source detour. Changed files must be reloaded before sharing. Lines longer than 72 columns are rejected to keep projected code legible.
+
+The viewer is read-only and omits hidden files, generated folders, common credential filenames, and symlinks. Text files are limited to 128 KiB. Review selected code before sharing; ordinary source files can still contain embedded sensitive values. No full source tree is sent to the audience.

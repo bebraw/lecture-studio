@@ -2576,3 +2576,72 @@ blockquote {
   border: 0;
   transform-origin: top left;
 }
+.source-browser {
+  width: min(1100px, 94vw);
+  max-height: 92vh;
+  padding: 24px;
+  border: 1px solid var(--line);
+  background: var(--paper);
+  color: var(--ink);
+}
+.source-browser::backdrop {
+  background: #0008;
+}
+.source-browser header,
+.source-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  justify-content: space-between;
+  flex-wrap: wrap;
+}
+.source-toolbar label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.source-toolbar input {
+  width: 80px;
+}
+.source-toolbar select {
+  max-width: min(650px, 70vw);
+}
+.source-code,
+.source-excerpt {
+  tab-size: 4;
+  overflow: auto;
+  padding: 16px;
+  background: #fff;
+  color: #202020;
+  font:
+    14px/1.6 Menlo,
+    monospace;
+  border: 1px solid #ddd;
+}
+.source-code {
+  height: 40vh;
+}
+.source-excerpt {
+  max-height: 20vh;
+}
+.source-line {
+  display: block;
+  min-height: 1.6em;
+}
+.source-line-number {
+  display: inline-block;
+  width: 5ch;
+  margin-right: 2ch;
+  color: #666;
+  user-select: none;
+}
+.source-keyword {
+  color: #65369b;
+  font-weight: 600;
+}
+.source-string {
+  color: #865010;
+}
+.source-comment {
+  color: #526b55;
+}
