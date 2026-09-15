@@ -14,6 +14,9 @@ export class StageState extends DurableObject<Env> {
       "CREATE TABLE IF NOT EXISTS feedback_collections (collection TEXT PRIMARY KEY, round TEXT, mode TEXT, prompt TEXT, expires INTEGER)",
     );
     ctx.storage.sql.exec(
+      "INSERT OR IGNORE INTO feedback_collections SELECT 'legacy:' || round,round,mode,prompt,expires FROM feedback_meta WHERE round NOT IN (SELECT round FROM feedback_collections)",
+    );
+    ctx.storage.sql.exec(
       "CREATE TABLE IF NOT EXISTS feedback_items (id TEXT PRIMARY KEY, round TEXT, text TEXT, status TEXT, voter TEXT, network TEXT, created INTEGER)",
     );
     ctx.storage.sql.exec(

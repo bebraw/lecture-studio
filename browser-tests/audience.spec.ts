@@ -127,7 +127,7 @@ test.describe("Native forms", () => {
         await (
           await audience.admin("/presenter/feedback", { action: "close" })
         ).json(),
-      ).toEqual({ config: null, items: [] });
+      ).toEqual({ config: null, items: [], approvedWords: [] });
       expect((await send(first)).status).toBe(409);
       await admin("open-session", "first-lecture");
       await send(second);
