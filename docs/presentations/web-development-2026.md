@@ -27,6 +27,15 @@ Versioned export of the Obsidian lecture at `Lectures/Web Development 2026/Prese
       "title": "Today’s route",
       "body": "1. **Past** — Finding knowledge; documents, links and native forms\n2. **Present** — Browser interaction; AJAX and shared state\n3. **Future** — What people might delegate to agents\n4. **References** — Sources and further reading",
       "notes": "Introduce the route before the CERN example. Across the sections, we build and inspect one application together.",
+      "next": "learning-outcomes"
+    },
+    {
+      "id": "learning-outcomes",
+      "type": "material",
+      "chapter": "Opening",
+      "title": "What you should be able to explain",
+      "body": "1. **Trace a submission:** browser → server → database → result. Explain what AJAX changes.\n2. **Reason about failure:** separate the server’s state from what the browser knows; choose a usable baseline.\n3. **Evaluate a generated view:** connect a claim to its source, identify allowed actions, and test the fallback.",
+      "notes": "These are the three checks we will return to. Historical examples explain the design problems; audience needs shape the app, while prediction and evidence tasks check understanding.",
       "next": "step-4"
     },
     {
@@ -1068,25 +1077,34 @@ Versioned export of the Obsidian lecture at `Lectures/Web Development 2026/Prese
       "title": "What would you test next?",
       "body": "Suggest one next test for our seminar app in 1–3 words.\n\n**Word cloud · 45 seconds**\n\nOn live.scalableweb.dev, open **Add words** and send one response (up to 32 characters).\n\nWe’ll discuss two approved suggestions: what would each test help us decide?",
       "notes": "86–89 · While Live is on, open Responses, choose Word cloud, enter “What would you test next?”, and open a new collection. Allow 45 seconds, close collection, review privately, approve relevant responses, then show the approved cloud. Pick two contrasting suggestions and ask what result would support or challenge the proposed direction. Frequency is not a vote. If collection is unavailable, take two spoken suggestions. Use Back to slide, then advance to the closing takeaway. Do not start another build.",
-      "next": "step-19",
+      "next": "audience-evidence-recap",
       "related": ["accessibility-parallels", "meaning-and-action"],
       "wordCloud": true
     },
     {
-      "id": "step-19",
+      "id": "audience-evidence-recap",
       "type": "material",
       "chapter": "Closing",
-      "title": "Choose the next change from the evidence",
-      "body": "Choose one next step from the approved suggestions and the needs still unresolved in our checks.\n\nState: **the need → the change to try → the observation that would tell us it helped**.\n\nKeep unsupported tasks explicit: they may require better source data, another capability, or a different design.",
-      "notes": "Use these approved responses as a recap, not a claim that every request was implemented. Ask the audience to identify one unmet need observed at a checkpoint and connect it to a proposed test. Agree a concrete next change and success criterion.",
-      "related": ["detour-5-0", "detour-5-1"],
-      "next": "references-title",
+      "title": "What our audience evidence suggests next",
+      "body": "Choose one unmet need. Name a change and the observation that would show it helped.",
       "reviewWordsFrom": [
         "knowledge-experience",
         "step-9",
         "future-visions",
         "closing-app-question"
-      ]
+      ],
+      "notes": "Use these as audience findings, not proof that the app implemented every request. Take one concrete example before the transfer problem.",
+      "next": "step-19"
+    },
+    {
+      "id": "step-19",
+      "type": "question",
+      "chapter": "Closing",
+      "title": "Transfer the three checks to another app",
+      "body": "**In pairs · 2 minutes**\n\nA course-booking app shows no confirmation after you press Reserve. A generated view claims “You have a place.”\n\n1. Trace the request and response. What changes if the app uses AJAX?\n2. Give two server states consistent with the missing confirmation. What should the UI say and check next?\n3. What evidence supports the generated claim? Which action needs permission, and what should the fixed fallback show?",
+      "notes": "Take one explanation per question, then reveal the answer verbally: AJAX changes the update mechanism, not the need to validate/store. The request may never arrive, or the write may succeed and the response be lost. Show unknown until authoritative status is checked; retries need duplicate handling. A place requires an actual confirmed reservation record, not inferred interest counts. Generated text cannot confer booking authority. The fallback should show verified status and a clearly authorized next action. Use the approved needs in the preceding recap to motivate the test.",
+      "related": ["detour-5-0", "detour-5-1"],
+      "next": "references-title"
     },
     {
       "id": "references-title",

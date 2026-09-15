@@ -317,7 +317,7 @@ test("later builds and reviews use their own approved audience input", async () 
   assert.match(session.resolve().prompt, /unsupported tasks/);
   session.move("select", "check-document-review");
   assert.match(session.resolve().prompt, /date/);
-  session.move("select", "step-19");
+  session.move("select", "audience-evidence-recap");
   for (const term of [
     "date",
     "clear feedback",
@@ -344,7 +344,7 @@ test("full-size approved collections remain readable and references must resolve
     session.approvedWords[step.id] = Array.from({ length: 500 }, (_, i) =>
       i < 250 ? "date" : "finding " + i,
     );
-  session.move("select", "step-19");
+  session.move("select", "audience-evidence-recap");
   const summary = session.resolve().prompt;
   assert.ok(summary.length < 4000);
   assert.match(summary, /date \(250\)/);
