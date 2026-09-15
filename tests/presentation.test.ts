@@ -290,7 +290,8 @@ test("first build maps approved audience needs and labels missing findings", asy
   assert.match(session.resolve().prompt, /No approved word-cloud responses/);
   session.approvedWords["knowledge-experience"] = ["date", "prerequisites"];
   const prompt = session.resolve().prompt;
-  assert.match(prompt, /\["date","prerequisites"\]/);
+  assert.match(prompt, /"text":"date","count":1/);
+  assert.match(prompt, /"text":"prerequisites","count":1/);
   assert.match(prompt, /headings, content order/);
   assert.doesNotMatch(prompt, /No approved word-cloud responses/);
 });
@@ -324,4 +325,35 @@ test("later builds and reviews use their own approved audience input", async () 
     "test offline",
   ])
     assert.ok(session.resolve().prompt.includes(term));
+});
+
+test("full-size approved collections remain readable and references must resolve", async () => {
+  const lecture = parsePresentation(
+    sections(
+      await readFile(
+        new URL(
+          "../docs/presentations/web-development-2026.md",
+          import.meta.url,
+        ),
+        "utf8",
+      ),
+    ),
+  );
+  const session = new PresentationSession(lecture, "test");
+  for (const step of lecture.steps.filter((s) => s.wordCloud))
+    session.approvedWords[step.id] = Array.from({ length: 500 }, (_, i) =>
+      i < 250 ? "date" : "finding " + i,
+    );
+  session.move("select", "step-19");
+  const summary = session.resolve().prompt;
+  assert.ok(summary.length < 4000);
+  assert.match(summary, /date \(250\)/);
+  assert.ok(summary.split("\n- ").length <= 13);
+  session.move("select", "build-document");
+  session.defaults.add("build-document");
+  assert.ok(session.resolve().prompt.length < 16000);
+  assert.equal(session.approvedWords["knowledge-experience"]!.length, 500);
+  const broken = structuredClone(lecture);
+  broken.steps[0]!.wordsFrom = "missing";
+  assert.throws(() => parsePresentation(note(broken)), /Word references/);
 });
