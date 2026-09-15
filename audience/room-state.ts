@@ -38,6 +38,7 @@ export class RoomState extends DurableObject<Env> implements RoomOperations {
     super(ctx, env);
     void ctx.blockConcurrencyWhile(async () => {
       this.ctx.storage.sql.exec(`
+        CREATE TABLE IF NOT EXISTS vote_limits (network TEXT PRIMARY KEY, since INTEGER, count INTEGER);
         CREATE TABLE IF NOT EXISTS lecture_session (singleton INTEGER PRIMARY KEY CHECK (singleton = 1), id TEXT NOT NULL);
         CREATE TABLE IF NOT EXISTS choices (
           id TEXT PRIMARY KEY,
@@ -65,7 +66,11 @@ export class RoomState extends DurableObject<Env> implements RoomOperations {
     return this.readSnapshot(voterKey);
   }
 
-  async castVote(voterKey: string, choiceId: string): Promise<RoomVoteResult> {
+  async castVote(
+    voterKey: string,
+    choiceId: string,
+    network?: string,
+  ): Promise<RoomVoteResult> {
     if (!isIdentifier(voterKey))
       return { ok: false, code: "invalid-voter-key" };
     if (this.readMetadata().status === "locked")
@@ -76,6 +81,29 @@ export class RoomState extends DurableObject<Env> implements RoomOperations {
       .toArray()[0];
     if (!choice) return { ok: false, code: "unknown-choice" };
 
+    const existing = this.readSelection(voterKey);
+    if (network && !existing) {
+      const sql = this.ctx.storage.sql,
+        now = Date.now();
+      sql.exec("DELETE FROM vote_limits WHERE since<=?", now - 60000);
+      const limit = sql
+        .exec<{ count: number }>(
+          "SELECT count FROM vote_limits WHERE network=?",
+          network,
+        )
+        .toArray()[0];
+      const total = sql
+        .exec<{ n: number }>("SELECT count(*) n FROM votes")
+        .one().n;
+      // Generous shared-network admission; changing an existing vote remains possible.
+      if ((limit?.count ?? 0) >= 300 || total >= 1000)
+        return { ok: false, code: "rate-limited" };
+      sql.exec(
+        "INSERT INTO vote_limits VALUES (?,?,1) ON CONFLICT(network) DO UPDATE SET count=count+1",
+        network,
+        now,
+      );
+    }
     if (this.readSelection(voterKey) !== choiceId) {
       this.ctx.storage.transactionSync(() => {
         this.ctx.storage.sql.exec(
@@ -101,6 +129,7 @@ export class RoomState extends DurableObject<Env> implements RoomOperations {
         .toArray()[0]?.id;
       if (current !== sessionId) {
         this.ctx.storage.sql.exec("DELETE FROM votes");
+        this.ctx.storage.sql.exec("DELETE FROM vote_limits");
         this.ctx.storage.sql.exec(
           "INSERT INTO lecture_session (singleton, id) VALUES (1, ?) ON CONFLICT(singleton) DO UPDATE SET id = excluded.id",
           sessionId,
@@ -117,12 +146,14 @@ export class RoomState extends DurableObject<Env> implements RoomOperations {
   }
 
   async resetVotes(): Promise<RoomSnapshot> {
+    this.ctx.storage.sql.exec("DELETE FROM vote_limits");
     const voteCount = this.ctx.storage.sql
       .exec<VoteCountRow>("SELECT COUNT(*) AS vote_count FROM votes")
       .one().vote_count;
     if (voteCount > 0) {
       this.ctx.storage.transactionSync(() => {
         this.ctx.storage.sql.exec("DELETE FROM votes");
+        this.ctx.storage.sql.exec("DELETE FROM vote_limits");
         this.incrementRevision();
       });
     }

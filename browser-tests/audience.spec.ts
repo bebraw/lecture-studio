@@ -1,3 +1,4 @@
+import { audienceRooms } from "../shared/audience-rooms.ts";
 import { expect } from "@playwright/test";
 import * as v from "valibot";
 import { feedbackSchema } from "../shared/schemas.ts";
@@ -416,4 +417,31 @@ test("slide collections survive switching and resume until lecture reset", async
   const fresh = await select("lecture:one");
   expect(fresh.items).toHaveLength(0);
   expect(fresh.config?.round).not.toBe(first.config?.round);
+});
+
+test("shared-network vote admission caps fresh identities but permits updates", async ({
+  audience,
+}) => {
+  const room = rooms[0]!;
+  await audience.admin(`/presenter/rooms/${room}/open-session`, undefined, {
+    "X-Lecture-Session": "admission-test",
+  });
+  const choice = audienceRooms[room]!.choices[0]!.id;
+  const vote = (cookie = "") =>
+    fetch(new URL(`/rooms/${room}`, audience.url), {
+      method: "POST",
+      redirect: "manual",
+      headers: {
+        origin: new URL(audience.url).origin,
+        "content-type": "application/x-www-form-urlencoded",
+        cookie,
+      },
+      body: new URLSearchParams({ choice }),
+    });
+  const first = await vote();
+  expect(first.status).toBe(303);
+  const cookie = first.headers.get("set-cookie")!.split(";")[0]!;
+  for (let i = 1; i < 300; i++) expect((await vote()).status).toBe(303);
+  expect((await vote()).status).toBe(429);
+  expect((await vote(cookie)).status).toBe(303);
 });

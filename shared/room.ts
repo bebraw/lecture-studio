@@ -19,12 +19,20 @@ export interface RoomSnapshot {
 
 export type RoomVoteResult =
   | { ok: true; snapshot: RoomSnapshot }
-  | { ok: false; code: "invalid-voter-key" | "room-locked" | "unknown-choice" };
+  | {
+      ok: false;
+      code:
+        "invalid-voter-key" | "room-locked" | "unknown-choice" | "rate-limited";
+    };
 
 export interface RoomOperations {
   seedChoices(choices: readonly RoomChoice[]): Promise<RoomSnapshot>;
   initializeChoices(choices: readonly RoomChoice[]): Promise<RoomSnapshot>;
-  castVote(voterKey: string, choiceId: string): Promise<RoomVoteResult>;
+  castVote(
+    voterKey: string,
+    choiceId: string,
+    network?: string,
+  ): Promise<RoomVoteResult>;
   openSession(session: string): Promise<RoomSnapshot>;
   setStatus(status: RoomStatus): Promise<RoomSnapshot>;
   getSnapshot(voterKey?: string): Promise<RoomSnapshot>;

@@ -1,7 +1,7 @@
 import type { RoomSnapshot } from "./room-state";
 import { renderRoomDocument } from "./room-view";
 
-type RoomEnvironment = Pick<Env, "ROOM_STATE">;
+type RoomEnvironment = Pick<Env, "ROOM_STATE" | "PRESENTER_TOKEN">;
 
 export interface RoomRequestOptions {
   allowedOrigins?: readonly string[];
@@ -54,9 +54,18 @@ export async function handleRoomRequest(
     resolveCookieMaxAge(options.voterCookieMaxAgeSeconds),
   );
   const voterKey = await hashVoterKey(roomId, voter.id);
-  const result = await room.castVote(voterKey, choiceId);
+  const network = await hashVoterKey(
+    env.PRESENTER_TOKEN + ":" + roomId,
+    request.headers.get("cf-connecting-ip") || "local",
+  );
+  const result = await room.castVote(voterKey, choiceId, network);
 
   if (!result.ok) {
+    if (result.code === "rate-limited")
+      return new Response(
+        "Participation limit reached. Please wait a minute or tell the lecturer.",
+        { status: 429, headers: { "retry-after": "60" } },
+      );
     if (result.code === "room-locked")
       return new Response("Voting is locked.", { status: 409 });
     return new Response(

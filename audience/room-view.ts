@@ -52,6 +52,8 @@ export function renderRoomFragment({
     )
     .join("\n");
 
+  const participationNotice =
+    "<p>Informal participation: one choice per browser, not verified identities.</p>";
   const lockedMessage =
     snapshot.status === "locked"
       ? `<p>Voting is locked at revision ${snapshot.revision}.</p>`
@@ -61,7 +63,7 @@ export function renderRoomFragment({
 
   return `<section id="room-results" data-progressive-fragment ${sectionAttributes} tabindex="-1" aria-live="polite">
   <div id="room-aggregate" aria-live="polite">${hideResults ? "" : "<p>" + snapshot.totalVotes + " total votes</p><ul>" + snapshot.choices.map((choice) => `<li>${escapeHtml(choice.label)} — ${choice.votes}</li>`).join("") + "</ul>"}
-  ${lockedMessage}</div>
+  ${participationNotice}${lockedMessage}</div>
   ${
     projected
       ? ""
