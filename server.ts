@@ -188,9 +188,11 @@ export function createStudio({
   ) => {
     const id = snapshot.config && wordCloudRounds.get(snapshot.config.round);
     if (presentation && id && snapshot.config?.mode === "words")
-      presentation.approvedWords[id] = snapshot.items
-        .filter((item) => item.status === "approved")
-        .map((item) => item.text);
+      presentation.approvedWords[id] =
+        snapshot.approvedWords ??
+        snapshot.items
+          .filter((item) => item.status === "approved")
+          .map((item) => item.text);
   };
   const syncWordCloud = async (enabled: boolean) => {
     const step = presentation?.step();

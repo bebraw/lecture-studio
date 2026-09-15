@@ -16,6 +16,12 @@ export class StageState extends DurableObject<Env> {
     ctx.storage.sql.exec(
       "CREATE TABLE IF NOT EXISTS feedback_items (id TEXT PRIMARY KEY, round TEXT, text TEXT, status TEXT, voter TEXT, network TEXT, created INTEGER)",
     );
+    ctx.storage.sql.exec(
+      "CREATE TABLE IF NOT EXISTS feedback_approvals (id TEXT PRIMARY KEY, round TEXT, text TEXT)",
+    );
+    ctx.storage.sql.exec(
+      "INSERT OR IGNORE INTO feedback_approvals SELECT id,round,text FROM feedback_items WHERE status='approved'",
+    );
   }
   async publish(stage: Record<string, JsonValue>) {
     if (stage.live === false)
@@ -56,7 +62,16 @@ export class StageState extends DurableObject<Env> {
           )
           .toArray()
       : [];
-    return { config, items };
+    const approvedWords = config
+      ? this.ctx.storage.sql
+          .exec<{ text: string }>(
+            "SELECT text FROM feedback_approvals WHERE round=? ORDER BY id",
+            config.round,
+          )
+          .toArray()
+          .map((row) => row.text)
+      : [];
+    return { config, items, approvedWords };
   }
   async feedbackManage(action: string, input: Record<string, unknown>) {
     const sql = this.ctx.storage.sql;
@@ -111,6 +126,11 @@ export class StageState extends DurableObject<Env> {
       sql.exec("UPDATE feedback_meta SET opened=0");
     else if (action === "approve" || action === "done") {
       if (typeof input.id !== "string") throw new Error("Choose a response");
+      if (action === "approve")
+        sql.exec(
+          "INSERT OR IGNORE INTO feedback_approvals SELECT id,round,text FROM feedback_items WHERE id=?",
+          input.id,
+        );
       sql.exec(
         "UPDATE feedback_items SET status=? WHERE id=?",
         action === "approve" ? "approved" : "done",
@@ -195,6 +215,7 @@ export class StageState extends DurableObject<Env> {
   async resetFeedback() {
     this.ctx.storage.transactionSync(() => {
       this.ctx.storage.sql.exec("DELETE FROM feedback_items");
+      this.ctx.storage.sql.exec("DELETE FROM feedback_approvals");
       this.ctx.storage.sql.exec("DELETE FROM feedback_meta");
       this.ctx.storage.sql.exec("DELETE FROM feedback_collections");
     });
@@ -202,6 +223,10 @@ export class StageState extends DurableObject<Env> {
   }
   override async alarm() {
     const sql = this.ctx.storage.sql;
+    sql.exec(
+      "DELETE FROM feedback_approvals WHERE round IN (SELECT round FROM feedback_collections WHERE expires<=?)",
+      Date.now(),
+    );
     sql.exec(
       "DELETE FROM feedback_items WHERE round IN (SELECT round FROM feedback_collections WHERE expires<=?)",
       Date.now(),

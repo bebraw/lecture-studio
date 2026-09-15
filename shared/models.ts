@@ -198,6 +198,7 @@ export interface FeedbackItem {
   status: string;
 }
 export interface FeedbackSnapshot {
+  approvedWords?: string[];
   config: FeedbackConfig | null;
   items: FeedbackItem[];
 }

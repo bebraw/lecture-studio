@@ -14,7 +14,7 @@ This is the canonical operator guide. [Run of show](../LECTURE-NARRATIVE.md) sup
 
 - **Live on** at the start of a newly loaded/reset lecture clears prior votes and collections before opening the current activity. Off/on within the same lecture resumes it; it does not erase findings. To start a new lecture, use **Reset lecture** or reload while off.
 - Moving onto a poll opens it automatically. Leaving closes it and freezes its decision. Returning shows the saved result; explicitly reopening is a new collection of votes for that decision.
-- Word-cloud slides open automatically. Returning reopens the same collection. Approve responses before they can appear in a cloud or dependent build prompt. **Show approved cloud** projects a reviewed snapshot. **Back to slide** restores the slide.
+- Word-cloud slides open automatically. Returning reopens the same collection. Approved findings are saved separately from the review queue; **Done** dismisses an item without erasing its already-approved contribution. A new lecture clears both. Approve responses before they can appear in a cloud or dependent build prompt. **Show approved cloud** projects a reviewed snapshot. **Back to slide** restores the slide.
 - Questions and each slide cloud retain separate collections. Closing stops submissions without deleting responses. Use a new lecture for a complete reset.
 - **Live off** closes active voting and collection, then confirms the waiting screen. If delivery fails, the desk reports the failure instead of pretending the transition succeeded.
 - Navigation never starts implementation. Review the resolved prompt, then **Start this build**. Failed/interrupted builds expose **Retry this build**, preserving that attempt’s original inputs.

@@ -406,6 +406,11 @@ test("slide collections survive switching and resume until lecture reset", async
   restored = await select("lecture:one");
   expect(restored.config?.round).toBe(first.config?.round);
   expect(restored.items).toMatchObject([{ text: "date", status: "approved" }]);
+  await audience.admin("/presenter/feedback", {
+    action: "done",
+    id: restored.items[0]!.id,
+  });
+  expect((await select("lecture:one")).approvedWords).toEqual(["date"]);
   await audience.admin("/presenter/feedback", { action: "close" });
   expect((await select("lecture:one")).items).toHaveLength(1);
   await audience.admin("/presenter/reset-lecture");
