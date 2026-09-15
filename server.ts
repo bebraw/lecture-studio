@@ -346,7 +346,7 @@ export function createStudio({
     res.setHeader("x-content-type-options", "nosniff");
     res.setHeader(
       "content-security-policy",
-      "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' https: data:; font-src 'self'; connect-src 'self'; frame-src http://127.0.0.1:* http://localhost:* https:; frame-ancestors 'none'; base-uri 'none'; form-action 'self'; object-src 'none'",
+      "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' https: data:; font-src 'self'; connect-src 'self'; frame-src http://127.0.0.1:* http://localhost:* https:; frame-ancestors 'self'; base-uri 'none'; form-action 'self'; object-src 'none'",
     );
     try {
       if (req.headers.host !== new URL(origin).host)
@@ -821,6 +821,9 @@ export function createStudio({
         "/": "desk.html",
         "/desk": "desk.html",
         "/stage": "stage.html",
+        "/debug": "debug.html",
+        "/debug.css": "debug.css",
+        "/debug.mjs": "debug.mjs",
         "/style.css": "style.css",
         "/desk.mjs": "desk.mjs",
         "/stage.mjs": "stage.mjs",

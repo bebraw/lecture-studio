@@ -327,3 +327,9 @@ Docker. See [setup and retry instructions](docs/local-ci.md).
 Architecture: [runtime boundaries](ARCHITECTURE.md) and
 [accepted decisions](docs/adrs/README.md) describe privacy, voting and build
 behavior that refactoring must preserve.
+
+### Side-by-side debugging
+
+Open `/debug` on the local studio (by default `http://127.0.0.1:4317/debug`) to see the private desk, local stage, and deployed live audience page in three columns. Each pane has independent reload and open controls. Reloading a pane can discard unsaved input. Use a wide browser window; narrower windows scroll horizontally.
+
+The debug page stays local and is excluded from audience deployment. The desk and stage allow same-origin embedding; the audience page permits localhost parents. After updating, restart the local studio and deploy the audience Worker so its embedding policy is current.

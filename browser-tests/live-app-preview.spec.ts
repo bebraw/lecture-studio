@@ -16,7 +16,7 @@ test("live room embeds on stage, submits independently of the landing page, and 
     );
     const rootResponse = await page.request.get(audience.url);
     expect(rootResponse.headers()["content-security-policy"]).toContain(
-      "frame-ancestors 'none'",
+      "frame-ancestors http://127.0.0.1:* http://localhost:*",
     );
     const response = await page.request.post(
       studio.address.origin + "/api/show-preview",

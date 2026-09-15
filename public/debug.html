@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Lecture Studio · Debug</title>
+    <link rel="stylesheet" href="/debug.css" />
+    <script type="module" src="/debug.mjs"></script>
+  </head>
+  <body>
+    <header class="toolbar">
+      <div>
+        <span class="eyebrow">LECTURE STUDIO / LOCAL</span>
+        <h1>Three views. One lecture.</h1>
+      </div>
+      <p>Desk controls the lecture. Stage and live follow.</p>
+      <button id="reload-all">Reload all</button>
+    </header>
+    <main>
+      <section aria-labelledby="desk-title">
+        <header>
+          <div>
+            <h2 id="desk-title">Desk</h2>
+            <span>Private controls</span>
+          </div>
+          <button data-reload="desk">Reload</button
+          ><a href="/desk" target="_blank" rel="noopener">Open ↗</a>
+        </header>
+        <iframe id="desk" title="Private lecture desk" src="/desk"></iframe>
+      </section>
+      <section aria-labelledby="stage-title">
+        <header>
+          <div>
+            <h2 id="stage-title">Stage</h2>
+            <span>Local projection</span>
+          </div>
+          <button data-reload="stage">Reload</button
+          ><a href="/stage" target="_blank" rel="noopener">Open ↗</a>
+        </header>
+        <iframe id="stage" title="Local lecture stage" src="/stage"></iframe>
+      </section>
+      <section aria-labelledby="live-title">
+        <header>
+          <div>
+            <h2 id="live-title">Live</h2>
+            <span>Public audience · deployed version</span>
+          </div>
+          <button data-reload="live">Reload</button
+          ><a
+            href="https://live.scalableweb.dev/"
+            target="_blank"
+            rel="noopener"
+            >Open ↗</a
+          >
+        </header>
+        <iframe
+          id="live"
+          title="Live lecture audience"
+          src="https://live.scalableweb.dev/"
+          referrerpolicy="no-referrer"
+        ></iframe>
+      </section>
+    </main>
+  </body>
+</html>

@@ -215,7 +215,7 @@ export default {
       const response = new Response(asset.body, asset);
       response.headers.set(
         "content-security-policy",
-        "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' https: data:; frame-src https:; object-src 'none'; base-uri 'none'; frame-ancestors 'none'; form-action 'self'",
+        "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' https: data:; frame-src https:; object-src 'none'; base-uri 'none'; frame-ancestors http://127.0.0.1:* http://localhost:*; form-action 'self'",
       );
       response.headers.set("referrer-policy", "same-origin");
       response.headers.set("x-content-type-options", "nosniff");
