@@ -526,7 +526,7 @@ export function createStudio({
                 if (!presentation) throw new Error("Load a presentation first");
                 if (!audienceSessionStarted && poll.origin && poll.token) {
                   const response = await poll.fetcher(
-                    poll.origin + "/presenter/close-polls",
+                    poll.origin + "/presenter/reset-lecture",
                     {
                       method: "POST",
                       headers: { authorization: "Bearer " + poll.token },
@@ -537,8 +537,17 @@ export function createStudio({
                   await response.body?.cancel();
                   if (!response.ok)
                     throw new Error(
-                      "Could not close earlier votes. Deploy the updated audience Worker and try Live on again.",
+                      "Could not clear earlier audience responses. Deploy the updated audience Worker and try Live on again.",
                     );
+                  graphPolls.clear();
+                  graphPoll = null;
+                  projectedPoll = null;
+                  poll.reset();
+                  presentation.decisions = {};
+                  presentation.approvedWords = {};
+                  wordCloudRounds.clear();
+                  wordCloudStep = null;
+                  feedbackPrevious = null;
                   audienceSessionStarted = true;
                 }
                 await openGraphPoll();

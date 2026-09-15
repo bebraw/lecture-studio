@@ -905,12 +905,24 @@ Versioned export of the Obsidian lecture at `Lectures/Web Development 2026/Prese
     {
       "id": "step-15",
       "type": "question",
-      "title": "Which applications need a stable interface, and which could use a generated one?",
-      "body": "**Compare in pairs · 2 minutes**\n\nChoose one application that needs a stable interface and one that could use a generated view.\n\nAgree on one reason for each. We’ll compare two pairs’ examples.",
-      "notes": "62–70 · Give pairs two minutes, then discuss examples while the build runs. Use the two-directions diagram. This is a position, not a proven forecast.\nSource keys resolve to the References slides at the end. Unquoted explanations are lecture paraphrases; diagrams are not archival reproductions.\nFull attribution: Hypothesis · [13] Approved, unpublished position paper (2026)",
+      "title": "Which application type should we examine?",
+      "body": "**In pairs · 45 seconds**\n\nChoose one application type you know: a banking app, a course planner, a travel search…\n\nSubmit its type on live.scalableweb.dev in up to 32 characters.\n\nWe’ll select two contrasting examples from the approved responses.",
+      "notes": "Showing this slide live opens a word collection. Ask for an application type, not an interface preference yet. Close collection and approve relevant examples. Select two contrasting types to discuss on the next slide. Keep submissions unprojected until approved.",
       "related": ["detour-3-0", "detour-3-1"],
       "source": "[13] Lecture hypothesis · Unpublished paper, 2026",
       "chapter": "Future",
+      "next": "application-interface-choice",
+      "wordCloud": true
+    },
+    {
+      "id": "application-interface-choice",
+      "type": "question",
+      "chapter": "Future",
+      "title": "For this application, which interface approach fits?",
+      "body": "Choose one approved application type below and name a specific user task.\n\n**A · Stable:** the same controls and structure each time.\n\n**B · Generated:** a view composed for the task.\n\n**C · Mixed:** stable core actions with generated supporting views.\n\nReport: **application + task → A, B or C → reason**.",
+      "reviewWordsFrom": ["step-15"],
+      "notes": "Take one application type at a time so answers refer to the same case. Ask a pair to name its task and choose A, B or C with a reason; invite another pair to challenge it. Repeat with a contrasting type. Discuss familiarity, error cost, accessibility and variation between tasks. This is a spoken comparison, not an aggregate poll across unrelated applications. These are design hypotheses, not forecasts.",
+      "source": "[13] Lecture hypothesis · Unpublished paper, 2026",
       "next": "meaning-and-action"
     },
     {
@@ -1023,12 +1035,11 @@ Versioned export of the Obsidian lecture at `Lectures/Web Development 2026/Prese
     },
     {
       "id": "check-composed-interface-review",
-      "type": "question",
-      "chapter": "Future",
-      "title": "Which audience tasks can this view support?",
-      "body": "Compare the generated view with your suggested tasks.\n\nShow evidence for one supported task. Identify one limitation in the available data or actions.",
-      "reviewWordsFrom": ["future-visions"],
-      "notes": "Revisit the approved responses after showing the app. Ask the room to distinguish observed behavior from assumptions. Keep one unresolved need for the closing discussion.",
+      "type": "material",
+      "chapter": "Closing",
+      "title": "Recap · What changes, what remains",
+      "body": "- **Past:** structure information and connect it through links.\n- **Present:** improve interaction while preserving a working foundation.\n- **Future:** give agents explicit data, permitted actions and verifiable results.\n\n**Across all three: start with people’s needs, then test whether the implementation meets them.**",
+      "notes": "Bring the lecture back to its main argument. CERN motivated finding and connecting information; HTML and native forms gave us a usable foundation. Browser enhancements changed the interaction and introduced state and failure cases to handle. Agent-composed views introduced further questions about source evidence, scope and permission. These approaches can coexist: a generated interface still depends on reliable information and actions. Use one observed example from today’s builds to make the final sentence concrete, without claiming an unfinished or failed check succeeded. The next slide recaps what we actually built and tested.",
       "next": "step-18"
     },
     {

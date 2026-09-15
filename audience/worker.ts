@@ -82,6 +82,19 @@ export default {
         return new Response("Unauthorized", { status: 401 });
       return feedbackRequest(request, env, true);
     }
+    if (url.pathname === "/presenter/reset-lecture") {
+      if (request.method !== "POST")
+        return new Response("Method not allowed", { status: 405 });
+      if (!(await authorized(request, env.PRESENTER_TOKEN)))
+        return new Response("Unauthorized", { status: 401 });
+      for (const id of Object.keys(rooms)) {
+        const room = env.ROOM_STATE.getByName(id);
+        await room.setStatus("locked");
+        await room.resetVotes();
+      }
+      await env.STAGE_STATE.getByName("lecture").resetFeedback();
+      return new Response(null, { status: 204 });
+    }
     if (url.pathname === "/presenter/close-polls") {
       if (request.method !== "POST")
         return new Response("Method not allowed", { status: 405 });

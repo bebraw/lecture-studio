@@ -85,7 +85,52 @@ test.describe("Native forms", () => {
       expect(result.choices.find((choice) => choice.id === second)?.votes).toBe(
         1,
       );
-      expect(await admin("seed")).toEqual(result);
+      await audience.admin("/presenter/stage", {
+        live: true,
+        title: "Old lecture",
+        html: "",
+        version: 1,
+      });
+      const oldCloud = v.parse(
+        feedbackSchema,
+        await (
+          await audience.admin("/presenter/feedback", {
+            action: "start",
+            mode: "words",
+            prompt: "Old cloud",
+          })
+        ).json(),
+      );
+      const submission = await fetch(new URL("/api/feedback", audience.url), {
+        method: "POST",
+        headers: {
+          "content-type": "application/json",
+          origin: new URL(audience.url).origin,
+        },
+        body: JSON.stringify({
+          round: oldCloud.config!.round,
+          text: "old response",
+        }),
+      });
+      expect(submission.status).toBe(201);
+      expect(
+        (
+          await fetch(new URL("/presenter/reset-lecture", audience.url), {
+            method: "POST",
+          })
+        ).status,
+      ).toBe(401);
+      await audience.admin("/presenter/reset-lecture");
+      expect((await admin("lock")).totalVotes).toBe(0);
+      expect(
+        await (
+          await audience.admin("/presenter/feedback", { action: "close" })
+        ).json(),
+      ).toEqual({ config: null, items: [] });
+      expect((await send(first)).status).toBe(409);
+      await admin("open-session", "first-lecture");
+      await send(second);
+
       expect((await admin("open-session", "first-lecture")).totalVotes).toBe(1);
       expect((await admin("open-session", "first-lecture")).totalVotes).toBe(1);
       expect((await admin("open-session", "second-lecture")).totalVotes).toBe(

@@ -160,6 +160,13 @@ export class StageState extends DurableObject<Env> {
     );
     return { status: 201 };
   }
+  async resetFeedback() {
+    this.ctx.storage.transactionSync(() => {
+      this.ctx.storage.sql.exec("DELETE FROM feedback_items");
+      this.ctx.storage.sql.exec("DELETE FROM feedback_meta");
+    });
+    await this.ctx.storage.deleteAlarm();
+  }
   override async alarm() {
     const row = this.ctx.storage.sql
       .exec<{ expires: number }>("SELECT expires FROM feedback_meta WHERE id=1")

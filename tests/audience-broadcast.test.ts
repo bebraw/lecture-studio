@@ -21,7 +21,7 @@ test("only published slides sync; polling never replaces another projected slide
         collections.push(stringValue(init.body, "feedback body"));
         return Response.json({ config: null, items: [] });
       }
-      if (url.endsWith("/presenter/close-polls")) {
+      if (url.endsWith("/presenter/reset-lecture")) {
         cleanups++;
         status = "locked";
         return new Response(null, { status: 204 });
