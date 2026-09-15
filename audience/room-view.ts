@@ -4,6 +4,7 @@ export interface RoomViewModel {
   roomId: string;
   snapshot: RoomSnapshot;
   hideResults?: boolean;
+  projected?: boolean;
 }
 
 export function renderRoomDocument(view: RoomViewModel): string {
@@ -29,6 +30,7 @@ export function renderRoomFragment({
   roomId,
   snapshot,
   hideResults = false,
+  projected = false,
 }: RoomViewModel): string {
   const action = `/rooms/${encodeURIComponent(roomId)}`;
   const sectionAttributes = `data-room-revision="${snapshot.revision}" data-room-status="${snapshot.status}"`;
@@ -45,7 +47,7 @@ export function renderRoomFragment({
   <input id="room-choice-${index}" name="choice" type="radio" value="${escapeHtml(choice.id)}" required${
     snapshot.currentSelection === choice.id ? " checked" : ""
   }>
-  <label for="room-choice-${index}">${escapeHtml(choice.label)}${hideResults ? "" : " — " + choice.votes}</label>
+  <label for="room-choice-${index}">${escapeHtml(choice.label)}</label>
 </div>`,
     )
     .join("\n");
@@ -54,20 +56,24 @@ export function renderRoomFragment({
     snapshot.status === "locked"
       ? `<p>Voting is locked at revision ${snapshot.revision}.</p>`
       : "";
-  const submitButton =
-    snapshot.status === "open" ? '    <button type="submit">Vote</button>' : "";
+  const submitButton = `<button type="submit"${snapshot.status === "locked" ? " disabled" : ""}>Vote</button>`;
   const disabled = snapshot.status === "locked" ? " disabled" : "";
 
   return `<section id="room-results" data-progressive-fragment ${sectionAttributes} tabindex="-1" aria-live="polite">
-  ${hideResults ? "" : "<p>" + snapshot.totalVotes + " total votes</p>"}
-  ${lockedMessage}
-  <form action="${action}" method="post" data-progressive-form data-progressive-target="#room-results">
+  <div id="room-aggregate" aria-live="polite">${hideResults ? "" : "<p>" + snapshot.totalVotes + " total votes</p><ul>" + snapshot.choices.map((choice) => `<li>${escapeHtml(choice.label)} — ${choice.votes}</li>`).join("") + "</ul>"}
+  ${lockedMessage}</div>
+  ${
+    projected
+      ? ""
+      : `<form action="${action}" method="post" data-progressive-form data-progressive-target="#room-results">
     <fieldset${disabled}>
       <legend>Choose one option</legend>
       ${choices}
     </fieldset>
 ${submitButton}
-  </form>
+  </form>`
+  }
+  <p id="room-update-status" role="status"></p>
 </section>`;
 }
 

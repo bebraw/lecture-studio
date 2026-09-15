@@ -1,0 +1,57 @@
+/* Room-only additions to Document A's retro theme. */
+body > main {
+  max-width: 54rem;
+  margin: 2rem auto;
+  padding: 2rem;
+  background: var(--paper);
+  border: 2px solid var(--ink);
+  box-shadow: 6px 6px 0 var(--green);
+}
+body > main > h1 {
+  font-size: clamp(2rem, 6vw, 3.5rem);
+  line-height: 1.1;
+  letter-spacing: -0.03em;
+  margin-bottom: 1.5rem;
+}
+#room-results {
+  padding: 1rem 0;
+}
+#room-results fieldset {
+  margin: 1.5rem 0;
+  border: 2px solid var(--green);
+}
+#room-results legend {
+  font-weight: bold;
+}
+#room-results fieldset > div {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.5rem;
+}
+#room-results input[type="radio"] {
+  width: 1.25rem;
+  height: 1.25rem;
+  flex-shrink: 0;
+  accent-color: var(--green);
+}
+#room-results label {
+  font: inherit;
+  cursor: pointer;
+}
+#room-results button {
+  color: var(--paper);
+  background: var(--green);
+  border: 2px solid var(--ink);
+  border-radius: 0;
+  padding: 0.65rem 1.5rem;
+}
+#room-update-status {
+  margin-top: 1rem;
+}
+@media (max-width: 640px) {
+  body > main {
+    margin: 0.75rem;
+    padding: 1.25rem;
+  }
+}

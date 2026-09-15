@@ -1,4 +1,12 @@
-import { mkdir, copyFile, cp, stat, rm } from "node:fs/promises";
+import {
+  mkdir,
+  copyFile,
+  cp,
+  stat,
+  rm,
+  appendFile,
+  readFile,
+} from "node:fs/promises";
 await import("../scripts/build-browser.ts");
 const root = new URL("../", import.meta.url),
   output = new URL(".local/audience/assets/", root);
@@ -14,7 +22,12 @@ for (const name of ["shared.mjs", "style.css"])
     ),
     new URL(name, output),
   );
-for (const name of ["index.html", "audience.mjs", "audience.css"])
+for (const name of [
+  "index.html",
+  "audience.mjs",
+  "audience.css",
+  "seminar-browser.mjs",
+])
   await copyFile(
     new URL(
       name.endsWith(".mjs") ? "../.local/browser/audience/" + name : name,
@@ -22,6 +35,14 @@ for (const name of ["index.html", "audience.mjs", "audience.css"])
     ),
     new URL(name, output),
   );
+await copyFile(
+  new URL("../document-a/style.css", import.meta.url),
+  new URL("room.css", output),
+);
+await appendFile(
+  new URL("room.css", output),
+  await readFile(new URL("room.css", import.meta.url)),
+);
 await cp(
   new URL("node_modules/mermaid/dist/", root),
   new URL("vendor/mermaid/", output),

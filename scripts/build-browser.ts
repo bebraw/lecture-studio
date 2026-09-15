@@ -7,7 +7,11 @@ const entries = (await readdir(new URL("../public", import.meta.url)))
   .map((name) => "public/" + name);
 await build({
   absWorkingDir: root,
-  entryPoints: [...entries, "audience/audience.ts"],
+  entryPoints: [
+    ...entries,
+    "audience/audience.ts",
+    "audience/seminar-browser.ts",
+  ],
   outdir: ".local/browser",
   outbase: ".",
   bundle: true,

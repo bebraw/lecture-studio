@@ -37,7 +37,7 @@ const rooms: Record<
     ],
   },
 };
-function html(title: string, body: string) {
+function html(title: string, body: string, embeddableRoom = false) {
   return new Response(
     '<!doctype html><html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>' +
       title +
@@ -51,7 +51,10 @@ function html(title: string, body: string) {
         "content-type": "text/html;charset=utf-8",
         "cache-control": "no-store",
         "content-security-policy":
-          "default-src 'none'; style-src 'self'; form-action 'self'; base-uri 'none'; frame-ancestors 'none'",
+          "default-src 'none'; script-src 'self'; connect-src 'self'; style-src 'self'; form-action 'self'; base-uri 'none'; frame-ancestors " +
+          (embeddableRoom
+            ? "'self' http://127.0.0.1:* http://localhost:* https://live.scalableweb.dev"
+            : "'none'"),
         "x-content-type-options": "nosniff",
         "referrer-policy": "same-origin",
       },
@@ -200,6 +203,8 @@ export default {
           "/style.css",
           "/audience.css",
           "/audience.mjs",
+          "/seminar-browser.mjs",
+          "/room.css",
           "/shared.mjs",
         ].includes(url.pathname) ||
         url.pathname.startsWith("/vendor/mermaid/"))
@@ -257,10 +262,19 @@ export default {
         const snapshot = await readRoomSnapshot(request, env, id);
         return html(
           definition.question,
-          renderRoomFragment({ roomId: id, snapshot }) +
+          '<link rel="stylesheet" href="/room.css"><script type="module" src="/seminar-browser.mjs"></script>' +
+            renderRoomFragment({
+              roomId: id,
+              snapshot,
+              projected: url.searchParams.has("projected"),
+            }) +
+            '<p><a href="/rooms/' +
+            id +
+            '?projected=1">Projected results</a></p>' +
             '<p><a href="/">All polls</a> · <a href="/rooms/' +
             id +
             '">Refresh results</a></p><p>Your browser remembers your vote. Changing your choice replaces it.</p>',
+          true,
         );
       }
       const response = await handleRoomRequest(request, env, {
