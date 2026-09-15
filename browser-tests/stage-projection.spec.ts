@@ -70,7 +70,7 @@ test("desk previews actual poll projection and long questions fit the stage", as
     await desk.locator("#presentation-load").click();
     await desk.locator("#live-toggle").click();
     await expect(desk.locator("#projection-status")).toHaveText(
-      "On stage: Question",
+      "On stage: Poll",
     );
     await desk.locator("#graph-results").click();
     await expect(desk.locator("#projection-status")).toHaveText(

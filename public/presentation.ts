@@ -405,6 +405,7 @@ export function mountPresentations({ call, update }: MountOptions) {
       ? "Blank"
       : {
           question: "Question",
+          poll: "Poll",
           results: "Results",
           material: "Slide",
           brief: "Build prompt",
@@ -421,7 +422,7 @@ export function mountPresentations({ call, update }: MountOptions) {
         "aria-pressed",
         String(
           data.live &&
-            shown?.projectionKind === id &&
+            shown?.projectionKind === (id === "question" ? "poll" : id) &&
             shown?.title === p.step.poll?.question,
         ),
       );
