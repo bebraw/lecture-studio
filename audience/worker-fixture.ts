@@ -30,6 +30,11 @@ export async function workerFixture() {
   return {
     url: `http://127.0.0.1:${worker.port}/`,
     stop: worker.stop,
+    request: (url: string, init: RequestInit) => {
+      const headers = new Headers(init.headers);
+      headers.set("authorization", "Bearer " + token);
+      return fetch(url, { ...init, headers });
+    },
     async admin(
       path: string,
       body?: object,

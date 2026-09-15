@@ -1,3 +1,4 @@
+import { audienceProtocol } from "../shared/audience-protocol.ts";
 import { test, expect } from "@playwright/test";
 import { fixture } from "../tests/fixture.ts";
 import { AudiencePoll } from "../lib/audience-poll.ts";
@@ -18,12 +19,14 @@ test("desk previews actual poll projection and long questions fit the stage", as
     origin: "https://lecture-votes-20260909-bfbeb2745cce.survivejs.workers.dev",
     token: "fixture",
     fetcher: async (url) =>
-      Response.json({
-        status: url.endsWith("/open-session") ? "open" : "locked",
-        revision: 1,
-        totalVotes: 0,
-        choices: options.map((o) => ({ ...o, votes: 0 })),
-      }),
+      url.endsWith("/api/capabilities")
+        ? Response.json(audienceProtocol)
+        : Response.json({
+            status: url.endsWith("/open-session") ? "open" : "locked",
+            revision: 1,
+            totalVotes: 0,
+            choices: options.map((o) => ({ ...o, votes: 0 })),
+          }),
   });
   const path = "Lectures/Web Development 2026/Presentations/Test.md";
   const definition = {
