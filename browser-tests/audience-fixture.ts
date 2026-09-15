@@ -1,11 +1,8 @@
+import { audienceRooms } from "../shared/audience-rooms.ts";
 import { test as base } from "@playwright/test";
 import { workerFixture } from "../audience/worker-fixture.ts";
 
-export const rooms = [
-  "webdev-2026-friction",
-  "webdev-2026",
-  "webdev-2026-priority",
-] as const;
+export const rooms = Object.keys(audienceRooms);
 
 export const test = base.extend<{
   audience: Awaited<ReturnType<typeof workerFixture>>;

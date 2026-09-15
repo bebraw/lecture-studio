@@ -1,3 +1,4 @@
+import { audienceRooms as rooms } from "../shared/audience-rooms.ts";
 import { parse } from "valibot";
 import { audienceStageSchema } from "../shared/audience-schemas.ts";
 import { handleRoomRequest, readRoomSnapshot } from "./room-http";
@@ -7,36 +8,6 @@ import type { JsonValue } from "./stage-state";
 export { RoomState } from "./room-state";
 export { StageState } from "./stage-state";
 
-const rooms: Record<
-  string,
-  { question: string; choices: { id: string; label: string }[] }
-> = {
-  "webdev-2026-friction": {
-    question: "What feels unnecessarily difficult on the web?",
-    choices: [
-      { id: "finding", label: "Finding information" },
-      { id: "repeating", label: "Repeating information" },
-      { id: "navigation", label: "Navigating interfaces" },
-      { id: "trust", label: "Knowing what to trust" },
-    ],
-  },
-  "webdev-2026": {
-    question: "Which visual theme should shape our app?",
-    choices: [
-      { id: "editorial", label: "Editorial" },
-      { id: "retro-web", label: "Retro web" },
-      { id: "playful", label: "Playful" },
-    ],
-  },
-  "webdev-2026-priority": {
-    question: "What should the seminar view prioritize?",
-    choices: [
-      { id: "overview", label: "Quick overview" },
-      { id: "learning", label: "Learning outcomes" },
-      { id: "practical", label: "Practical details" },
-    ],
-  },
-};
 function html(title: string, body: string, embeddableRoom = false) {
   return new Response(
     '<!doctype html><html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>' +
@@ -271,6 +242,7 @@ export default {
         return new Response("Unauthorized", { status: 401 });
       if (!operation) return new Response("Not found", { status: 404 });
       if (operation === "open") {
+        await room.initializeChoices(definition.choices);
         const others = await Promise.all(
           Object.keys(rooms)
             .filter((key) => key !== id)

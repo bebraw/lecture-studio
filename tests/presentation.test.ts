@@ -1,3 +1,4 @@
+import { audienceRooms } from "../shared/audience-rooms.ts";
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
@@ -13,6 +14,13 @@ test("versioned lecture loads with formatter-safe fences and a complete main pat
     "utf8",
   );
   const lecture = parsePresentation(sections(markdown));
+  for (const step of lecture.steps.filter((s) => s.type === "poll")) {
+    assert.deepEqual(
+      audienceRooms[step.room!]?.choices,
+      step.poll!.options,
+      "Prepared room matches " + step.id,
+    );
+  }
   const visited = new Set<string>();
   let id: string | undefined = lecture.start;
   while (id) {
