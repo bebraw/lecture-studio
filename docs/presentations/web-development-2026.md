@@ -166,7 +166,7 @@ Versioned export of the Obsidian lecture at `Lectures/Web Development 2026/Prese
       "type": "material",
       "chapter": "Past",
       "title": "Which system is doing what?",
-      "body": "```mermaid\nflowchart LR\n L[Lecturer and audience] --> S[Studio: slides and moderated inputs]\n S -->|Lecturer starts build| C[Implementation agent: edits rehearsal code]\n C --> D[Demo app: browser and server]\n D -->|Future only: bounded data| M[Runtime model: proposes a view]\n M -->|Validate before rendering| D\n```\n\nThe implementation agent builds the app. The runtime model operates inside the app’s narrower contract.",
+      "body": "**Build time:** Studio → implementation agent → demo app\n\n**Run time (Future):** Demo app → runtime model → validation → view or fallback\n\n| System | Its job |\n| --- | --- |\n| **Studio** | Show slides and collect moderated audience input |\n| **Implementation agent** | Edit code in the separate rehearsal project after the lecturer starts a build |\n| **Demo app** | Validate submissions, store responses and serve views |\n| **Runtime model** | Propose a view from bounded data; the app validates it before display |",
       "notes": "Point out the separate systems before the first launch. The studio’s polls guide the implementation; the demo app collects a different seminar-interest survey. The runtime model is introduced later, not running during the native-form example.",
       "next": "build-document"
     },
@@ -340,7 +340,7 @@ Versioned export of the Obsidian lecture at `Lectures/Web Development 2026/Prese
       "chapter": "Past",
       "title": "Check the build · The document",
       "body": "- Find the seminar essentials and follow a real link.\n- Check the headings and reading order.\n- Compare the result with the audience’s chosen theme.",
-      "notes": "The linked build preview appears automatically on this slide. Advance to return to the lecture. If no preview URL is available, the slide reports that it is not ready.\n\nChecks to narrate:\n- Find the seminar essentials and follow a real link.\n- Check the headings and reading order.\n- Compare the result with the audience’s chosen theme.",
+      "notes": "The linked build preview appears automatically on this slide. Advance to return to the lecture. If no preview URL is available, a clearly labeled prepared reference opens. Its behavior is not evidence that the live build succeeded.\n\nChecks to narrate:\n- Find the seminar essentials and follow a real link.\n- Check the headings and reading order.\n- Compare the result with the audience’s chosen theme.",
       "type": "material",
       "next": "check-document-review",
       "previewOf": "build-document"
@@ -766,7 +766,7 @@ Versioned export of the Obsidian lecture at `Lectures/Web Development 2026/Prese
       "chapter": "Present",
       "title": "Check the build · Two views, one result",
       "body": "- Submit in one view; watch the other update.\n- Keep an unsent choice while results refresh.\n- After a connection failure, check what was saved.",
-      "notes": "The linked build preview appears automatically on this slide. Advance to return to the lecture. If no preview URL is available, the slide reports that it is not ready.\n\nChecks to narrate:\n- Submit in one view; watch the other update.\n- Keep an unsent choice while results refresh.\n- After a connection failure, check what was saved.",
+      "notes": "The linked build preview appears automatically on this slide. Advance to return to the lecture. If no preview URL is available, a clearly labeled prepared reference opens. Its behavior is not evidence that the live build succeeded.\n\nChecks to narrate:\n- Submit in one view; watch the other update.\n- Keep an unsent choice while results refresh.\n- After a connection failure, check what was saved.",
       "type": "material",
       "next": "check-interactive-app-review",
       "previewOf": "build-application"
@@ -992,7 +992,7 @@ Versioned export of the Obsidian lecture at `Lectures/Web Development 2026/Prese
       "chapter": "Future",
       "title": "Pick one generated claim; find its source",
       "body": "**Check the evidence · 60 seconds**\n\nPick one claim in the generated output. Find the input that supports it in the context receipt.\n\nReport the claim and its evidence—or say what evidence is missing.",
-      "notes": "Show actual inputs, source data and destination. Separate frozen aggregate priorities from personal information. Inspect the result against its sources. Return to Bush: a personal knowledge tool need not imply surrendering a personal profile. Do not invent a failure if none occurred; use a clearly labeled hypothetical case.\nFull attribution: Lecture design proposal · Context receipt is not an established standard",
+      "notes": "Show actual inputs, source data and destination. Separate frozen aggregate priorities from personal information. Inspect the result against its sources. Return to Bush: a personal knowledge tool need not imply surrendering a personal profile. Do not invent a failure if none occurred; use a clearly labeled hypothetical case.\nFull attribution: Lecture design proposal · Context receipt is not an established standard If the prepared reference is shown, inspect the fixed fallback and receipt; do not claim a runtime model produced it.",
       "next": "check-composed-interface",
       "related": ["detour-4-0", "detour-4-1"],
       "source": "Context receipt · Lecture proposal",
@@ -1003,7 +1003,7 @@ Versioned export of the Obsidian lecture at `Lectures/Web Development 2026/Prese
       "chapter": "Future",
       "title": "Check the build · The generated interface",
       "body": "- Compare the interface with the selected priority.\n- Inspect the inputs and locked result it used.\n- Show the fallback when generation cannot be used.",
-      "notes": "The linked build preview appears automatically on this slide. Advance to return to the lecture. If no preview URL is available, the slide reports that it is not ready.\n\nChecks to narrate:\n- Compare the interface with the selected priority.\n- Inspect the inputs and locked result it used.\n- Show the fallback when generation cannot be used.",
+      "notes": "The linked build preview appears automatically on this slide. Advance to return to the lecture. If no preview URL is available, a clearly labeled prepared reference opens. Its behavior is not evidence that the live build succeeded.\n\nChecks to narrate:\n- Compare the interface with the selected priority.\n- Inspect the inputs and locked result it used.\n- Show the fallback when generation cannot be used. If the prepared reference is shown, inspect the fixed fallback and receipt; do not claim a runtime model produced it.",
       "type": "material",
       "next": "check-composed-interface-review",
       "previewOf": "build-agents"
