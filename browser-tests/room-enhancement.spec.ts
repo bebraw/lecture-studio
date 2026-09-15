@@ -5,7 +5,7 @@ import { test } from "./audience-fixture";
 test("enhanced form preserves choices and updates an independent projection", async ({
   audience,
   browser,
-}) => {
+}, testInfo) => {
   await audience.admin("/presenter/rooms/webdev-2026/open-session", undefined, {
     "X-Lecture-Session": "present-test",
   });
@@ -69,11 +69,11 @@ test("enhanced form preserves choices and updates an independent projection", as
       ),
     ).toBe(true);
     await page.screenshot({
-      path: "/private/tmp/present-form.png",
+      path: testInfo.outputPath("present-form.png"),
       fullPage: true,
     });
     await screen.screenshot({
-      path: "/private/tmp/present-projection.png",
+      path: testInfo.outputPath("present-projection.png"),
       fullPage: true,
     });
   } finally {

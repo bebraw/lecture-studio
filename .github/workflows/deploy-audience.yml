@@ -37,7 +37,7 @@ jobs:
           test -n "$CLOUDFLARE_API_TOKEN" || { echo "Missing CLOUDFLARE_API_TOKEN repository secret"; exit 1; }
           npx wrangler deploy --name lecture-votes-20260909-bfbeb2745cce
       - name: Check public endpoint without changing votes
-        run: curl --fail --retry 3 https://lecture-votes-20260909-bfbeb2745cce.survivejs.workers.dev/api/audience --output /dev/null
+        run: curl --fail --retry 3 https://live.scalableweb.dev/api/audience --output /dev/null
       - name: Save coverage report
         if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
