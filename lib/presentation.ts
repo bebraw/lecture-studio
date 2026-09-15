@@ -49,7 +49,7 @@ export function parsePresentation(note: Note): PresentationDefinition {
       theme: v.exactOptional(v.unknown()),
     }),
     JSON.parse(
-      raw?.match(/^\s*```json\s*\n([\s\S]*?)\n```\s*$/)?.[1] || "null",
+      raw?.match(/^\s*(`{3,})json\s*\n([\s\S]*?)\n\1\s*$/)?.[2] || "null",
     ),
   );
   const value = { ...parsed, theme: parseTheme(parsed.theme) };
@@ -232,26 +232,31 @@ export class PresentationSession {
   state() {
     return {
       theme: this.definition.theme,
-      preview: publicStage(
-        {
-          ...initialDraft(),
-          mode: this.step().type === "build" ? "brief" : "material",
-          title: this.step().title,
-          body:
-            this.step().type === "build"
-              ? this.resolve().prompt
-              : (this.step().body || "") +
-                (this.step().type === "poll"
-                  ? "\n\n" +
-                    this.step()
-                      .poll!.options.map((o) => o.label)
-                      .join("\n\n")
-                  : ""),
-          source: this.step().source || "",
-          allowRemoteImages: this.step().allowRemoteImages === true,
-        },
-        this.loadedAt + "-" + this.current,
-      ),
+      preview: {
+        ...publicStage(
+          {
+            ...initialDraft(),
+            act: (this.step().chapter || "Related").slice(0, 40),
+            mode: this.step().type === "build" ? "brief" : "material",
+            title: this.step().title,
+            body:
+              this.step().type === "build"
+                ? this.resolve().prompt
+                : (this.step().body || "") +
+                  (this.step().type === "poll"
+                    ? "\n\n" +
+                      this.step()
+                        .poll!.options.map((o) => o.label)
+                        .join("\n\n")
+                    : ""),
+            source: this.step().source || "",
+            allowRemoteImages: this.step().allowRemoteImages === true,
+          },
+          this.loadedAt + "-" + this.current,
+        ),
+        slidePosition: this.position(),
+        slideType: this.step().type,
+      },
       outline: this.definition.steps.map(
         ({ id, title, type, chapter, next, related }) => ({
           id,

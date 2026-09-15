@@ -57,6 +57,7 @@ export const stageSchema = v.object({
   blank: v.exactOptional(v.boolean()),
   build: v.exactOptional(buildSchema),
   projectionKind: optionalText,
+  slideType: optionalText,
   slidePosition: v.exactOptional(
     v.nullable(
       v.object({

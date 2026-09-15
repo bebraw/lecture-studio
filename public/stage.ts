@@ -23,11 +23,17 @@ async function poll() {
     const state = await api(token, "stage");
     document.body.classList.toggle("blank", state.blank);
     slideNumber.textContent = state.slidePosition
-      ? "Slide " +
-        state.slidePosition.number +
-        " / " +
-        state.slidePosition.total
+      ? state.slidePosition.number + "/" + state.slidePosition.total
       : "";
+    slideNumber.setAttribute(
+      "aria-label",
+      state.slidePosition
+        ? "Slide " +
+            state.slidePosition.number +
+            " of " +
+            state.slidePosition.total
+        : "",
+    );
     progress.hidden = state.slidePosition?.progress == null;
     progress.value = state.slidePosition?.progress ?? 0;
     if (state.version !== version) {
@@ -41,9 +47,11 @@ async function poll() {
       query("#source-credit", document).textContent = state.source;
       void renderDiagrams(query("#stage-content", document));
     }
-    query("#build-signal", document).textContent = buildLabel(
-      state.build ?? { status: "ready" },
-    );
+    const building = ["working", "waiting"].includes(state.build?.status || "");
+    query("#build-signal", document).hidden = !building;
+    query("#build-signal", document).textContent = building
+      ? buildLabel(state.build!)
+      : "";
     query("#stage-connection", document).textContent = "";
   } catch {
     query("#stage-connection", document).textContent =

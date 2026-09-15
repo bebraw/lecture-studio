@@ -112,6 +112,11 @@ test("Obsidian snapshot loads privately and detours return without changing the 
     await expect(desk.locator("#current-stage h1")).toHaveText(
       "Snapshot title",
     );
+    await expect(desk.locator(".preview-slide-position")).toHaveText("1/3");
+    await expect(desk.locator(".preview-slide-progress")).toHaveAttribute(
+      "value",
+      "0.5",
+    );
     await expect(desk.locator("#current-stage")).toHaveCSS(
       "background-color",
       "rgb(255, 255, 255)",
@@ -252,6 +257,18 @@ test("Obsidian snapshot loads privately and detours return without changing the 
       desk.locator("#graph-presentation #current-stage"),
     ).toBeVisible();
     await expect(stage.locator("h1")).toHaveText("Snapshot title");
+    await expect(stage.locator("#slide-number")).toHaveText("1/3");
+    await expect(stage.locator("#slide-progress")).toHaveJSProperty(
+      "value",
+      0.5,
+    );
+    await expect(stage.locator("#build-signal")).toBeHidden();
+    bridge.state.status = "working";
+    await expect(stage.locator("#build-signal")).toBeVisible();
+    bridge.state.status = "waiting";
+    await expect(stage.locator("#build-signal")).toContainText("paused");
+    bridge.state.status = "ready";
+    await expect(stage.locator("#build-signal")).toBeHidden();
     await expect(stage.locator("h1")).toHaveCSS(
       "font-family",
       "Verdana, sans-serif",
@@ -264,13 +281,16 @@ test("Obsidian snapshot loads privately and detours return without changing the 
     await desk.locator("#graph-next").click();
     await desk.locator('#presentation-outline [data-step-id="aside"]').click();
     await expect(stage.locator("h1")).toHaveText("Definition detour");
+    await expect(stage.locator("#slide-number")).toHaveText("3/3");
+    await expect(stage.locator("#slide-progress")).toHaveJSProperty("value", 1);
     await expect(stage.locator("#student-link")).toBeVisible();
     await expect(stage.locator("body")).not.toContainText(
       "PRIVATE FACILITATION",
     );
-    await expect(stage.locator("#build-signal")).toBeVisible();
+    await expect(stage.locator("#build-signal")).toBeHidden();
     await desk.locator("#graph-return").click();
     await expect(stage.locator("h1")).toHaveText("Audience question");
+    await expect(stage.locator("#slide-number")).toHaveText("2/3");
     await desk.screenshot({
       path: "test-results/presentation-consolidated.png",
       fullPage: true,

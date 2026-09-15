@@ -1,10 +1,37 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
+import { readFile } from "node:fs/promises";
+import { sections } from "../lib/material.ts";
 import {
   parsePresentation,
   PresentationSession,
   parseTheme,
 } from "../lib/presentation.ts";
+test("versioned lecture loads with formatter-safe fences and a complete main path", async () => {
+  const markdown = await readFile(
+    new URL("../docs/presentations/web-development-2026.md", import.meta.url),
+    "utf8",
+  );
+  const lecture = parsePresentation(sections(markdown));
+  const visited = new Set<string>();
+  let id: string | undefined = lecture.start;
+  while (id) {
+    assert.ok(!visited.has(id), "The main path must not loop");
+    visited.add(id);
+    id = lecture.steps.find((step) => step.id === id)!.next;
+  }
+  for (const chapter of ["Past", "Present", "Future", "References"]) {
+    const divider = lecture.steps.find(
+      (step) => step.type === "title" && step.title === chapter,
+    );
+    assert.ok(
+      divider && visited.has(divider.id),
+      chapter + " divider is on the main path",
+    );
+  }
+  assert.ok(visited.has("contents"));
+  assert.ok(visited.has("references-history-photos"));
+});
 const definition = {
   version: 1,
   title: "Test",

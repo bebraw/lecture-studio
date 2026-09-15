@@ -145,8 +145,36 @@ const diagrams: Record<string, string> = {
   context:
     '<div class="diagram context"><div><span class="diagram-number">STAYS WITH YOU</span><h3>Personal context</h3><p>Private notes<br>Identity<br>Unshared preferences</p></div><div class="boundary"><span>EXPLICIT<br>SELECTION →</span></div><div><span class="diagram-number">CROSSES THE BOUNDARY</span><h3>Model input</h3><p>Reviewed facts<br>Aggregate choices<br>Allowed actions</p></div><footer>A context receipt makes the boundary inspectable.</footer></div>',
 };
-export function surface(stage: Partial<Stage>) {
-  const heading = "<h1>" + escape(stage.title) + "</h1>";
+export function surface(stage: Partial<Stage>, previewPosition = false) {
+  const position = stage.slidePosition;
+  const footer =
+    previewPosition && position
+      ? '<div class="preview-slide-position" aria-label="Slide ' +
+        position.number +
+        " of " +
+        position.total +
+        '">' +
+        position.number +
+        "/" +
+        position.total +
+        "</div>" +
+        (position.progress == null
+          ? ""
+          : '<progress class="preview-slide-progress" aria-label="Lecture progress" max="1" value="' +
+            position.progress +
+            '"></progress>')
+      : "";
+  const heading =
+    footer +
+    "<h1" +
+    (stage.slideType === "title"
+      ? ' class="section-title' +
+        (stage.title === stage.act ? " chapter-divider" : "") +
+        '"'
+      : "") +
+    ">" +
+    escape(stage.title) +
+    "</h1>";
   if (stage.mode === "diagram")
     return (
       heading +
@@ -212,6 +240,22 @@ export async function renderDiagrams(container: HTMLElement) {
         const holder = document.createElement("div");
         holder.className = "mermaid-graphic";
         holder.innerHTML = svg;
+        // Opt-in sequence reveals: counts of messages and notes already explained.
+        const focus = text.match(/^\s*%% focus-after: (\d+),(\d+)\s*$/m);
+        if (focus) {
+          for (const [selector, count] of [
+            [".messageText", Number(focus[1])],
+            [".messageLine0, .messageLine1", Number(focus[1])],
+            [".note", Number(focus[2])],
+            [".noteText", Number(focus[2])],
+          ] as const) {
+            holder.querySelectorAll(selector).forEach((element, index) => {
+              element.classList.add(
+                index < count ? "sequence-context" : "sequence-current",
+              );
+            });
+          }
+        }
         parent.replaceWith(holder);
       }
     }

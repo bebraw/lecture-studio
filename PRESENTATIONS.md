@@ -1,6 +1,6 @@
 # Obsidian presentation snapshots — first migration
 
-The full lecture is migrated as **Web development 2026**: 25 preferred-path steps, 12 optional detours, three polls and four build prompts. In Prepare, choose **Find presentations in Obsidian**, select that note, then **Load snapshot / restart presentation**. Its chapter-grouped outline is generated from the loaded definition; selecting an outline step stays private. In Present, use Begin presentation, Next, Previous, named detours and Return to narrative.
+The full lecture is migrated as **Web development 2026**: 78 slides: 51 main lecture steps, eight reference slides (including the divider), and 19 optional detours. The lecture includes three polls and four build prompts. In Prepare, choose **Find presentations in Obsidian**, select that note, then **Load snapshot / restart presentation**. Its chapter-grouped outline is generated from the loaded definition; selecting an outline step stays private. In Present, use Begin presentation, Next, Previous, named detours and Return to narrative.
 
 Two example definitions live under **Lectures/Web Development 2026/Presentations**: Web opening and Discussion practice. The current scoped Obsidian connection is intentionally unchanged; presentations currently need to be inside that lecture folder. Use original lecture to return to the old implementation.
 
@@ -39,3 +39,15 @@ The top-level presentation JSON may include a `theme` object. Omitted fields use
 ```
 
 Colors use six-digit hex notation. Fonts are locally available CSS family lists; no remote fonts are downloaded. The snapshot carries its theme to the private preview, projected slides, and Mermaid diagrams. Studio controls remain independent. There are no per-slide overrides. Existing notes need no migration; reload the snapshot after changing a theme in Obsidian.
+
+# September 2026 presentation pass
+
+The opening contents slide previews Past, Present, Future and References. Each has a title divider. CERN and Engelbart use credited historical photographs; these remote images require network access. Progressive enhancement uses a layered teaching diagram.
+
+Native form submission, AJAX with HTML, and AJAX with JSON each use four successive slides. Use Next/Previous to walk through them. The final native-form slide focuses on loading the results after the redirect.
+
+The stage and private preview show `current/total` and a subtle bottom progress bar. Numbering includes reference slides and detours. Progress follows the main lecture, reaches completion before References, and holds its place during linked detours. Reload the Obsidian snapshot to pick up note edits; restart the app after server changes.
+
+The reviewed lecture export is versioned in [docs/presentations/web-development-2026.md](docs/presentations/web-development-2026.md). Obsidian remains the live source. Full attributions stay in speaker notes and the References section; footers use short credits.
+
+Staged Mermaid sequence diagrams can include `%% focus-after: M,N`, where `M` is the number of previously explained messages and `N` the number of previously explained notes. Those elements are muted; later elements remain emphasized. This is optional and does not affect other diagrams. The stage shows build status only while working or waiting for input. Standalone historical images expand to the slide area without cropping.

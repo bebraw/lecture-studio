@@ -516,7 +516,7 @@ export function mountPresentations({ call, update }: MountOptions) {
       );
       $("current-stage").innerHTML = preview.blank
         ? "<p>Stage is blank</p>"
-        : surface(preview);
+        : surface(preview, true);
       void renderDiagrams($("current-stage"));
     }
     if (snapshot !== p.loadedAt) {

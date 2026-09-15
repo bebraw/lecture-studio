@@ -165,6 +165,7 @@ export function createStudio({
     }
     draft = validateDraft({
       ...initialDraft(),
+      act: (s.chapter || "Related").slice(0, 40),
       mode:
         s.type === "build"
           ? "brief"
@@ -180,6 +181,8 @@ export function createStudio({
     stage = {
       ...publicStage(draft, ++version),
       theme: presentation.definition.theme,
+      slidePosition: presentation.position(),
+      slideType: s.type,
     };
     blank = false;
   };
@@ -299,7 +302,7 @@ export function createStudio({
       : "Working";
     return {
       ...projected,
-      slidePosition: presentation?.position() || null,
+      slidePosition: stage.slidePosition || null,
       live: true,
       projectionKind: pollOnStage
         ? pollResults
