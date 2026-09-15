@@ -192,10 +192,13 @@ export function createStudio({
     const step = presentation?.step();
     if (enabled && step?.wordCloud) {
       if (wordCloudStep === step.id) return;
+      if (wordCloudStep)
+        captureWords(await feedbackRequest(poll, { action: "close" }));
       const snapshot = await feedbackRequest(poll, {
         action: "start",
         mode: "words",
         prompt: step.title,
+        collection: poll.sessionId + ":" + step.id,
       });
       if (snapshot.config) wordCloudRounds.set(snapshot.config.round, step.id);
       wordCloudStep = step.id;

@@ -11,6 +11,9 @@ export class StageState extends DurableObject<Env> {
       "CREATE TABLE IF NOT EXISTS feedback_meta (id INTEGER PRIMARY KEY, round TEXT, mode TEXT, prompt TEXT, opened INTEGER, expires INTEGER)",
     );
     ctx.storage.sql.exec(
+      "CREATE TABLE IF NOT EXISTS feedback_collections (collection TEXT PRIMARY KEY, round TEXT, mode TEXT, prompt TEXT, expires INTEGER)",
+    );
+    ctx.storage.sql.exec(
       "CREATE TABLE IF NOT EXISTS feedback_items (id TEXT PRIMARY KEY, round TEXT, text TEXT, status TEXT, voter TEXT, network TEXT, created INTEGER)",
     );
   }
@@ -67,18 +70,43 @@ export class StageState extends DurableObject<Env> {
         input.prompt.length > 200
       )
         throw new Error("Choose a mode and a short prompt");
-      const expires = Date.now() + 86400000;
-      // Explicit new collection replaces only feedback, never votes or stage data.
-      sql.exec("DELETE FROM feedback_items");
+      const key =
+        input.collection ??
+        (input.mode === "questions" ? "questions" : crypto.randomUUID());
+      if (typeof key !== "string" || !key || key.length > 240)
+        throw new Error("Invalid collection identity");
+      const prior = sql
+        .exec<{ round: string; expires: number }>(
+          "SELECT round,expires FROM feedback_collections WHERE collection=? AND expires>?",
+          key,
+          Date.now(),
+        )
+        .toArray()[0];
+      const expires = prior?.expires ?? Date.now() + 86400000;
+      const round = prior?.round ?? crypto.randomUUID();
+      // Navigation selects a collection; only a new lecture erases all collections.
+      sql.exec(
+        "INSERT OR REPLACE INTO feedback_collections VALUES (?,?,?,?,?)",
+        key,
+        round,
+        input.mode,
+        input.prompt.trim(),
+        expires,
+      );
       sql.exec(
         "INSERT OR REPLACE INTO feedback_meta VALUES (1,?,?,?,?,?)",
-        crypto.randomUUID(),
+        round,
         input.mode,
         input.prompt.trim(),
         1,
         expires,
       );
-      await this.ctx.storage.setAlarm(expires);
+      const earliest = sql
+        .exec<{ expires: number }>(
+          "SELECT min(expires) expires FROM feedback_collections",
+        )
+        .one().expires;
+      await this.ctx.storage.setAlarm(earliest);
     } else if (action === "close")
       sql.exec("UPDATE feedback_meta SET opened=0");
     else if (action === "approve" || action === "done") {
@@ -123,12 +151,16 @@ export class StageState extends DurableObject<Env> {
             : "Use a question up to 400 characters",
       };
     const total = sql
-      .exec<{ n: number }>("SELECT count(*) n FROM feedback_items")
+      .exec<{ n: number }>(
+        "SELECT count(*) n FROM feedback_items WHERE round=?",
+        round,
+      )
       .one().n;
     const personal = sql
       .exec<{ n: number; latest: number }>(
-        "SELECT count(*) n, coalesce(max(created),0) latest FROM feedback_items WHERE voter=?",
+        "SELECT count(*) n, coalesce(max(created),0) latest FROM feedback_items WHERE voter=? AND round=?",
         voter,
+        round,
       )
       .one();
     const recent = sql
@@ -164,18 +196,23 @@ export class StageState extends DurableObject<Env> {
     this.ctx.storage.transactionSync(() => {
       this.ctx.storage.sql.exec("DELETE FROM feedback_items");
       this.ctx.storage.sql.exec("DELETE FROM feedback_meta");
+      this.ctx.storage.sql.exec("DELETE FROM feedback_collections");
     });
     await this.ctx.storage.deleteAlarm();
   }
   override async alarm() {
-    const row = this.ctx.storage.sql
-      .exec<{ expires: number }>("SELECT expires FROM feedback_meta WHERE id=1")
-      .toArray()[0];
-    if (row && row.expires > Date.now()) {
-      await this.ctx.storage.setAlarm(row.expires);
-      return;
-    }
-    this.ctx.storage.sql.exec("DELETE FROM feedback_items");
-    this.ctx.storage.sql.exec("DELETE FROM feedback_meta");
+    const sql = this.ctx.storage.sql;
+    sql.exec(
+      "DELETE FROM feedback_items WHERE round IN (SELECT round FROM feedback_collections WHERE expires<=?)",
+      Date.now(),
+    );
+    sql.exec("DELETE FROM feedback_collections WHERE expires<=?", Date.now());
+    sql.exec("DELETE FROM feedback_meta WHERE expires<=?", Date.now());
+    const next = sql
+      .exec<{ expires: number | null }>(
+        "SELECT min(expires) expires FROM feedback_collections",
+      )
+      .one().expires;
+    if (next) await this.ctx.storage.setAlarm(next);
   }
 }

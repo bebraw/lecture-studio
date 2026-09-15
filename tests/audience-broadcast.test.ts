@@ -126,6 +126,7 @@ test("only published slides sync; polling never replaces another projected slide
       action: "start",
       mode: "words",
       prompt: "Public title",
+      collection: poll.sessionId + ":title",
     });
     await call("show");
     assert.equal(

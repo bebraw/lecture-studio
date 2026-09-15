@@ -362,3 +362,58 @@ test("audience shares chapter styling, position and transient build status", asy
     ),
   ).toBe(true);
 });
+
+test("slide collections survive switching and resume until lecture reset", async ({
+  audience,
+}) => {
+  await audience.admin("/presenter/stage", {
+    live: true,
+    title: "Cloud",
+    html: "",
+    mode: "material",
+  });
+  const select = async (collection: string, mode = "words") =>
+    v.parse(
+      feedbackSchema,
+      await (
+        await audience.admin("/presenter/feedback", {
+          action: "start",
+          mode,
+          prompt: collection,
+          collection,
+        })
+      ).json(),
+    );
+  const first = await select("lecture:one");
+  const response = await fetch(new URL("/api/feedback", audience.url), {
+    method: "POST",
+    headers: {
+      "content-type": "application/json",
+      origin: new URL(audience.url).origin,
+    },
+    body: JSON.stringify({ round: first.config?.round, text: "date" }),
+  });
+  expect(response.status).toBe(201);
+  let restored = await select("lecture:one");
+  await audience.admin("/presenter/feedback", {
+    action: "approve",
+    id: restored.items[0]!.id,
+  });
+  await select("questions", "questions");
+  await select("lecture:two");
+  restored = await select("lecture:one");
+  expect(restored.config?.round).toBe(first.config?.round);
+  expect(restored.items).toMatchObject([{ text: "date", status: "approved" }]);
+  await audience.admin("/presenter/feedback", { action: "close" });
+  expect((await select("lecture:one")).items).toHaveLength(1);
+  await audience.admin("/presenter/reset-lecture");
+  await audience.admin("/presenter/stage", {
+    live: true,
+    title: "Cloud",
+    html: "",
+    mode: "material",
+  });
+  const fresh = await select("lecture:one");
+  expect(fresh.items).toHaveLength(0);
+  expect(fresh.config?.round).not.toBe(first.config?.round);
+});
