@@ -25,7 +25,7 @@ const feedback = document.createElement("details");
 feedback.id = "student-feedback";
 feedback.hidden = true;
 feedback.innerHTML =
-  '<summary>Send a response</summary><form><label id="feedback-label" for="feedback-text"></label><textarea id="feedback-text" required maxlength="400"></textarea><p>The lecturer reviews responses before sharing. Approved words may appear on slides and be sent to the AI builder when the lecturer starts a build. Do not include names or sensitive information. The response queue expires after 24 hours; projected slides, model conversations and generated apps may retain approved words longer.</p><button>Send for review</button><p id="feedback-notice" role="status"></p></form>';
+  '<summary>Send a response</summary><form><label id="feedback-label" for="feedback-text"></label><textarea id="feedback-text" required maxlength="400" aria-describedby="feedback-hint"></textarea><p id="feedback-hint"></p><p>The lecturer reviews responses before sharing. Approved words may appear on slides and be sent to the AI builder when the lecturer starts a build. Do not include names or sensitive information. The response queue expires after 24 hours; projected slides, model conversations and generated apps may retain approved words longer.</p><button>Send for review</button><p id="feedback-notice" role="status"></p></form>';
 query(".stage-bottom", document).before(feedback);
 let feedbackConfig: FeedbackConfig | null = null,
   feedbackBusy = false;
@@ -48,8 +48,17 @@ async function refreshFeedback() {
       query("summary", feedback).textContent =
         config.mode === "words" ? "Add words" : "Ask a question";
       query("#feedback-label", feedback).textContent = config.prompt;
+      query("#feedback-hint", feedback).textContent =
+        config.mode === "words"
+          ? "One idea per line. Use 1–3 words and at most 32 characters per idea. Send up to five ideas together; commas do not separate ideas."
+          : "Ask one question, up to 400 characters.";
+      query("textarea", feedback).placeholder =
+        config.mode === "words"
+          ? "Topic\nDate and location\nRequired background"
+          : "";
+
       query("textarea", feedback).maxLength =
-        config.mode === "words" ? 32 : 400;
+        config.mode === "words" ? 164 : 400;
     }
   } catch {
     feedback.hidden = true;

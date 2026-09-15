@@ -154,23 +154,37 @@ export class StageState extends DurableObject<Env> {
       sql = this.ctx.storage.sql;
     if (stage?.live !== true || !config?.open || round !== config.round)
       return { status: 409, error: "Collection is closed" };
-    text = text
-      .normalize("NFKC")
-      // Remove control and bidi characters from audience submissions.
-      // oxlint-disable-next-line no-control-regex
-      .replace(/[\u0000-\u001f\u007f-\u009f\u202a-\u202e\u2066-\u2069]/g, " ")
-      .replace(/\s+/g, " ")
-      .trim();
+    // Preserve line boundaries until word-cloud entries have been separated.
+    const entries = (
+      config.mode === "words" ? text.split(/\r\n|\r|\n/) : [text]
+    )
+      .map((entry) =>
+        entry
+          .normalize("NFKC")
+          // Remove control and bidi characters from each entry.
+          .replace(
+            // oxlint-disable-next-line no-control-regex
+            /[\u0000-\u001f\u007f-\u009f\u202a-\u202e\u2066-\u2069]/g,
+            " ",
+          )
+          .replace(/\s+/g, " ")
+          .trim(),
+      )
+      .filter(Boolean);
     if (
-      !text ||
-      text.length > (config.mode === "words" ? 32 : 400) ||
-      (config.mode === "words" && text.split(" ").length > 3)
+      !entries.length ||
+      entries.length > 5 ||
+      entries.some(
+        (entry) =>
+          entry.length > (config.mode === "words" ? 32 : 400) ||
+          (config.mode === "words" && entry.split(" ").length > 3),
+      )
     )
       return {
         status: 400,
         error:
           config.mode === "words"
-            ? "Use 1–3 words, up to 32 characters"
+            ? "Enter one idea per line: 1–3 words, up to 32 characters each; at most five ideas"
             : "Use a question up to 400 characters",
       };
     const total = sql
@@ -188,14 +202,14 @@ export class StageState extends DurableObject<Env> {
       .one();
     const recent = sql
       .exec<{ n: number }>(
-        "SELECT count(*) n FROM feedback_items WHERE network=? AND created>?",
+        "SELECT count(*) n FROM (SELECT voter,created FROM feedback_items WHERE network=? AND created>? GROUP BY voter,created)",
         network,
         now - 60000,
       )
       .one().n;
     if (
-      total >= 500 ||
-      personal.n >= 5 ||
+      total + entries.length > 500 ||
+      personal.n + entries.length > 5 ||
       now - personal.latest < 20000 ||
       recent >= 120
     )
@@ -203,16 +217,19 @@ export class StageState extends DurableObject<Env> {
         status: 429,
         error: "Submission limit reached. Please wait or ask aloud.",
       };
-    sql.exec(
-      "INSERT INTO feedback_items VALUES (?,?,?,?,?,?,?)",
-      crypto.randomUUID(),
-      round,
-      text,
-      "pending",
-      voter,
-      network,
-      now,
-    );
+    this.ctx.storage.transactionSync(() => {
+      for (const entry of entries)
+        sql.exec(
+          "INSERT INTO feedback_items VALUES (?,?,?,?,?,?,?)",
+          crypto.randomUUID(),
+          round,
+          entry,
+          "pending",
+          voter,
+          network,
+          now,
+        );
+    });
     return { status: 201 };
   }
   async resetFeedback() {

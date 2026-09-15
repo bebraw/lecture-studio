@@ -44,161 +44,10 @@ Versioned export of the Obsidian lecture at `Lectures/Web Development 2026/Prese
       "chapter": "Past",
       "title": "Past",
       "body": "Finding and connecting knowledge",
-      "notes": "Begin Past with CERN’s information problem, then connect it to the audience’s own experience. Introduce the seminar app immediately before collecting its design choices and starting the first build.",
-      "next": "cern-problem",
-      "related": ["web-response"],
-      "source": "Historical framing · [1–5]"
-    },
-    {
-      "id": "cern-problem",
-      "type": "material",
-      "chapter": "Past",
-      "title": "CERN: finding shared knowledge (1989)",
-      "body": "![Tim Berners-Lee beside a computer at CERN, photographed in 1994](https://home.cern/wp-content/uploads/2026/05/9407011_31.jpg)\n\n> Often, the information has been recorded, it just cannot be found.\n\nTim Berners-Lee · Information Management: A Proposal",
-      "source": "[5, 24] Berners-Lee · Photo: CERN, 1994",
-      "notes": "Explain changing projects, people leaving and information spread across incompatible systems. This is the problem behind the proposal, not a desire to invent another interface. The source is dated March 1989 and May 1990.\nSource keys resolve to the References slides at the end. Unquoted explanations are lecture paraphrases; diagrams are not archival reproductions. Photo dates from 1994, not the 1989 proposal. Photo source: https://home.cern/science/computing/the-birth-of-the-web/ ; CERN record 39437. If the archival image is unavailable, use the visible explanatory caption.\nFull attribution: [5, 24] Tim Berners-Lee · Proposal 1989/1990 · Photo: CERN, 1994",
-      "next": "cern-connections",
-      "related": ["cern-connections"],
-      "allowRemoteImages": true
-    },
-    {
-      "id": "cern-connections",
-      "type": "material",
-      "title": "CERN: relationships do not fit one filing tree (1989)",
-      "body": "![Original circles-and-arrows diagram from Berners-Lee’s Information Management proposal](https://www.w3.org/History/1989/Image1.gif)\n\nProjects, people and systems have many relationships; a single filing tree cannot express them all.",
-      "source": "[5] © Tim Berners-Lee, 1989/1990 · W3C archive",
-      "notes": "Historical artifact, not a teaching reconstruction. Trace one connection rather than reading every label. Notice the mixture of systems, concepts and relationships. If the archival image is unavailable, use the visible explanatory caption.\nFull attribution: [5] Tim Berners-Lee © 1989/1990 · Original proposal diagram, W3C archive",
-      "allowRemoteImages": true,
-      "chapter": "Past",
-      "next": "demo-background"
-    },
-    {
-      "id": "demo-background",
-      "type": "material",
-      "chapter": "Past",
-      "title": "What we’ll build: a seminar information app",
-      "body": "We’ll build an app for someone considering the SDLCAI seminar.\n\nTheir first task: understand the topic, find practical details, and follow links to the original sources.\n\nWe’ll start with a readable information page. Then we’ll add a form, shared results, and a generated view as the lecture progresses.",
-      "notes": "Introduce the app here for the first time. It does not exist yet. Identify the prepared seminar material as the source for the first build. The visitor is someone deciding whether to attend. The next slide outlines the implementation stages; then the audience chooses requirements before we start building. Distinguish the lecture polls, which shape requirements, from the form we will later build inside the demo. Keep this introduction to about one minute.",
-      "next": "knowledge-experience"
-    },
-    {
-      "id": "knowledge-experience",
-      "type": "question",
-      "chapter": "Past",
-      "title": "When deciding whether to attend a seminar, what information do you need first?",
-      "body": "Think of yourself as a potential attendee.\n\n**Word cloud · 45 seconds**\n\nOn live.scalableweb.dev, send one short response (up to 32 characters).\n\nWe’ll use the approved responses to decide what the first information page should make easy to find.",
-      "notes": "Showing this slide while Live is on automatically opens its word collection. Allow 45 seconds. Close collection, review submissions privately, approve relevant responses, then Show approved cloud. Discuss two or three needs, such as topic, date, location or prerequisites. Connect these needs to the first document’s headings and ordering; refer back to them when checking the build. Frequency is a discussion cue, not proof of importance. Use Back to slide before continuing. If collection is unavailable, take three spoken responses. Never project unreviewed submissions.",
-      "next": "step-3",
-      "wordCloud": true
-    },
-    {
-      "id": "step-3",
-      "type": "material",
-      "chapter": "Past",
-      "title": "One seminar app, three stages",
-      "body": "1. **Past:** read the seminar information and submit a native form.\n2. **Present:** submit without leaving the page; watch shared results update.\n3. **Future:** generate a seminar view around the room’s chosen priority.\n\nYour votes shape the requirements. We inspect each result before moving on.",
-      "notes": "Explain the three stages using the seminar scenario introduced before the word cloud. We develop the same app across three lecture sections. Past has two build steps: the document, then its native form. Present enhances that form and adds shared updates. Future adds constrained view composition using the reviewed seminar material. Explain that the coding agent implements the app; the later composition model generates a view inside it. Show the starter context before the first build.",
-      "next": "vote-friction",
-      "related": ["web-response"]
-    },
-    {
-      "id": "vote-friction",
-      "type": "poll",
-      "chapter": "Past",
-      "title": "When you use the web today, what feels unnecessarily difficult?",
-      "body": "Which difficulty should our application address?",
-      "notes": "Connect the audience’s information needs to a concrete design priority for the seminar page. Ask which difficulty the app should address. Moving to the theme poll closes this vote and freezes the requirement automatically.",
-      "room": "webdev-2026-friction",
-      "poll": {
-        "question": "When you use the web today, what feels unnecessarily difficult?",
-        "options": [
-          {
-            "id": "finding",
-            "label": "Finding information"
-          },
-          {
-            "id": "repeating",
-            "label": "Repeating information"
-          },
-          {
-            "id": "navigation",
-            "label": "Navigating interfaces"
-          },
-          {
-            "id": "trust",
-            "label": "Knowing what to trust"
-          }
-        ],
-        "defaultId": "finding"
-      },
-      "next": "vote-theme"
-    },
-    {
-      "id": "vote-theme",
-      "type": "poll",
-      "chapter": "Past",
-      "title": "Which visual theme should shape our app?",
-      "body": "Your choice becomes a requirement in the next build.",
-      "notes": "This slide opens its prepared poll automatically; closing or leaving freezes the result. Missing decisions require explicitly accepted defaults.",
-      "room": "webdev-2026",
-      "poll": {
-        "question": "Which visual theme should shape our app?",
-        "options": [
-          {
-            "id": "editorial",
-            "label": "Editorial"
-          },
-          {
-            "id": "retro-web",
-            "label": "Retro web"
-          },
-          {
-            "id": "playful",
-            "label": "Playful"
-          }
-        ],
-        "defaultId": "editorial"
-      },
-      "next": "lecture-architecture"
-    },
-    {
-      "id": "lecture-architecture",
-      "type": "material",
-      "chapter": "Past",
-      "title": "Which system is doing what?",
-      "body": "**Build time:** Studio → implementation agent → demo app\n\n**Run time (Future):** Demo app → runtime model → validation → view or fallback\n\n| System | Its job |\n| --- | --- |\n| **Studio** | Show slides and collect moderated audience input |\n| **Implementation agent** | Edit code in the separate rehearsal project after the lecturer starts a build |\n| **Demo app** | Validate submissions, store responses and serve views |\n| **Runtime model** | Propose a view from bounded data; the app validates it before display |",
-      "notes": "Point out the separate systems before the first launch. The studio’s polls guide the implementation; the demo app collects a different seminar-interest survey. The runtime model is introduced later, not running during the native-form example.",
-      "next": "build-document"
-    },
-    {
-      "id": "build-document",
-      "type": "build",
-      "chapter": "Past",
-      "title": "Build · Create the seminar document",
-      "body": "Build Document A: a readable SDLCAI seminar document with our chosen defaults and real links. Show a local preview, finish the relevant checks, and stop before the form.",
-      "notes": "Review the approved audience needs in this prompt and explain how they will shape the document. Start explicitly after the app introduction and its two design votes. Continue through the historical visions while the build runs. Spend about 6–8 minutes across the four visions, then inspect the output at the document checkpoint.",
-      "uses": [
-        {
-          "poll": "vote-friction",
-          "instructions": {
-            "finding": "Make seminar essentials easy to scan with headings and a concise summary.",
-            "repeating": "Preserve form choices; do not require repeat entry.",
-            "navigation": "Use descriptive links and a predictable page structure.",
-            "trust": "Attribute seminar facts and distinguish source facts from generated summaries."
-          }
-        },
-        {
-          "poll": "vote-theme",
-          "instructions": {
-            "editorial": "Use an editorial theme with restrained typography.",
-            "retro-web": "Use a readable retro-web theme with accessible contrast.",
-            "playful": "Use a playful theme with readable typography and accessible controls."
-          }
-        }
-      ],
+      "notes": "Start with distinct ambitions for organizing and using knowledge. These are conceptual precursors, not a claim of a direct chain of influence. Then introduce CERN’s concrete information problem and Berners-Lee’s response.",
       "next": "vision-otlet",
-      "related": ["web-response"],
-      "wordsFrom": "knowledge-experience"
+      "related": [],
+      "source": "Historical framing · [1–5]"
     },
     {
       "id": "vision-otlet",
@@ -209,7 +58,7 @@ Versioned export of the Obsidian lecture at `Lectures/Web Development 2026/Prese
       "source": "[1, 29] Mundaneum · Photo: fdecomite, 2011 · CC BY 2.0",
       "notes": "One ambition, not a biography: make knowledge discoverable beyond a local collection. Mention classification and the broader ideal of international cooperation. A conceptual precursor, not a claim of direct influence on Berners-Lee.\nSource keys resolve to the References slides at the end. Unquoted explanations are lecture paraphrases; diagrams are not archival reproductions.\nTitle year refers to the creation of the Universal Bibliographic Repertory (1895). Date source: Mundaneum, https://mundaneum.org/nl/collections/het-universele-bibliografische-repertorium/ .\nPhoto shows the catalogue drawers at the Mundaneum in Mons in 2011, not the institution in 1895. Point to the physical drawers to explain the scale and work of indexing. Photo: fdecomite, Drawers, 23 February 2011, via Wikimedia Commons; CC BY 2.0. Unmodified. If the archival image is unavailable, use the visible explanatory caption. The unmodified CC BY 2.0 photograph is packaged locally; credit and license are in public/lecture-assets/README.md.",
       "next": "vision-bush",
-      "related": ["vision-comparison"],
+      "related": [],
       "allowRemoteImages": true
     },
     {
@@ -221,7 +70,7 @@ Versioned export of the Obsidian lecture at `Lectures/Web Development 2026/Prese
       "source": "[2, 15] Memex sketch, c. 1945 · Computer History Museum",
       "notes": "Contrast associative trails with placing each item in a category. The memex was a proposed personal device, not an implemented web. Relate to following references during an assignment.\nSource keys resolve to the References slides at the end. Unquoted explanations are lecture paraphrases; diagrams are not archival reproductions. This is a proposed device, never built. Point to the two displays: how would you preserve the path between two records?\nFull attribution: [2, 15] Memex conceptual sketch · c. 1945 · Computer History Museum, object 500004817",
       "next": "bush-trail",
-      "related": ["bush-trail", "vision-comparison"],
+      "related": ["bush-trail"],
       "allowRemoteImages": true
     },
     {
@@ -243,7 +92,7 @@ Versioned export of the Obsidian lecture at `Lectures/Web Development 2026/Prese
       "source": "[16] Ted Nelson · 1965 diagram, reproduced 2000",
       "notes": "OPTIONAL IF SHORT ON TIME: skip this discussion; keep the next build checkpoint and failure/transfer checks. Hypertext term introduced in 1965. Distinguish basic non-sequential reading from Xanadu’s richer ambition: visible connections and reuse tied to origins. Do not imply the web implemented all of Xanadu. Existing vault clippings on Xanadu offer contrasting contemporary opinions, not historical proof.\nSource keys resolve to the References slides at the end. Unquoted explanations are lecture paraphrases; diagrams are not archival reproductions. Distinguish links between items from shared content (transclusion). This is a conceptual diagram, not a screenshot of a working 1965 system.\nFull attribution: [16] Ted Nelson · 1965 connection diagram reproduced in his 2000 survey, Fig. 1",
       "next": "vision-engelbart",
-      "related": ["vision-comparison"],
+      "related": [],
       "allowRemoteImages": true
     },
     {
@@ -254,30 +103,32 @@ Versioned export of the Obsidian lecture at `Lectures/Web Development 2026/Prese
       "body": "![Doug Engelbart speaking beside a shared screen during his 1968 demonstration](https://dougengelbart.org/images/pix/img0029.jpg)\n\nThe demonstration combined linked information and shared work: augment people’s ability to solve problems together.",
       "source": "[4, 25] NLS, 1968 · Doug Engelbart Institute",
       "notes": "Emphasize augmentation rather than replacement. His later NLS work gives a concrete bridge to collaborative applications. Ask students to keep this ambition in mind as an agent helps us build. Avoid turning this into a mouse-invention anecdote.\nSource keys resolve to the References slides at the end. Unquoted explanations are lecture paraphrases; diagrams are not archival reproductions. The photo shows the 1968 demonstration, six years after his 1962 conceptual framework. Point to the shared display: people can work with information together. Source: https://dougengelbart.org/content/view/224/217/ , section 4b. If the archival image is unavailable, use the visible explanatory caption.\nFull attribution: [4, 25] NLS demonstration · 9 December 1968 · Doug Engelbart Institute archive",
-      "next": "vision-comparison",
-      "related": ["vision-comparison"],
+      "next": "cern-connections",
+      "related": [],
       "allowRemoteImages": true
     },
     {
-      "id": "vision-comparison",
-      "type": "question",
-      "title": "Which ambition does your everyday software serve?",
-      "body": "**Choose and explain · 60 seconds**\n\nPick one familiar application. Which ambition does it serve best?\n\n**Otlet:** organize knowledge · **Bush:** preserve trails\n\n**Nelson:** connect texts and sources · **Engelbart:** augment problem-solving\n\nShare the application, your choice, and one missing capability.",
-      "notes": "OPTIONAL IF SHORT ON TIME: skip this discussion; keep the next build checkpoint and failure/transfer checks. Give students 60 seconds to choose an application and a missing capability, then hear two examples. These are distinct ambitions, not a chain of direct influence. Continue to how the web connects information.\nSource keys resolve to the References slides at the end.",
-      "source": "Lecture synthesis and discussion · [1–5]",
+      "id": "cern-connections",
+      "type": "material",
+      "title": "CERN: one filing tree is not enough (1989)",
+      "body": "Projects change, people leave, and information is spread across incompatible systems.\n\nA person can belong to several projects; a document can describe several systems. Where should each record go?",
+      "source": "[5] © Tim Berners-Lee, 1989/1990 · W3C archive",
+      "notes": "Establish the working context before introducing Tim Berners-Lee. Explain one person belonging to two projects. This paraphrases the problem described in the 1989 proposal; do not read the archival diagram here.",
+      "allowRemoteImages": true,
       "chapter": "Past",
-      "next": "web-response"
+      "next": "cern-problem"
     },
     {
-      "id": "web-response",
+      "id": "cern-problem",
       "type": "material",
       "chapter": "Past",
-      "title": "The web connects information without one central catalogue",
-      "body": "```mermaid\nflowchart LR\n subgraph A[Server A]\n D[Document]\n M[Meeting minutes]\n end\n subgraph B[Server B]\n U[Equipment information]\n end\n D -->|Follow meeting link| M\n M -->|Follow equipment link| U\n```\n\nFollow links between documents—even when they live on different servers.",
-      "source": "[6] Berners-Lee & Cailliau, 1990 · Adapted from Hypertext concepts",
-      "notes": "Trace the path from a document to meeting minutes to equipment information. The 1990 proposal uses a GHI meeting and UPS information to explain following links, then states that nodes need not be on the same machine. The server grouping here illustrates that statement; it is not an original figure or a record of the documents’ actual hosting. No central catalogue is needed for this navigation. Connect this to the seminar app: a page can link to information maintained elsewhere.\nSource: [6] WorldWideWeb: Proposal for a HyperText Project, 12 November 1990, Hypertext concepts. https://www.w3.org/Proposal.html . Original teaching adaptation, not an archival reproduction.",
+      "title": "CERN: finding shared knowledge (1989)",
+      "body": "![Tim Berners-Lee beside a computer at CERN, photographed in 1994](https://home.cern/wp-content/uploads/2026/05/9407011_31.jpg)\n\n> Often, the information has been recorded, it just cannot be found.\n\nTim Berners-Lee · Information Management: A Proposal\n\nHis proposal: follow links between documents, including documents on different servers.",
+      "source": "[5, 6, 24] Berners-Lee · Photo: CERN, 1994",
+      "notes": "Explain changing projects, people leaving and information spread across incompatible systems. This is the problem behind the proposal, not a desire to invent another interface. The source is dated March 1989 and May 1990.\nSource keys resolve to the References slides at the end. Unquoted explanations are lecture paraphrases; diagrams are not archival reproductions. Photo dates from 1994, not the 1989 proposal. Photo source: https://home.cern/science/computing/the-birth-of-the-web/ ; CERN record 39437. If the archival image is unavailable, use the visible explanatory caption.\nFull attribution: [5, 24] Tim Berners-Lee · Proposal 1989/1990 · Photo: CERN, 1994\nThe 1990 proposal explains that linked nodes need not be on the same machine. Trace that distinction verbally: many relationships, with documents maintained by different groups. The earlier thinkers posed distinct ambitions; the web did not implement all of them.",
       "next": "worldwideweb-browser",
-      "related": ["cern-connections"]
+      "related": ["cern-connections"],
+      "allowRemoteImages": true
     },
     {
       "id": "worldwideweb-browser",
@@ -288,8 +139,87 @@ Versioned export of the Obsidian lecture at `Lectures/Web Development 2026/Prese
       "allowRemoteImages": true,
       "source": "[14] Berners-Lee / W3C · Screenshot, 1993",
       "notes": "Use the screenshot instead of explaining the interface in bullets. Point out the Link menu and editing. Ask: what changes when you can create links as well as follow them? This is the 1993 screenshot, not an image of the original 1990 release. If the archival image is unavailable, use the visible explanatory caption.\nFull attribution: [14] Tim Berners-Lee / W3C · WorldWideWeb (written 1990); screenshot 1993",
+      "next": "step-5",
+      "related": []
+    },
+    {
+      "id": "step-5",
+      "type": "material",
+      "chapter": "Past",
+      "title": "HTML: headings, paragraphs and links",
+      "body": "```html\n<h1>Research group</h1>\n<p>Our projects and publications.</p>\n<a href=\"/publications\">Read our publications</a>\n```\n\n### Research group\nOur projects and publications.\n\nRead our publications →",
+      "notes": "Connect the browser-editor to the document it reads and edits. Identify the heading, paragraph and link. The lower portion illustrates the rendered text; it is not a working publications page. This is a modern teaching example, not a claim to reproduce the original HTML syntax. [7, 18] HTML text and link semantics.",
+      "next": "demo-background",
+      "related": [],
+      "source": "[7, 18] HTML semantics · Teaching example"
+    },
+    {
+      "id": "demo-background",
+      "type": "material",
+      "chapter": "Past",
+      "title": "A seminar app, developed in three stages",
+      "body": "Help someone decide whether to attend SDLCAI.\n\n1. **Document:** find the seminar essentials and follow source links.\n2. **Interactive app:** submit preferences and see shared results.\n3. **Generated view:** adapt the information to a chosen priority.",
+      "notes": "Introduce the seminar scenario for the first time here. The app does not exist yet. We first build its information page, then add the native form. Audience information needs shape the headings and ordering; the theme vote shapes presentation. Distinguish the coding agent implementing this app from the model used inside it later.",
+      "next": "knowledge-experience"
+    },
+    {
+      "id": "knowledge-experience",
+      "type": "question",
+      "chapter": "Past",
+      "title": "When deciding whether to attend a seminar, what information do you need first?",
+      "body": "**Word cloud · 45 seconds**\n\nOn live.scalableweb.dev, enter **one idea per line**.\n\nUse 1–3 words per idea, up to 32 characters. Submit up to five ideas together.\n\nFor example:\n```text\nTopic\nDate and location\nRequired background\n```",
+      "notes": "Showing this slide while Live is on automatically opens its word collection. Allow 45 seconds. Close collection, review submissions privately, approve relevant responses, then Show approved cloud. Discuss two or three needs, such as topic, date, location or prerequisites. Connect these needs to the first document’s headings and ordering; refer back to them when checking the build. Frequency is a discussion cue, not proof of importance. Use Back to slide before continuing. If collection is unavailable, take three spoken responses. Never project unreviewed submissions.",
+      "next": "vote-theme",
+      "wordCloud": true
+    },
+    {
+      "id": "vote-theme",
+      "type": "poll",
+      "chapter": "Past",
+      "title": "Which visual theme should shape our app?",
+      "body": "",
+      "notes": "This slide opens its prepared poll automatically; closing or leaving freezes the result. Missing decisions require explicitly accepted defaults.",
+      "room": "webdev-2026",
+      "poll": {
+        "question": "Which visual theme should shape our app?",
+        "options": [
+          {
+            "id": "editorial",
+            "label": "Editorial"
+          },
+          {
+            "id": "retro-web",
+            "label": "Retro web"
+          },
+          {
+            "id": "playful",
+            "label": "Playful"
+          }
+        ],
+        "defaultId": "editorial"
+      },
+      "next": "build-document"
+    },
+    {
+      "id": "build-document",
+      "type": "build",
+      "chapter": "Past",
+      "title": "Build · Create the seminar document",
+      "body": "Build a readable SDLCAI information page from the reviewed seminar sources. Use the approved audience needs for headings and ordering, and apply the chosen theme. Include real source links. Show a local preview and check the result. Stop before adding the form.",
+      "notes": "The coding agent implements this in a separate app project. Review the approved audience needs and theme, then start the build. Discuss GeoCities, FrontPage and Dreamweaver while it runs. Allow around 3–5 minutes; use the labeled prepared reference if the build is not ready at the checkpoint.",
+      "uses": [
+        {
+          "poll": "vote-theme",
+          "instructions": {
+            "editorial": "Use an editorial theme with restrained typography.",
+            "retro-web": "Use a readable retro-web theme with accessible contrast.",
+            "playful": "Use a playful theme with readable typography and accessible controls."
+          }
+        }
+      ],
       "next": "geocities-personal-page",
-      "related": ["web-response"]
+      "related": [],
+      "wordsFrom": "knowledge-experience"
     },
     {
       "id": "geocities-personal-page",
@@ -320,20 +250,9 @@ Versioned export of the Obsidian lecture at `Lectures/Web Development 2026/Prese
       "title": "Macromedia Dreamweaver (1997)",
       "body": "![Macromedia Dreamweaver 1.2 visual editor showing a company profile page and formatting controls](https://www.webdesignmuseum.org/uploaded/old-software/html-editors/macromedia-dreamweaver/macromedia-dreamweaver-1-2-05.png)\n\nVisual page editing · Dreamweaver 1.2 (1998)",
       "source": "[27, 31] Macromedia · Screenshot: Web Design Museum, Dreamweaver 1.2",
-      "notes": "Spend about one minute here. This is the Macromedia editor later associated with Adobe. The December 1997 launch emphasized visual authoring and preserving existing HTML when working with an external source editor; do not imply that later split-view UI already existed in the first release. Compare with FrontPage without treating them as identical products or making unsupported claims about their output quality. Transition to the next HTML slide: authoring tools change, but the generated document still matters.\nSource: Macromedia launch announcement dated 8 December 1997, reproduced by MacTech on 9 December: https://www.mactech.com/1997/12/09/md1-macromedia-ships-dreamweaver/\nThe title dates Dreamweaver’s first release in 1997. The screenshot shows version 1.2 for Windows (1998), labeled separately in the caption. Point out the visual document and formatting controls. Screenshot preserved by Web Design Museum; software interface © Macromedia. If the archival image is unavailable, use the visible explanatory caption.",
-      "next": "step-5",
-      "allowRemoteImages": true
-    },
-    {
-      "id": "step-5",
-      "type": "material",
-      "chapter": "Past",
-      "title": "HTML: headings, paragraphs and links",
-      "body": "```html\n<h1>SDLCAI seminar</h1>\n<p>Explore AI and software development.</p>\n<a href=\"https://www.sdlcai.org/\">Visit the seminar</a>\n```\n\n### SDLCAI seminar\nExplore AI and software development.\n\n[Visit the seminar](https://www.sdlcai.org/)",
-      "notes": "Ask what each element tells the browser. Below the code is an illustrative rendered equivalent, not an executing HTML sandbox. Inspect the real app afterwards. This is sample copy, not a sourced seminar-program claim.\nFull attribution: [7, 18] Original teaching example · HTML text and link semantics",
+      "notes": "Spend about one minute here. This is the Macromedia editor later associated with Adobe. The December 1997 launch emphasized visual authoring and preserving existing HTML when working with an external source editor; do not imply that later split-view UI already existed in the first release. Compare with FrontPage without treating them as identical products or making unsupported claims about their output quality. Recall the HTML example: authoring tools change, but the generated document still matters. Inspect our generated document next.\nSource: Macromedia launch announcement dated 8 December 1997, reproduced by MacTech on 9 December: https://www.mactech.com/1997/12/09/md1-macromedia-ships-dreamweaver/\nThe title dates Dreamweaver’s first release in 1997. The screenshot shows version 1.2 for Windows (1998), labeled separately in the caption. Point out the visual document and formatting controls. Screenshot preserved by Web Design Museum; software interface © Macromedia. If the archival image is unavailable, use the visible explanatory caption.",
       "next": "check-document",
-      "related": ["web-response"],
-      "source": "[7, 18] HTML semantics · Teaching example"
+      "allowRemoteImages": true
     },
     {
       "id": "check-document",
@@ -353,18 +272,7 @@ Versioned export of the Obsidian lecture at `Lectures/Web Development 2026/Prese
       "body": "Find the information you asked for in the app we just inspected.\n\nWhich need is met? What is still missing or hard to find?",
       "reviewWordsFrom": ["knowledge-experience"],
       "notes": "Revisit the approved responses after showing the app. Ask the room to distinguish observed behavior from assumptions. Keep one unresolved need for the closing discussion.",
-      "next": "step-6"
-    },
-    {
-      "id": "step-6",
-      "type": "material",
-      "chapter": "Past",
-      "title": "Demo · The document without CSS or JavaScript",
-      "body": "Read the seminar information and follow a link without CSS or JavaScript.",
-      "notes": "Demonstrate with the document build, which appears automatically. Show its styled version, then disable JavaScript and reload the demo browser. Disable the document’s stylesheets and remove inline styles in that demo context, then show the resulting page. Read a heading, find a practical detail, and follow a source link. Explain what changed in appearance and what still works. Restore JavaScript and reload afterwards. These browser changes are manual and apply only to the demo browser, not automatically to audience devices. Use a prepared plain-HTML version if needed and identify it as prepared. The native form has not been built yet; demonstrate form submission at the later native-form checkpoint.",
-      "next": "seminar-form-fields",
-      "related": ["web-response"],
-      "previewOf": "build-document"
+      "next": "seminar-form-fields"
     },
     {
       "id": "seminar-form-fields",
@@ -394,15 +302,6 @@ Versioned export of the Obsidian lecture at `Lectures/Web Development 2026/Prese
       "body": "Build Document B: a native seminar-interest form with fresh audience submissions. Collect experience (required select: new, some, regular), topic (checkboxes: learning, practical, evaluation; at least one), format (required radio: talk, demo, discussion), and question (optional textarea, maximum 200 characters). Use visible labels, fieldsets and legends. Implement POST /responses with server-side allowlist and length validation; preserve entered values and show field errors on invalid submission. Save a structured response, then return a 303 redirect to GET /results. That page confirms this browser’s predefined submitted values and shows aggregate counts. Exclude the free-text question from shared pages. Use a demo-browser identifier so resubmission replaces that browser’s response. Show aggregate counts only for predefined fields. Store questions for presenter review, never in the public aggregate or model context. Extend the demo app’s data model; the prepared lecture poll backend only accepts a single choice and is not this form’s storage. Verify submission, invalid input and replacement without JavaScript. Do not deploy until requested. Stop before browser enhancement.",
       "notes": "Start explicitly; the next automatic app checkpoint is Check the native form. Trace POST /responses → validation → Database → 303 redirect → GET /results while the build runs.",
       "uses": [
-        {
-          "poll": "vote-friction",
-          "instructions": {
-            "finding": "Make seminar essentials easy to scan with headings and a concise summary.",
-            "repeating": "Preserve form choices; do not require repeat entry.",
-            "navigation": "Use descriptive links and a predictable page structure.",
-            "trust": "Attribute seminar facts and distinguish source facts from generated summaries."
-          }
-        },
         {
           "poll": "vote-theme",
           "instructions": {
@@ -477,7 +376,18 @@ Versioned export of the Obsidian lecture at `Lectures/Web Development 2026/Prese
       "body": "- Submit experience, interests and format without JavaScript.\n- Leave a required field empty; inspect the error and retained values.\n- Change an answer and resubmit; check the confirmation and counts.",
       "notes": "Now submit a fresh response in the visible app. Check invalid input, preserved values and replacement. Inspect the POST /responses and GET /results requests. Verify the displayed aggregate excludes the optional question.",
       "type": "material",
+      "next": "step-6",
+      "previewOf": "build-forms"
+    },
+    {
+      "id": "step-6",
+      "type": "material",
+      "chapter": "Past",
+      "title": "Demo · Remove the outer layers",
+      "body": "Without CSS and JavaScript, can we still read the seminar information and submit the form?",
+      "notes": "After the onion model and native-form checkpoint, predict what survives. Use the completed native-form app, not the earlier document-only build. Disable JavaScript and reload in the demo browser; disable stylesheets and inline styles there. Read a heading, follow a link, submit a valid response, and inspect confirmation and aggregate counts. Restore JavaScript and styles afterwards. These browser changes are manual and affect only the demo browser. If using the prepared reference, label it as prepared rather than evidence of build success.",
       "next": "step-10",
+      "related": [],
       "previewOf": "build-forms"
     },
     {
@@ -496,7 +406,7 @@ Versioned export of the Obsidian lecture at `Lectures/Web Development 2026/Prese
       "type": "question",
       "chapter": "Present",
       "title": "What would make our form easier to use?",
-      "body": "Name one improvement in 1–3 words.\n\n**Word cloud · 45 seconds**\n\nOn live.scalableweb.dev, open **Add words** and send one short response (up to 32 characters).\n\nWe’ll review the approved cloud and discuss two contrasting suggestions.",
+      "body": "**Word cloud · 45 seconds**\n\nOn live.scalableweb.dev, enter **one idea per line**.\n\nUse 1–3 words per idea, up to 32 characters. Submit up to five ideas together.",
       "notes": "Collect suggestions before showing the build prompt. Discuss two approved suggestions, then use the next priority vote to capture a concrete build requirement. The cloud itself is not automatically passed to the coding agent.\n\nModerated word cloud: Showing this slide while Live is on automatically opens its word collection. Allow 45 seconds. Close collection, review submissions privately, approve relevant responses, then Show approved cloud. Read out two contrasting contributions and ask their authors to explain; frequency is not a vote or a measure of correctness. Use Back to slide before continuing. If collection is unavailable, take three spoken responses and discuss two. Never project unreviewed submissions.",
       "next": "vote-interaction",
       "related": ["step-8"],
@@ -507,7 +417,7 @@ Versioned export of the Obsidian lecture at `Lectures/Web Development 2026/Prese
       "type": "poll",
       "chapter": "Present",
       "title": "Which interaction improvement should we prioritize?",
-      "body": "Choose one priority on live.scalableweb.dev.\n\nWe’ll close the vote, review the result, then reveal the build prompt with your choice included.",
+      "body": "",
       "notes": "Allow 30 seconds after discussing the cloud. Close voting to freeze the result and show it. Explain how the winning priority relates to the suggestions, then advance to the build prompt. If voting is unavailable, explicitly accept the declared default before building.",
       "room": "webdev-2026-interaction",
       "poll": {
@@ -538,15 +448,6 @@ Versioned export of the Obsidian lecture at `Lectures/Web Development 2026/Prese
       "body": "Advance to Present. Enhance the same form and let the projected view receive aggregate changes. Preserve native submission. Verify in two browser contexts and stop before model composition. Preserve all four fields and field-level errors. Refresh aggregate counts for experience, interests and format without overwriting a partially completed form. Keep questions private. Verify that replacing a response changes the appropriate counts without increasing the respondent total. The audience priority chooses the first acceptance test, not which baseline protections to omit. Put the selected test and its observed result at the top of the build summary.",
       "notes": "Review the approved audience responses in the resolved prompt before starting. After the audience priority vote is closed, show the resolved prompt and point out the requirement supplied by the frozen result. Start explicitly, then continue discussing while the agent works. Inspect the app using Preview from Codex when ready.",
       "uses": [
-        {
-          "poll": "vote-friction",
-          "instructions": {
-            "finding": "Make seminar essentials easy to scan with headings and a concise summary.",
-            "repeating": "Preserve form choices; do not require repeat entry.",
-            "navigation": "Use descriptive links and a predictable page structure.",
-            "trust": "Attribute seminar facts and distinguish source facts from generated summaries."
-          }
-        },
         {
           "poll": "vote-theme",
           "instructions": {
@@ -798,7 +699,7 @@ Versioned export of the Obsidian lecture at `Lectures/Web Development 2026/Prese
       "chapter": "Future",
       "title": "Future",
       "body": "What should we be able to delegate?",
-      "notes": "Start constrained Future composition when inputs are ready. Explain that the agent building this app and an agent using it are different roles.\nSource keys resolve to the References slides at the end. Unquoted explanations are lecture paraphrases; diagrams are not archival reproductions.\nFull attribution: Hypothesis · [13] Lecture hypothesis summary (2026); background manuscript unpublished",
+      "notes": "Start constrained Future composition when inputs are ready. Explain that the agent building this app and an agent using it are different roles.\nSource keys resolve to the References slides at the end. Unquoted explanations are lecture paraphrases; diagrams are not archival reproductions.\nFull attribution: Hypothesis · [13] Lecture hypothesis summary (2026); background manuscript unpublished\nBefore composition, distinguish the two models: the coding agent edits the app’s code; the runtime model proposes a view from bounded data, which the app validates before display. The studio collects lecture input; the app owns its survey data.",
       "next": "future-visions",
       "related": ["detour-3-1"],
       "source": "[13] Lecture hypothesis summary, 2026"
@@ -808,7 +709,7 @@ Versioned export of the Obsidian lecture at `Lectures/Web Development 2026/Prese
       "type": "question",
       "chapter": "Future",
       "title": "What task would you give a software agent?",
-      "body": "Name one task in 1–3 words: compare sources, trace decisions…\n\n**Word cloud · 45 seconds**\n\nOn live.scalableweb.dev, open **Add words** and send one short response (up to 32 characters).\n\nWe’ll review the approved cloud and discuss two contrasting suggestions.",
+      "body": "**Word cloud · 45 seconds**\n\nOn live.scalableweb.dev, enter **one idea per line**.\n\nUse 1–3 words per idea, up to 32 characters. Submit up to five ideas together.",
       "source": "Lecture synthesis · [1–5]",
       "notes": "Briefly recall Otlet, Bush, Nelson and Engelbart; use related images rather than repeat the biographies. Hear one task from the room. Keep the distinction between assistance and replacement.\n\nModerated word cloud: Showing this slide while Live is on automatically opens its word collection. Allow 45 seconds. Close collection, review submissions privately, approve relevant responses, then Show approved cloud. Read out two contrasting contributions and ask their authors to explain; frequency is not a vote or a measure of correctness. Use Back to slide before continuing. If collection is unavailable, take three spoken responses and discuss two. Never project unreviewed submissions.",
       "related": ["vision-bush", "vision-nelson", "vision-engelbart"],
@@ -830,7 +731,7 @@ Versioned export of the Obsidian lecture at `Lectures/Web Development 2026/Prese
       "type": "poll",
       "chapter": "Future",
       "title": "What should the generated seminar view prioritize?",
-      "body": "Your choice becomes a requirement in the next build.",
+      "body": "",
       "notes": "This slide opens its prepared poll automatically; closing or leaving freezes the result. Missing decisions require explicitly accepted defaults.",
       "room": "webdev-2026-priority",
       "poll": {
@@ -882,15 +783,6 @@ Versioned export of the Obsidian lecture at `Lectures/Web Development 2026/Prese
       "notes": "Review the approved audience responses in the resolved prompt before starting. Start explicitly, then continue discussing while the agent works. Inspect the app using Preview from Codex when ready.\nShow the actual resolved build prompt, including the frozen audience priority. Explain that the coding agent builds the application; the runtime composition model has a different, constrained role. No real booking, purchase or personal profile is needed. At the checkpoint, test the same task in the fixed and generated views; a source mismatch or unauthorized control falsifies the claimed improvement.",
       "uses": [
         {
-          "poll": "vote-friction",
-          "instructions": {
-            "finding": "Make seminar essentials easy to scan with headings and a concise summary.",
-            "repeating": "Preserve form choices; do not require repeat entry.",
-            "navigation": "Use descriptive links and a predictable page structure.",
-            "trust": "Attribute seminar facts and distinguish source facts from generated summaries."
-          }
-        },
-        {
           "poll": "vote-theme",
           "instructions": {
             "editorial": "Use an editorial theme with restrained typography.",
@@ -926,7 +818,7 @@ Versioned export of the Obsidian lecture at `Lectures/Web Development 2026/Prese
       "id": "step-15",
       "type": "question",
       "title": "Which application type should we examine?",
-      "body": "**In pairs · 45 seconds**\n\nChoose one application type you know: a banking app, a course planner, a travel search…\n\nSubmit its type on live.scalableweb.dev in up to 32 characters.\n\nWe’ll select two contrasting examples from the approved responses.",
+      "body": "**Word cloud · 45 seconds**\n\nOn live.scalableweb.dev, enter **one idea per line**.\n\nUse 1–3 words per idea, up to 32 characters. Submit up to five ideas together.",
       "notes": "Showing this slide live opens a word collection. Ask for an application type, not an interface preference yet. Close collection and approve relevant examples. Select two contrasting types to discuss on the next slide. Keep submissions unprojected until approved.",
       "related": ["detour-3-1"],
       "source": "[13] Lecture hypothesis summary, 2026",
@@ -1025,7 +917,7 @@ Versioned export of the Obsidian lecture at `Lectures/Web Development 2026/Prese
       "body": "| Stage | What we added | What we checked |\n|---|---|---|\n| Past | Seminar information and a native form | Reading, links and submission without JavaScript |\n| Present | Browser interaction and shared results | Two views, unsent choices and connection failures |\n| Future | A generated seminar view | Source inputs, the chosen priority and a fallback |",
       "notes": "Recap the same seminar app across the three sections. Point to one observed result from each checkpoint. Distinguish completed builds from prepared examples or unfinished work; describe a failed check as a finding, not a success. Recall one difficulty from the opening audience discussion and ask whether our app addressed it. The historical thread connected documents and links, browser interaction, and possible agent use; these approaches can coexist.",
       "next": "closing-directions",
-      "related": ["vision-comparison", "detour-5-0"]
+      "related": ["detour-5-0"]
     },
     {
       "id": "closing-directions",
@@ -1041,7 +933,7 @@ Versioned export of the Obsidian lecture at `Lectures/Web Development 2026/Prese
       "type": "question",
       "chapter": "Closing",
       "title": "What would you test next?",
-      "body": "Suggest one next test for our seminar app in 1–3 words.\n\n**Word cloud · 45 seconds**\n\nOn live.scalableweb.dev, open **Add words** and send one response (up to 32 characters).\n\nWe’ll discuss two approved suggestions: what would each test help us decide?",
+      "body": "**Word cloud · 45 seconds**\n\nOn live.scalableweb.dev, enter **one idea per line**.\n\nUse 1–3 words per idea, up to 32 characters. Submit up to five ideas together.",
       "notes": "This slide opens its word collection automatically while Live is on. Allow 45 seconds, close collection, review privately, approve relevant responses, then show the approved cloud. Pick two contrasting suggestions and ask what result would support or challenge the proposed direction. Frequency is not a vote. If collection is unavailable, take two spoken suggestions. Use Back to slide, then advance to the closing takeaway. Do not start another build.",
       "next": "audience-evidence-recap",
       "related": ["accessibility-parallels", "meaning-and-action"],

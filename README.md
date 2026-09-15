@@ -20,9 +20,9 @@ shared stage. Pending submissions remain private to the lecturer. Approving word
   **Open new collection** starts a separate manual word collection; automatic slide clouds retain their own rounds, and the questions queue resumes independently. Live off
   also closes collection. No votes are affected.
 
-Limits: 400 characters per question; 1–3 words / 32 characters per cloud response;
-20 seconds between submissions and five per anonymous browser per collection;
-120 submissions per minute per hashed network address; 500 total per collection.
+Limits: 400 characters per question; 1–3 words / 32 characters per cloud idea, with one idea per line and up to five ideas in one submission;
+20 seconds between submissions and five ideas per anonymous browser per collection;
+120 submissions per minute per hashed network address; 500 ideas or questions total per collection.
 Polls admit up to 300 new voter cookies per minute per hashed network and 1,000 voters per room/session; existing voters can still update their choice. Counts are informal participation signals, not verified one-person votes. Cookies and network limits deter casual flooding, not determined abuse. The
 shared-network allowance accommodates a classroom behind one network.
 No names or raw IP addresses are stored. The queue and hashed limiter data expire

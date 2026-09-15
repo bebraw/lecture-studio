@@ -304,14 +304,41 @@ test("feedback remains private and enforces moderation, origin and submission li
     prompt: "Describe the web",
   });
   await expect(page.getByText("Add words", { exact: true })).toBeVisible();
+  await expect(page.locator("#feedback-hint")).toContainText(
+    "One idea per line",
+  );
   expect((await submit("one two three four")).status).toBe(400);
-  expect((await submit("hypermedia")).status).toBe(201);
+  expect((await submit("one\ntwo\nthree\nfour\nfive\nsix")).status).toBe(400);
+  expect((await submit("valid\n" + "x".repeat(33))).status).toBe(400);
+  // Invalid batches insert nothing; a valid batch creates separately moderated ideas.
+  await page
+    .getByLabel("Describe the web")
+    .fill("hypermedia\nshared knowledge\nopen standards");
+  await page.getByRole("button", { name: "Send for review" }).click();
+  await expect(page.locator("#feedback-notice")).toContainText(
+    "Sent privately",
+  );
   snapshot = await admin({ action: "close" });
-  expect(snapshot.items).toHaveLength(1);
-  await admin({ action: "approve", id: snapshot.items[0]?.id });
+  expect(snapshot.items).toHaveLength(3);
+  expect(snapshot.items.map((item) => item.text).sort()).toEqual([
+    "hypermedia",
+    "open standards",
+    "shared knowledge",
+  ]);
+  expect(snapshot.items.every((item) => item.status === "pending")).toBe(true);
+  const approved = await admin({
+    action: "approve",
+    id: snapshot.items.find((item) => item.text === "hypermedia")?.id,
+  });
+  expect(
+    approved.items.filter((item) => item.status === "approved"),
+  ).toHaveLength(1);
+  expect(
+    approved.items.filter((item) => item.status === "pending"),
+  ).toHaveLength(2);
   expect(
     await (await fetch(new URL("/api/audience", audience.url))).text(),
-  ).not.toContain("hypermedia");
+  ).not.toMatch(/hypermedia|shared knowledge|open standards/);
   await publish(false);
   expect((await submit("late")).status).toBe(409);
   expect(
