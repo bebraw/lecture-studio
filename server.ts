@@ -174,18 +174,29 @@ export function createStudio({
     if (run && url) buildPreviews.set(run.step, validDemoUrl(url, origin));
   };
   let wordCloudStep: string | null = null;
+  const wordCloudRounds = new Map<string, string>();
+  const captureWords = (
+    snapshot: Awaited<ReturnType<typeof feedbackRequest>>,
+  ) => {
+    const id = snapshot.config && wordCloudRounds.get(snapshot.config.round);
+    if (presentation && id && snapshot.config?.mode === "words")
+      presentation.approvedWords[id] = snapshot.items
+        .filter((item) => item.status === "approved")
+        .map((item) => item.text);
+  };
   const syncWordCloud = async (enabled: boolean) => {
     const step = presentation?.step();
     if (enabled && step?.wordCloud) {
       if (wordCloudStep === step.id) return;
-      await feedbackRequest(poll, {
+      const snapshot = await feedbackRequest(poll, {
         action: "start",
         mode: "words",
         prompt: step.title,
       });
+      if (snapshot.config) wordCloudRounds.set(snapshot.config.round, step.id);
       wordCloudStep = step.id;
     } else if (wordCloudStep) {
-      await feedbackRequest(poll, { action: "close" });
+      captureWords(await feedbackRequest(poll, { action: "close" }));
       wordCloudStep = null;
     }
   };
@@ -194,6 +205,8 @@ export function createStudio({
     feedbackPrevious = null;
     const s = presentation.step();
     if (live) await syncWordCloud(true);
+    if ((s.wordsFrom || s.reviewWordsFrom) && poll.origin && poll.token)
+      captureWords(await feedbackRequest(poll));
     captureBuildPreview();
     const demoUrl = s.previewOf ? buildPreviews.get(s.previewOf) : undefined;
     if (demoUrl) await sharePreview(demoUrl);
@@ -224,7 +237,9 @@ export function createStudio({
           ? "The app preview is not available yet."
           : s.type === "build"
             ? presentation.resolve().prompt
-            : s.body || "",
+            : s.reviewWordsFrom
+              ? presentation.resolve().prompt
+              : s.body || "",
       source: s.source || "",
       allowRemoteImages: s.allowRemoteImages === true,
     });
@@ -466,6 +481,7 @@ export function createStudio({
             ) {
               if (!live) throw new Error("Turn Live on first");
               const snapshot = await feedbackRequest(poll);
+              captureWords(snapshot);
               const selected = feedbackSlide(
                 snapshot,
                 body.action === "show-question"
@@ -490,7 +506,9 @@ export function createStudio({
               if (!live) throw new Error("Turn Live on first");
               await audienceSync.deliver(audienceState());
             }
-            return json(res, await feedbackRequest(poll, body));
+            const snapshot = await feedbackRequest(poll, body);
+            captureWords(snapshot);
+            return json(res, snapshot);
           } finally {
             graphBusy = false;
           }
@@ -589,6 +607,8 @@ export function createStudio({
               }
               poll.reset();
               presentation = next;
+              wordCloudRounds.clear();
+              wordCloudStep = null;
               audienceSessionStarted = false;
               graphPoll = null;
               graphPolls.clear();
@@ -650,6 +670,8 @@ export function createStudio({
               } else if (op === "build") {
                 if (presentation.step().type !== "build")
                   throw new Error("Choose a build step");
+                if (presentation.step().wordsFrom && poll.origin && poll.token)
+                  captureWords(await feedbackRequest(poll));
                 const resolved = presentation.resolve();
                 if (resolved.missing.length)
                   throw new Error(

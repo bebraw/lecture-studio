@@ -268,3 +268,52 @@ test("navigation rejects unknown steps and only returns through linked detours",
   session.current = "missing";
   assert.throws(() => session.step(), /Unknown current/);
 });
+
+test("first build maps approved audience needs and labels missing findings", async () => {
+  const markdown = await readFile(
+    new URL("../docs/presentations/web-development-2026.md", import.meta.url),
+    "utf8",
+  );
+  const session = new PresentationSession(
+    parsePresentation(sections(markdown)),
+    "test",
+  );
+  session.move("select", "build-document");
+  assert.match(session.resolve().prompt, /No approved word-cloud responses/);
+  session.approvedWords["knowledge-experience"] = ["date", "prerequisites"];
+  const prompt = session.resolve().prompt;
+  assert.match(prompt, /\["date","prerequisites"\]/);
+  assert.match(prompt, /headings, content order/);
+  assert.doesNotMatch(prompt, /No approved word-cloud responses/);
+});
+
+test("later builds and reviews use their own approved audience input", async () => {
+  const markdown = await readFile(
+    new URL("../docs/presentations/web-development-2026.md", import.meta.url),
+    "utf8",
+  );
+  const session = new PresentationSession(
+    parsePresentation(sections(markdown)),
+    "test",
+  );
+  session.approvedWords["knowledge-experience"] = ["date"];
+  session.approvedWords["step-9"] = ["clear feedback"];
+  session.approvedWords["future-visions"] = ["compare topics"];
+  session.approvedWords["closing-app-question"] = ["test offline"];
+  session.move("select", "build-application");
+  assert.match(session.resolve().prompt, /clear feedback/);
+  assert.doesNotMatch(session.resolve().prompt, /compare topics/);
+  session.move("select", "build-agents");
+  assert.match(session.resolve().prompt, /compare topics/);
+  assert.match(session.resolve().prompt, /unsupported tasks/);
+  session.move("select", "check-document-review");
+  assert.match(session.resolve().prompt, /date/);
+  session.move("select", "step-19");
+  for (const term of [
+    "date",
+    "clear feedback",
+    "compare topics",
+    "test offline",
+  ])
+    assert.ok(session.resolve().prompt.includes(term));
+});
