@@ -19,6 +19,7 @@ export function audienceStage(state: Partial<Stage>): Partial<Stage> {
     "slidePosition",
     "slideType",
     "projectionKind",
+    "pollId",
   ] as const) {
     if (state[key] !== undefined)
       Object.assign(result, { [key]: structuredClone(state[key]) });

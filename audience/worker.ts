@@ -145,6 +145,7 @@ export default {
           "slidePosition",
           "slideType",
           "projectionKind",
+          "pollId",
         ] as const)
           if (input[key] !== undefined) stage[key] = input[key];
         await env.STAGE_STATE.getByName("lecture").publish(stage);
@@ -174,7 +175,8 @@ export default {
       const active = snapshots.find(
         (item) =>
           item.snapshot.status === "open" &&
-          (!stage || stage.projectionKind === "question"),
+          stage?.projectionKind === "poll" &&
+          stage.pollId === item.id,
       );
       return Response.json(
         {

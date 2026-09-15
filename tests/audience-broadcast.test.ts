@@ -149,7 +149,7 @@ test("only published slides sync; polling never replaces another projected slide
     assert.equal(opened.graphPoll?.snapshot?.status, "open");
     await wait();
     assert.equal(writes.at(-1)!.title, themePoll().question);
-    assert.equal(writes.at(-1)!.projectionKind, "question");
+    assert.equal(writes.at(-1)!.projectionKind, "poll");
     await call("poll-refresh");
     await wait();
     assert.equal(writes.at(-1)!.title, themePoll().question);
@@ -163,7 +163,7 @@ test("only published slides sync; polling never replaces another projected slide
     assert.equal(writes.at(-1)!.projectionKind, "results");
     const nextPoll = await call("next");
     assert.equal(nextPoll.graphPoll?.snapshot?.status, "open");
-    assert.equal(nextPoll.projection.projectionKind, "question");
+    assert.equal(nextPoll.projection.projectionKind, "poll");
     await wait();
     assert.equal(writes.at(-1)!.title, "What next?");
     // Returning shows the saved results, without reopening the earlier poll.
@@ -174,6 +174,9 @@ test("only published slides sync; polling never replaces another projected slide
     // The open vote is no longer the selected slide when broadcasting stops.
     await call("select", { id: "title" });
     await call("show");
+    assert.equal(status, "locked", "Leaving a poll closes voting");
+    await wait();
+    assert.equal(writes.at(-1)!.pollId, undefined);
     const stopped = await call("live", { live: false });
     assert.equal(stopped.live, false);
     assert.equal(status, "locked");

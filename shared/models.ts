@@ -42,6 +42,7 @@ export interface Stage {
   blank?: boolean;
   build?: BuildState;
   projectionKind?: string;
+  pollId?: string;
   slideType?: string;
   slidePosition?: {
     number: number;

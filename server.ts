@@ -153,8 +153,11 @@ export function createStudio({
     return selected;
   };
   const openGraphPoll = async () => {
-    if (!presentation || presentation.step().type !== "poll") return;
-    const selected = getGraphPoll(presentation.step());
+    if (!presentation) return;
+    const selected =
+      presentation.step().type === "poll"
+        ? getGraphPoll(presentation.step())
+        : null;
     for (const [id, activePoll] of graphPolls) {
       if (activePoll === selected || activePoll.snapshot?.status !== "open")
         continue;
@@ -164,7 +167,8 @@ export function createStudio({
     }
     if (poll !== selected && poll.snapshot?.status === "open")
       await poll.act("lock");
-    if (selected.frozen || selected.snapshot?.status === "open") return;
+    if (!selected || selected.frozen || selected.snapshot?.status === "open")
+      return;
     await selected.act("open");
   };
   const buildPreviews = new Map<string, string>();
@@ -374,8 +378,9 @@ export function createStudio({
       projectionKind: pollOnStage
         ? pollResults
           ? "results"
-          : "question"
+          : "poll"
         : stage.mode,
+      ...(pollOnStage ? { pollId: (projectedPoll || poll).room } : {}),
       ...(stage.theme === undefined ? {} : { theme: stage.theme }),
       blank,
       build: {
