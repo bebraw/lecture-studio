@@ -290,7 +290,7 @@ test("feedback remains private and enforces moderation, origin and submission li
   await page.goto(audience.url);
   await page.getByText("Ask a question", { exact: true }).click();
   await page.getByLabel("Any questions?").fill("A browser question");
-  await page.getByRole("button", { name: "Send privately" }).click();
+  await page.getByRole("button", { name: "Send for review" }).click();
   await expect(
     page.getByText("Sent privately. The lecturer chooses what to show."),
   ).toBeVisible();

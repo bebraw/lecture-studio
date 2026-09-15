@@ -6,7 +6,7 @@
 
 The header's **Responses** menu opens either questions or a word collection,
 independently of voting. Students submit from a collapsible form below their
-shared stage. Nothing submitted is automatically published or sent to Codex.
+shared stage. Pending submissions remain private to the lecturer. Approving words allows their projection and inclusion as data in dependent build prompts; the lecturer must still explicitly start each build. Questions are projected only with **Discuss**.
 
 - **Discuss** projects one selected question; **Back to slide** restores the
   previous projection. **Done** removes an item from the pending review list.
@@ -25,6 +25,7 @@ Cookies and network limits deter casual flooding, not determined abuse. The
 shared-network allowance accommodates a classroom behind one network.
 No names or raw IP addresses are stored. The queue and hashed limiter data expire
 after 24 hours; already projected snapshots remain until you change the stage.
+Approved words in model conversations and generated artifacts have a separate lifecycle: the queue expiry does not delete them. Retention follows the configured model account and workspace; remove saved artifacts separately when appropriate.
 Cloudflare's storage recovery window may retain recoverable data beyond deletion.
 
 Run `npm run test:browser -- browser-tests/audience.spec.ts` for the audience acceptance tests.

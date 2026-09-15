@@ -25,7 +25,7 @@ const feedback = document.createElement("details");
 feedback.id = "student-feedback";
 feedback.hidden = true;
 feedback.innerHTML =
-  '<summary>Send a response</summary><form><label id="feedback-label" for="feedback-text"></label><textarea id="feedback-text" required maxlength="400"></textarea><p>Private to the lecturer unless selected for discussion. No names or sensitive information. Responses expire after 24 hours.</p><button>Send privately</button><p id="feedback-notice" role="status"></p></form>';
+  '<summary>Send a response</summary><form><label id="feedback-label" for="feedback-text"></label><textarea id="feedback-text" required maxlength="400"></textarea><p>The lecturer reviews responses before sharing. Approved words may appear on slides and be sent to the AI builder when the lecturer starts a build. Do not include names or sensitive information. The response queue expires after 24 hours; projected slides, model conversations and generated apps may retain approved words longer.</p><button>Send for review</button><p id="feedback-notice" role="status"></p></form>';
 query(".stage-bottom", document).before(feedback);
 let feedbackConfig: FeedbackConfig | null = null,
   feedbackBusy = false;
