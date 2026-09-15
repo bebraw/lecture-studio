@@ -36,7 +36,7 @@ test("a frozen vote feeds the explicit build without launching during navigation
       },
     ],
   };
-  const sessions = [];
+  const sessions: (string | null)[] = [];
   let opened = false;
   const poll = new AudiencePoll({
     origin: "https://audience.invalid",
@@ -81,13 +81,23 @@ test("a frozen vote feeds the explicit build without launching during navigation
     await desk.locator("#presentation-load").click();
     await desk.locator("#live-toggle").click();
     expect(bridge.lastPrompt).toBeUndefined();
-    await desk.locator("#graph-open").click();
+    await expect(desk.locator("#graph-open")).toBeHidden();
+    expect(sessions).toHaveLength(1);
     await desk.locator("#graph-close").click();
+    await expect(desk.locator("#current-stage")).toContainText(
+      "Selected: Retro web",
+    );
     await desk.locator("#graph-next").click();
     await expect(desk.locator("#graph-prompt")).toContainText(
       "Use retro styling.",
     );
     expect(bridge.lastPrompt).toBeUndefined();
+    await desk.locator("#graph-previous").click();
+    await expect(desk.locator("#current-stage")).toContainText(
+      "Selected: Retro web",
+    );
+    expect(sessions).toHaveLength(1);
+    await desk.locator("#graph-next").click();
     await desk.locator("#graph-build").click();
     await expect.poll(() => bridge.lastPrompt).toContain("Use retro styling.");
     await expect(desk.locator("#graph-build")).toBeDisabled();

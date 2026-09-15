@@ -82,6 +82,18 @@ export default {
         return new Response("Unauthorized", { status: 401 });
       return feedbackRequest(request, env, true);
     }
+    if (url.pathname === "/presenter/close-polls") {
+      if (request.method !== "POST")
+        return new Response("Method not allowed", { status: 405 });
+      if (!(await authorized(request, env.PRESENTER_TOKEN)))
+        return new Response("Unauthorized", { status: 401 });
+      for (const id of Object.keys(rooms)) {
+        const room = env.ROOM_STATE.getByName(id);
+        if ((await room.getSnapshot()).status === "open")
+          await room.setStatus("locked");
+      }
+      return new Response(null, { status: 204 });
+    }
     if (url.pathname === "/presenter/stage") {
       if (request.method !== "POST")
         return new Response("Method not allowed", { status: 405 });
@@ -148,6 +160,7 @@ export default {
           "build",
           "slidePosition",
           "slideType",
+          "projectionKind",
         ] as const)
           if (input[key] !== undefined) stage[key] = input[key];
         await env.STAGE_STATE.getByName("lecture").publish(stage);
@@ -174,7 +187,11 @@ export default {
           snapshot: await readRoomSnapshot(request, env, id),
         })),
       );
-      const active = snapshots.find((item) => item.snapshot.status === "open");
+      const active = snapshots.find(
+        (item) =>
+          item.snapshot.status === "open" &&
+          (!stage || stage.projectionKind === "question"),
+      );
       return Response.json(
         {
           stage,

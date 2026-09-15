@@ -88,6 +88,13 @@ export function parsePresentation(note: Note): PresentationDefinition {
   }
   if (!ids.has(value.start)) throw new Error("Missing start step");
   for (const s of value.steps) {
+    if (
+      s.previewOf !== undefined &&
+      !value.steps.some(
+        (step) => step.id === s.previewOf && step.type === "build",
+      )
+    )
+      throw new Error("Preview requires a build step");
     if (s.next && !ids.has(s.next)) throw new Error("Missing next step");
     for (const id of s.related || [])
       if (!ids.has(id)) throw new Error("Missing detour");
@@ -130,37 +137,9 @@ export class PresentationSession {
     return step;
   }
   position() {
-    const steps = this.definition.steps,
-      path: string[] = [],
-      seen = new Set<string>();
-    let id: string | undefined = this.definition.start;
-    while (id && !seen.has(id)) {
-      seen.add(id);
-      const s = steps.find((s) => s.id === id);
-      if (!s || s.chapter === "References") break;
-      path.push(id);
-      id = s.next;
-    }
-    const currentIndex = path.indexOf(this.current);
-    const anchor =
-      currentIndex >= 0
-        ? currentIndex
-        : [...this.history]
-            .reverse()
-            .map((id) => path.indexOf(id))
-            .find((i) => i >= 0);
-    return {
-      number: steps.findIndex((s) => s.id === this.current) + 1,
-      total: steps.length,
-      progress:
-        currentIndex >= 0
-          ? (currentIndex + 1) / path.length
-          : this.step().chapter === "References"
-            ? 1
-            : anchor === undefined
-              ? null
-              : (anchor + 1) / path.length,
-    };
+    const steps = this.definition.steps;
+    const number = steps.findIndex((step) => step.id === this.current) + 1;
+    return { number, total: steps.length, progress: number / steps.length };
   }
   move(action: string, id?: string) {
     const s = this.step();

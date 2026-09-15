@@ -17,9 +17,9 @@ test("desk previews actual poll projection and long questions fit the stage", as
   const poll = new AudiencePoll({
     origin: "https://lecture-votes-20260909-bfbeb2745cce.survivejs.workers.dev",
     token: "fixture",
-    fetcher: async () =>
+    fetcher: async (url) =>
       Response.json({
-        status: "locked",
+        status: url.endsWith("/open-session") ? "open" : "locked",
         revision: 1,
         totalVotes: 0,
         choices: options.map((o) => ({ ...o, votes: 0 })),

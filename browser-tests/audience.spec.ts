@@ -68,6 +68,15 @@ test.describe("Native forms", () => {
       const cookie = vote.headers.get("set-cookie")?.split(";")[0];
       expect(cookie).toBeTruthy();
       expect((await send(second, undefined, cookie)).status).toBe(303);
+      expect(
+        (
+          await fetch(new URL("/presenter/close-polls", audience.url), {
+            method: "POST",
+          })
+        ).status,
+      ).toBe(401);
+      await audience.admin("/presenter/close-polls");
+      expect((await send(first)).status).toBe(409);
       const result = await admin("lock");
       expect(result.totalVotes).toBe(1);
       expect(result.choices.find((choice) => choice.id === first)?.votes).toBe(
@@ -98,7 +107,7 @@ test("students follow the stage without losing their poll selection", async ({
   audience,
   page,
 }) => {
-  const publish = (title: string, live = true) =>
+  const publish = (title: string, live = true, projectionKind = "material") =>
     audience.admin("/presenter/stage", {
       live,
       title,
@@ -106,6 +115,7 @@ test("students follow the stage without losing their poll selection", async ({
       mode: "material",
       act: "past",
       version: title,
+      projectionKind,
       theme: { bodyFont: "Verdana, sans-serif" },
       notes: "PRIVATE",
     });
@@ -128,9 +138,10 @@ test("students follow the stage without losing their poll selection", async ({
   ).toBeVisible();
   await audience.admin("/presenter/rooms/webdev-2026/open");
   await expect(publish("Stopped", false)).rejects.toThrow("409");
+  await publish("Which visual theme should shape our app?", true, "question");
   const choice = page.getByLabel("Editorial", { exact: true });
   await choice.check();
-  await publish("The projector moved on");
+  await publish("Which visual theme should shape our app?", true, "question");
   // Wait for a complete audience refresh before checking retained form state.
   await page.waitForResponse(
     (response) => response.url().endsWith("/api/audience") && response.ok(),
@@ -141,7 +152,7 @@ test("students follow the stage without losing their poll selection", async ({
     page.getByRole("button", { name: "Vote saved · change vote" }),
   ).toBeVisible();
   expect(page.url()).toBe(audience.url);
-  await audience.admin("/presenter/rooms/webdev-2026/lock");
+  await publish("The projector moved on");
   await expect(
     page.getByRole("heading", { name: "The projector moved on" }),
   ).toBeVisible();
@@ -150,6 +161,16 @@ test("students follow the stage without losing their poll selection", async ({
     "font-family",
     "Verdana, sans-serif",
   );
+  // Returning to the poll permits an unsubmitted choice, but leaving still follows the stage.
+  await publish("Which visual theme should shape our app?", true, "question");
+  await expect(choice).toBeVisible();
+  await choice.check();
+  await publish("Next slide without another vote");
+  await expect(
+    page.getByRole("heading", { name: "Next slide without another vote" }),
+  ).toBeVisible();
+  await expect(page.locator("main form")).toHaveCount(0);
+  await audience.admin("/presenter/rooms/webdev-2026/lock");
   await publish("Stopped", false);
   expect(
     await (await fetch(new URL("/api/audience", audience.url))).json(),

@@ -114,6 +114,7 @@ export interface Step {
   next?: string;
   related?: string[];
   uses?: Dependency[];
+  previewOf?: string;
   allowRemoteImages?: boolean;
   poll?: PollDefinition;
   room?: string;

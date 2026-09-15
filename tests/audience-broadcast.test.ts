@@ -9,12 +9,18 @@ import { fixture } from "./fixture.ts";
 import { AudiencePoll, themePoll } from "../lib/audience-poll.ts";
 test("only published slides sync; polling never replaces another projected slide", async () => {
   const writes: Partial<Stage>[] = [];
-  let status = "locked",
+  let cleanups = 0;
+  let status = "open",
     revision = 1;
   const poll = new AudiencePoll({
     origin: "https://audience.invalid",
     token: "private",
     fetcher: async (url, init) => {
+      if (url.endsWith("/presenter/close-polls")) {
+        cleanups++;
+        status = "locked";
+        return new Response(null, { status: 204 });
+      }
       if (url.endsWith("/presenter/stage")) {
         writes.push(
           parse(
@@ -94,15 +100,20 @@ test("only published slides sync; polling never replaces another projected slide
     assert.equal(writes.at(-1)!.live, false);
     assert.equal(writes.at(-1)!.title, "Waiting for the lecturer");
     await call("live", { live: true });
+    assert.equal(cleanups, 1);
+    assert.equal(status, "locked");
     await wait();
     assert.equal(writes.at(-1)!.title, "Public title");
     await call("select", { id: "vote" });
-    await call("poll-open");
     await wait();
     assert.equal(writes.at(-1)!.title, "Public title");
+    const opened = await call("show");
+    assert.equal(opened.graphPoll?.snapshot?.status, "open");
+    await wait();
+    assert.equal(writes.at(-1)!.title, themePoll().question);
     await call("poll-refresh");
     await wait();
-    assert.equal(writes.at(-1)!.title, "Public title");
+    assert.equal(writes.at(-1)!.title, themePoll().question);
     await call("poll-question");
     await wait();
     assert.match(writes.at(-1)!.html!, /Editorial/);
@@ -110,19 +121,18 @@ test("only published slides sync; polling never replaces another projected slide
     await call("poll-results");
     await wait();
     assert.match(writes.at(-1)!.html!, /Editorial: 0/);
-    const blocked = await fetch(address.origin + "/api/presentation/live", {
-      method: "POST",
-      headers: {
-        origin: address.origin,
-        authorization: "Bearer " + address.deskToken,
-        "content-type": "application/json",
-      },
-      body: JSON.stringify({ live: false }),
-    });
-    assert.equal(blocked.status, 400);
-    await call("poll-close");
+    // The open vote is no longer the selected slide when broadcasting stops.
+    await call("select", { id: "title" });
+    await call("show");
     const stopped = await call("live", { live: false });
     assert.equal(stopped.live, false);
+    assert.equal(status, "locked");
+    await call("select", { id: "vote" });
+    const resumed = await call("live", { live: true });
+    assert.equal(resumed.graphPoll?.snapshot?.status, "locked");
+    assert.ok(resumed.graphPoll?.frozen);
+    assert.equal(resumed.projection.projectionKind, "results");
+    await call("live", { live: false });
     assert.equal(writes.at(-1)!.live, false);
     await call("select", { id: "title" });
     await call("show");
@@ -131,6 +141,7 @@ test("only published slides sync; polling never replaces another projected slide
     await call("live", { live: true });
     await wait();
     assert.equal(writes.at(-1)!.title, "Public title");
+    assert.equal(cleanups, 1, "Resuming does not reset the lecture again");
     assert.doesNotMatch(
       JSON.stringify(writes),
       /PRIVATE|private-output|workspace/,

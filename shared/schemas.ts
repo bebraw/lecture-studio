@@ -122,6 +122,7 @@ export const stepSchema = v.object({
   uses: v.exactOptional(
     v.array(v.object({ poll: text, instructions: stringMap })),
   ),
+  previewOf: optionalText,
   allowRemoteImages: v.exactOptional(v.boolean("Invalid remote image setting")),
   poll: v.exactOptional(pollDefinitionSchema),
   room: optionalText,

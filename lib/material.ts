@@ -39,6 +39,31 @@ export function renderMarkdown(
   { allowRemoteImages = false } = {},
 ) {
   const md = new MarkdownIt({ html: false, linkify: false, typographer: true });
+  const defaultFence = md.renderer.rules.fence!;
+  md.renderer.rules.fence = (tokens, index, options, env, self) => {
+    const token = tokens[index]!;
+    if (token.info.trim() !== "onion")
+      return defaultFence(tokens, index, options, env, self);
+    const layers = token.content
+      .trim()
+      .split("\n")
+      .map((line) => line.split("|"));
+    if (layers.length !== 3)
+      return defaultFence(tokens, index, options, env, self);
+    const escape = md.utils.escapeHtml;
+    const labels = layers.map(([label]) => escape(label!.trim()));
+    const descriptions = layers.map((parts) => escape((parts[1] || "").trim()));
+    return `<svg viewBox="0 0 1000 440" role="img" aria-label="${labels.join(" inside ")}" style="display:block;width:100%;max-height:55vh;font-family:Arial,sans-serif">
+      <circle cx="235" cy="220" r="205" fill="#e5e7eb" stroke="#555" stroke-width="2"/>
+      <circle cx="235" cy="220" r="145" fill="#cbd5c7" stroke="#555" stroke-width="2"/>
+      <circle cx="235" cy="220" r="80" fill="#fffdf6" stroke="#555" stroke-width="2"/>
+      <g fill="#202020" font-size="24" text-anchor="middle">
+      <text x="235" y="52">${labels[2]}</text><text x="235" y="111">${labels[1]}</text><text x="235" y="228">${labels[0]}</text></g>
+      <g fill="#202020" font-size="23">
+      <text x="495" y="130">${labels[0]}</text><text x="495" y="163" font-size="20">${descriptions[0]}</text>
+      <text x="495" y="230">${labels[1]}</text><text x="495" y="263" font-size="20">${descriptions[1]}</text>
+      <text x="495" y="330">${labels[2]}</text><text x="495" y="363" font-size="20">${descriptions[2]}</text></g></svg>`;
+  };
   // Highlight only markup; escape every source fragment before adding spans.
   md.options.highlight = (code, language) => {
     if (!["html", "xml"].includes(language)) return "";

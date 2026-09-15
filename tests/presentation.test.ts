@@ -79,7 +79,7 @@ const note = (value: unknown) => ({
     },
   ],
 });
-test("slide numbering includes detours while progress follows the lecture path", () => {
+test("slide numbering and progress follow the flat slide order", () => {
   const d = {
     version: 1,
     title: "Deck",
@@ -98,16 +98,16 @@ test("slide numbering includes detours while progress follows the lecture path",
   };
   const session = new PresentationSession(parsePresentation(note(d)), "test");
   assert.deepEqual(session.state().outline, d.steps);
-  assert.deepEqual(session.position(), { number: 1, total: 4, progress: 0.5 });
+  assert.deepEqual(session.position(), { number: 1, total: 4, progress: 0.25 });
   session.move("detour", "aside");
-  assert.equal(session.position().progress, 0.5);
+  assert.equal(session.position().progress, 1);
   session.move("return");
   session.move("next");
-  assert.equal(session.position().progress, 1);
+  assert.equal(session.position().progress, 0.5);
   session.move("next");
   assert.equal(session.position().number, 3);
   session.move("select", "aside");
-  assert.equal(session.position().progress, null);
+  assert.equal(session.position().progress, 1);
 });
 test("remote slide images require an explicit boolean opt-in", () => {
   const d = {

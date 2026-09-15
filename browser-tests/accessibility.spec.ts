@@ -137,6 +137,12 @@ test("audience voting and feedback work with a keyboard and survive background u
   ).toBeVisible();
   await accessible(page, info, "audience-stage");
   await audience.admin("/presenter/rooms/webdev-2026/open");
+  await audience.admin("/presenter/stage", {
+    live: true,
+    title: "Choose a theme",
+    projectionKind: "question",
+    html: "<p>Vote</p>",
+  });
   const editorial = page.getByRole("radio", { name: "Editorial", exact: true });
   await editorial.focus();
   await page.keyboard.press("Space");
@@ -144,7 +150,8 @@ test("audience voting and feedback work with a keyboard and survive background u
   await accessible(page, info, "audience-poll");
   await audience.admin("/presenter/stage", {
     live: true,
-    title: "Next material",
+    title: "Choose a theme",
+    projectionKind: "question",
     html: "<p>The vote stays open</p>",
   });
   await page.waitForResponse(

@@ -27,27 +27,47 @@ Versioned export of the Obsidian lecture at `Lectures/Web Development 2026/Prese
       "title": "Today’s route",
       "body": "1. **Past** — Finding knowledge; documents, links and native forms\n2. **Present** — Browser interaction; AJAX and shared state\n3. **Future** — What people might delegate to agents\n4. **References** — Sources and further reading",
       "notes": "Introduce the route before the CERN example. Across the sections, we build and inspect one application together.",
+      "next": "demo-background"
+    },
+    {
+      "id": "demo-background",
+      "type": "material",
+      "chapter": "Opening",
+      "title": "Our example: a seminar information app",
+      "body": "Imagine you are considering attending the SDLCAI seminar.\n\nYou want to understand what it covers, find practical details, and follow the source links.\n\nIn our demo, you can also submit a preference. The room sees the combined responses, and later we generate a view around its chosen priority.",
+      "notes": "Introduce the scenario before asking the audience to shape the app. Show the prepared seminar material and identify it as the source the builds will use. The visitor is someone considering the seminar; the shared display lets the room see aggregate preferences. Walk through one example: look for practical details, choose a priority, then inspect the resulting view. The lecture’s polls shape the build requirements; the form inside the demo is the application we test. Distinguish those two interfaces when showing them. Keep this introduction to about one minute.",
       "next": "cern-problem"
     },
     {
       "id": "cern-problem",
       "type": "material",
       "chapter": "Opening",
-      "title": "CERN, 1989: finding shared knowledge",
+      "title": "CERN: finding shared knowledge (1989)",
       "body": "![Tim Berners-Lee beside a computer at CERN, photographed in 1994](https://home.cern/wp-content/uploads/2026/05/9407011_31.jpg)\n\n> Often, the information has been recorded, it just cannot be found.\n\nTim Berners-Lee · Information Management: A Proposal",
-      "source": "[R5, R24] Berners-Lee · Photo: CERN, 1994",
-      "notes": "02–04 · Explain changing projects, people leaving and information spread across incompatible systems. This is the problem behind the proposal, not a desire to invent another interface. The source is dated March 1989 and May 1990.\nSource keys resolve to the References slides at the end. Unquoted explanations are lecture paraphrases; diagrams are not archival reproductions. Photo dates from 1994, not the 1989 proposal. Photo source: https://home.cern/science/computing/the-birth-of-the-web/ ; CERN record 39437. Requires network access.\nFull attribution: [R5, R24] Tim Berners-Lee · Proposal 1989/1990 · Photo: CERN, 1994",
-      "next": "knowledge-experience",
+      "source": "[5, 24] Berners-Lee · Photo: CERN, 1994",
+      "notes": "02–04 · Explain changing projects, people leaving and information spread across incompatible systems. This is the problem behind the proposal, not a desire to invent another interface. The source is dated March 1989 and May 1990.\nSource keys resolve to the References slides at the end. Unquoted explanations are lecture paraphrases; diagrams are not archival reproductions. Photo dates from 1994, not the 1989 proposal. Photo source: https://home.cern/science/computing/the-birth-of-the-web/ ; CERN record 39437. Requires network access.\nFull attribution: [5, 24] Tim Berners-Lee · Proposal 1989/1990 · Photo: CERN, 1994",
+      "next": "cern-connections",
       "related": ["cern-connections"],
       "allowRemoteImages": true
+    },
+    {
+      "id": "cern-connections",
+      "type": "material",
+      "title": "CERN: relationships do not fit one filing tree (1989)",
+      "body": "![Original circles-and-arrows diagram from Berners-Lee’s Information Management proposal](https://www.w3.org/History/1989/Image1.gif)",
+      "source": "[5] © Tim Berners-Lee, 1989/1990 · W3C archive",
+      "notes": "Historical artifact, not a teaching reconstruction. Trace one connection rather than reading every label. Notice the mixture of systems, concepts and relationships. Requires network access.\nFull attribution: [5] Tim Berners-Lee © 1989/1990 · Original proposal diagram, W3C archive",
+      "allowRemoteImages": true,
+      "chapter": "Opening",
+      "next": "knowledge-experience"
     },
     {
       "id": "knowledge-experience",
       "type": "question",
       "chapter": "Opening",
-      "title": "Where does this happen in your studies or work?",
-      "body": "The information exists—but you cannot find it.\n\nDiscuss with a neighbour for two minutes. Bring back one example.",
-      "notes": "04–07 · Hear two examples: course platforms, shared drives, chat histories, project handovers. Keep their wording for the closing discussion. Do not solve the examples yet.",
+      "title": "Where is information hardest to find?",
+      "body": "Name one place: a course platform, chat, shared drive…\n\n**Word cloud · 45 seconds**\n\nOn live.scalableweb.dev, open **Add words** and send one short response (up to 32 characters).\n\nWe’ll review the approved cloud and discuss two contrasting suggestions.",
+      "notes": "04–07 · Hear two examples: course platforms, shared drives, chat histories, project handovers. Keep their wording for the closing discussion. Do not solve the examples yet.\n\nModerated word cloud: while Live is on, open Responses, choose Word cloud, enter “Where is information hardest to find?”, and click Open new collection. Allow 45 seconds. Close collection, review submissions privately, approve relevant responses, then Show approved cloud. Read out two contrasting contributions and ask their authors to explain; frequency is not a vote or a measure of correctness. Use Back to slide before continuing. If collection is unavailable, take three spoken responses and discuss two. Never project unreviewed submissions.",
       "next": "vote-friction"
     },
     {
@@ -86,9 +106,9 @@ Versioned export of the Obsidian lecture at `Lectures/Web Development 2026/Prese
       "id": "step-3",
       "type": "material",
       "chapter": "Opening",
-      "title": "We will build one application—and change how we use it.",
-      "body": "You help choose the direction. An agent helps implement it. Together, we inspect what actually works.",
-      "notes": "09–11 · Show the starter context. This seminar app is a small test case for finding information and acting on it, not a recreation of an entire historical vision.",
+      "title": "One seminar app, three stages",
+      "body": "1. **Past:** read the seminar information and submit a native form.\n2. **Present:** submit without leaving the page; watch shared results update.\n3. **Future:** generate a seminar view around the room’s chosen priority.\n\nYour votes shape the requirements. We inspect each result before moving on.",
+      "notes": "09–11 · Return to the seminar scenario introduced at the beginning. We develop the same app across three lecture sections. Past has two build steps: the document, then its native form. Present enhances that form and adds shared updates. Future adds constrained view composition using the reviewed seminar material. Explain that the coding agent implements the app; the later composition model generates a view inside it. Show the starter context before the first build.",
       "next": "step-4",
       "related": ["detour-0-1"]
     },
@@ -101,7 +121,7 @@ Versioned export of the Obsidian lecture at `Lectures/Web Development 2026/Prese
       "notes": "11–14 · Take the theme vote and start Document A, then rewind through four visions while it builds. Spend about 6–8 minutes across the four, not 6–8 minutes each.\nSource keys resolve to the References slides at the end. Unquoted explanations are lecture paraphrases; diagrams are not archival reproductions.",
       "next": "vote-theme",
       "related": ["detour-0-1"],
-      "source": "Historical framing · [R1–R5]"
+      "source": "Historical framing · [1–5]"
     },
     {
       "id": "vote-theme",
@@ -164,33 +184,44 @@ Versioned export of the Obsidian lecture at `Lectures/Web Development 2026/Prese
       "id": "vision-otlet",
       "type": "material",
       "chapter": "Past",
-      "title": "Otlet: organizing knowledge",
-      "body": "The Universal Bibliographic Repertory\n\nA shared catalogue of publications, organized for retrieval.",
-      "source": "Institutional history · [R1] Mundaneum (n.d.)",
-      "notes": "14–16 · One ambition, not a biography: make knowledge discoverable beyond a local collection. Mention classification and the broader ideal of international cooperation. A conceptual precursor, not a claim of direct influence on Berners-Lee.\nSource keys resolve to the References slides at the end. Unquoted explanations are lecture paraphrases; diagrams are not archival reproductions.",
+      "title": "Otlet: organizing knowledge (1895)",
+      "body": "![Catalogue drawers at the Mundaneum in Mons, photographed in 2011](https://upload.wikimedia.org/wikipedia/commons/9/96/Drawers.jpg)\n\nThe Universal Bibliographic Repertory: a shared catalogue of publications, organized for retrieval.",
+      "source": "[1, 29] Mundaneum · Photo: fdecomite, 2011 · CC BY 2.0",
+      "notes": "14–16 · One ambition, not a biography: make knowledge discoverable beyond a local collection. Mention classification and the broader ideal of international cooperation. A conceptual precursor, not a claim of direct influence on Berners-Lee.\nSource keys resolve to the References slides at the end. Unquoted explanations are lecture paraphrases; diagrams are not archival reproductions.\nTitle year refers to the creation of the Universal Bibliographic Repertory (1895). Date source: Mundaneum, https://mundaneum.org/nl/collections/het-universele-bibliografische-repertorium/ .\nPhoto shows the catalogue drawers at the Mundaneum in Mons in 2011, not the institution in 1895. Point to the physical drawers to explain the scale and work of indexing. Photo: fdecomite, Drawers, 23 February 2011, via Wikimedia Commons; CC BY 2.0. Unmodified. Remote image requires network access.",
       "next": "vision-bush",
-      "related": ["vision-comparison"]
+      "related": ["vision-comparison"],
+      "allowRemoteImages": true
     },
     {
       "id": "vision-bush",
       "type": "material",
       "chapter": "Past",
-      "title": "Bush: Memex and associative trails",
+      "title": "Bush: Memex and associative trails (1945)",
       "body": "![Conceptual sketch of the proposed Memex desk with side-by-side displays](https://images.computerhistory.org/revonline/images/500004817-03-01.jpg?w=600)",
-      "source": "[R2, R15] Memex sketch, c. 1945 · Computer History Museum",
-      "notes": "16–18 · Contrast associative trails with placing each item in a category. The memex was a proposed personal device, not an implemented web. Relate to following references during an assignment.\nSource keys resolve to the References slides at the end. Unquoted explanations are lecture paraphrases; diagrams are not archival reproductions. This is a proposed device, never built. Point to the two displays: how would you preserve the path between two records?\nFull attribution: [R2, R15] Memex conceptual sketch · c. 1945 · Computer History Museum, object 500004817",
-      "next": "vision-nelson",
+      "source": "[2, 15] Memex sketch, c. 1945 · Computer History Museum",
+      "notes": "16–18 · Contrast associative trails with placing each item in a category. The memex was a proposed personal device, not an implemented web. Relate to following references during an assignment.\nSource keys resolve to the References slides at the end. Unquoted explanations are lecture paraphrases; diagrams are not archival reproductions. This is a proposed device, never built. Point to the two displays: how would you preserve the path between two records?\nFull attribution: [2, 15] Memex conceptual sketch · c. 1945 · Computer History Museum, object 500004817",
+      "next": "bush-trail",
       "related": ["bush-trail", "vision-comparison"],
       "allowRemoteImages": true
+    },
+    {
+      "id": "bush-trail",
+      "type": "material",
+      "title": "A research trail is more than a folder",
+      "body": "```mermaid\nflowchart LR\n Question --> Article\n Article -->|reference| Earlier[Earlier study]\n Earlier -->|association| Example[Example from another field]\n```",
+      "source": "[2] Bush, 1945 · Teaching diagram",
+      "notes": "This is a modern explanatory example, not Bush’s original illustration. Ask whether bookmarks retain the reason each source mattered.\nSource keys resolve to the References slides at the end. Unquoted explanations are lecture paraphrases; diagrams are not archival reproductions.\nFull attribution: Original explanatory diagram · [2] Vannevar Bush (1945)",
+      "chapter": "Past",
+      "next": "vision-nelson"
     },
     {
       "id": "vision-nelson",
       "type": "material",
       "chapter": "Past",
-      "title": "Nelson: hypertext and Xanadu",
+      "title": "Nelson: hypertext and Xanadu (1965)",
       "body": "![Nelson’s diagram showing connections between parallel sequences of text](https://xanadu.com.au/ted/XUsurvey/HARTadj5in.JPG)",
-      "source": "[R16] Ted Nelson · 1965 diagram, reproduced 2000",
-      "notes": "18–20 · Hypertext term introduced in 1965. Distinguish basic non-sequential reading from Xanadu’s richer ambition: visible connections and reuse tied to origins. Do not imply the web implemented all of Xanadu. Existing vault clippings on Xanadu offer contrasting contemporary opinions, not historical proof.\nSource keys resolve to the References slides at the end. Unquoted explanations are lecture paraphrases; diagrams are not archival reproductions. Distinguish links between items from shared content (transclusion). This is a conceptual diagram, not a screenshot of a working 1965 system.\nFull attribution: [R16] Ted Nelson · 1965 connection diagram reproduced in his 2000 survey, Fig. 1",
+      "source": "[16] Ted Nelson · 1965 diagram, reproduced 2000",
+      "notes": "18–20 · Hypertext term introduced in 1965. Distinguish basic non-sequential reading from Xanadu’s richer ambition: visible connections and reuse tied to origins. Do not imply the web implemented all of Xanadu. Existing vault clippings on Xanadu offer contrasting contemporary opinions, not historical proof.\nSource keys resolve to the References slides at the end. Unquoted explanations are lecture paraphrases; diagrams are not archival reproductions. Distinguish links between items from shared content (transclusion). This is a conceptual diagram, not a screenshot of a working 1965 system.\nFull attribution: [16] Ted Nelson · 1965 connection diagram reproduced in his 2000 survey, Fig. 1",
       "next": "vision-engelbart",
       "related": ["vision-comparison"],
       "allowRemoteImages": true
@@ -199,34 +230,54 @@ Versioned export of the Obsidian lecture at `Lectures/Web Development 2026/Prese
       "id": "vision-engelbart",
       "type": "material",
       "chapter": "Past",
-      "title": "Engelbart: the 1968 demonstration",
+      "title": "Engelbart: the NLS demonstration (1968)",
       "body": "![Doug Engelbart speaking beside a shared screen during his 1968 demonstration](https://dougengelbart.org/images/pix/img0029.jpg)",
-      "source": "[R4, R25] NLS, 1968 · Doug Engelbart Institute",
-      "notes": "20–22 · Emphasize augmentation rather than replacement. His later NLS work gives a concrete bridge to collaborative applications. Ask students to keep this ambition in mind as an agent helps us build. Avoid turning this into a mouse-invention anecdote.\nSource keys resolve to the References slides at the end. Unquoted explanations are lecture paraphrases; diagrams are not archival reproductions. The photo shows the 1968 demonstration, six years after his 1962 conceptual framework. Point to the shared display: people can work with information together. Source: https://dougengelbart.org/content/view/224/217/ , section 4b. Requires network access.\nFull attribution: [R4, R25] NLS demonstration · 9 December 1968 · Doug Engelbart Institute archive",
-      "next": "web-response",
+      "source": "[4, 25] NLS, 1968 · Doug Engelbart Institute",
+      "notes": "20–22 · Emphasize augmentation rather than replacement. His later NLS work gives a concrete bridge to collaborative applications. Ask students to keep this ambition in mind as an agent helps us build. Avoid turning this into a mouse-invention anecdote.\nSource keys resolve to the References slides at the end. Unquoted explanations are lecture paraphrases; diagrams are not archival reproductions. The photo shows the 1968 demonstration, six years after his 1962 conceptual framework. Point to the shared display: people can work with information together. Source: https://dougengelbart.org/content/view/224/217/ , section 4b. Requires network access.\nFull attribution: [4, 25] NLS demonstration · 9 December 1968 · Doug Engelbart Institute archive",
+      "next": "vision-comparison",
       "related": ["vision-comparison"],
       "allowRemoteImages": true
+    },
+    {
+      "id": "vision-comparison",
+      "type": "question",
+      "title": "Which ambition does your everyday software serve?",
+      "body": "**Choose and explain · 60 seconds**\n\nPick one familiar application. Which ambition does it serve best?\n\n**Otlet:** organize knowledge · **Bush:** preserve trails\n\n**Nelson:** connect texts and sources · **Engelbart:** augment problem-solving\n\nShare the application, your choice, and one missing capability.",
+      "notes": "Give students 60 seconds to choose an application and a missing capability, then hear two examples. These are distinct ambitions, not a chain of direct influence. Continue to how the web connects information.\nSource keys resolve to the References slides at the end.",
+      "source": "Lecture synthesis and discussion · [1–5]",
+      "chapter": "Past",
+      "next": "web-response"
     },
     {
       "id": "web-response",
       "type": "material",
       "chapter": "Past",
       "title": "The web connects information without one central catalogue",
-      "body": "Documents can live on different servers.\n\nAddresses identify them. Links connect them.",
-      "source": "[R5, R7] Berners-Lee; W3C · Paraphrase",
-      "notes": "22–25 · Return to CERN: accommodate existing systems and let people add connections as work changes. This is a practical response, not completion of every earlier vision. Inspect the generated seminar document when ready.\nSource keys resolve to the References slides at the end. Unquoted explanations are lecture paraphrases; diagrams are not archival reproductions.\nFull attribution: Paraphrase · [R5] Tim Berners-Lee (1989/1990); [R7] W3C (2004)",
-      "next": "worldwideweb-browser",
+      "body": "```mermaid\nflowchart LR\n subgraph A[Server A]\n D[Document]\n M[Meeting minutes]\n end\n subgraph B[Server B]\n U[Equipment information]\n end\n D -->|Follow meeting link| M\n M -->|Follow equipment link| U\n```\n\nFollow links between documents—even when they live on different servers.",
+      "source": "[6] Berners-Lee & Cailliau, 1990 · Adapted from Hypertext concepts",
+      "notes": "22–25 · Trace the path from a document to meeting minutes to equipment information. The 1990 proposal uses a GHI meeting and UPS information to explain following links, then states that nodes need not be on the same machine. The server grouping here illustrates that statement; it is not an original figure or a record of the documents’ actual hosting. No central catalogue is needed for this navigation. Connect this to the seminar app: a page can link to information maintained elsewhere.\nSource: [6] WorldWideWeb: Proposal for a HyperText Project, 12 November 1990, Hypertext concepts. https://www.w3.org/Proposal.html . Original teaching adaptation, not an archival reproduction.",
+      "next": "detour-0-1",
       "related": ["cern-connections", "detour-0-1"]
+    },
+    {
+      "id": "detour-0-1",
+      "type": "material",
+      "title": "Documents connect through links",
+      "body": "```mermaid\nflowchart LR\n Document -->|link| Resource\n Resource -->|link| Another[Another resource]\n```",
+      "notes": "What survives when CSS and JavaScript are removed?\nSource keys resolve to the References slides at the end. Unquoted explanations are lecture paraphrases; diagrams are not archival reproductions.\nFull attribution: Original explanatory diagram · [6] Tim Berners-Lee and Robert Cailliau (1990)",
+      "source": "[6] Berners-Lee & Cailliau, 1990 · Teaching diagram",
+      "chapter": "Past",
+      "next": "worldwideweb-browser"
     },
     {
       "id": "worldwideweb-browser",
       "type": "material",
       "chapter": "Past",
-      "title": "WorldWideWeb browser-editor",
+      "title": "WorldWideWeb browser-editor (1990)",
       "body": "![WorldWideWeb browser-editor on NeXT: document windows and a link-creation menu, screenshot from 1993](https://www.w3.org/History/1994/WWW/Journals/CACM/screensnap2_24c.gif)",
       "allowRemoteImages": true,
-      "source": "[R14] Berners-Lee / W3C · Screenshot, 1993",
-      "notes": "Use the screenshot instead of explaining the interface in bullets. Point out the Link menu and editing. Ask: what changes when you can create links as well as follow them? This is the 1993 screenshot, not an image of the original 1990 release. Image requires network access.\nFull attribution: [R14] Tim Berners-Lee / W3C · WorldWideWeb (written 1990); screenshot 1993",
+      "source": "[14] Berners-Lee / W3C · Screenshot, 1993",
+      "notes": "Use the screenshot instead of explaining the interface in bullets. Point out the Link menu and editing. Ask: what changes when you can create links as well as follow them? This is the 1993 screenshot, not an image of the original 1990 release. Image requires network access.\nFull attribution: [14] Tim Berners-Lee / W3C · WorldWideWeb (written 1990); screenshot 1993",
       "next": "geocities-personal-page",
       "related": ["detour-0-1"]
     },
@@ -234,12 +285,34 @@ Versioned export of the Obsidian lecture at `Lectures/Web Development 2026/Prese
       "id": "geocities-personal-page",
       "type": "material",
       "chapter": "Past",
-      "title": "GeoCities: personal publishing",
+      "title": "GeoCities: personal publishing (1994)",
       "body": "![Archived GeoCities page from CollegePark Lounge 9002, displayed in a browser](https://64.media.tumblr.com/547f0c98f0570a6f43406f27e3660b3d/5e00078737a43466-44/s1280x1920/3593b988bc52c5704bb3c421ac8cc2f81579de9e.png)",
       "allowRemoteImages": true,
-      "source": "[R17] GeoCities archive · Lialina & Espenschied · Capture 2009",
-      "notes": "Use briefly after the browser-editor: personal publishing rather than just institutional information. Ask what students would put on a page of their own. Distinguish control of a page’s design from ownership of its hosting platform. Archive capture date is not the page’s creation date. Screenshot produced by Olia Lialina and Dragan Espenschied’s archive project from rescued files; not necessarily a screenshot taken in 2009.\nFull attribution: [R17] GeoCities CollegePark/Lounge/9002 · archived 28 April 2009 · One Terabyte of Kilobyte Age",
-      "next": "step-5"
+      "source": "[17] GeoCities archive · Lialina & Espenschied · Capture 2009",
+      "notes": "Use briefly after the browser-editor: personal publishing rather than just institutional information. Ask what students would put on a page of their own. Distinguish control of a page’s design from ownership of its hosting platform. Archive capture date is not the page’s creation date. Screenshot produced by Olia Lialina and Dragan Espenschied’s archive project from rescued files; not necessarily a screenshot taken in 2009.\nFull attribution: [17] GeoCities CollegePark/Lounge/9002 · archived 28 April 2009 · One Terabyte of Kilobyte Age\nTitle year refers to GeoCities’ founding, not the archived page or screenshot. Date source: David Bohnett Foundation biography, https://www.bohnettfoundation.org/david-bohnett-bio/ .",
+      "next": "editor-frontpage"
+    },
+    {
+      "id": "editor-frontpage",
+      "type": "material",
+      "chapter": "Past",
+      "title": "Microsoft FrontPage 1.1 (1996)",
+      "body": "![Microsoft FrontPage 1.1 showing a visual page editor and its View HTML dialog](https://www.webdesignmuseum.org/uploaded/old-software/html-editors/microsoft-frontpage/microsoft-frontpage-1-1-04.png)\n\nEdit the page visually; inspect the HTML it produces.",
+      "source": "[26, 30] Microsoft FrontPage 1.1 · Screenshot: Web Design Museum",
+      "notes": "Spend about one minute here. Connect GeoCities’ personal publishing to desktop authoring tools: a visual editor could help people create the files they published. The date refers to Microsoft FrontPage 1.1, not the original Vermeer product. Microsoft acquired Vermeer in January 1996. Avoid presenting vendor claims about ease of use as measured accessibility or browser compatibility. Ask: what does the editor handle, and what must the author still understand?\nSource: Microsoft announcement, 6 August 1996: https://news.microsoft.com/source/1996/08/06/microsoft-frontpage-1-1-momentum-explodes-in-first-two-months-industry-lauds-web-authoring-and-management-tool-as-best-of-breed/\nScreenshot shows FrontPage 1.1 (1996), with the visual editor behind the View HTML dialog. Point out the relationship between the formatted page and its source. Screenshot preserved by Web Design Museum; software interface © Microsoft. This is a later capture of historical software, not a photograph dated 1996. Remote image requires network access.",
+      "next": "editor-dreamweaver",
+      "allowRemoteImages": true
+    },
+    {
+      "id": "editor-dreamweaver",
+      "type": "material",
+      "chapter": "Past",
+      "title": "Macromedia Dreamweaver (1997)",
+      "body": "![Macromedia Dreamweaver 1.2 visual editor showing a company profile page and formatting controls](https://www.webdesignmuseum.org/uploaded/old-software/html-editors/macromedia-dreamweaver/macromedia-dreamweaver-1-2-05.png)\n\nVisual page editing · Dreamweaver 1.2 (1998)",
+      "source": "[27, 31] Macromedia · Screenshot: Web Design Museum, Dreamweaver 1.2",
+      "notes": "Spend about one minute here. This is the Macromedia editor later associated with Adobe. The December 1997 launch emphasized visual authoring and preserving existing HTML when working with an external source editor; do not imply that later split-view UI already existed in the first release. Compare with FrontPage without treating them as identical products or making unsupported claims about their output quality. Transition to the next HTML slide: authoring tools change, but the generated document still matters.\nSource: Macromedia launch announcement dated 8 December 1997, reproduced by MacTech on 9 December: https://www.mactech.com/1997/12/09/md1-macromedia-ships-dreamweaver/\nThe title dates Dreamweaver’s first release in 1997. The screenshot shows version 1.2 for Windows (1998), labeled separately in the caption. Point out the visual document and formatting controls. Screenshot preserved by Web Design Museum; software interface © Macromedia. Remote image requires network access.",
+      "next": "step-5",
+      "allowRemoteImages": true
     },
     {
       "id": "step-5",
@@ -247,20 +320,31 @@ Versioned export of the Obsidian lecture at `Lectures/Web Development 2026/Prese
       "chapter": "Past",
       "title": "HTML: headings, paragraphs and links",
       "body": "```html\n<h1>SDLCAI seminar</h1>\n<p>Explore AI and software development.</p>\n<a href=\"https://www.sdlcai.org/\">Visit the seminar</a>\n```\n\n### SDLCAI seminar\nExplore AI and software development.\n\n[Visit the seminar](https://www.sdlcai.org/)",
-      "notes": "25–27 · Ask what each element tells the browser. Below the code is an illustrative rendered equivalent, not an executing HTML sandbox. Inspect the real app afterwards. This is sample copy, not a sourced seminar-program claim.\nFull attribution: [R7, R18] Original teaching example · HTML text and link semantics",
-      "next": "step-6",
+      "notes": "25–27 · Ask what each element tells the browser. Below the code is an illustrative rendered equivalent, not an executing HTML sandbox. Inspect the real app afterwards. This is sample copy, not a sourced seminar-program claim.\nFull attribution: [7, 18] Original teaching example · HTML text and link semantics",
+      "next": "check-document",
       "related": ["detour-0-1"],
-      "source": "[R7, R18] HTML semantics · Teaching example"
+      "source": "[7, 18] HTML semantics · Teaching example"
+    },
+    {
+      "id": "check-document",
+      "chapter": "Past",
+      "title": "Check the build · The document",
+      "body": "- Find the seminar essentials and follow a real link.\n- Check the headings and reading order.\n- Compare the result with the audience’s chosen theme.",
+      "notes": "The linked build preview appears automatically on this slide. Advance to return to the lecture. If no preview URL is available, the slide reports that it is not ready.\n\nChecks to narrate:\n- Find the seminar essentials and follow a real link.\n- Check the headings and reading order.\n- Compare the result with the audience’s chosen theme.",
+      "type": "material",
+      "next": "step-6",
+      "previewOf": "build-document"
     },
     {
       "id": "step-6",
-      "type": "question",
+      "type": "material",
       "chapter": "Past",
-      "title": "What will still work if we remove the styling and JavaScript?",
-      "body": "Make a prediction before we try it.",
-      "notes": "27–30 · Take predictions and inspect the running result. Use the prepared baseline if necessary.",
+      "title": "Demo · The document without CSS or JavaScript",
+      "body": "Read the seminar information and follow a link without CSS or JavaScript.",
+      "notes": "27–30 · Demonstrate with the document build, which appears automatically. Show its styled version, then disable JavaScript and reload the demo browser. Disable the document’s stylesheets and remove inline styles in that demo context, then show the resulting page. Read a heading, find a practical detail, and follow a source link. Explain what changed in appearance and what still works. Restore JavaScript and reload afterwards. These browser changes are manual and apply only to the demo browser, not automatically to audience devices. Use a prepared plain-HTML version if needed and identify it as prepared. The native form has not been built yet; demonstrate form submission at the later native-form checkpoint.",
       "next": "step-7",
-      "related": ["detour-0-1"]
+      "related": ["detour-0-1"],
+      "previewOf": "build-document"
     },
     {
       "id": "step-7",
@@ -268,10 +352,10 @@ Versioned export of the Obsidian lecture at `Lectures/Web Development 2026/Prese
       "chapter": "Past",
       "title": "HTML forms",
       "body": "```html\n<form action=\"/vote\" method=\"post\">\n  <label for=\"topic\">Your topic</label>\n  <select id=\"topic\" name=\"topic\">\n    <option value=\"learning\">Learning outcomes</option>\n    <option value=\"practical\">Practical details</option>\n  </select>\n  <button>Vote</button>\n</form>\n```",
-      "notes": "30–31 · Ask what the browser sends and where. With Learning outcomes selected: POST /vote, form body topic=learning. The server must provide the route, validate input and return a response; HTML alone does not implement voting. /vote is an illustrative endpoint, not a promise about the generated app. Compare the actual form after Document B completes. Later enhance the same capability with JavaScript.\nFull attribution: [R8] WHATWG HTML — Forms · Original teaching example",
+      "notes": "30–31 · Ask what the browser sends and where. With Learning outcomes selected: POST /vote, form body topic=learning. The server must provide the route, validate input and return a response; HTML alone does not implement voting. /vote is an illustrative endpoint, not a promise about the generated app. Compare the actual form after Document B completes. Later enhance the same capability with JavaScript.\nFull attribution: [8] WHATWG HTML — Forms · Original teaching example",
       "next": "build-forms",
-      "related": ["detour-1-1"],
-      "source": "[R8] WHATWG HTML forms · Teaching example"
+      "related": ["step-8"],
+      "source": "[8] WHATWG HTML forms · Teaching example"
     },
     {
       "id": "build-forms",
@@ -300,7 +384,7 @@ Versioned export of the Obsidian lecture at `Lectures/Web Development 2026/Prese
         }
       ],
       "next": "flow-native",
-      "related": ["detour-1-1"]
+      "related": ["step-8"]
     },
     {
       "id": "flow-native",
@@ -308,8 +392,8 @@ Versioned export of the Obsidian lecture at `Lectures/Web Development 2026/Prese
       "chapter": "Past",
       "title": "Native form submission · 1/4 Submit",
       "body": "```mermaid\nsequenceDiagram\n%% focus-after: 0,0\n participant B as Browser\n participant S as Server\n participant D as Stored votes\nB->>S: POST /vote · topic=learning\n```",
-      "source": "[R8, R19] Teaching model · Adapted from Vepsäläinen",
-      "notes": "Model, not a network recording. This example uses POST/Redirect/GET; returning HTML directly is another valid native-form response. Point to topic=learning, then follow the same value through the server. Ask who rendered the results. Browser restoration of local fields can vary; do not claim every reload always clears every input. Compare with the actual generated form.\nReveal 1 of 4: Submit. Advance with Next; Previous revisits the preceding state.\nFull attribution: Explanatory model · [R8, R19] Adapted for this lecture from Juho Vepsäläinen’s Web architecture lens",
+      "source": "[8, 19] Teaching model · Adapted from Vepsäläinen",
+      "notes": "Model, not a network recording. This example uses POST/Redirect/GET; returning HTML directly is another valid native-form response. Point to topic=learning, then follow the same value through the server. Ask who rendered the results. Browser restoration of local fields can vary; do not claim every reload always clears every input. Compare with the actual generated form.\nReveal 1 of 4: Submit. Advance with Next; Previous revisits the preceding state.\nFull attribution: Explanatory model · [8, 19] Adapted for this lecture from Juho Vepsäläinen’s Web architecture lens",
       "next": "flow-native-2",
       "related": ["flow-html-4", "flow-json-4"]
     },
@@ -318,9 +402,9 @@ Versioned export of the Obsidian lecture at `Lectures/Web Development 2026/Prese
       "type": "material",
       "chapter": "Past",
       "title": "Native form submission · 2/4 Store",
-      "body": "```mermaid\nsequenceDiagram\n%% focus-after: 1,0\n participant B as Browser\n participant S as Server\n participant D as Stored votes\nB->>S: POST /vote · topic=learning\nS->>S: Validate input\nS->>D: Record vote\nD-->>S: Vote recorded\n```",
-      "source": "[R8, R19] Teaching model · Adapted from Vepsäläinen",
-      "notes": "Model, not a network recording. This example uses POST/Redirect/GET; returning HTML directly is another valid native-form response. Point to topic=learning, then follow the same value through the server. Ask who rendered the results. Browser restoration of local fields can vary; do not claim every reload always clears every input. Compare with the actual generated form.\nReveal 2 of 4: Store. Advance with Next; Previous revisits the preceding state.\nFull attribution: Explanatory model · [R8, R19] Adapted for this lecture from Juho Vepsäläinen’s Web architecture lens",
+      "body": "```mermaid\nsequenceDiagram\n%% focus-after: 1,0\n participant B as Browser\n participant S as Server\n participant D as Stored votes\nB->>S: POST /vote · topic=learning\nNote over S: Validate input\nS->>D: Record vote\nD-->>S: Vote recorded\n```",
+      "source": "[8, 19] Teaching model · Adapted from Vepsäläinen",
+      "notes": "Model, not a network recording. This example uses POST/Redirect/GET; returning HTML directly is another valid native-form response. Point to topic=learning, then follow the same value through the server. Ask who rendered the results. Browser restoration of local fields can vary; do not claim every reload always clears every input. Compare with the actual generated form.\nReveal 2 of 4: Store. Advance with Next; Previous revisits the preceding state.\nFull attribution: Explanatory model · [8, 19] Adapted for this lecture from Juho Vepsäläinen’s Web architecture lens",
       "next": "flow-native-3",
       "related": ["flow-html-4", "flow-json-4"]
     },
@@ -329,9 +413,9 @@ Versioned export of the Obsidian lecture at `Lectures/Web Development 2026/Prese
       "type": "material",
       "chapter": "Past",
       "title": "Native form submission · 3/4 Redirect",
-      "body": "```mermaid\nsequenceDiagram\n%% focus-after: 4,0\n participant B as Browser\n participant S as Server\n participant D as Stored votes\nB->>S: POST /vote · topic=learning\nS->>S: Validate input\nS->>D: Record vote\nD-->>S: Vote recorded\nS-->>B: 303 redirect to /results\n```",
-      "source": "[R8, R19] Teaching model · Adapted from Vepsäläinen",
-      "notes": "Model, not a network recording. This example uses POST/Redirect/GET; returning HTML directly is another valid native-form response. Point to topic=learning, then follow the same value through the server. Ask who rendered the results. Browser restoration of local fields can vary; do not claim every reload always clears every input. Compare with the actual generated form.\nReveal 3 of 4: Redirect. Advance with Next; Previous revisits the preceding state.\nFull attribution: Explanatory model · [R8, R19] Adapted for this lecture from Juho Vepsäläinen’s Web architecture lens",
+      "body": "```mermaid\nsequenceDiagram\n%% focus-after: 3,1\n participant B as Browser\n participant S as Server\n participant D as Stored votes\nB->>S: POST /vote · topic=learning\nNote over S: Validate input\nS->>D: Record vote\nD-->>S: Vote recorded\nS-->>B: 303 redirect to /results\n```",
+      "source": "[8, 19] Teaching model · Adapted from Vepsäläinen",
+      "notes": "Model, not a network recording. This example uses POST/Redirect/GET; returning HTML directly is another valid native-form response. Point to topic=learning, then follow the same value through the server. Ask who rendered the results. Browser restoration of local fields can vary; do not claim every reload always clears every input. Compare with the actual generated form.\nReveal 3 of 4: Redirect. Advance with Next; Previous revisits the preceding state.\nFull attribution: Explanatory model · [8, 19] Adapted for this lecture from Juho Vepsäläinen’s Web architecture lens",
       "next": "flow-native-4",
       "related": ["flow-html-4", "flow-json-4"]
     },
@@ -341,8 +425,8 @@ Versioned export of the Obsidian lecture at `Lectures/Web Development 2026/Prese
       "chapter": "Past",
       "title": "Native form submission · 4/4 Load results",
       "body": "```mermaid\nsequenceDiagram\n%% focus-after: 0,1\n participant B as Browser\n participant S as Server\n participant D as Stored votes\n Note over B: Follow the redirect\n B->>S: GET /results\n S->>D: Read aggregate\n D-->>S: Current aggregate\n S-->>B: Complete HTML\n Note over B: Replace the document\n```",
-      "source": "[R8, R19] Teaching model · Adapted from Vepsäläinen",
-      "notes": "Model, not a network recording. This example uses POST/Redirect/GET; returning HTML directly is another valid native-form response. Point to topic=learning, then follow the same value through the server. Ask who rendered the results. Browser restoration of local fields can vary; do not claim every reload always clears every input. Compare with the actual generated form.\nReveal 4 of 4: Load results. Advance with Next; Previous revisits the preceding state. This slide focuses on the GET after the redirect; submission and storage were shown in the preceding slides.\nFull attribution: Explanatory model · [R8, R19] Adapted for this lecture from Juho Vepsäläinen’s Web architecture lens",
+      "source": "[8, 19] Teaching model · Adapted from Vepsäläinen",
+      "notes": "Model, not a network recording. This example uses POST/Redirect/GET; returning HTML directly is another valid native-form response. Point to topic=learning, then follow the same value through the server. Ask who rendered the results. Browser restoration of local fields can vary; do not claim every reload always clears every input. Compare with the actual generated form.\nReveal 4 of 4: Load results. Advance with Next; Previous revisits the preceding state. This slide focuses on the GET after the redirect; submission and storage were shown in the preceding slides.\nFull attribution: Explanatory model · [8, 19] Adapted for this lecture from Juho Vepsäläinen’s Web architecture lens",
       "next": "step-8",
       "related": ["flow-html-4", "flow-json-4"]
     },
@@ -350,22 +434,22 @@ Versioned export of the Obsidian lecture at `Lectures/Web Development 2026/Prese
       "id": "step-8",
       "type": "material",
       "chapter": "Past",
-      "title": "Progressive enhancement",
-      "body": "```mermaid\nflowchart BT\n H[\"HTML + server: submit a vote and read results\"]\n C[\"CSS: make the form easier to scan\"]\n J[\"JavaScript: update results without navigation\"]\n H --> C\n C --> J\n```\n\nRemove JavaScript and CSS: the vote still works.",
-      "notes": "31–35 · While the form builds, explain progressive enhancement. Test native submission and keyboard access when ready. Semantic HTML alone is not proof of accessibility.\nSource keys resolve to the References slides at the end. Unquoted explanations are lecture paraphrases; diagrams are not archival reproductions.\nFull attribution: [R9] Original teaching diagram · Progressive enhancement",
-      "next": "step-9",
-      "related": ["detour-1-1"],
-      "source": "[R9] Progressive enhancement · Teaching diagram"
+      "title": "Progressive enhancement (2003)",
+      "body": "```onion\nHTML | Read the content and submit the form\nCSS | Make the same content easier to scan\nJavaScript | Update results without navigating\n```\n\nPeel away the outer layers: the core still works.\n\n[Original presentation: Champeon & Finck, SXSW 2003](https://web.archive.org/web/20210226200650/http://www.hesketh.com/publications/inclusive_web_design_for_the_future/)",
+      "notes": "Explain from the centre outward. HTML provides content and the native form; the server processes the submission. CSS enhances presentation. JavaScript enhances interaction. Remove either enhancement and the core task should remain available. This onion is an original teaching illustration, not a reproduction of the original presentation. The principle does not guarantee accessibility: still test labels, keyboard use, focus and feedback.\nOriginal source: Steven Champeon and Nick Finck, Inclusive Web Design for the Future, SXSW 2003. Original URL: http://www.hesketh.com/publications/inclusive_web_design_for_the_future/ . Archived link supplied because the original site is unavailable; archive retrieval could not be verified here. Attribution corroborated by Aaron Gustafson’s 2008 A List Apart article [9], which uses a Peanut M&M metaphor for nested HTML, CSS and JavaScript layers.",
+      "next": "check-native-form",
+      "related": [],
+      "source": "[28] Champeon & Finck, 2003 · Onion diagram: teaching adaptation"
     },
     {
-      "id": "step-9",
-      "type": "question",
+      "id": "check-native-form",
       "chapter": "Past",
-      "title": "The capability works. What would make the interaction better?",
-      "body": "Suggest one change—and explain who it would help.",
-      "notes": "35–38 · Invite one concrete improvement and carry it into the Present prompt.",
+      "title": "Check the build · A working native form",
+      "body": "- Choose an option and submit without JavaScript.\n- Check the returned result.\n- Change the choice: does it replace the previous vote?",
+      "notes": "The linked build preview appears automatically on this slide. Advance to return to the lecture. If no preview URL is available, the slide reports that it is not ready.\n\nChecks to narrate:\n- Choose an option and submit without JavaScript.\n- Check the returned result.\n- Change the choice: does it replace the previous vote?\nDemonstrate the form with JavaScript disabled in the demo browser: choose an option, submit, and inspect the server-rendered response. Restore JavaScript and reload before the Present section.",
+      "type": "material",
       "next": "step-10",
-      "related": ["detour-1-1"]
+      "previewOf": "build-forms"
     },
     {
       "id": "step-10",
@@ -373,10 +457,48 @@ Versioned export of the Obsidian lecture at `Lectures/Web Development 2026/Prese
       "chapter": "Present",
       "title": "Present",
       "body": "What happens after your click?",
-      "notes": "38–41 · Start the Present build. Show its prompt and explain what is preserved from the native form.\nSource keys resolve to the References slides at the end. Unquoted explanations are lecture paraphrases; diagrams are not archival reproductions.",
-      "next": "build-application",
+      "notes": "38–41 · Gather audience opinions before revealing the build prompt: collect suggestions, discuss the approved cloud, then freeze a priority vote. Only then advance to the resolved prompt and start the Present build.",
+      "next": "step-9",
       "related": ["rendering-location", "flow-html-4", "detour-2-1"],
-      "source": "Paraphrase · [R10] Jesse James Garrett (2005)"
+      "source": "Paraphrase · [10] Jesse James Garrett (2005)"
+    },
+    {
+      "id": "step-9",
+      "type": "question",
+      "chapter": "Present",
+      "title": "What would make our form easier to use?",
+      "body": "Name one improvement in 1–3 words.\n\n**Word cloud · 45 seconds**\n\nOn live.scalableweb.dev, open **Add words** and send one short response (up to 32 characters).\n\nWe’ll review the approved cloud and discuss two contrasting suggestions.",
+      "notes": "38–41 · Collect suggestions before showing the build prompt. Discuss two approved suggestions, then use the next priority vote to capture a concrete build requirement. The cloud itself is not automatically passed to the coding agent.\n\nModerated word cloud: while Live is on, open Responses, choose Word cloud, enter “What would make our form easier to use?”, and click Open new collection. Allow 45 seconds. Close collection, review submissions privately, approve relevant responses, then Show approved cloud. Read out two contrasting contributions and ask their authors to explain; frequency is not a vote or a measure of correctness. Use Back to slide before continuing. If collection is unavailable, take three spoken responses and discuss two. Never project unreviewed submissions.",
+      "next": "vote-interaction",
+      "related": ["step-8"]
+    },
+    {
+      "id": "vote-interaction",
+      "type": "poll",
+      "chapter": "Present",
+      "title": "Which interaction improvement should we prioritize?",
+      "body": "Choose one priority on live.scalableweb.dev.\n\nWe’ll close the vote, review the result, then reveal the build prompt with your choice included.",
+      "notes": "Allow 30 seconds after discussing the cloud. Close voting to freeze the result and show it. Explain how the winning priority relates to the suggestions, then advance to the build prompt. If voting is unavailable, explicitly accept the declared default before building.",
+      "room": "webdev-2026-interaction",
+      "poll": {
+        "question": "Which interaction improvement should we prioritize?",
+        "options": [
+          {
+            "id": "confirmation",
+            "label": "Clear submission feedback"
+          },
+          {
+            "id": "preserve",
+            "label": "Keep my unsent choice"
+          },
+          {
+            "id": "updates",
+            "label": "Keep shared results up to date"
+          }
+        ],
+        "defaultId": "confirmation"
+      },
+      "next": "build-application"
     },
     {
       "id": "build-application",
@@ -384,7 +506,7 @@ Versioned export of the Obsidian lecture at `Lectures/Web Development 2026/Prese
       "chapter": "Present",
       "title": "Build · Make the room interactive",
       "body": "Advance to Present. Enhance the same form and let the projected view receive aggregate changes. Preserve native submission. Verify in two browser contexts and stop before model composition.",
-      "notes": "Start explicitly, then continue discussing while the agent works. Inspect the app using Preview from Codex when ready.",
+      "notes": "After the audience priority vote is closed, show the resolved prompt and point out the requirement supplied by the frozen result. Start explicitly, then continue discussing while the agent works. Inspect the app using Preview from Codex when ready.",
       "uses": [
         {
           "poll": "vote-friction",
@@ -402,10 +524,60 @@ Versioned export of the Obsidian lecture at `Lectures/Web Development 2026/Prese
             "retro-web": "Use a readable retro-web theme with accessible contrast.",
             "playful": "Use a playful theme with readable typography and accessible controls."
           }
+        },
+        {
+          "poll": "vote-interaction",
+          "instructions": {
+            "confirmation": "Prioritize clear submission feedback: distinguish sending, confirmed success, and an unknown outcome after a connection failure. Do not report success without confirmation.",
+            "preserve": "Prioritize preserving the user's unsent choice while aggregate results refresh. Verify this with two browser contexts.",
+            "updates": "Prioritize keeping the projected aggregate up to date after another browser submits. Make a disconnected or stale view apparent."
+          }
         }
       ],
-      "next": "flow-html",
+      "next": "rendering-location",
       "related": ["flow-html-4", "detour-2-1"]
+    },
+    {
+      "id": "rendering-location",
+      "type": "material",
+      "title": "Initial rendering: server or browser",
+      "body": "```mermaid\nflowchart LR\n subgraph SSR[SSR]\n S[Server renders HTML] --> B[Browser displays HTML]\n end\n subgraph CSR[CSR]\n J[Shell and JavaScript] --> C[Browser fetches data and renders]\n end\n```",
+      "source": "[19] Lecture adaptation · Web architecture lens",
+      "notes": "Introduce initial rendering before the AJAX sequences. SSR means server-side rendering; CSR means client-side rendering. This choice is separate from how later interactions work: SSR can initialize an SPA, and an HTML-first page can use AJAX. Compare the two paths, then explain caching.",
+      "related": ["rendering-cached", "activation-detour"],
+      "chapter": "Present",
+      "next": "rendering-cached"
+    },
+    {
+      "id": "rendering-cached",
+      "type": "material",
+      "title": "Cached HTML and regeneration",
+      "body": "```mermaid\nflowchart LR\n R[Request] --> C[Cached HTML]\n C --> B[Browser]\n C -. Policy triggers regeneration .-> S[Server renders newer HTML]\n S --> C\n```",
+      "source": "[19] Lecture adaptation · Web architecture lens",
+      "notes": "ISR is a framework/platform regeneration strategy, not a universal HTTP mode. Some policies serve stale content while regenerating; others differ. The public seminar description can tolerate different freshness from a vote confirmation. Do not imply a vote POST can be safely cached as a read.",
+      "related": ["rendering-location"],
+      "chapter": "Present",
+      "next": "activation-detour"
+    },
+    {
+      "id": "activation-detour",
+      "type": "material",
+      "title": "Visible HTML is not the same as initialized JavaScript",
+      "body": "Native links and forms can work before JavaScript initializes.\n\nFor a JavaScript-dependent control, the HTML may be visible before the control responds.\n\nIn our app, identify which controls still work while scripts load.",
+      "source": "[20] Vepsäläinen · Client activation teaching model",
+      "notes": "Connect initial rendering to the form already tested. Explain that hydration attaches application behavior to existing HTML. Islands initialize selected regions; resumability aims to resume serialized state without replaying all initialization. Keep the focus on whether the user can complete the task. The linked source is for further exploration; opening another demo is not required.\nFull attribution: [20] Juho Vepsäläinen · Client activation lens · Teaching model",
+      "chapter": "Present",
+      "next": "detour-2-1"
+    },
+    {
+      "id": "detour-2-1",
+      "type": "material",
+      "title": "Update the page after a response",
+      "body": "```mermaid\nsequenceDiagram\n Browser->>Server: Request data\n Server-->>Browser: Data or fragment\n Note over Browser: Update current view\n```",
+      "notes": "Which interaction is worth the extra state management? Give frameworks credit for the problems they solve.\nSource keys resolve to the References slides at the end. Unquoted explanations are lecture paraphrases; diagrams are not archival reproductions.\nFull attribution: Original explanatory diagram · [10] Jesse James Garrett (2005)",
+      "source": "[10] Garrett, 2005 · Teaching diagram",
+      "chapter": "Present",
+      "next": "flow-html"
     },
     {
       "id": "flow-html",
@@ -413,8 +585,8 @@ Versioned export of the Obsidian lecture at `Lectures/Web Development 2026/Prese
       "chapter": "Present",
       "title": "AJAX: HTML response · 1/4 Request",
       "body": "```mermaid\nsequenceDiagram\n%% focus-after: 0,0\n participant B as Browser\n participant S as Server\n participant D as Stored votes\nNote over B: JavaScript handles submit\nB->>S: POST /vote · topic=learning\n```",
-      "source": "[R8, R19] Teaching model · Adapted from Vepsäläinen",
-      "notes": "The request happens without document navigation. The server still renders the result. AJAX does not require JSON. This is an alternative to compare, not a second required implementation. Preserve a native form path. Show the actual Network response when the build is ready.\nReveal 1 of 4: Request. Advance with Next; Previous revisits the preceding state.\nFull attribution: Explanatory model · [R8, R19] Adapted for this lecture from Juho Vepsäläinen’s Web architecture lens",
+      "source": "[8, 19] Teaching model · Adapted from Vepsäläinen",
+      "notes": "The request happens without document navigation. The server still renders the result. AJAX does not require JSON. This is an alternative to compare, not a second required implementation. Preserve a native form path. Show the actual Network response when the build is ready.\nReveal 1 of 4: Request. Advance with Next; Previous revisits the preceding state.\nFull attribution: Explanatory model · [8, 19] Adapted for this lecture from Juho Vepsäläinen’s Web architecture lens",
       "next": "flow-html-2",
       "related": ["flow-native-4", "rendering-location"]
     },
@@ -424,8 +596,8 @@ Versioned export of the Obsidian lecture at `Lectures/Web Development 2026/Prese
       "chapter": "Present",
       "title": "AJAX: HTML response · 2/4 Store",
       "body": "```mermaid\nsequenceDiagram\n%% focus-after: 1,1\n participant B as Browser\n participant S as Server\n participant D as Stored votes\nNote over B: JavaScript handles submit\nB->>S: POST /vote · topic=learning\nS->>S: Validate input\nS->>D: Record vote\nD-->>S: Updated aggregate\n```",
-      "source": "[R8, R19] Teaching model · Adapted from Vepsäläinen",
-      "notes": "The request happens without document navigation. The server still renders the result. AJAX does not require JSON. This is an alternative to compare, not a second required implementation. Preserve a native form path. Show the actual Network response when the build is ready.\nReveal 2 of 4: Store. Advance with Next; Previous revisits the preceding state.\nFull attribution: Explanatory model · [R8, R19] Adapted for this lecture from Juho Vepsäläinen’s Web architecture lens",
+      "source": "[8, 19] Teaching model · Adapted from Vepsäläinen",
+      "notes": "The request happens without document navigation. The server still renders the result. AJAX does not require JSON. This is an alternative to compare, not a second required implementation. Preserve a native form path. Show the actual Network response when the build is ready.\nReveal 2 of 4: Store. Advance with Next; Previous revisits the preceding state.\nFull attribution: Explanatory model · [8, 19] Adapted for this lecture from Juho Vepsäläinen’s Web architecture lens",
       "next": "flow-html-3",
       "related": ["flow-native-4", "rendering-location"]
     },
@@ -435,8 +607,8 @@ Versioned export of the Obsidian lecture at `Lectures/Web Development 2026/Prese
       "chapter": "Present",
       "title": "AJAX: HTML response · 3/4 Respond",
       "body": "```mermaid\nsequenceDiagram\n%% focus-after: 4,1\n participant B as Browser\n participant S as Server\n participant D as Stored votes\nNote over B: JavaScript handles submit\nB->>S: POST /vote · topic=learning\nS->>S: Validate input\nS->>D: Record vote\nD-->>S: Updated aggregate\nS-->>B: HTML results fragment\n```",
-      "source": "[R8, R19] Teaching model · Adapted from Vepsäläinen",
-      "notes": "The request happens without document navigation. The server still renders the result. AJAX does not require JSON. This is an alternative to compare, not a second required implementation. Preserve a native form path. Show the actual Network response when the build is ready.\nReveal 3 of 4: Respond. Advance with Next; Previous revisits the preceding state.\nFull attribution: Explanatory model · [R8, R19] Adapted for this lecture from Juho Vepsäläinen’s Web architecture lens",
+      "source": "[8, 19] Teaching model · Adapted from Vepsäläinen",
+      "notes": "The request happens without document navigation. The server still renders the result. AJAX does not require JSON. This is an alternative to compare, not a second required implementation. Preserve a native form path. Show the actual Network response when the build is ready.\nReveal 3 of 4: Respond. Advance with Next; Previous revisits the preceding state.\nFull attribution: Explanatory model · [8, 19] Adapted for this lecture from Juho Vepsäläinen’s Web architecture lens",
       "next": "flow-html-4",
       "related": ["flow-native-4", "rendering-location"]
     },
@@ -446,8 +618,8 @@ Versioned export of the Obsidian lecture at `Lectures/Web Development 2026/Prese
       "chapter": "Present",
       "title": "AJAX: HTML response · 4/4 Update",
       "body": "```mermaid\nsequenceDiagram\n%% focus-after: 5,1\n participant B as Browser\n participant S as Server\n participant D as Stored votes\nNote over B: JavaScript handles submit\nB->>S: POST /vote · topic=learning\nS->>S: Validate input\nS->>D: Record vote\nD-->>S: Updated aggregate\nS-->>B: HTML results fragment\nNote over B: JavaScript swaps the results region\n```",
-      "source": "[R8, R19] Teaching model · Adapted from Vepsäläinen",
-      "notes": "The request happens without document navigation. The server still renders the result. AJAX does not require JSON. This is an alternative to compare, not a second required implementation. Preserve a native form path. Show the actual Network response when the build is ready.\nReveal 4 of 4: Update. Advance with Next; Previous revisits the preceding state.\nFull attribution: Explanatory model · [R8, R19] Adapted for this lecture from Juho Vepsäläinen’s Web architecture lens",
+      "source": "[8, 19] Teaching model · Adapted from Vepsäläinen",
+      "notes": "The request happens without document navigation. The server still renders the result. AJAX does not require JSON. This is an alternative to compare, not a second required implementation. Preserve a native form path. Show the actual Network response when the build is ready.\nReveal 4 of 4: Update. Advance with Next; Previous revisits the preceding state.\nFull attribution: Explanatory model · [8, 19] Adapted for this lecture from Juho Vepsäläinen’s Web architecture lens",
       "next": "flow-json",
       "related": ["flow-native-4", "rendering-location"]
     },
@@ -457,8 +629,8 @@ Versioned export of the Obsidian lecture at `Lectures/Web Development 2026/Prese
       "chapter": "Present",
       "title": "AJAX: JSON response · 1/4 Request",
       "body": "```mermaid\nsequenceDiagram\n%% focus-after: 0,0\n participant B as Browser\n participant S as Server\n participant D as Stored votes\nNote over B: JavaScript handles submit\nB->>S: POST /vote · topic=learning\n```",
-      "source": "[R8, R19] Teaching model · Adapted from Vepsäläinen",
-      "notes": "The server owns authoritative votes; the browser owns this rendering step. A small fetch handler can do this without SPA routing or a framework. If our demo uses HTML fragments, treat JSON as the comparison instead. These diagrams are teaching models, not promises about exact generated routes.\nReveal 1 of 4: Request. Advance with Next; Previous revisits the preceding state.\nFull attribution: Explanatory model · [R8, R19] Adapted for this lecture from Juho Vepsäläinen’s Web architecture lens",
+      "source": "[8, 19] Teaching model · Adapted from Vepsäläinen",
+      "notes": "The server owns authoritative votes; the browser owns this rendering step. A small fetch handler can do this without SPA routing or a framework. If our demo uses HTML fragments, treat JSON as the comparison instead. These diagrams are teaching models, not promises about exact generated routes.\nReveal 1 of 4: Request. Advance with Next; Previous revisits the preceding state.\nFull attribution: Explanatory model · [8, 19] Adapted for this lecture from Juho Vepsäläinen’s Web architecture lens",
       "next": "flow-json-2",
       "related": ["flow-native-4", "flow-html-4", "rendering-location"]
     },
@@ -468,8 +640,8 @@ Versioned export of the Obsidian lecture at `Lectures/Web Development 2026/Prese
       "chapter": "Present",
       "title": "AJAX: JSON response · 2/4 Store",
       "body": "```mermaid\nsequenceDiagram\n%% focus-after: 1,1\n participant B as Browser\n participant S as Server\n participant D as Stored votes\nNote over B: JavaScript handles submit\nB->>S: POST /vote · topic=learning\nS->>S: Validate input\nS->>D: Record vote\nD-->>S: Updated aggregate\n```",
-      "source": "[R8, R19] Teaching model · Adapted from Vepsäläinen",
-      "notes": "The server owns authoritative votes; the browser owns this rendering step. A small fetch handler can do this without SPA routing or a framework. If our demo uses HTML fragments, treat JSON as the comparison instead. These diagrams are teaching models, not promises about exact generated routes.\nReveal 2 of 4: Store. Advance with Next; Previous revisits the preceding state.\nFull attribution: Explanatory model · [R8, R19] Adapted for this lecture from Juho Vepsäläinen’s Web architecture lens",
+      "source": "[8, 19] Teaching model · Adapted from Vepsäläinen",
+      "notes": "The server owns authoritative votes; the browser owns this rendering step. A small fetch handler can do this without SPA routing or a framework. If our demo uses HTML fragments, treat JSON as the comparison instead. These diagrams are teaching models, not promises about exact generated routes.\nReveal 2 of 4: Store. Advance with Next; Previous revisits the preceding state.\nFull attribution: Explanatory model · [8, 19] Adapted for this lecture from Juho Vepsäläinen’s Web architecture lens",
       "next": "flow-json-3",
       "related": ["flow-native-4", "flow-html-4", "rendering-location"]
     },
@@ -479,8 +651,8 @@ Versioned export of the Obsidian lecture at `Lectures/Web Development 2026/Prese
       "chapter": "Present",
       "title": "AJAX: JSON response · 3/4 Respond",
       "body": "```mermaid\nsequenceDiagram\n%% focus-after: 4,1\n participant B as Browser\n participant S as Server\n participant D as Stored votes\nNote over B: JavaScript handles submit\nB->>S: POST /vote · topic=learning\nS->>S: Validate input\nS->>D: Record vote\nD-->>S: Updated aggregate\nS-->>B: JSON aggregate\n```",
-      "source": "[R8, R19] Teaching model · Adapted from Vepsäläinen",
-      "notes": "The server owns authoritative votes; the browser owns this rendering step. A small fetch handler can do this without SPA routing or a framework. If our demo uses HTML fragments, treat JSON as the comparison instead. These diagrams are teaching models, not promises about exact generated routes.\nReveal 3 of 4: Respond. Advance with Next; Previous revisits the preceding state.\nFull attribution: Explanatory model · [R8, R19] Adapted for this lecture from Juho Vepsäläinen’s Web architecture lens",
+      "source": "[8, 19] Teaching model · Adapted from Vepsäläinen",
+      "notes": "The server owns authoritative votes; the browser owns this rendering step. A small fetch handler can do this without SPA routing or a framework. If our demo uses HTML fragments, treat JSON as the comparison instead. These diagrams are teaching models, not promises about exact generated routes.\nReveal 3 of 4: Respond. Advance with Next; Previous revisits the preceding state.\nFull attribution: Explanatory model · [8, 19] Adapted for this lecture from Juho Vepsäläinen’s Web architecture lens",
       "next": "flow-json-4",
       "related": ["flow-native-4", "flow-html-4", "rendering-location"]
     },
@@ -490,8 +662,8 @@ Versioned export of the Obsidian lecture at `Lectures/Web Development 2026/Prese
       "chapter": "Present",
       "title": "AJAX: JSON response · 4/4 Update",
       "body": "```mermaid\nsequenceDiagram\n%% focus-after: 5,1\n participant B as Browser\n participant S as Server\n participant D as Stored votes\nNote over B: JavaScript handles submit\nB->>S: POST /vote · topic=learning\nS->>S: Validate input\nS->>D: Record vote\nD-->>S: Updated aggregate\nS-->>B: JSON aggregate\nNote over B: JavaScript renders the results region\n```",
-      "source": "[R8, R19] Teaching model · Adapted from Vepsäläinen",
-      "notes": "The server owns authoritative votes; the browser owns this rendering step. A small fetch handler can do this without SPA routing or a framework. If our demo uses HTML fragments, treat JSON as the comparison instead. These diagrams are teaching models, not promises about exact generated routes.\nReveal 4 of 4: Update. Advance with Next; Previous revisits the preceding state.\nFull attribution: Explanatory model · [R8, R19] Adapted for this lecture from Juho Vepsäläinen’s Web architecture lens",
+      "source": "[8, 19] Teaching model · Adapted from Vepsäläinen",
+      "notes": "The server owns authoritative votes; the browser owns this rendering step. A small fetch handler can do this without SPA routing or a framework. If our demo uses HTML fragments, treat JSON as the comparison instead. These diagrams are teaching models, not promises about exact generated routes.\nReveal 4 of 4: Update. Advance with Next; Previous revisits the preceding state.\nFull attribution: Explanatory model · [8, 19] Adapted for this lecture from Juho Vepsäläinen’s Web architecture lens",
       "next": "step-11",
       "related": ["flow-native-4", "flow-html-4", "rendering-location"]
     },
@@ -502,29 +674,59 @@ Versioned export of the Obsidian lecture at `Lectures/Web Development 2026/Prese
       "title": "Vote here. Watch the other screen.",
       "body": "Make a choice. Watch how the shared view responds.",
       "notes": "41–49 · Open two real views. Submit one predefined choice and watch the aggregate. The second view needs its own update mechanism: inspect whether this app polls, uses server-sent events or WebSockets. Do not suggest that updating one browser automatically updates another.",
-      "next": "step-12",
+      "next": "flow-shared",
       "related": ["flow-shared", "flow-html-4", "detour-2-1"]
+    },
+    {
+      "id": "flow-shared",
+      "type": "material",
+      "title": "Updating a second browser",
+      "body": "```mermaid\nsequenceDiagram\n participant A as Browser A\n participant S as Server\n participant D as Stored votes\n participant B as Browser B\n A->>S: Submit vote\n S->>D: Record vote\n S-->>A: Updated result\n B->>S: Request current aggregate\n S->>D: Read votes\n S-->>B: Current aggregate\n Note over B: Render updated result\n```",
+      "source": "[8, 19] Teaching model · Adapted from Vepsäläinen",
+      "notes": "Polling example only. Server-sent events or WebSockets can deliver updates differently. Match the explanation to the implementation; no need to teach all three transports. Stored state stays on the server, not in either browser’s display.\nFull attribution: Explanatory model · [8, 19] Adapted for this lecture from Juho Vepsäläinen’s Web architecture lens",
+      "chapter": "Present",
+      "next": "step-12"
     },
     {
       "id": "step-12",
       "type": "question",
       "chapter": "Present",
-      "title": "Disconnect the browser. What can it honestly tell us?",
-      "body": "Was the vote recorded—or is the outcome unknown?",
+      "title": "Disconnect the browser. What can it tell us?",
+      "body": "**Observe → decide → explain**\n\nWe’ll disconnect the demo browser and submit a vote.\n\nChoose: **recorded**, **not recorded**, or **unknown**. Point to the evidence on screen.\n\nThen we’ll reconnect and check the server’s state.",
       "notes": "49–54 · Use the rehearsal app, not an unrelated production service. Browser DevTools offline mode affects that browser, not the whole server. Distinguish failure before send from a response lost after the server wrote the vote. Do not blindly retry an uncertain write: duplicate handling is an implementation concern. If offline reproduction is unreliable, discuss the failure diagram as a model. Compare native and enhanced feedback.",
-      "next": "step-13",
+      "next": "flow-failure",
       "related": ["flow-failure", "flow-html-4", "detour-2-1"]
+    },
+    {
+      "id": "flow-failure",
+      "type": "material",
+      "title": "Lost response after a recorded vote",
+      "body": "```mermaid\nsequenceDiagram\n participant B as Browser\n participant S as Server\n participant D as Stored votes\n B->>S: POST /vote\n S->>D: Record vote\n S--xB: Response lost\n Note over B: Outcome unknown\n Note over S,D: Vote may already be stored\n```",
+      "source": "Lost-response scenario · Teaching model",
+      "notes": "Ask students what the UI should say. Separate pending, confirmed and unknown. Inspect how the actual demo handles repeated submissions; do not claim exactly-once delivery.\nFull attribution: Original failure scenario · Explanatory model, not an observed demo outcome",
+      "chapter": "Present",
+      "next": "check-interactive-app"
+    },
+    {
+      "id": "check-interactive-app",
+      "chapter": "Present",
+      "title": "Check the build · Two views, one result",
+      "body": "- Submit in one view; watch the other update.\n- Keep an unsent choice while results refresh.\n- After a connection failure, check what was saved.",
+      "notes": "The linked build preview appears automatically on this slide. Advance to return to the lecture. If no preview URL is available, the slide reports that it is not ready.\n\nChecks to narrate:\n- Submit in one view; watch the other update.\n- Keep an unsent choice while results refresh.\n- After a connection failure, check what was saved.",
+      "type": "material",
+      "next": "step-13",
+      "previewOf": "build-application"
     },
     {
       "id": "step-13",
       "type": "question",
       "chapter": "Present",
       "title": "A person can use this. What would another client need to understand it?",
-      "body": "Think about the available actions, required input, and resulting state.",
-      "notes": "54–58 · Inspect the form or shared contract. Distinguish explicit actions from behavior that must be inferred.\nSource keys resolve to the References slides at the end. Unquoted explanations are lecture paraphrases; diagrams are not archival reproductions.\nFull attribution: Discussion informed by · [R12] Petros, Gross, Shaffer and Revelle (2025)",
+      "body": "**Inspect in pairs · 60 seconds**\n\nPick one action in our app. Identify its required input and how a client can tell it succeeded.\n\nReport one detail that is explicit—and one the client would have to guess.",
+      "notes": "54–58 · Inspect the form or shared contract. Distinguish explicit actions from behavior that must be inferred.\nSource keys resolve to the References slides at the end. Unquoted explanations are lecture paraphrases; diagrams are not archival reproductions.\nFull attribution: Discussion informed by · [12] Petros, Gross, Shaffer and Revelle (2025)",
       "next": "step-14",
       "related": ["flow-native-4", "flow-html-4", "flow-json-4", "detour-2-1"],
-      "source": "[R12] Petros et al., 2025 · Discussion"
+      "source": "[12] Petros et al., 2025 · Discussion"
     },
     {
       "id": "step-14",
@@ -532,19 +734,19 @@ Versioned export of the Obsidian lecture at `Lectures/Web Development 2026/Prese
       "chapter": "Future",
       "title": "Future",
       "body": "What should we be able to delegate?",
-      "notes": "58–62 · Start constrained Future composition when inputs are ready. Explain that the agent building this app and an agent using it are different roles.\nSource keys resolve to the References slides at the end. Unquoted explanations are lecture paraphrases; diagrams are not archival reproductions.\nFull attribution: Hypothesis · [R13] Approved, unpublished position paper (2026)",
+      "notes": "58–62 · Start constrained Future composition when inputs are ready. Explain that the agent building this app and an agent using it are different roles.\nSource keys resolve to the References slides at the end. Unquoted explanations are lecture paraphrases; diagrams are not archival reproductions.\nFull attribution: Hypothesis · [13] Approved, unpublished position paper (2026)",
       "next": "future-visions",
       "related": ["detour-3-0", "detour-3-1"],
-      "source": "[R13] Lecture hypothesis · Unpublished paper, 2026"
+      "source": "[13] Lecture hypothesis · Unpublished paper, 2026"
     },
     {
       "id": "future-visions",
       "type": "question",
       "chapter": "Future",
-      "title": "Which early ambition is still unfinished?",
-      "body": "Find knowledge. Follow connections. Work through a problem.\n\nWhat would you now ask a software agent to do?",
-      "source": "Lecture synthesis · [R1–R5]",
-      "notes": "58–60 · Briefly recall Otlet, Bush, Nelson and Engelbart; use related images rather than repeat the biographies. Hear one task from the room. Keep the distinction between assistance and replacement.",
+      "title": "What task would you give a software agent?",
+      "body": "Name one task in 1–3 words: compare sources, trace decisions…\n\n**Word cloud · 45 seconds**\n\nOn live.scalableweb.dev, open **Add words** and send one short response (up to 32 characters).\n\nWe’ll review the approved cloud and discuss two contrasting suggestions.",
+      "source": "Lecture synthesis · [1–5]",
+      "notes": "58–60 · Briefly recall Otlet, Bush, Nelson and Engelbart; use related images rather than repeat the biographies. Hear one task from the room. Keep the distinction between assistance and replacement.\n\nModerated word cloud: while Live is on, open Responses, choose Word cloud, enter “What task would you give a software agent?”, and click Open new collection. Allow 45 seconds. Close collection, review submissions privately, approve relevant responses, then Show approved cloud. Read out two contrasting contributions and ask their authors to explain; frequency is not a vote or a measure of correctness. Use Back to slide before continuing. If collection is unavailable, take three spoken responses and discuss two. Never project unreviewed submissions.",
       "related": ["vision-bush", "vision-nelson", "vision-engelbart"],
       "next": "semantic-web-agents"
     },
@@ -554,8 +756,8 @@ Versioned export of the Obsidian lecture at `Lectures/Web Development 2026/Prese
       "chapter": "Future",
       "title": "Semantic Web agents (2001)",
       "body": "```mermaid\nflowchart LR\n Need[Arrange appointments] --> Agent[Software agent]\n Providers[Providers and availability] --> Agent\n Constraints[Preferences and schedules] --> Agent\n Agent --> Plan[Proposed plan]\n```",
-      "source": "[R21] Berners-Lee, Hendler & Lassila, 2001 · Teaching diagram",
-      "notes": "60–62 · The article’s fictional scenario coordinates care appointments, provider constraints and family schedules. It illustrates a proposed future, not a deployed system. Explicit data meanings and inference rules were central. Do not equate this with modern language models or claim the Semantic Web disappeared. The practical question remains: how can services communicate meaning well enough for useful delegation?\nFull attribution: [R21] Berners-Lee, Hendler & Lassila · The Semantic Web (2001) · Paraphrase and original diagram",
+      "source": "[21] Berners-Lee, Hendler & Lassila, 2001 · Teaching diagram",
+      "notes": "60–62 · The article’s fictional scenario coordinates care appointments, provider constraints and family schedules. It illustrates a proposed future, not a deployed system. Explicit data meanings and inference rules were central. Do not equate this with modern language models or claim the Semantic Web disappeared. The practical question remains: how can services communicate meaning well enough for useful delegation?\nFull attribution: [21] Berners-Lee, Hendler & Lassila · The Semantic Web (2001) · Paraphrase and original diagram",
       "next": "vote-priority"
     },
     {
@@ -620,8 +822,39 @@ Versioned export of the Obsidian lecture at `Lectures/Web Development 2026/Prese
           }
         }
       ],
-      "next": "meaning-and-action",
+      "next": "detour-3-0",
       "related": ["detour-3-0", "detour-3-1"]
+    },
+    {
+      "id": "detour-3-0",
+      "type": "material",
+      "title": "Two ways agents could use a service",
+      "body": "Existing applications may expose clearer actions to agents. Some services may instead let consumer agents construct an interface for the task.",
+      "notes": "Which application needs a stable interface? These directions can coexist; neither is an established outcome.\nSource keys resolve to the References slides at the end. Unquoted explanations are lecture paraphrases; diagrams are not archival reproductions.\nFull attribution: Hypothesis · [13] Approved, unpublished position paper (2026)",
+      "source": "[13] Lecture hypothesis · Unpublished paper, 2026",
+      "chapter": "Future",
+      "next": "detour-3-1"
+    },
+    {
+      "id": "detour-3-1",
+      "type": "material",
+      "title": "Provider-designed and agent-composed interfaces",
+      "body": "```mermaid\nflowchart LR\n C[Shared capability] --> P[Provider-designed interface]\n C --> A[Agent-composed interface]\n P --> H[Human use]\n A --> H\n```",
+      "notes": "Which application needs a stable interface? These directions can coexist; neither is an established outcome.\nSource keys resolve to the References slides at the end. Unquoted explanations are lecture paraphrases; diagrams are not archival reproductions.\nFull attribution: Original diagram of a hypothesis · [13] Approved, unpublished position paper (2026)",
+      "source": "[13] Lecture hypothesis · Unpublished paper, 2026",
+      "chapter": "Future",
+      "next": "step-15"
+    },
+    {
+      "id": "step-15",
+      "type": "question",
+      "title": "Which applications need a stable interface, and which could use a generated one?",
+      "body": "**Compare in pairs · 2 minutes**\n\nChoose one application that needs a stable interface and one that could use a generated view.\n\nAgree on one reason for each. We’ll compare two pairs’ examples.",
+      "notes": "62–70 · Give pairs two minutes, then discuss examples while the build runs. Use the two-directions diagram. This is a position, not a proven forecast.\nSource keys resolve to the References slides at the end. Unquoted explanations are lecture paraphrases; diagrams are not archival reproductions.\nFull attribution: Hypothesis · [13] Approved, unpublished position paper (2026)",
+      "related": ["detour-3-0", "detour-3-1"],
+      "source": "[13] Lecture hypothesis · Unpublished paper, 2026",
+      "chapter": "Future",
+      "next": "meaning-and-action"
     },
     {
       "id": "meaning-and-action",
@@ -629,7 +862,7 @@ Versioned export of the Obsidian lecture at `Lectures/Web Development 2026/Prese
       "chapter": "Future",
       "title": "Discovering available actions",
       "body": "| Question | In our seminar app |\n|---|---|\n| What is this? | Seminar information and its source |\n| What can I do? | Choose a priority; request a view |\n| What input is valid? | The predefined choices |\n| What happened? | A result, rejection or unknown outcome |",
-      "source": "Lecture synthesis · [R8, R12, R13, R21]",
+      "source": "Lecture synthesis · [8, 12, 13, 21]",
       "notes": "65–69 · Inspect actual controls and responses. Semantic Web work also considered services and actions; this is not a claim that it only described nouns. The distinction helps explain behavioral affordances. Can the client discover the next action, or must it guess?",
       "next": "accessibility-parallels"
     },
@@ -639,56 +872,124 @@ Versioned export of the Obsidian lecture at `Lectures/Web Development 2026/Prese
       "chapter": "Future",
       "title": "Human accessibility and agent interaction",
       "body": "| Shared design | Human accessibility | Agent use |\n|---|---|---|\n| Named controls | Identify purpose | Identify action |\n| Explicit inputs | Understand choices | Construct valid input |\n| Exposed state | Perceive feedback | Check the outcome |\n| Stable structure | Navigate consistently | Locate relevant controls |",
-      "source": "[R22, R23] WAI guidance · [R12, R13] Agent hypothesis",
-      "notes": "69–72 · Human accessibility is the goal in its own right, not a proxy for machine convenience. Assistive technology mediates human use; an autonomous agent is not a screen-reader user. Agent benefit depends on whether it reads the DOM, accessibility tree, pixels or a separate contract. Accessible names are not guaranteed agent success; native HTML still requires testing for keyboard, focus, contrast and understandable feedback. Explicit constraints need server validation. Do not give every static message an ARIA live region.\nFull attribution: Human guidance: [R22, R23] · Agent parallels: lecture hypothesis [R12, R13]",
-      "next": "step-16",
+      "source": "[22, 23] WAI guidance · [12, 13] Agent hypothesis",
+      "notes": "69–72 · Human accessibility is the goal in its own right, not a proxy for machine convenience. Assistive technology mediates human use; an autonomous agent is not a screen-reader user. Agent benefit depends on whether it reads the DOM, accessibility tree, pixels or a separate contract. Accessible names are not guaranteed agent success; native HTML still requires testing for keyboard, focus, contrast and understandable feedback. Explicit constraints need server validation. Do not give every static message an ARIA live region.\nFull attribution: Human guidance: [22, 23] · Agent parallels: lecture hypothesis [12, 13]",
+      "next": "accessibility-boundaries",
       "related": ["accessibility-boundaries"]
     },
     {
+      "id": "accessibility-boundaries",
+      "type": "material",
+      "title": "Accessible to people does not mean authorized for agents",
+      "body": "A clear action can still require permission.\n\nA machine-readable interface can still exclude people.",
+      "source": "Lecture distinction · [11–13, 22, 23]",
+      "notes": "After the accessibility parallels, separate usability from authority. Human accessibility includes perception, operation and understanding. Agent access also requires authorization, scope and verification. Compare a well-labeled destructive button with whether an agent should invoke it.",
+      "chapter": "Future",
+      "next": "step-16"
+    },
+    {
       "id": "step-16",
-      "type": "question",
+      "type": "material",
       "chapter": "Future",
       "title": "Explicit affordances in HTML",
       "body": "Make actions, inputs and outcomes explicit.",
-      "notes": "72–77 · The human-facing HTML page or application can also expose enough information for machines to act. People often infer how an interface works from visual conventions and context. Machines, especially when limited to screenshots, may have to guess. Explicit affordances can reduce that guesswork without requiring a separate interface. This is the lecture’s design argument, not a guarantee of agent reliability. Programmatically available information can help assistive technologies and agents, but their requirements are not identical. Inspect the actual controls, inputs and result feedback in our app. Distinguish an agent using this interface from one composing another view. Use the stable-versus-generated question as an optional detour.\nFull attribution: Hypothesis · [R13] Approved, unpublished position paper (2026)",
-      "next": "step-17",
+      "notes": "72–77 · The human-facing HTML page or application can also expose enough information for machines to act. People often infer how an interface works from visual conventions and context. Machines, especially when limited to screenshots, may have to guess. Explicit affordances can reduce that guesswork without requiring a separate interface. This is the lecture’s design argument, not a guarantee of agent reliability. Programmatically available information can help assistive technologies and agents, but their requirements are not identical. Inspect the actual controls, inputs and result feedback in our app. Distinguish an agent using this interface from one composing another view. Connect this inspection to the earlier stable-versus-generated discussion.\nFull attribution: Hypothesis · [13] Approved, unpublished position paper (2026)",
+      "next": "detour-5-0",
       "related": [
         "step-15",
         "accessibility-boundaries",
         "detour-3-0",
         "detour-3-1"
       ],
-      "source": "[R13] Lecture hypothesis · Unpublished paper, 2026"
+      "source": "[13] Lecture hypothesis · Unpublished paper, 2026"
+    },
+    {
+      "id": "detour-5-0",
+      "type": "material",
+      "title": "Describe an action once",
+      "body": "For our voting service: name the action, list valid choices, and describe the result.\n\nA shared description could support the human interface, assistive tools, and agent clients.",
+      "notes": "Ask for a counterexample. Shared semantics do not guarantee accessibility or better agent performance.\nSource keys resolve to the References slides at the end. Unquoted explanations are lecture paraphrases; diagrams are not archival reproductions.\nFull attribution: Hypothesis · [13] Approved, unpublished position paper (2026)",
+      "source": "[13] Lecture hypothesis · Unpublished paper, 2026",
+      "chapter": "Future",
+      "next": "detour-5-1"
+    },
+    {
+      "id": "detour-5-1",
+      "type": "material",
+      "title": "Different clients, shared actions and constraints",
+      "body": "```mermaid\nflowchart TB\n C[Shared capability and constraints] --> H[Human interface]\n C --> T[Assistive tools]\n C --> A[Agent interaction]\n```",
+      "notes": "Ask for a counterexample. Shared semantics do not guarantee accessibility or better agent performance.\nSource keys resolve to the References slides at the end. Unquoted explanations are lecture paraphrases; diagrams are not archival reproductions.\nFull attribution: Original diagram of a hypothesis · [13] Approved, unpublished position paper (2026)",
+      "source": "[13] Lecture hypothesis · Unpublished paper, 2026",
+      "chapter": "Future",
+      "next": "detour-4-0"
+    },
+    {
+      "id": "detour-4-0",
+      "type": "material",
+      "title": "What a context receipt records",
+      "body": "For a generated seminar view, record:\n\n- Which source material and audience result were used\n- Where that information was sent\n- What output or action followed",
+      "notes": "What useful personal information would you refuse to send? This receipt is a proposed design pattern, not a standard.\nSource keys resolve to the References slides at the end. Unquoted explanations are lecture paraphrases; diagrams are not archival reproductions.\nFull attribution: Lecture design proposal · Context receipt is not an established standard",
+      "source": "Context receipt · Lecture proposal",
+      "chapter": "Future",
+      "next": "detour-4-1"
+    },
+    {
+      "id": "detour-4-1",
+      "type": "material",
+      "title": "From selected inputs to a generated view",
+      "body": "```mermaid\nflowchart LR\n R[Aggregate room choices] --> B[Declared context boundary]\n N[Curated lecture notes] --> B\n B --> A[Agent selection]\n A --> V[Rendered view]\n```",
+      "notes": "What useful personal information would you refuse to send? This receipt is a proposed design pattern, not a standard.\nSource keys resolve to the References slides at the end. Unquoted explanations are lecture paraphrases; diagrams are not archival reproductions.\nFull attribution: Original diagram · Lecture context-receipt proposal",
+      "source": "Context receipt · Teaching diagram",
+      "chapter": "Future",
+      "next": "step-17"
     },
     {
       "id": "step-17",
       "type": "question",
       "chapter": "Future",
       "title": "Inspect the model’s inputs and output",
-      "body": "Inspect the context receipt.\n\nWhich input helped? Which conclusion was not justified?",
+      "body": "**Check the evidence · 60 seconds**\n\nPick one claim in the generated output. Find the input that supports it in the context receipt.\n\nReport the claim and its evidence—or say what evidence is missing.",
       "notes": "77–83 · Show actual inputs, source data and destination. Separate frozen aggregate priorities from personal information. Inspect the result against its sources. Return to Bush: a personal knowledge tool need not imply surrendering a personal profile. Do not invent a failure if none occurred; use a clearly labeled hypothetical case.\nFull attribution: Lecture design proposal · Context receipt is not an established standard",
-      "next": "step-18",
+      "next": "check-composed-interface",
       "related": ["detour-4-0", "detour-4-1"],
       "source": "Context receipt · Lecture proposal"
+    },
+    {
+      "id": "check-composed-interface",
+      "chapter": "Future",
+      "title": "Check the build · The generated interface",
+      "body": "- Compare the interface with the selected priority.\n- Inspect the inputs and locked result it used.\n- Show the fallback when generation cannot be used.",
+      "notes": "The linked build preview appears automatically on this slide. Advance to return to the lecture. If no preview URL is available, the slide reports that it is not ready.\n\nChecks to narrate:\n- Compare the interface with the selected priority.\n- Inspect the inputs and locked result it used.\n- Show the fallback when generation cannot be used.",
+      "type": "material",
+      "next": "step-18",
+      "previewOf": "build-agents"
     },
     {
       "id": "step-18",
       "type": "material",
       "chapter": "Closing",
-      "title": "CERN, 1989",
-      "body": "> Often, the information has been recorded, it just cannot be found.",
-      "notes": "83–84 · Return to the opening quote and one example the audience gave. Connect finding information with discovering how to use it. Keep this callback brief; the audience applies the argument on the next slide.\nFull attribution: Quotation · [R5] Tim Berners-Lee · Information Management: A Proposal (1989/1990)",
-      "next": "closing-app-question",
-      "related": ["vision-comparison", "detour-5-0", "detour-5-1"],
-      "source": "[R5] Berners-Lee, 1989/1990 · Quotation"
+      "title": "What we built and tested",
+      "body": "| Stage | What we added | What we checked |\n|---|---|---|\n| Past | Seminar information and a native form | Reading, links and submission without JavaScript |\n| Present | Browser interaction and shared results | Two views, unsent choices and connection failures |\n| Future | A generated seminar view | Source inputs, the chosen priority and a fallback |",
+      "notes": "83–85 · Recap the same seminar app across the three sections. Point to one observed result from each checkpoint. Distinguish completed builds from prepared examples or unfinished work; describe a failed check as a finding, not a success. Recall one difficulty from the opening audience discussion and ask whether our app addressed it. The historical thread connected documents and links, browser interaction, and possible agent use; these approaches can coexist.",
+      "next": "closing-directions",
+      "related": ["vision-comparison", "detour-5-0", "detour-5-1"]
+    },
+    {
+      "id": "closing-directions",
+      "type": "material",
+      "chapter": "Closing",
+      "title": "Where could we take this next?",
+      "body": "- **Improve the existing app:** test with seminar visitors and fix where they get stuck.\n- **Support another client:** expose actions, inputs and results so it can use the same service.\n- **Explore generated views:** compare a generated view with a fixed page on the same task.",
+      "notes": "85–86 · Present these as possible next experiments. For visitor testing, observe whether someone can find a practical detail and submit a preference. For another client, test a permitted action and verify its result. For generated views, compare task completion and factual accuracy against the fixed page using the same source material. Ask what evidence would justify each direction; do not imply that generation is the required next step.",
+      "next": "closing-app-question"
     },
     {
       "id": "closing-app-question",
       "type": "question",
       "chapter": "Closing",
-      "title": "What would you change in our app so an agent wouldn’t have to guess?",
-      "body": "Discuss with a neighbour for two minutes. Suggest one specific change.",
-      "notes": "84–89 · Take two or three suggestions grounded in the app. Possible discussion points: action labels, explicit inputs, validation, result feedback and permissions. Distinguish ambiguity from missing authority: a clear action does not grant permission to perform it. Invite a counterexample; do not turn the answers into a feature backlog or start another build.",
+      "title": "What would you test next?",
+      "body": "Suggest one next test for our seminar app in 1–3 words.\n\n**Word cloud · 45 seconds**\n\nOn live.scalableweb.dev, open **Add words** and send one response (up to 32 characters).\n\nWe’ll discuss two approved suggestions: what would each test help us decide?",
+      "notes": "86–89 · While Live is on, open Responses, choose Word cloud, enter “What would you test next?”, and open a new collection. Allow 45 seconds, close collection, review privately, approve relevant responses, then show the approved cloud. Pick two contrasting suggestions and ask what result would support or challenge the proposed direction. Frequency is not a vote. If collection is unavailable, take two spoken suggestions. Use Back to slide, then advance to the closing takeaway. Do not start another build.",
       "next": "step-19",
       "related": ["accessibility-parallels", "meaning-and-action"]
     },
@@ -696,12 +997,11 @@ Versioned export of the Obsidian lecture at `Lectures/Web Development 2026/Prese
       "id": "step-19",
       "type": "material",
       "chapter": "Closing",
-      "title": "Designing for people and machines",
-      "body": "When you build for people, make the actions explicit enough for machines too.",
-      "notes": "89–90 · State the takeaway and stop. This is the lecturer’s design argument, not a guarantee that every agent can use the interface. Leave this slide visible for discussion. References follow only when wanted; mention free seminar tickets as an optional continuation, not as the conclusion.\nFull attribution: Lecture design argument · [R13] Approved, unpublished position paper (2026)",
+      "title": "Choose the next change from the evidence",
+      "body": "Start with a task someone needs to complete.\n\nBuild a version, observe what happens, and check the result.\n\nUse what you learn to decide what to change next.",
+      "notes": "89–90 · Close by naming one finding from today and the next test it suggests. The seminar app gave us a way to compare documents, browser interaction and generated views against concrete tasks. Leave this slide visible for discussion; the references follow.",
       "related": ["detour-5-0", "detour-5-1"],
-      "next": "references-title",
-      "source": "[R13] Lecture design argument · Unpublished paper, 2026"
+      "next": "references-title"
     },
     {
       "id": "references-title",
@@ -717,8 +1017,8 @@ Versioned export of the Obsidian lecture at `Lectures/Web Development 2026/Prese
       "type": "material",
       "chapter": "References",
       "title": "References · Early visions and the web",
-      "body": "- [R1] Mundaneum (n.d.). [History](https://mundaneum.org/en/the-mundaneum/history/)\n- [R2] Vannevar Bush (1945). [As We May Think](https://www.theatlantic.com/magazine/archive/1945/07/as-we-may-think/303881/)\n- [R3] Ted Nelson (1999). [Xanalogical Structure: Now More Than Ever](https://www.xanadu.net/NOWMORETHANEVER/XuSum99.html)\n- [R4] Douglas Engelbart (1962). [Augmenting Human Intellect: A Conceptual Framework](https://dougengelbart.org/content/view/138/000/)\n- [R5] Tim Berners-Lee (1989/1990). [Information Management: A Proposal](https://www.w3.org/History/1989/proposal.html)\n- [R6] Tim Berners-Lee and Robert Cailliau (1990). [WorldWideWeb: Proposal for a HyperText Project](https://info.cern.ch/hypertext/WWW/Proposal.html)",
-      "notes": "Reference appendix, not timed lecture content. Citation keys are unchanged. R13 is a position paper, not empirical proof; context receipts and teaching diagrams are lecture proposals.",
+      "body": "- [1] Mundaneum (n.d.). [History](https://mundaneum.org/en/the-mundaneum/history/)\n- [2] Vannevar Bush (1945). [As We May Think](https://www.theatlantic.com/magazine/archive/1945/07/as-we-may-think/303881/)\n- [3] Ted Nelson (1999). [Xanalogical Structure: Now More Than Ever](https://www.xanadu.net/NOWMORETHANEVER/XuSum99.html)\n- [4] Douglas Engelbart (1962). [Augmenting Human Intellect: A Conceptual Framework](https://dougengelbart.org/content/view/138/000/)\n- [5] Tim Berners-Lee (1989/1990). [Information Management: A Proposal](https://www.w3.org/History/1989/proposal.html)\n- [6] Tim Berners-Lee and Robert Cailliau (1990). [WorldWideWeb: Proposal for a HyperText Project](https://info.cern.ch/hypertext/WWW/Proposal.html)",
+      "notes": "Reference appendix, not timed lecture content. Citation keys are unchanged. [13] is a position paper, not empirical proof; context receipts and teaching diagrams are lecture proposals.",
       "next": "references-2"
     },
     {
@@ -726,8 +1026,8 @@ Versioned export of the Obsidian lecture at `Lectures/Web Development 2026/Prese
       "type": "material",
       "chapter": "References",
       "title": "References · Architecture and interaction",
-      "body": "- [R7] W3C (2004). [Architecture of the World Wide Web, Volume One](https://www.w3.org/TR/webarch/)\n- [R8] WHATWG (living standard). [HTML Living Standard — Forms](https://html.spec.whatwg.org/multipage/forms.html)\n- [R9] Aaron Gustafson (2008). [Understanding Progressive Enhancement](https://alistapart.com/article/understandingprogressiveenhancement/)\n- [R10] Jesse James Garrett (2005). [Ajax: A New Approach to Web Applications](https://www.oceanpark.com/webmuseum/2005/garrett_on_ajax.html)\n- [R11] W3C WAI (living guidance). [WCAG overview](https://www.w3.org/WAI/standards-guidelines/wcag/)\n- [R12] Petros, Gross, Shaffer and Revelle (2025). [The Missing Mechanic: Behavioral Affordances as the Limiting Factor in Generalizing HTML Controls](https://doi.org/10.1145/3720553.3746684)",
-      "notes": "Reference appendix, not timed lecture content. Citation keys are unchanged. R13 is a position paper, not empirical proof; context receipts and teaching diagrams are lecture proposals.",
+      "body": "- [7] W3C (2004). [Architecture of the World Wide Web, Volume One](https://www.w3.org/TR/webarch/)\n- [8] WHATWG (living standard). [HTML Living Standard — Forms](https://html.spec.whatwg.org/multipage/forms.html)\n- [9] Aaron Gustafson (2008). [Understanding Progressive Enhancement](https://alistapart.com/article/understandingprogressiveenhancement/)\n- [10] Jesse James Garrett (2005). [Ajax: A New Approach to Web Applications](https://www.oceanpark.com/webmuseum/2005/garrett_on_ajax.html)\n- [11] W3C WAI (living guidance). [WCAG overview](https://www.w3.org/WAI/standards-guidelines/wcag/)\n- [12] Petros, Gross, Shaffer and Revelle (2025). [The Missing Mechanic: Behavioral Affordances as the Limiting Factor in Generalizing HTML Controls](https://doi.org/10.1145/3720553.3746684)\n- [28] Steven Champeon and Nick Finck (2003). [Inclusive Web Design for the Future](https://web.archive.org/web/20210226200650/http://www.hesketh.com/publications/inclusive_web_design_for_the_future/). SXSW presentation; archived original.",
+      "notes": "Reference appendix, not timed lecture content. Citation keys are unchanged. [13] is a position paper, not empirical proof; context receipts and teaching diagrams are lecture proposals.",
       "next": "references-3"
     },
     {
@@ -735,8 +1035,8 @@ Versioned export of the Obsidian lecture at `Lectures/Web Development 2026/Prese
       "type": "material",
       "chapter": "References",
       "title": "References · Position and imagery",
-      "body": "- [R13] *Hypermedia as a Substrate for the Agentic Web: From Documents to Affordances* (2026). Approved, unpublished position paper; manuscript supplied by the lecturer.\n- [R14] Tim Berners-Lee. [The WorldWideWeb browser](https://www.w3.org/People/Berners-Lee/WorldWideWeb.html). Browser-editor written in 1990; reproduced screenshot from 1993.",
-      "notes": "Reference appendix, not timed lecture content. Citation keys are unchanged. R13 is a position paper, not empirical proof; context receipts and teaching diagrams are lecture proposals.",
+      "body": "- [13] *Hypermedia as a Substrate for the Agentic Web: From Documents to Affordances* (2026). Approved, unpublished position paper; manuscript supplied by the lecturer.\n- [14] Tim Berners-Lee. [The WorldWideWeb browser](https://www.w3.org/People/Berners-Lee/WorldWideWeb.html). Browser-editor written in 1990; reproduced screenshot from 1993.",
+      "notes": "Reference appendix, not timed lecture content. Citation keys are unchanged. [13] is a position paper, not empirical proof; context receipts and teaching diagrams are lecture proposals.",
       "next": "references-4"
     },
     {
@@ -744,7 +1044,7 @@ Versioned export of the Obsidian lecture at `Lectures/Web Development 2026/Prese
       "type": "material",
       "chapter": "References",
       "title": "References · Images and code",
-      "body": "- [R15] Computer History Museum. [Memex conceptual sketch](https://www.computerhistory.org/revolution/the-web/20/370/2111), c. 1945; object 500004817.\n- [R16] Ted Nelson. [Xanalogical Structure](https://xanadu.com.au/ted/XUsurvey/xuDation.html), 2000 version, Fig. 1 (1965 diagram).\n- [R17] Olia Lialina and Dragan Espenschied. [GeoCities: CollegePark/Lounge/9002](https://oneterabyteofkilobyteage.tumblr.com/post/827274459639611392/original-url). Archive capture: 28 April 2009.\n- [R18] WHATWG. [HTML text-level semantics](https://html.spec.whatwg.org/multipage/text-level-semantics.html), living standard.",
+      "body": "- [15] Computer History Museum. [Memex conceptual sketch](https://www.computerhistory.org/revolution/the-web/20/370/2111), c. 1945; object 500004817.\n- [16] Ted Nelson. [Xanalogical Structure](https://xanadu.com.au/ted/XUsurvey/xuDation.html), 2000 version, Fig. 1 (1965 diagram).\n- [17] Olia Lialina and Dragan Espenschied. [GeoCities: CollegePark/Lounge/9002](https://oneterabyteofkilobyteage.tumblr.com/post/827274459639611392/original-url). Archive capture: 28 April 2009.\n- [18] WHATWG. [HTML text-level semantics](https://html.spec.whatwg.org/multipage/text-level-semantics.html), living standard.\n- [26] Microsoft (1996). [FrontPage 1.1 release and adoption]( https://news.microsoft.com/source/1996/08/06/microsoft-frontpage-1-1-momentum-explodes-in-first-two-months-industry-lauds-web-authoring-and-management-tool-as-best-of-breed/).\n- [27] Macromedia (1997). [Macromedia Ships Dreamweaver]( https://www.mactech.com/1997/12/09/md1-macromedia-ships-dreamweaver/). Launch announcement reproduced by MacTech.\n- [30] Web Design Museum. [Microsoft FrontPage 1.1 in 1996](https://www.webdesignmuseum.org/software/microsoft-frontpage-1-1-in-1996). Screenshot: View HTML. Software interface © Microsoft.\n- [31] Web Design Museum. [Macromedia Dreamweaver 1.2 in 1998](https://www.webdesignmuseum.org/software/macromedia-dreamweaver-1-2-in-1998). Screenshot: Working with Document. Software interface © Macromedia.",
       "notes": "Image credits identify the holding collection or source publication, not a claim that images are public domain. Code examples are original teaching material grounded in the HTML standard.",
       "next": "references-flows"
     },
@@ -753,8 +1053,8 @@ Versioned export of the Obsidian lecture at `Lectures/Web Development 2026/Prese
       "type": "material",
       "chapter": "References",
       "title": "References · Architecture demos",
-      "body": "- [R19] Juho Vepsäläinen. [Web architecture lens](https://scalableweb.dev/demos/#demo-web-architecture-lens). Teaching model: initial delivery and later interaction are separate decisions.\n- [R20] Juho Vepsäläinen. [Client activation lens](https://scalableweb.dev/demos/#demo-client-activation-lens). Teaching comparison of hydration, islands and resumability.\n\nLecture flow diagrams are adaptations, not captured network traces.",
-      "notes": "Do not present modeled request sizes or timings as measurements. HTML behavior remains grounded in [R8].",
+      "body": "- [19] Juho Vepsäläinen. [Web architecture lens](https://scalableweb.dev/demos/#demo-web-architecture-lens). Teaching model: initial delivery and later interaction are separate decisions.\n- [20] Juho Vepsäläinen. [Client activation lens](https://scalableweb.dev/demos/#demo-client-activation-lens). Teaching comparison of hydration, islands and resumability.\n\nLecture flow diagrams are adaptations, not captured network traces.",
+      "notes": "Do not present modeled request sizes or timings as measurements. HTML behavior remains grounded in [8].",
       "next": "references-semantic-access"
     },
     {
@@ -762,7 +1062,7 @@ Versioned export of the Obsidian lecture at `Lectures/Web Development 2026/Prese
       "type": "material",
       "chapter": "References",
       "title": "References · Meaning and accessibility",
-      "body": "- [R21] Tim Berners-Lee, James Hendler and Ora Lassila (2001). [The Semantic Web](https://lassila.org/publications/2001/SciAm.html). Scientific American 284(5), 34–43.\n- [R22] W3C WAI. [Labeling Controls](https://www.w3.org/WAI/tutorials/forms/labels/). Human accessibility guidance.\n- [R23] W3C WAI. [User Notification](https://www.w3.org/WAI/tutorials/forms/notifications/). Human accessibility guidance.",
+      "body": "- [21] Tim Berners-Lee, James Hendler and Ora Lassila (2001). [The Semantic Web](https://lassila.org/publications/2001/SciAm.html). Scientific American 284(5), 34–43.\n- [22] W3C WAI. [Labeling Controls](https://www.w3.org/WAI/tutorials/forms/labels/). Human accessibility guidance.\n- [23] W3C WAI. [User Notification](https://www.w3.org/WAI/tutorials/forms/notifications/). Human accessibility guidance.",
       "notes": "Agent parallels are lecture hypotheses, not results established by WAI guidance. Historical appointment scenario is fictional.",
       "next": "references-history-photos"
     },
@@ -771,164 +1071,8 @@ Versioned export of the Obsidian lecture at `Lectures/Web Development 2026/Prese
       "type": "material",
       "chapter": "References",
       "title": "References · Historical photographs",
-      "body": "- [R24] CERN. [The birth of the Web](https://home.cern/science/computing/the-birth-of-the-web/). Tim Berners-Lee photograph, 1994; CERN PhotoLab, record 39437.\n- [R25] Doug Engelbart Institute. [History in Pictures, §4b](https://dougengelbart.org/content/view/224/217/). Frame from the NLS demonstration, 9 December 1968.",
+      "body": "- [24] CERN. [The birth of the Web](https://home.cern/science/computing/the-birth-of-the-web/). Tim Berners-Lee photograph, 1994; CERN PhotoLab, record 39437.\n- [25] Doug Engelbart Institute. [History in Pictures, §4b](https://dougengelbart.org/content/view/224/217/). Frame from the NLS demonstration, 9 December 1968.\n- [29] fdecomite (2011). [Drawers: Mundaneum, Mons](https://commons.wikimedia.org/wiki/File:Drawers.jpg). Photograph, 23 February 2011. [CC BY 2.0](https://creativecommons.org/licenses/by/2.0/); unmodified.",
       "notes": "Image credits identify source collections; no public-domain claim. The CERN image is later than the 1989 proposal."
-    },
-    {
-      "id": "step-15",
-      "type": "question",
-      "title": "Which applications need a stable interface, and which could use a generated one?",
-      "body": "Choose one example of each. What makes the difference?",
-      "notes": "62–70 · Give pairs two minutes, then discuss examples while the build runs. Use the two-directions diagram. This is a position, not a proven forecast.\nSource keys resolve to the References slides at the end. Unquoted explanations are lecture paraphrases; diagrams are not archival reproductions.\nFull attribution: Hypothesis · [R13] Approved, unpublished position paper (2026)",
-      "related": ["detour-3-0", "detour-3-1"],
-      "source": "[R13] Lecture hypothesis · Unpublished paper, 2026"
-    },
-    {
-      "id": "detour-0-1",
-      "type": "material",
-      "title": "Web foundations · diagram",
-      "body": "```mermaid\nflowchart LR\n Document -->|link| Resource\n Resource -->|link| Another[Another resource]\n```",
-      "notes": "What survives when CSS and JavaScript are removed?\nSource keys resolve to the References slides at the end. Unquoted explanations are lecture paraphrases; diagrams are not archival reproductions.\nFull attribution: Original explanatory diagram · [R6] Tim Berners-Lee and Robert Cailliau (1990)",
-      "source": "[R6] Berners-Lee & Cailliau, 1990 · Teaching diagram"
-    },
-    {
-      "id": "detour-1-1",
-      "type": "material",
-      "title": "Progressive enhancement · diagram",
-      "body": "```mermaid\nflowchart BT\n HTML[Working HTML capability] --> CSS[CSS presentation]\n CSS --> JS[JavaScript interaction]\n```",
-      "notes": "Turn off JavaScript: can a person still submit the form? Semantic HTML is a foundation, not proof of accessibility.\nSource keys resolve to the References slides at the end. Unquoted explanations are lecture paraphrases; diagrams are not archival reproductions.\nFull attribution: Original explanatory diagram · [R9] Aaron Gustafson (2008)",
-      "source": "[R9] Gustafson, 2008 · Teaching diagram"
-    },
-    {
-      "id": "detour-2-1",
-      "type": "material",
-      "title": "Browser applications · diagram",
-      "body": "```mermaid\nsequenceDiagram\n Browser->>Server: Request data\n Server-->>Browser: Data or fragment\n Note over Browser: Update current view\n```",
-      "notes": "Which interaction is worth the extra state management? Give frameworks credit for the problems they solve.\nSource keys resolve to the References slides at the end. Unquoted explanations are lecture paraphrases; diagrams are not archival reproductions.\nFull attribution: Original explanatory diagram · [R10] Jesse James Garrett (2005)",
-      "source": "[R10] Garrett, 2005 · Teaching diagram"
-    },
-    {
-      "id": "detour-3-0",
-      "type": "material",
-      "title": "Agentic directions · definition",
-      "body": "Existing applications may expose clearer actions to agents. Some services may instead let consumer agents construct an interface for the task.",
-      "notes": "Which application needs a stable interface? These directions can coexist; neither is an established outcome.\nSource keys resolve to the References slides at the end. Unquoted explanations are lecture paraphrases; diagrams are not archival reproductions.\nFull attribution: Hypothesis · [R13] Approved, unpublished position paper (2026)",
-      "source": "[R13] Lecture hypothesis · Unpublished paper, 2026"
-    },
-    {
-      "id": "detour-3-1",
-      "type": "material",
-      "title": "Agentic directions · diagram",
-      "body": "```mermaid\nflowchart LR\n C[Shared capability] --> P[Provider-designed interface]\n C --> A[Agent-composed interface]\n P --> H[Human use]\n A --> H\n```",
-      "notes": "Which application needs a stable interface? These directions can coexist; neither is an established outcome.\nSource keys resolve to the References slides at the end. Unquoted explanations are lecture paraphrases; diagrams are not archival reproductions.\nFull attribution: Original diagram of a hypothesis · [R13] Approved, unpublished position paper (2026)",
-      "source": "[R13] Lecture hypothesis · Unpublished paper, 2026"
-    },
-    {
-      "id": "detour-4-0",
-      "type": "material",
-      "title": "Context boundaries · definition",
-      "body": "A visible account of the information used to produce a result, where it was sent, and what action followed.",
-      "notes": "What useful personal information would you refuse to send? This receipt is a proposed design pattern, not a standard.\nSource keys resolve to the References slides at the end. Unquoted explanations are lecture paraphrases; diagrams are not archival reproductions.\nFull attribution: Lecture design proposal · Context receipt is not an established standard",
-      "source": "Context receipt · Lecture proposal"
-    },
-    {
-      "id": "detour-4-1",
-      "type": "material",
-      "title": "Context boundaries · diagram",
-      "body": "```mermaid\nflowchart LR\n R[Aggregate room choices] --> B[Declared context boundary]\n N[Curated lecture notes] --> B\n B --> A[Agent selection]\n A --> V[Rendered view]\n```",
-      "notes": "What useful personal information would you refuse to send? This receipt is a proposed design pattern, not a standard.\nSource keys resolve to the References slides at the end. Unquoted explanations are lecture paraphrases; diagrams are not archival reproductions.\nFull attribution: Original diagram · Lecture context-receipt proposal",
-      "source": "Context receipt · Teaching diagram"
-    },
-    {
-      "id": "detour-5-0",
-      "type": "material",
-      "title": "Shared capability · definition",
-      "body": "One shared description of a capability and its constraints may support human interfaces, assistive tools, and agents.",
-      "notes": "Ask for a counterexample. Shared semantics do not guarantee accessibility or better agent performance.\nSource keys resolve to the References slides at the end. Unquoted explanations are lecture paraphrases; diagrams are not archival reproductions.\nFull attribution: Hypothesis · [R13] Approved, unpublished position paper (2026)",
-      "source": "[R13] Lecture hypothesis · Unpublished paper, 2026"
-    },
-    {
-      "id": "detour-5-1",
-      "type": "material",
-      "title": "Shared capability · diagram",
-      "body": "```mermaid\nflowchart TB\n C[Shared capability and constraints] --> H[Human interface]\n C --> T[Assistive tools]\n C --> A[Agent interaction]\n```",
-      "notes": "Ask for a counterexample. Shared semantics do not guarantee accessibility or better agent performance.\nSource keys resolve to the References slides at the end. Unquoted explanations are lecture paraphrases; diagrams are not archival reproductions.\nFull attribution: Original diagram of a hypothesis · [R13] Approved, unpublished position paper (2026)",
-      "source": "[R13] Lecture hypothesis · Unpublished paper, 2026"
-    },
-    {
-      "id": "cern-connections",
-      "type": "material",
-      "title": "CERN: relationships do not fit one filing tree",
-      "body": "![Original circles-and-arrows diagram from Berners-Lee’s Information Management proposal](https://www.w3.org/History/1989/Image1.gif)",
-      "source": "[R5] © Tim Berners-Lee, 1989/1990 · W3C archive",
-      "notes": "Historical artifact, not a teaching reconstruction. Trace one connection rather than reading every label. Notice the mixture of systems, concepts and relationships. Requires network access.\nFull attribution: [R5] Tim Berners-Lee © 1989/1990 · Original proposal diagram, W3C archive",
-      "allowRemoteImages": true
-    },
-    {
-      "id": "bush-trail",
-      "type": "material",
-      "title": "A research trail is more than a folder",
-      "body": "```mermaid\nflowchart LR\n Question --> Article\n Article -->|reference| Earlier[Earlier study]\n Earlier -->|association| Example[Example from another field]\n```",
-      "source": "[R2] Bush, 1945 · Teaching diagram",
-      "notes": "This is a modern explanatory example, not Bush’s original illustration. Ask whether bookmarks retain the reason each source mattered.\nSource keys resolve to the References slides at the end. Unquoted explanations are lecture paraphrases; diagrams are not archival reproductions.\nFull attribution: Original explanatory diagram · [R2] Vannevar Bush (1945)"
-    },
-    {
-      "id": "vision-comparison",
-      "type": "question",
-      "title": "Which ambition does your everyday software serve?",
-      "body": "Otlet: organize knowledge.\n\nBush: preserve trails.\n\nNelson: connect texts and sources.\n\nEngelbart: augment problem-solving.",
-      "notes": "Optional detour; these are distinct ambitions, not a chain of direct influence. Ask for one familiar application and one gap. Return to the selected slide afterwards.\nSource keys resolve to the References slides at the end. Unquoted explanations are lecture paraphrases; diagrams are not archival reproductions.",
-      "source": "Lecture synthesis and discussion · [R1–R5]"
-    },
-    {
-      "id": "flow-shared",
-      "type": "material",
-      "title": "Updating a second browser",
-      "body": "```mermaid\nsequenceDiagram\n participant A as Browser A\n participant S as Server\n participant D as Stored votes\n participant B as Browser B\n A->>S: Submit vote\n S->>D: Record vote\n S-->>A: Updated result\n B->>S: Request current aggregate\n S->>D: Read votes\n S-->>B: Current aggregate\n Note over B: Render updated result\n```",
-      "source": "[R8, R19] Teaching model · Adapted from Vepsäläinen",
-      "notes": "Polling example only. Server-sent events or WebSockets can deliver updates differently. Match the explanation to the implementation; no need to teach all three transports. Stored state stays on the server, not in either browser’s display.\nFull attribution: Explanatory model · [R8, R19] Adapted for this lecture from Juho Vepsäläinen’s Web architecture lens"
-    },
-    {
-      "id": "flow-failure",
-      "type": "material",
-      "title": "Lost response after a recorded vote",
-      "body": "```mermaid\nsequenceDiagram\n participant B as Browser\n participant S as Server\n participant D as Stored votes\n B->>S: POST /vote\n S->>D: Record vote\n S--xB: Response lost\n Note over B: Outcome unknown\n Note over S,D: Vote may already be stored\n```",
-      "source": "Lost-response scenario · Teaching model",
-      "notes": "Ask students what the UI should say. Separate pending, confirmed and unknown. Inspect how the actual demo handles repeated submissions; do not claim exactly-once delivery.\nFull attribution: Original failure scenario · Explanatory model, not an observed demo outcome"
-    },
-    {
-      "id": "rendering-location",
-      "type": "material",
-      "title": "Initial rendering: server or browser",
-      "body": "```mermaid\nflowchart LR\n subgraph SSR[SSR]\n S[Server renders HTML] --> B[Browser displays HTML]\n end\n subgraph CSR[CSR]\n J[Shell and JavaScript] --> C[Browser fetches data and renders]\n end\n```",
-      "source": "[R19] Lecture adaptation · Web architecture lens",
-      "notes": "Optional Present detour. This is about initial rendering, not how every later interaction works. SSR can initialize an SPA; an HTML-first page can use AJAX. Show the original interactive lens if students want to explore combinations.",
-      "related": ["rendering-cached", "activation-detour"]
-    },
-    {
-      "id": "rendering-cached",
-      "type": "material",
-      "title": "Cached HTML and regeneration",
-      "body": "```mermaid\nflowchart LR\n R[Request] --> C[Cached HTML]\n C --> B[Browser]\n C -. Policy triggers regeneration .-> S[Server renders newer HTML]\n S --> C\n```",
-      "source": "[R19] Lecture adaptation · Web architecture lens",
-      "notes": "ISR is a framework/platform regeneration strategy, not a universal HTTP mode. Some policies serve stale content while regenerating; others differ. The public seminar description can tolerate different freshness from a vote confirmation. Do not imply a vote POST can be safely cached as a read.",
-      "related": ["rendering-location"]
-    },
-    {
-      "id": "activation-detour",
-      "type": "material",
-      "title": "Visible HTML is not the same as initialized JavaScript",
-      "body": "[Explore the client activation lens](https://scalableweb.dev/demos/#demo-client-activation-lens)\n\nWhich parts of this page need JavaScript before we can use them?",
-      "source": "[R20] Vepsäläinen · Client activation teaching model",
-      "notes": "Optional deeper demo. Compare hydration, islands and resumability only if useful to this audience. Native links and forms can work before framework handlers initialize. The course demo’s transfer sizes are illustrative, not measured benchmarks for our app.\nFull attribution: [R20] Juho Vepsäläinen · Client activation lens · Teaching model"
-    },
-    {
-      "id": "accessibility-boundaries",
-      "type": "question",
-      "title": "Accessible to people does not mean authorized for agents",
-      "body": "A clear action can still require permission.\n\nA machine-readable interface can still exclude people.",
-      "source": "Lecture distinction · [R11–R13, R22, R23]",
-      "notes": "Optional detour. Human accessibility covers perception, operation and understanding, including needs an agent does not share. Agent access adds authorization, scope and verification concerns that accessibility alone does not solve. Compare a well-labeled destructive button with whether an agent should invoke it."
     }
   ]
 }

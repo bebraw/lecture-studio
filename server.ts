@@ -1,3 +1,4 @@
+import { previewCandidates } from "./shared/preview.ts";
 import { asyncHandler } from "./shared/errors.ts";
 import { validateApiRequest, type DeskState } from "./shared/api.ts";
 import type { IncomingMessage, ServerResponse } from "node:http";
@@ -134,6 +135,7 @@ export function createStudio({
   let presentation: PresentationSession | null = null,
     graphPoll: AudiencePoll | null = null,
     graphBusy = false;
+  let audienceSessionStarted = false;
   const graphPolls = new Map<string, AudiencePoll>();
   const getGraphPoll = (step: Step) => {
     let selected = graphPolls.get(step.id);
@@ -150,15 +152,36 @@ export function createStudio({
     }
     return selected;
   };
-  const showGraph = () => {
+  const openGraphPoll = async () => {
+    if (!presentation || presentation.step().type !== "poll") return;
+    const selected = getGraphPoll(presentation.step());
+    if (selected.frozen || selected.snapshot?.status === "open") return;
+    if (
+      [...graphPolls.values(), poll].some(
+        (p) => p !== selected && p.snapshot?.status === "open",
+      )
+    )
+      throw new Error("Close the current vote first");
+    await selected.act("open");
+  };
+  const buildPreviews = new Map<string, string>();
+  const captureBuildPreview = () => {
+    const run = presentation?.runs.at(-1);
+    const url = previewCandidates(bridge.state.messages, origin).at(-1);
+    if (run && url) buildPreviews.set(run.step, validDemoUrl(url, origin));
+  };
+  const showGraph = async () => {
     if (!presentation) throw new Error("Load a presentation first");
     feedbackPrevious = null;
     const s = presentation.step();
+    captureBuildPreview();
+    const demoUrl = s.previewOf ? buildPreviews.get(s.previewOf) : undefined;
+    if (demoUrl) await sharePreview(demoUrl);
     if (s.type === "poll") {
       graphPoll = getGraphPoll(s);
       projectedPoll = graphPoll;
       pollOnStage = true;
-      pollResults = false;
+      pollResults = !!graphPoll.frozen;
     } else {
       graphPoll = null;
       pollOnStage = false;
@@ -166,14 +189,22 @@ export function createStudio({
     draft = validateDraft({
       ...initialDraft(),
       act: (s.chapter || "Related").slice(0, 40),
-      mode:
-        s.type === "build"
+      demoUrl: demoUrl || "",
+      mode: demoUrl
+        ? "demo"
+        : s.type === "build"
           ? "brief"
           : s.type === "question"
             ? "question"
             : "material",
       title: s.title,
-      body: s.type === "build" ? presentation.resolve().prompt : s.body || "",
+      body: demoUrl
+        ? ""
+        : s.previewOf
+          ? "The app preview is not available yet."
+          : s.type === "build"
+            ? presentation.resolve().prompt
+            : s.body || "",
       source: s.source || "",
       allowRemoteImages: s.allowRemoteImages === true,
     });
@@ -193,6 +224,7 @@ export function createStudio({
     poll.reset();
     pollOnStage = false;
     presentation = null;
+    audienceSessionStarted = false;
     graphPoll = null;
     graphPolls.clear();
     bridge.close();
@@ -454,18 +486,43 @@ export function createStudio({
                 throw new Error("Choose Live on or off");
               if (body.live) {
                 if (!presentation) throw new Error("Load a presentation first");
-                showGraph();
+                if (!audienceSessionStarted && poll.origin && poll.token) {
+                  const response = await poll.fetcher(
+                    poll.origin + "/presenter/close-polls",
+                    {
+                      method: "POST",
+                      headers: { authorization: "Bearer " + poll.token },
+                      redirect: "error",
+                      signal: AbortSignal.timeout(8000),
+                    },
+                  );
+                  await response.body?.cancel();
+                  if (!response.ok)
+                    throw new Error(
+                      "Could not close earlier votes. Deploy the updated audience Worker and try Live on again.",
+                    );
+                  audienceSessionStarted = true;
+                }
+                await openGraphPoll();
+                await showGraph();
                 live = true;
                 audienceSync.publish(audienceState());
               } else {
-                if (
-                  [...graphPolls.values(), poll].some(
-                    (p) => p.busy || p.snapshot?.status === "open",
-                  )
-                )
-                  throw new Error("Close voting before turning Live off");
+                if ([...graphPolls.values(), poll].some((p) => p.busy))
+                  throw new Error(
+                    "Wait for the current voting operation to finish",
+                  );
                 liveTransition = true;
                 try {
+                  for (const [id, activePoll] of graphPolls) {
+                    if (activePoll.snapshot?.status !== "open") continue;
+                    await activePoll.act("lock");
+                    if (presentation && activePoll.frozen)
+                      presentation.decisions[id] = structuredClone(
+                        activePoll.frozen,
+                      );
+                  }
+                  if (poll.snapshot?.status === "open") await poll.act("lock");
                   await audienceSync.deliver(waitingStage());
                   live = false;
                   previewTunnel.close();
@@ -510,8 +567,10 @@ export function createStudio({
               }
               poll.reset();
               presentation = next;
+              audienceSessionStarted = false;
               graphPoll = null;
               graphPolls.clear();
+              buildPreviews.clear();
               // Loading is private: the existing projection stays until navigation.
             } else {
               if (!presentation) throw new Error("Load a presentation first");
@@ -522,10 +581,11 @@ export function createStudio({
               ) {
                 if (op !== "show")
                   presentation.move(op, optionalString(body.id, "step"));
-                showGraph();
+                if (live) await openGraphPoll();
+                await showGraph();
               } else if (op === "defaults") {
                 presentation.defaults.add(presentation.current);
-                showGraph();
+                await showGraph();
               } else if (
                 op === "poll-open" ||
                 op === "poll-close" ||
@@ -556,10 +616,14 @@ export function createStudio({
                     structuredClone(graphPoll.frozen);
                 else if (op === "poll-open")
                   delete presentation.decisions[presentation.current];
+                if (op === "poll-close" || op === "poll-open") {
+                  await showGraph();
+                  pollResults = op === "poll-close";
+                }
               } else if (op === "poll-question" || op === "poll-results") {
                 if (presentation.step().type !== "poll")
                   throw new Error("Choose a poll step");
-                showGraph();
+                await showGraph();
                 pollResults = op === "poll-results";
               } else if (op === "build") {
                 if (presentation.step().type !== "build")
@@ -577,7 +641,7 @@ export function createStudio({
                   throw new Error(
                     "This step has already started in this session",
                   );
-                showGraph();
+                await showGraph();
                 await bridge.start(
                   resolved.prompt,
                   optionalString(body.model, "model") ?? "",

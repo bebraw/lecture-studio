@@ -1,6 +1,6 @@
 import { test, expect } from "@playwright/test";
 import { fixture } from "../tests/fixture.ts";
-test("Obsidian snapshot loads privately and detours return without changing the definition", async ({
+test("Obsidian snapshot uses a flat list and consecutive arrow navigation", async ({
   context,
 }) => {
   const path = "Lectures/Web Development 2026/Presentations/Test.md";
@@ -115,7 +115,7 @@ test("Obsidian snapshot loads privately and detours return without changing the 
     await expect(desk.locator(".preview-slide-position")).toHaveText("1/3");
     await expect(desk.locator(".preview-slide-progress")).toHaveAttribute(
       "value",
-      "0.5",
+      String(1 / 3),
     );
     await expect(desk.locator("#current-stage")).toHaveCSS(
       "background-color",
@@ -198,11 +198,11 @@ test("Obsidian snapshot loads privately and detours return without changing the 
       "Optional detours",
     );
     await expect(
-      desk.locator('.outline-related[data-related-to="question"]'),
+      desk.locator('#presentation-outline [data-step-id="aside"]'),
     ).toHaveText("3. Definition detour");
     await expect(
-      desk.locator('.outline-related[data-related-to="question"]'),
-    ).toBeHidden();
+      desk.locator('#presentation-outline [data-step-id="aside"]'),
+    ).toBeVisible();
     await expect(desk.locator(".plot")).toBeHidden();
     const width = await desk
       .locator("#presentation-outline")
@@ -222,7 +222,7 @@ test("Obsidian snapshot loads privately and detours return without changing the 
     );
     await expect(questionButton).toBeFocused();
     await expect(
-      desk.locator('.outline-related[data-related-to="question"]'),
+      desk.locator('#presentation-outline [data-step-id="aside"]'),
     ).toBeVisible();
     expect((await desk.locator("#presentation-outline").boundingBox())!.y).toBe(
       outlineBox!.y,
@@ -260,7 +260,7 @@ test("Obsidian snapshot loads privately and detours return without changing the 
     await expect(stage.locator("#slide-number")).toHaveText("1/3");
     await expect(stage.locator("#slide-progress")).toHaveJSProperty(
       "value",
-      0.5,
+      1 / 3,
     );
     await expect(stage.locator("#build-signal")).toBeHidden();
     bridge.state.status = "working";
@@ -279,7 +279,8 @@ test("Obsidian snapshot loads privately and detours return without changing the 
     );
     await expect(desk.locator("#graph-presentation")).toBeVisible();
     await desk.locator("#graph-next").click();
-    await desk.locator('#presentation-outline [data-step-id="aside"]').click();
+    await expect(stage.locator("h1")).toHaveText("Audience question");
+    await desk.keyboard.press("ArrowRight");
     await expect(stage.locator("h1")).toHaveText("Definition detour");
     await expect(stage.locator("#slide-number")).toHaveText("3/3");
     await expect(stage.locator("#slide-progress")).toHaveJSProperty("value", 1);
@@ -288,7 +289,8 @@ test("Obsidian snapshot loads privately and detours return without changing the 
       "PRIVATE FACILITATION",
     );
     await expect(stage.locator("#build-signal")).toBeHidden();
-    await desk.locator("#graph-return").click();
+    await expect(desk.locator("#graph-return")).toBeHidden();
+    await desk.keyboard.press("ArrowLeft");
     await expect(stage.locator("h1")).toHaveText("Audience question");
     await expect(stage.locator("#slide-number")).toHaveText("2/3");
     await desk.screenshot({

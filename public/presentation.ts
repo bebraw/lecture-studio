@@ -206,26 +206,15 @@ export function mountPresentations({ call, update }: MountOptions) {
   function neighbour(direction: string) {
     const p = data?.presentation;
     if (!p) return;
-    if (direction === "next")
-      return (
-        p.step.next ||
-        p.outline.find((s) => (s.related || []).includes(p.current))?.next
-      );
-    return (
-      p.outline.find((s) => s.next === p.current)?.id ||
-      p.outline.find((s) => (s.related || []).includes(p.current))?.id
-    );
+    const index = p.outline.findIndex((step) => step.id === p.current);
+    return p.outline[index + (direction === "next" ? 1 : -1)]?.id;
   }
-  let navigating = false,
-    relatedParent = "";
-  async function selectSlide(id: string, parent?: string | null) {
+  let navigating = false;
+  async function selectSlide(id: string) {
     if (navigating) return;
     navigating = true;
-    relatedParent = parent || "";
     try {
-      if (!preparing() && parent === data.presentation!.current)
-        await run("presentation/detour", { id });
-      else if (await run("presentation/select", { id })) {
+      if (await run("presentation/select", { id })) {
         if (!preparing()) await run("presentation/show");
       }
     } finally {
@@ -264,9 +253,7 @@ export function mountPresentations({ call, update }: MountOptions) {
       if (preparing()) {
         const id = neighbour(direction);
         if (id) await run("presentation/select", { id });
-      } else if (direction === "previous" && data.presentation!.canPrevious)
-        await run("presentation/previous");
-      else {
+      } else {
         const id = neighbour(direction);
         if (id && (await run("presentation/select", { id })))
           await run("presentation/show");
@@ -394,83 +381,20 @@ export function mountPresentations({ call, update }: MountOptions) {
         snapshot = "";
         return;
       }
-      const detours = new Set(p.outline.flatMap((s) => s.related || []));
-      let chapter = "";
-      const addStep = (
-        s: NonNullable<DeskState["presentation"]>["outline"][number],
-        parent: string | null,
-        target: HTMLElement,
-        label = s.title,
-      ) => {
-        const b = document.createElement("button");
-        b.className = "outline-step";
-        b.dataset.stepId = s.id;
-        b.setAttribute("aria-current", s.id === p.current ? "step" : "false");
-        if (parent) {
-          b.classList.add("outline-related");
-          b.dataset.relatedTo = parent;
-          b.title = "Related slide";
-        }
-        const number = p.outline.findIndex((item) => item.id === s.id) + 1;
-        b.textContent = number + ". " + label;
-        b.setAttribute(
+      for (const [index, step] of p.outline.entries()) {
+        const button = document.createElement("button");
+        button.className = "outline-step";
+        button.dataset.stepId = step.id;
+        button.textContent = index + 1 + ". " + step.title;
+        button.setAttribute(
           "aria-label",
-          "Slide " +
-            number +
-            ": " +
-            s.title +
-            (parent ? " — related slide" : ""),
+          "Slide " + (index + 1) + ": " + step.title,
         );
-        b.onclick = () => selectSlide(s.id, parent);
-        target.append(b);
-      };
-      for (const s of p.outline.filter((s) => !detours.has(s.id))) {
-        const group = s.chapter || "Narrative";
-        if (group !== chapter) {
-          chapter = group;
-          const h = document.createElement("h3");
-          h.textContent = group;
-          outline.append(h);
-        }
-        const row = document.createElement("div");
-        row.className = "outline-row";
-        row.dataset.rowId = s.id;
-        outline.append(row);
-        addStep(s, null, row);
-        const links = document.createElement("div");
-        links.className = "outline-links";
-        row.append(links);
-        let topic = "";
-        for (const id of s.related || []) {
-          const related = p.outline.find((step) => step.id === id);
-          if (!related) continue;
-          const parts = related.title.split(" · ");
-          const prefix = parts.length > 1 ? parts.slice(0, -1).join(" · ") : "";
-          if (prefix && prefix !== topic) {
-            const label = document.createElement("span");
-            label.className = "related-topic";
-            label.textContent = prefix;
-            links.append(label);
-            topic = prefix;
-          }
-          addStep(
-            related,
-            s.id,
-            links,
-            parts.length > 1 ? parts.at(-1)! : related.title,
-          );
-        }
+        button.onclick = () => selectSlide(step.id);
+        outline.append(button);
       }
     }
     if (!p) return;
-    const parent =
-      p.outline.find(
-        (s) => s.id === relatedParent && (s.related || []).includes(p.current),
-      ) || p.outline.find((s) => (s.related || []).includes(p.current));
-    for (const row of all(".outline-row", outline)) {
-      const active = row.dataset.rowId === (parent?.id || p.current);
-      query(".outline-links", row).hidden = !active;
-    }
     const shown = data.projection;
     const preview = preparing() || !shown ? p.preview : shown;
     const kind = shown?.blank
@@ -535,9 +459,8 @@ export function mountPresentations({ call, update }: MountOptions) {
     $("graph-next").textContent = "Next →";
     $("graph-next").disabled = !neighbour("next");
     $("graph-previous").textContent = "← Previous";
-    $("graph-previous").disabled =
-      !neighbour("previous") && (preparing() || !p.canPrevious);
-    $("graph-return").hidden = preparing() || !p.canReturn;
+    $("graph-previous").disabled = !neighbour("previous");
+    $("graph-return").hidden = true;
     $("graph-defaults").hidden = !p.resolved.missing.length;
     $("graph-build").hidden = p.step.type !== "build";
     $("graph-build").disabled =
@@ -548,7 +471,9 @@ export function mountPresentations({ call, update }: MountOptions) {
       ? "Reopen voting"
       : "Open voting";
     for (const id of ["open", "close"]) {
-      $("graph-" + id).hidden = p.step.type !== "poll";
+      $("graph-" + id).hidden =
+        p.step.type !== "poll" ||
+        (id === "open" && data.graphPoll?.snapshot?.status === "open");
       ($("graph-" + id) as HTMLButtonElement).disabled =
         !data.graphPoll?.configured ||
         !!data.graphPoll?.busy ||
