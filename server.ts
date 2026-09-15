@@ -1044,6 +1044,7 @@ export function createStudio({
         "/": "desk.html",
         "/desk": "desk.html",
         "/stage": "stage.html",
+        "/hypotheses": "hypotheses.html",
         "/debug": "debug.html",
         "/teaching/failure": "failure-demo.html",
         "/failure-demo.mjs": "failure-demo.mjs",
@@ -1063,6 +1064,10 @@ export function createStudio({
           staticFile.endsWith(".mjs") ? ".local/browser/public" : "public",
           staticFile,
         );
+      else if (
+        /^\/lecture-assets\/[a-z0-9-]+\.(jpg|png|gif)$/.test(url.pathname)
+      )
+        path = resolve(root, "public", url.pathname.slice(1));
       else if (url.pathname.startsWith("/vendor/mermaid/")) {
         const vendorRoot = await realpath(
           resolve(root, "node_modules/mermaid/dist"),
@@ -1097,6 +1102,9 @@ export function createStudio({
         ".mjs": "text/javascript",
         ".js": "text/javascript",
         ".woff2": "font/woff2",
+        ".jpg": "image/jpeg",
+        ".png": "image/png",
+        ".gif": "image/gif",
       };
       const type = types[extname(path)] ?? "application/octet-stream";
       res.writeHead(200, { "content-type": type });

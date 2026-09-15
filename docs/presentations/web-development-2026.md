@@ -56,7 +56,7 @@ Versioned export of the Obsidian lecture at `Lectures/Web Development 2026/Prese
       "title": "CERN: finding shared knowledge (1989)",
       "body": "![Tim Berners-Lee beside a computer at CERN, photographed in 1994](https://home.cern/wp-content/uploads/2026/05/9407011_31.jpg)\n\n> Often, the information has been recorded, it just cannot be found.\n\nTim Berners-Lee · Information Management: A Proposal",
       "source": "[5, 24] Berners-Lee · Photo: CERN, 1994",
-      "notes": "Explain changing projects, people leaving and information spread across incompatible systems. This is the problem behind the proposal, not a desire to invent another interface. The source is dated March 1989 and May 1990.\nSource keys resolve to the References slides at the end. Unquoted explanations are lecture paraphrases; diagrams are not archival reproductions. Photo dates from 1994, not the 1989 proposal. Photo source: https://home.cern/science/computing/the-birth-of-the-web/ ; CERN record 39437. Requires network access.\nFull attribution: [5, 24] Tim Berners-Lee · Proposal 1989/1990 · Photo: CERN, 1994",
+      "notes": "Explain changing projects, people leaving and information spread across incompatible systems. This is the problem behind the proposal, not a desire to invent another interface. The source is dated March 1989 and May 1990.\nSource keys resolve to the References slides at the end. Unquoted explanations are lecture paraphrases; diagrams are not archival reproductions. Photo dates from 1994, not the 1989 proposal. Photo source: https://home.cern/science/computing/the-birth-of-the-web/ ; CERN record 39437. If the archival image is unavailable, use the visible explanatory caption.\nFull attribution: [5, 24] Tim Berners-Lee · Proposal 1989/1990 · Photo: CERN, 1994",
       "next": "cern-connections",
       "related": ["cern-connections"],
       "allowRemoteImages": true
@@ -65,9 +65,9 @@ Versioned export of the Obsidian lecture at `Lectures/Web Development 2026/Prese
       "id": "cern-connections",
       "type": "material",
       "title": "CERN: relationships do not fit one filing tree (1989)",
-      "body": "![Original circles-and-arrows diagram from Berners-Lee’s Information Management proposal](https://www.w3.org/History/1989/Image1.gif)",
+      "body": "![Original circles-and-arrows diagram from Berners-Lee’s Information Management proposal](https://www.w3.org/History/1989/Image1.gif)\n\nProjects, people and systems have many relationships; a single filing tree cannot express them all.",
       "source": "[5] © Tim Berners-Lee, 1989/1990 · W3C archive",
-      "notes": "Historical artifact, not a teaching reconstruction. Trace one connection rather than reading every label. Notice the mixture of systems, concepts and relationships. Requires network access.\nFull attribution: [5] Tim Berners-Lee © 1989/1990 · Original proposal diagram, W3C archive",
+      "notes": "Historical artifact, not a teaching reconstruction. Trace one connection rather than reading every label. Notice the mixture of systems, concepts and relationships. If the archival image is unavailable, use the visible explanatory caption.\nFull attribution: [5] Tim Berners-Lee © 1989/1990 · Original proposal diagram, W3C archive",
       "allowRemoteImages": true,
       "chapter": "Past",
       "next": "demo-background"
@@ -139,7 +139,7 @@ Versioned export of the Obsidian lecture at `Lectures/Web Development 2026/Prese
       "chapter": "Past",
       "title": "Which visual theme should shape our app?",
       "body": "Your choice becomes a requirement in the next build.",
-      "notes": "Open the prepared room and close voting to freeze the result. Missing decisions require explicitly accepted defaults.",
+      "notes": "This slide opens its prepared poll automatically; closing or leaving freezes the result. Missing decisions require explicitly accepted defaults.",
       "room": "webdev-2026",
       "poll": {
         "question": "Which visual theme should shape our app?",
@@ -205,9 +205,9 @@ Versioned export of the Obsidian lecture at `Lectures/Web Development 2026/Prese
       "type": "material",
       "chapter": "Past",
       "title": "Otlet: organizing knowledge (1895)",
-      "body": "![Catalogue drawers at the Mundaneum in Mons, photographed in 2011](https://upload.wikimedia.org/wikipedia/commons/9/96/Drawers.jpg)\n\nThe Universal Bibliographic Repertory: a shared catalogue of publications, organized for retrieval.",
+      "body": "![Catalogue drawers at the Mundaneum in Mons, photographed in 2011](/lecture-assets/mundaneum-drawers.jpg)\n\nThe Universal Bibliographic Repertory: a shared catalogue of publications, organized for retrieval.",
       "source": "[1, 29] Mundaneum · Photo: fdecomite, 2011 · CC BY 2.0",
-      "notes": "One ambition, not a biography: make knowledge discoverable beyond a local collection. Mention classification and the broader ideal of international cooperation. A conceptual precursor, not a claim of direct influence on Berners-Lee.\nSource keys resolve to the References slides at the end. Unquoted explanations are lecture paraphrases; diagrams are not archival reproductions.\nTitle year refers to the creation of the Universal Bibliographic Repertory (1895). Date source: Mundaneum, https://mundaneum.org/nl/collections/het-universele-bibliografische-repertorium/ .\nPhoto shows the catalogue drawers at the Mundaneum in Mons in 2011, not the institution in 1895. Point to the physical drawers to explain the scale and work of indexing. Photo: fdecomite, Drawers, 23 February 2011, via Wikimedia Commons; CC BY 2.0. Unmodified. Remote image requires network access.",
+      "notes": "One ambition, not a biography: make knowledge discoverable beyond a local collection. Mention classification and the broader ideal of international cooperation. A conceptual precursor, not a claim of direct influence on Berners-Lee.\nSource keys resolve to the References slides at the end. Unquoted explanations are lecture paraphrases; diagrams are not archival reproductions.\nTitle year refers to the creation of the Universal Bibliographic Repertory (1895). Date source: Mundaneum, https://mundaneum.org/nl/collections/het-universele-bibliografische-repertorium/ .\nPhoto shows the catalogue drawers at the Mundaneum in Mons in 2011, not the institution in 1895. Point to the physical drawers to explain the scale and work of indexing. Photo: fdecomite, Drawers, 23 February 2011, via Wikimedia Commons; CC BY 2.0. Unmodified. If the archival image is unavailable, use the visible explanatory caption. The unmodified CC BY 2.0 photograph is packaged locally; credit and license are in public/lecture-assets/README.md.",
       "next": "vision-bush",
       "related": ["vision-comparison"],
       "allowRemoteImages": true
@@ -217,7 +217,7 @@ Versioned export of the Obsidian lecture at `Lectures/Web Development 2026/Prese
       "type": "material",
       "chapter": "Past",
       "title": "Bush: Memex and associative trails (1945)",
-      "body": "![Conceptual sketch of the proposed Memex desk with side-by-side displays](https://images.computerhistory.org/revonline/images/500004817-03-01.jpg?w=600)",
+      "body": "![Conceptual sketch of the proposed Memex desk with side-by-side displays](https://images.computerhistory.org/revonline/images/500004817-03-01.jpg?w=600)\n\nMemex was a proposal: preserve an associative trail between records, rather than only filing each record in a category.",
       "source": "[2, 15] Memex sketch, c. 1945 · Computer History Museum",
       "notes": "Contrast associative trails with placing each item in a category. The memex was a proposed personal device, not an implemented web. Relate to following references during an assignment.\nSource keys resolve to the References slides at the end. Unquoted explanations are lecture paraphrases; diagrams are not archival reproductions. This is a proposed device, never built. Point to the two displays: how would you preserve the path between two records?\nFull attribution: [2, 15] Memex conceptual sketch · c. 1945 · Computer History Museum, object 500004817",
       "next": "bush-trail",
@@ -239,7 +239,7 @@ Versioned export of the Obsidian lecture at `Lectures/Web Development 2026/Prese
       "type": "material",
       "chapter": "Past",
       "title": "Nelson: hypertext and Xanadu (1965)",
-      "body": "![Nelson’s diagram showing connections between parallel sequences of text](https://xanadu.com.au/ted/XUsurvey/HARTadj5in.JPG)",
+      "body": "![Nelson’s diagram showing connections between parallel sequences of text](https://xanadu.com.au/ted/XUsurvey/HARTadj5in.JPG)\n\nHypertext supports non-sequential reading; Xanadu also pursued visible connections and reuse tied to origins.",
       "source": "[16] Ted Nelson · 1965 diagram, reproduced 2000",
       "notes": "OPTIONAL IF SHORT ON TIME: skip this discussion; keep the next build checkpoint and failure/transfer checks. Hypertext term introduced in 1965. Distinguish basic non-sequential reading from Xanadu’s richer ambition: visible connections and reuse tied to origins. Do not imply the web implemented all of Xanadu. Existing vault clippings on Xanadu offer contrasting contemporary opinions, not historical proof.\nSource keys resolve to the References slides at the end. Unquoted explanations are lecture paraphrases; diagrams are not archival reproductions. Distinguish links between items from shared content (transclusion). This is a conceptual diagram, not a screenshot of a working 1965 system.\nFull attribution: [16] Ted Nelson · 1965 connection diagram reproduced in his 2000 survey, Fig. 1",
       "next": "vision-engelbart",
@@ -251,9 +251,9 @@ Versioned export of the Obsidian lecture at `Lectures/Web Development 2026/Prese
       "type": "material",
       "chapter": "Past",
       "title": "Engelbart: the NLS demonstration (1968)",
-      "body": "![Doug Engelbart speaking beside a shared screen during his 1968 demonstration](https://dougengelbart.org/images/pix/img0029.jpg)",
+      "body": "![Doug Engelbart speaking beside a shared screen during his 1968 demonstration](https://dougengelbart.org/images/pix/img0029.jpg)\n\nThe demonstration combined linked information and shared work: augment people’s ability to solve problems together.",
       "source": "[4, 25] NLS, 1968 · Doug Engelbart Institute",
-      "notes": "Emphasize augmentation rather than replacement. His later NLS work gives a concrete bridge to collaborative applications. Ask students to keep this ambition in mind as an agent helps us build. Avoid turning this into a mouse-invention anecdote.\nSource keys resolve to the References slides at the end. Unquoted explanations are lecture paraphrases; diagrams are not archival reproductions. The photo shows the 1968 demonstration, six years after his 1962 conceptual framework. Point to the shared display: people can work with information together. Source: https://dougengelbart.org/content/view/224/217/ , section 4b. Requires network access.\nFull attribution: [4, 25] NLS demonstration · 9 December 1968 · Doug Engelbart Institute archive",
+      "notes": "Emphasize augmentation rather than replacement. His later NLS work gives a concrete bridge to collaborative applications. Ask students to keep this ambition in mind as an agent helps us build. Avoid turning this into a mouse-invention anecdote.\nSource keys resolve to the References slides at the end. Unquoted explanations are lecture paraphrases; diagrams are not archival reproductions. The photo shows the 1968 demonstration, six years after his 1962 conceptual framework. Point to the shared display: people can work with information together. Source: https://dougengelbart.org/content/view/224/217/ , section 4b. If the archival image is unavailable, use the visible explanatory caption.\nFull attribution: [4, 25] NLS demonstration · 9 December 1968 · Doug Engelbart Institute archive",
       "next": "vision-comparison",
       "related": ["vision-comparison"],
       "allowRemoteImages": true
@@ -284,10 +284,10 @@ Versioned export of the Obsidian lecture at `Lectures/Web Development 2026/Prese
       "type": "material",
       "chapter": "Past",
       "title": "WorldWideWeb browser-editor (1990)",
-      "body": "![WorldWideWeb browser-editor on NeXT: document windows and a link-creation menu, screenshot from 1993](https://www.w3.org/History/1994/WWW/Journals/CACM/screensnap2_24c.gif)",
+      "body": "![WorldWideWeb browser-editor on NeXT: document windows and a link-creation menu, screenshot from 1993](https://www.w3.org/History/1994/WWW/Journals/CACM/screensnap2_24c.gif)\n\nThe browser also edited documents and created links: authoring and reading belonged in the same tool.",
       "allowRemoteImages": true,
       "source": "[14] Berners-Lee / W3C · Screenshot, 1993",
-      "notes": "Use the screenshot instead of explaining the interface in bullets. Point out the Link menu and editing. Ask: what changes when you can create links as well as follow them? This is the 1993 screenshot, not an image of the original 1990 release. Image requires network access.\nFull attribution: [14] Tim Berners-Lee / W3C · WorldWideWeb (written 1990); screenshot 1993",
+      "notes": "Use the screenshot instead of explaining the interface in bullets. Point out the Link menu and editing. Ask: what changes when you can create links as well as follow them? This is the 1993 screenshot, not an image of the original 1990 release. If the archival image is unavailable, use the visible explanatory caption.\nFull attribution: [14] Tim Berners-Lee / W3C · WorldWideWeb (written 1990); screenshot 1993",
       "next": "geocities-personal-page",
       "related": ["web-response"]
     },
@@ -296,7 +296,7 @@ Versioned export of the Obsidian lecture at `Lectures/Web Development 2026/Prese
       "type": "material",
       "chapter": "Past",
       "title": "GeoCities: personal publishing (1994)",
-      "body": "![Archived GeoCities page from CollegePark Lounge 9002, displayed in a browser](https://64.media.tumblr.com/547f0c98f0570a6f43406f27e3660b3d/5e00078737a43466-44/s1280x1920/3593b988bc52c5704bb3c421ac8cc2f81579de9e.png)",
+      "body": "![Archived GeoCities page from CollegePark Lounge 9002, displayed in a browser](https://64.media.tumblr.com/547f0c98f0570a6f43406f27e3660b3d/5e00078737a43466-44/s1280x1920/3593b988bc52c5704bb3c421ac8cc2f81579de9e.png)\n\nPersonal publishing widened who could make a web page, while the hosting platform still controlled its availability.",
       "allowRemoteImages": true,
       "source": "[17] GeoCities archive · Lialina & Espenschied · Capture 2009",
       "notes": "Use briefly after the browser-editor: personal publishing rather than just institutional information. Ask what students would put on a page of their own. Distinguish control of a page’s design from ownership of its hosting platform. Archive capture date is not the page’s creation date. Screenshot produced by Olia Lialina and Dragan Espenschied’s archive project from rescued files; not necessarily a screenshot taken in 2009.\nFull attribution: [17] GeoCities CollegePark/Lounge/9002 · archived 28 April 2009 · One Terabyte of Kilobyte Age\nTitle year refers to GeoCities’ founding, not the archived page or screenshot. Date source: David Bohnett Foundation biography, https://www.bohnettfoundation.org/david-bohnett-bio/ .",
@@ -309,7 +309,7 @@ Versioned export of the Obsidian lecture at `Lectures/Web Development 2026/Prese
       "title": "Microsoft FrontPage 1.1 (1996)",
       "body": "![Microsoft FrontPage 1.1 showing a visual page editor and its View HTML dialog](https://www.webdesignmuseum.org/uploaded/old-software/html-editors/microsoft-frontpage/microsoft-frontpage-1-1-04.png)\n\nEdit the page visually; inspect the HTML it produces.",
       "source": "[26, 30] Microsoft FrontPage 1.1 · Screenshot: Web Design Museum",
-      "notes": "Spend about one minute here. Connect GeoCities’ personal publishing to desktop authoring tools: a visual editor could help people create the files they published. The date refers to Microsoft FrontPage 1.1, not the original Vermeer product. Microsoft acquired Vermeer in January 1996. Avoid presenting vendor claims about ease of use as measured accessibility or browser compatibility. Ask: what does the editor handle, and what must the author still understand?\nSource: Microsoft announcement, 6 August 1996: https://news.microsoft.com/source/1996/08/06/microsoft-frontpage-1-1-momentum-explodes-in-first-two-months-industry-lauds-web-authoring-and-management-tool-as-best-of-breed/\nScreenshot shows FrontPage 1.1 (1996), with the visual editor behind the View HTML dialog. Point out the relationship between the formatted page and its source. Screenshot preserved by Web Design Museum; software interface © Microsoft. This is a later capture of historical software, not a photograph dated 1996. Remote image requires network access.",
+      "notes": "Spend about one minute here. Connect GeoCities’ personal publishing to desktop authoring tools: a visual editor could help people create the files they published. The date refers to Microsoft FrontPage 1.1, not the original Vermeer product. Microsoft acquired Vermeer in January 1996. Avoid presenting vendor claims about ease of use as measured accessibility or browser compatibility. Ask: what does the editor handle, and what must the author still understand?\nSource: Microsoft announcement, 6 August 1996: https://news.microsoft.com/source/1996/08/06/microsoft-frontpage-1-1-momentum-explodes-in-first-two-months-industry-lauds-web-authoring-and-management-tool-as-best-of-breed/\nScreenshot shows FrontPage 1.1 (1996), with the visual editor behind the View HTML dialog. Point out the relationship between the formatted page and its source. Screenshot preserved by Web Design Museum; software interface © Microsoft. This is a later capture of historical software, not a photograph dated 1996. If the archival image is unavailable, use the visible explanatory caption.",
       "next": "editor-dreamweaver",
       "allowRemoteImages": true
     },
@@ -320,7 +320,7 @@ Versioned export of the Obsidian lecture at `Lectures/Web Development 2026/Prese
       "title": "Macromedia Dreamweaver (1997)",
       "body": "![Macromedia Dreamweaver 1.2 visual editor showing a company profile page and formatting controls](https://www.webdesignmuseum.org/uploaded/old-software/html-editors/macromedia-dreamweaver/macromedia-dreamweaver-1-2-05.png)\n\nVisual page editing · Dreamweaver 1.2 (1998)",
       "source": "[27, 31] Macromedia · Screenshot: Web Design Museum, Dreamweaver 1.2",
-      "notes": "Spend about one minute here. This is the Macromedia editor later associated with Adobe. The December 1997 launch emphasized visual authoring and preserving existing HTML when working with an external source editor; do not imply that later split-view UI already existed in the first release. Compare with FrontPage without treating them as identical products or making unsupported claims about their output quality. Transition to the next HTML slide: authoring tools change, but the generated document still matters.\nSource: Macromedia launch announcement dated 8 December 1997, reproduced by MacTech on 9 December: https://www.mactech.com/1997/12/09/md1-macromedia-ships-dreamweaver/\nThe title dates Dreamweaver’s first release in 1997. The screenshot shows version 1.2 for Windows (1998), labeled separately in the caption. Point out the visual document and formatting controls. Screenshot preserved by Web Design Museum; software interface © Macromedia. Remote image requires network access.",
+      "notes": "Spend about one minute here. This is the Macromedia editor later associated with Adobe. The December 1997 launch emphasized visual authoring and preserving existing HTML when working with an external source editor; do not imply that later split-view UI already existed in the first release. Compare with FrontPage without treating them as identical products or making unsupported claims about their output quality. Transition to the next HTML slide: authoring tools change, but the generated document still matters.\nSource: Macromedia launch announcement dated 8 December 1997, reproduced by MacTech on 9 December: https://www.mactech.com/1997/12/09/md1-macromedia-ships-dreamweaver/\nThe title dates Dreamweaver’s first release in 1997. The screenshot shows version 1.2 for Windows (1998), labeled separately in the caption. Point out the visual document and formatting controls. Screenshot preserved by Web Design Museum; software interface © Macromedia. If the archival image is unavailable, use the visible explanatory caption.",
       "next": "step-5",
       "allowRemoteImages": true
     },
@@ -798,10 +798,10 @@ Versioned export of the Obsidian lecture at `Lectures/Web Development 2026/Prese
       "chapter": "Future",
       "title": "Future",
       "body": "What should we be able to delegate?",
-      "notes": "Start constrained Future composition when inputs are ready. Explain that the agent building this app and an agent using it are different roles.\nSource keys resolve to the References slides at the end. Unquoted explanations are lecture paraphrases; diagrams are not archival reproductions.\nFull attribution: Hypothesis · [13] Approved, unpublished position paper (2026)",
+      "notes": "Start constrained Future composition when inputs are ready. Explain that the agent building this app and an agent using it are different roles.\nSource keys resolve to the References slides at the end. Unquoted explanations are lecture paraphrases; diagrams are not archival reproductions.\nFull attribution: Hypothesis · [13] Lecture hypothesis summary (2026); background manuscript unpublished",
       "next": "future-visions",
       "related": ["detour-3-1"],
-      "source": "[13] Lecture hypothesis · Unpublished paper, 2026"
+      "source": "[13] Lecture hypothesis summary, 2026"
     },
     {
       "id": "future-visions",
@@ -831,7 +831,7 @@ Versioned export of the Obsidian lecture at `Lectures/Web Development 2026/Prese
       "chapter": "Future",
       "title": "What should the generated seminar view prioritize?",
       "body": "Your choice becomes a requirement in the next build.",
-      "notes": "Open the prepared room and close voting to freeze the result. Missing decisions require explicitly accepted defaults.",
+      "notes": "This slide opens its prepared poll automatically; closing or leaving freezes the result. Missing decisions require explicitly accepted defaults.",
       "room": "webdev-2026-priority",
       "poll": {
         "question": "What should the generated seminar view prioritize?",
@@ -917,8 +917,8 @@ Versioned export of the Obsidian lecture at `Lectures/Web Development 2026/Prese
       "type": "material",
       "title": "Provider-designed and agent-composed interfaces",
       "body": "```mermaid\nflowchart LR\n C[Shared capability] --> P[Provider-designed interface]\n C --> A[Agent-composed interface]\n P --> H[Human use]\n A --> H\n```\n\nThese can coexist. A generated view alone does not show that an agent can safely execute service actions.",
-      "notes": "Which application needs a stable interface? These directions can coexist; neither is an established outcome.\nSource keys resolve to the References slides at the end. Unquoted explanations are lecture paraphrases; diagrams are not archival reproductions.\nFull attribution: Original diagram of a hypothesis · [13] Approved, unpublished position paper (2026)",
-      "source": "[13] Lecture hypothesis · Unpublished paper, 2026",
+      "notes": "Which application needs a stable interface? These directions can coexist; neither is an established outcome.\nSource keys resolve to the References slides at the end. Unquoted explanations are lecture paraphrases; diagrams are not archival reproductions.\nFull attribution: Original diagram of a hypothesis · [13] Lecture hypothesis summary (2026); background manuscript unpublished",
+      "source": "[13] Lecture hypothesis summary, 2026",
       "chapter": "Future",
       "next": "step-15"
     },
@@ -929,7 +929,7 @@ Versioned export of the Obsidian lecture at `Lectures/Web Development 2026/Prese
       "body": "**In pairs · 45 seconds**\n\nChoose one application type you know: a banking app, a course planner, a travel search…\n\nSubmit its type on live.scalableweb.dev in up to 32 characters.\n\nWe’ll select two contrasting examples from the approved responses.",
       "notes": "Showing this slide live opens a word collection. Ask for an application type, not an interface preference yet. Close collection and approve relevant examples. Select two contrasting types to discuss on the next slide. Keep submissions unprojected until approved.",
       "related": ["detour-3-1"],
-      "source": "[13] Lecture hypothesis · Unpublished paper, 2026",
+      "source": "[13] Lecture hypothesis summary, 2026",
       "chapter": "Future",
       "next": "application-interface-choice",
       "wordCloud": true
@@ -942,7 +942,7 @@ Versioned export of the Obsidian lecture at `Lectures/Web Development 2026/Prese
       "body": "Choose one approved application type below and name a specific user task.\n\n**A · Stable:** the same controls and structure each time.\n\n**B · Generated:** a view composed for the task.\n\n**C · Mixed:** stable core actions with generated supporting views.\n\nReport: **application + task → A, B or C → reason**.",
       "reviewWordsFrom": ["step-15"],
       "notes": "OPTIONAL IF SHORT ON TIME: skip this discussion; keep the next build checkpoint and failure/transfer checks. Take one application type at a time so answers refer to the same case. Ask a pair to name its task and choose A, B or C with a reason; invite another pair to challenge it. Repeat with a contrasting type. Discuss familiarity, error cost, accessibility and variation between tasks. This is a spoken comparison, not an aggregate poll across unrelated applications. These are design hypotheses, not forecasts.",
-      "source": "[13] Lecture hypothesis · Unpublished paper, 2026",
+      "source": "[13] Lecture hypothesis summary, 2026",
       "next": "meaning-and-action"
     },
     {
@@ -981,8 +981,8 @@ Versioned export of the Obsidian lecture at `Lectures/Web Development 2026/Prese
       "type": "material",
       "title": "Describe an action once",
       "body": "For **submit seminar interests**, describe:\n\n- **Inputs:** allowed experience, topics and format\n- **Preconditions:** valid fields and an authorized submission\n- **Outcome:** stored response and explicit confirmation\n- **Failure:** preserved input and an honest unknown state\n\nShared semantics may help different clients. They do not by themselves guarantee accessibility or reliable agent action.",
-      "notes": "Ask for a counterexample. Shared semantics do not guarantee accessibility or better agent performance.\nSource keys resolve to the References slides at the end. Unquoted explanations are lecture paraphrases; diagrams are not archival reproductions.\nFull attribution: Hypothesis · [13] Approved, unpublished position paper (2026)",
-      "source": "[13] Lecture hypothesis · Unpublished paper, 2026",
+      "notes": "Ask for a counterexample. Shared semantics do not guarantee accessibility or better agent performance.\nSource keys resolve to the References slides at the end. Unquoted explanations are lecture paraphrases; diagrams are not archival reproductions.\nFull attribution: Hypothesis · [13] Lecture hypothesis summary (2026); background manuscript unpublished",
+      "source": "[13] Lecture hypothesis summary, 2026",
       "chapter": "Future",
       "next": "step-17"
     },
@@ -1042,7 +1042,7 @@ Versioned export of the Obsidian lecture at `Lectures/Web Development 2026/Prese
       "chapter": "Closing",
       "title": "What would you test next?",
       "body": "Suggest one next test for our seminar app in 1–3 words.\n\n**Word cloud · 45 seconds**\n\nOn live.scalableweb.dev, open **Add words** and send one response (up to 32 characters).\n\nWe’ll discuss two approved suggestions: what would each test help us decide?",
-      "notes": "While Live is on, open Responses, choose Word cloud, enter “What would you test next?”, and open a new collection. Allow 45 seconds, close collection, review privately, approve relevant responses, then show the approved cloud. Pick two contrasting suggestions and ask what result would support or challenge the proposed direction. Frequency is not a vote. If collection is unavailable, take two spoken suggestions. Use Back to slide, then advance to the closing takeaway. Do not start another build.",
+      "notes": "This slide opens its word collection automatically while Live is on. Allow 45 seconds, close collection, review privately, approve relevant responses, then show the approved cloud. Pick two contrasting suggestions and ask what result would support or challenge the proposed direction. Frequency is not a vote. If collection is unavailable, take two spoken suggestions. Use Back to slide, then advance to the closing takeaway. Do not start another build.",
       "next": "audience-evidence-recap",
       "related": ["accessibility-parallels", "meaning-and-action"],
       "wordCloud": true
@@ -1104,8 +1104,8 @@ Versioned export of the Obsidian lecture at `Lectures/Web Development 2026/Prese
       "type": "material",
       "chapter": "References",
       "title": "References · Position and imagery",
-      "body": "- [13] *Hypermedia as a Substrate for the Agentic Web: From Documents to Affordances* (2026). Approved, unpublished position paper; manuscript supplied by the lecturer.\n- [14] Tim Berners-Lee. [The WorldWideWeb browser](https://www.w3.org/People/Berners-Lee/WorldWideWeb.html). Browser-editor written in 1990; reproduced screenshot from 1993.",
-      "notes": "Reference appendix, not timed lecture content. Citation keys are unchanged. [13] is a position paper, not empirical proof; context receipts and teaching diagrams are lecture proposals.",
+      "body": "- [13] [Lecture hypotheses and ways to test them](https://live.scalableweb.dev/hypotheses) (2026). Student-facing summary of the proposals used here; hypotheses, not empirical results. Background: *Hypermedia as a Substrate for the Agentic Web: From Documents to Affordances*, unpublished manuscript supplied by the lecturer.\n- [14] Tim Berners-Lee. [The WorldWideWeb browser](https://www.w3.org/People/Berners-Lee/WorldWideWeb.html). Browser-editor written in 1990; reproduced screenshot from 1993.",
+      "notes": "Student-accessible summary is bundled with the audience app at /hypotheses and available locally at /hypotheses. It states the lecture proposals without claiming to reproduce the unpublished manuscript.",
       "next": "references-4"
     },
     {

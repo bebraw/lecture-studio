@@ -1,5 +1,7 @@
 # Lecture Studio
 
+For the current lecture workflow, use the [operator guide](docs/operator-guide.md) and [90-minute run of show](LECTURE-NARRATIVE.md). The guide takes precedence over the legacy manual preparation workflows below.
+
 ## Live broadcast and deployment
 
 ### Private audience responses
@@ -15,7 +17,7 @@ shared stage. Pending submissions remain private to the lecturer. Approving word
   Repeated terms are combined case-insensitively; the 40 most frequent approved
   terms are shown with counts. New submissions require another review and show.
 - **Close collection** stops submissions without removing responses.
-  **Open new collection** replaces the old queue after confirmation. Live off
+  **Open new collection** starts a separate manual word collection; automatic slide clouds retain their own rounds, and the questions queue resumes independently. Live off
   also closes collection. No votes are affected.
 
 Limits: 400 characters per question; 1–3 words / 32 characters per cloud response;
@@ -41,8 +43,7 @@ Worker; the main scalableweb.dev site is unchanged.
 
 The header's **Live** control is server-owned. Live off clears the public student
 view to “Waiting for the lecturer”; browsing slides remains private. Live on
-immediately broadcasts the selected slide. Close any open vote before turning
-Live off. If the audience service cannot confirm the update, the desk reports an
+immediately broadcasts the selected slide. Live off automatically closes any open vote. If the audience service cannot confirm the update, the desk reports an
 error rather than claiming the broadcast stopped. Reloading a desk does not
 change Live state; restarting the local server starts with Live off.
 

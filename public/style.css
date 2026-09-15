@@ -2541,3 +2541,8 @@ blockquote {
     grid-template-columns: 1fr auto;
   }
 }
+
+/* Leave space for the historical claim when a source image has a caption. */
+.stage .stage-copy:has(> p + p):not(:has(blockquote)) img {
+  max-height: 48vh;
+}

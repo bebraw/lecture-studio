@@ -61,12 +61,6 @@ export function mountFeedback({ call, update }: MountOptions) {
   };
   const act = async (action: ApiBody<"feedback">["action"], id?: string) => {
     if (busy) return;
-    if (
-      action === "start" &&
-      snapshot?.items?.length &&
-      !confirm("Start a new collection? Current responses will be removed.")
-    )
-      return;
     busy = true;
     revision++;
     try {

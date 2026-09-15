@@ -52,3 +52,13 @@ await cp(
       (await stat(source)).isDirectory() || /\.(mjs|js|woff2)$/.test(source),
   },
 );
+
+await cp(
+  new URL("public/lecture-assets/", root),
+  new URL("lecture-assets/", output),
+  { recursive: true },
+);
+await copyFile(
+  new URL("public/hypotheses.html", root),
+  new URL("hypotheses.html", output),
+);

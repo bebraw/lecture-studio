@@ -88,14 +88,19 @@ export function renderMarkdown(
       })
       .join("");
   };
-  md.validateLink = (url) => /^https:\/\//i.test(url);
+  md.validateLink = (url) =>
+    /^https:\/\//i.test(url) ||
+    /^\/lecture-assets\/[a-z0-9-]+\.(jpg|png|gif)$/.test(url);
   const escape = md.utils.escapeHtml;
   md.renderer.rules.image = (tokens, index) => {
     const token = tokens[index];
     if (!token) throw new Error("Missing Markdown image token");
     const src = String(token.attrGet("src") ?? ""),
       alt = escape(token.content || "Source image");
-    if (allowRemoteImages && /^https:\/\//i.test(src))
+    if (
+      /^\/lecture-assets\/[a-z0-9-]+\.(jpg|png|gif)$/.test(src) ||
+      (allowRemoteImages && /^https:\/\//i.test(src))
+    )
       return (
         '<img referrerpolicy="no-referrer" src="' +
         escape(src) +

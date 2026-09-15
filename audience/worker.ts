@@ -217,7 +217,9 @@ export default {
           "/room.css",
           "/shared.mjs",
         ].includes(url.pathname) ||
-        url.pathname.startsWith("/vendor/mermaid/"))
+        url.pathname.startsWith("/vendor/mermaid/") ||
+        url.pathname.startsWith("/lecture-assets/") ||
+        url.pathname === "/hypotheses")
     ) {
       const asset = await env.ASSETS.fetch(request);
       const response = new Response(asset.body, asset);
