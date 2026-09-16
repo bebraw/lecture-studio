@@ -211,7 +211,11 @@ export const bridgeSchema = v.object({
 export const deskSchema = v.object({
   live: v.boolean(),
   projection: stageSchema,
-  audienceSync: v.object({ error: text, readiness: optionalText }),
+  audienceSync: v.object({
+    error: text,
+    readiness: optionalText,
+    active: v.exactOptional(v.nullable(v.number())),
+  }),
   presentation: v.nullable(presentationSchema),
   graphPoll: v.nullable(pollSchema),
   acts: v.array(

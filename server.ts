@@ -144,6 +144,7 @@ export function createStudio({
     graphPoll: AudiencePoll | null = null,
     graphBusy = false;
   let audienceSessionStarted = false;
+  let workspacePrepared = false;
   const graphPolls = new Map<string, AudiencePoll>();
   const getGraphPoll = (step: Step) => {
     let selected = graphPolls.get(step.id);
@@ -180,7 +181,7 @@ export function createStudio({
     await selected.act("open");
   };
   const teachingRecords = new Set<string>();
-  const servePreparedDemo = preparedDemo();
+  let servePreparedDemo = preparedDemo();
   const buildPreviews = new Map<string, string>();
   const captureBuildPreview = () => {
     const run = presentation?.runs.at(-1);
@@ -279,16 +280,11 @@ export function createStudio({
     };
     blank = false;
   };
-  const resetLecture = () => {
-    feedbackPrevious = null;
+  const disconnectBuilder = () => {
     previewTunnel.close();
-    live = false;
-    poll.reset();
-    pollOnStage = false;
-    presentation = null;
-    audienceSessionStarted = false;
-    graphPoll = null;
-    graphPolls.clear();
+    buildPreviews.clear();
+    teachingRecords.clear();
+    servePreparedDemo = preparedDemo();
     bridge.close();
     Object.assign(bridge.state, {
       status: "disconnected",
@@ -301,6 +297,19 @@ export function createStudio({
       finishedAt: null,
       outcome: null,
     });
+  };
+  const resetLecture = () => {
+    feedbackPrevious = null;
+    previewTunnel.close();
+    live = false;
+    poll.reset();
+    pollOnStage = false;
+    presentation = null;
+    audienceSessionStarted = false;
+    workspacePrepared = false;
+    graphPoll = null;
+    graphPolls.clear();
+    disconnectBuilder();
     draft = initialDraft();
     publishedDraft = initialDraft();
     stage = publicStage(publishedDraft, ++version);
@@ -358,7 +367,11 @@ export function createStudio({
     return {
       live,
       projection: publicState(),
-      audienceSync: { error: audienceSync.error, readiness: audienceReadiness },
+      audienceSync: {
+        error: audienceSync.error,
+        readiness: audienceReadiness,
+        active: audienceSync.active,
+      },
       presentation: presentation?.state() || null,
       graphPoll: graphPoll?.state() || null,
       acts,
@@ -473,6 +486,7 @@ export function createStudio({
       await previewTunnel.open(url, origin);
   };
   const broadcastTimer = setInterval(() => {
+    void audienceSync.refreshPresence();
     if (!liveTransition) audienceSync.publish(audienceState());
   }, 1000);
   broadcastTimer.unref();
@@ -629,6 +643,36 @@ export function createStudio({
                 throw new Error("Choose Live on or off");
               if (body.live) {
                 if (!presentation) throw new Error("Load a presentation first");
+                if (!workspacePrepared) {
+                  if (
+                    bridge.state.turnId ||
+                    ["running", "waiting"].includes(bridge.state.status)
+                  )
+                    throw new Error(
+                      "Finish or interrupt the current build before starting a new lecture",
+                    );
+                  rehearsalJob = { status: "creating" };
+                  try {
+                    const next = await rehearsals.create();
+                    disconnectBuilder();
+                    workspace = next;
+                    workspacePrepared = true;
+                    rehearsalJob = { status: "ready" };
+                  } catch {
+                    rehearsalJob = {
+                      status: "failed",
+                      error:
+                        "Fresh project setup failed. Existing project retained; retry Live on.",
+                    };
+                    throw new Error(rehearsalJob.error);
+                  }
+                  try {
+                    await bridge.connect(workspace);
+                  } catch {
+                    bridge.state.activity =
+                      "Fresh app ready; retry Codex in Connections.";
+                  }
+                }
                 if (!audienceSessionStarted && poll.origin && poll.token) {
                   const response = await poll.fetcher(
                     poll.origin + "/presenter/reset-lecture",
@@ -740,6 +784,7 @@ export function createStudio({
               wordCloudRounds.clear();
               wordCloudStep = null;
               audienceSessionStarted = false;
+              workspacePrepared = false;
               graphPoll = null;
               graphPolls.clear();
               buildPreviews.clear();
@@ -894,6 +939,7 @@ export function createStudio({
             .then((next) => {
               workspace = next;
               resetLecture();
+              workspacePrepared = true;
               rehearsalJob = { status: "ready" };
             })
             .catch(() => {

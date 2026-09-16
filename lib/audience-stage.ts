@@ -57,6 +57,9 @@ export class AudienceStageSync {
   busy: boolean;
   error: string;
   closed: boolean;
+  active: number | null = null;
+  presenceBusy = false;
+  presenceChecked = 0;
   timer?: ReturnType<typeof setTimeout> | null;
 
   constructor({
@@ -81,6 +84,40 @@ export class AudienceStageSync {
     if (!this.origin || !this.token || this.closed) return;
     this.pending = JSON.stringify(audienceStage(state));
     if (!this.timer) void this.flush();
+  }
+  async refreshPresence() {
+    if (
+      !this.origin ||
+      !this.token ||
+      this.closed ||
+      this.presenceBusy ||
+      Date.now() - this.presenceChecked < 10000
+    )
+      return;
+    this.presenceBusy = true;
+    this.presenceChecked = Date.now();
+    try {
+      const response = await this.fetcher(this.origin + "/presenter/presence", {
+        headers: { authorization: "Bearer " + this.token },
+        signal: AbortSignal.timeout(5000),
+      });
+      const value: unknown = await response.json();
+      if (
+        !response.ok ||
+        !value ||
+        typeof value !== "object" ||
+        !("active" in value) ||
+        !Number.isInteger(value.active) ||
+        Number(value.active) < 0 ||
+        Number(value.active) > 2000
+      )
+        throw new Error("Invalid presence");
+      this.active = Number(value.active);
+    } catch {
+      this.active = null;
+    } finally {
+      this.presenceBusy = false;
+    }
   }
   async deliver(state: Partial<Stage>) {
     if (!this.origin || !this.token) return;

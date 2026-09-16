@@ -27,6 +27,53 @@ Versioned export of the Obsidian lecture at `Lectures/Web Development 2026/Prese
       "title": "Today’s route",
       "body": "1. **Past** — Finding knowledge; documents, links and native forms\n2. **Present** — Browser interaction; AJAX and shared state\n3. **Future** — What people might delegate to agents\n4. **References** — Sources and further reading",
       "notes": "Introduce the route before the CERN example. Across the sections, we build and inspect one application together.",
+      "next": "join-live"
+    },
+    {
+      "id": "join-live",
+      "type": "material",
+      "chapter": "Opening",
+      "title": "Join the live lecture",
+      "body": "![Scan to open https://live.scalableweb.dev/](/lecture-assets/live-qr.png)\n\n[**live.scalableweb.dev**](https://live.scalableweb.dev/)\n\nKeep this page open for votes and word clouds. No account needed.",
+      "notes": "Explain the phone/browser setup here. The QR opens the direct audience URL with no redirect. Check the active-browser count beside Live. Students can also type the printed URL. Use the next two practice activities to check that everyone can participate.",
+      "next": "practice-poll"
+    },
+    {
+      "id": "practice-poll",
+      "type": "poll",
+      "chapter": "Opening",
+      "title": "Practice vote: which drink would you pick?",
+      "body": "",
+      "room": "webdev-2026-practice",
+      "poll": {
+        "question": "Practice vote: which drink would you pick?",
+        "options": [
+          {
+            "id": "coffee",
+            "label": "Coffee"
+          },
+          {
+            "id": "tea",
+            "label": "Tea"
+          },
+          {
+            "id": "water",
+            "label": "Water"
+          }
+        ],
+        "defaultId": "water"
+      },
+      "notes": "Practice only; this result does not affect any build. Showing the slide opens voting. Ask students to choose and submit, then try changing their choice. Close voting to show the result.",
+      "next": "practice-cloud"
+    },
+    {
+      "id": "practice-cloud",
+      "type": "question",
+      "chapter": "Opening",
+      "title": "Practice word cloud: name a place you would like to visit",
+      "body": "Enter **one place per line** on live.scalableweb.dev.\n\nUse 1–3 words per idea, up to 32 characters. Submit up to five ideas together.",
+      "wordCloud": true,
+      "notes": "Practice only; these words are never used in build prompts. Showing this slide opens its collection. Close collection, review privately, approve a few entries, and show the approved cloud. Demonstrate that multiple ideas use separate lines. Return to the slide before continuing.",
       "next": "step-4"
     },
     {
@@ -139,10 +186,32 @@ Versioned export of the Obsidian lecture at `Lectures/Web Development 2026/Prese
       "chapter": "Past",
       "title": "HTML: headings, paragraphs and links",
       "body": "```html\n<h1>Seminar</h1>\n<p>Topic, date and location.</p>\n<a href=\"https://www.sdlcai.org/\">Seminar details</a>\n```\n\n### Seminar\nTopic, date and location.\n\n[Seminar details](https://www.sdlcai.org/)",
-      "notes": "Identify the heading, paragraph and link. This modern HTML teaching example leads directly into the app scenario: a seminar page can answer practical questions, but we still need to decide which information belongs first. The link opens the real SDLCAI site. Introduce the seminar and visitor task on the next slide.",
-      "next": "demo-background",
+      "notes": "Identify the heading, paragraph and link. This modern HTML teaching example leads directly into the app scenario: a seminar page can answer practical questions, but we still need to decide which information belongs first. The link opens the real SDLCAI site. Next distinguish styling and browser behavior, then introduce the seminar and visitor task.",
+      "next": "css-foundations",
       "related": [],
       "source": "[7, 18] HTML semantics · Teaching example"
+    },
+    {
+      "id": "css-foundations",
+      "type": "material",
+      "chapter": "Past",
+      "title": "CSS: presentation rules (1996)",
+      "body": "Style the same HTML without changing its meaning.\n\n```css\nh1 {\n  color: navy;\n  font-size: 2em;\n}\n```\n\nThe selector chooses headings; the declarations change how they look.",
+      "source": "[40] W3C · CSS1 Recommendation, 17 December 1996",
+      "notes": "Håkon Wium Lie proposed CSS in 1994; the title marks the first W3C Recommendation, co-authored with Bert Bos, in 1996. Point back to the HTML h1: it remains a heading when its color or size changes. The cascade combines rules from different sources. Keep this at the level of structure versus presentation; the onion model returns to it later. This is an original teaching example.",
+      "related": [],
+      "next": "javascript-foundations"
+    },
+    {
+      "id": "javascript-foundations",
+      "type": "material",
+      "chapter": "Past",
+      "title": "JavaScript: behavior in the browser (1995)",
+      "body": "Respond to an action and update the current page.\n\n```javascript\nconst button = document.querySelector(\"button\");\nbutton.addEventListener(\"click\", () => {\n  document.querySelector(\"h1\").textContent = \"Welcome!\";\n});\n```\n\nChanging the page does not by itself save anything on the server.",
+      "source": "[41] Wirfs-Brock & Eich · JavaScript: The First 20 Years",
+      "notes": "Brendan Eich created JavaScript at Netscape in 1995. This uses modern syntax and DOM APIs; it is not 1995 source code. Assume the page has a button and heading. Explain the event, handler and visible change. The DOM is a browser API used from JavaScript. We cover HTML, CSS and JS by role, not strict release order; CSS1’s Recommendation followed JavaScript’s introduction. Transition to using these tools to build the seminar app.",
+      "related": [],
+      "next": "demo-background"
     },
     {
       "id": "demo-background",
@@ -1067,7 +1136,16 @@ Versioned export of the Obsidian lecture at `Lectures/Web Development 2026/Prese
       "chapter": "References",
       "title": "References · Browser applications and frameworks",
       "body": "- [32] Alex Hopmann. [The Story of XMLHTTP](https://www.alexhopmann.com/page/the-story-of-xmlhttp). Firsthand account of Outlook Web Access and XMLHTTP.\n- [33] Paul Buchheit (2005). [Guess what just turned 34?](https://googleblog.blogspot.com/2005/10/guess-what-just-turned-34.html). Gmail’s launch and dynamic interface.\n- [34] React. [React Versions](https://react.dev/versions). Open-source release: 29 May 2013.\n- [35] Evan You (2014). [First Week of Launching Vue.js](https://blog.evanyou.me/2014/02/11/first-week-of-launching-an-oss-project/).\n- [36] Google Open Source (2016). [Angular, version 2](https://opensource.googleblog.com/2016/09/angular-version-2-proprioception.html).\n- [37] Angular. [What is Angular?](https://angular.dev/docs); AngularJS. [Developer Guide](https://docs.angularjs.org/guide).\n- [38] ServerWatch (2002). [Exchange 2000 OWA tutorial, Figure 5](https://www.serverwatch.com/guides/learn-exchange-server-2000-setting-up-outlook-web-access-to-use-ssl-page-2/). Contemporary screenshot; interface © Microsoft.\n- [39] Google (2019). [Hitting send on the next 15 years of Gmail](https://blog.google/products-and-platforms/products/gmail/hitting-send-on-the-next-15-years-of-gmail/). Original 2004 inbox screenshot.",
-      "notes": "Early application examples are drawn from their developers’ accounts. They establish examples and dates, not an exclusive invention claim."
+      "notes": "Early application examples are drawn from their developers’ accounts. They establish examples and dates, not an exclusive invention claim.",
+      "next": "references-css-javascript"
+    },
+    {
+      "id": "references-css-javascript",
+      "type": "material",
+      "chapter": "References",
+      "title": "References · CSS and JavaScript",
+      "body": "- [40] Håkon Wium Lie and Bert Bos (1996). [Cascading Style Sheets, level 1](https://www.w3.org/TR/REC-CSS1/). W3C Recommendation, 17 December 1996. See also [W3C’s history of CSS](https://www.w3.org/Style/CSS20/history.html) for the 1994 proposal.\n- [41] Allen Wirfs-Brock and Brendan Eich (2020). [JavaScript: The First 20 Years](https://doi.org/10.1145/3386327). History by key participants; [open author copy](https://zenodo.org/records/4960086).",
+      "notes": "Dates distinguish the introduction of JavaScript in 1995 from the CSS1 Recommendation in 1996. Slide code is a modern teaching example, not historical source."
     }
   ]
 }

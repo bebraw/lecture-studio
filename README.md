@@ -113,6 +113,10 @@ Optional settings are documented in [.env.example](.env.example). Create your ow
 
 ## A ten-minute rehearsal
 
+Starting **Live on** for a newly loaded/restarted presentation prepares a fresh numbered app checkout from the pinned starter. It clears the prior builder session and preview records without deleting earlier checkouts. Setup failure preserves the current project and leaves the new lecture unstarted. Turning Live off and on during the same lecture retains that lecture’s project. Allow time for cloning and dependency installation before students arrive.
+
+The opening QR slide links directly to `https://live.scalableweb.dev/`, followed by an isolated practice vote and moderated practice word cloud. Practice responses are not used in build prompts. **Following** beside the desk Live toggle and in the audience footer counts anonymous browsers with a heartbeat in the last 45 seconds, not people. Tabs share a short-lived cookie; hidden tabs expire and embedded debug previews are excluded. No IP address or identifying profile is stored for this count.
+
 1. Open the desk and stage side by side. Move the stage to the projected display.
 2. Open **Connections** in the header and connect Obsidian. Select a concept, then its **Stage block** or **Visual** section. Reading it does not project it. The header shows both service statuses; note exploration also connects Obsidian automatically.
 3. Use the section in the draft. Edit it, then press **Show this to the room**. Try blanking and unblanking the stage.

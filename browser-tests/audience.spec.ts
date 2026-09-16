@@ -221,7 +221,7 @@ test("students follow the stage without losing their poll selection", async ({
   await publish("Stopped", false);
   expect(
     await (await fetch(new URL("/api/audience", audience.url))).json(),
-  ).toEqual({ stage: null, poll: null });
+  ).toEqual({ stage: null, poll: null, active: 1 });
   await expect(
     page.getByRole("heading", { name: "Waiting for the lecturer" }),
   ).toBeVisible();
@@ -491,5 +491,5 @@ test("public capabilities describe required rooms without activating a lecture",
   });
   expect(
     await (await fetch(new URL("/api/audience", audience.url))).json(),
-  ).toEqual({ stage: null, poll: null });
+  ).toEqual({ stage: null, poll: null, active: 0 });
 });

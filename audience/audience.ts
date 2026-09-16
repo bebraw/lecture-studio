@@ -18,6 +18,20 @@ import {
 const main = query("#stage-content", document),
   notice = query("#stage-connection", document);
 const updateStatus = createStageStatus();
+// One short-lived anonymous browser identity; embedded desk previews do not join.
+async function heartbeat() {
+  if (window.top === window.self && document.visibilityState === "visible") {
+    try {
+      await fetch("/api/presence", {
+        method: "POST",
+        signal: AbortSignal.timeout(5000),
+      });
+    } catch {}
+  }
+}
+void heartbeat();
+setInterval(() => void heartbeat(), 15000);
+document.addEventListener("visibilitychange", () => void heartbeat());
 let key = "",
   submitting = false,
   voteError = "";
@@ -102,10 +116,12 @@ async function refresh() {
       signal: AbortSignal.timeout(8000),
     });
     if (!response.ok) throw new Error();
-    const { stage, poll } = v.parse(
+    const { stage, poll, active } = v.parse(
       audienceResponseSchema,
       await response.json(),
     );
+    query("#audience-followers", document).textContent =
+      active === undefined ? "Following: unavailable" : `${active} following`;
     const next = poll
       ? "poll:" + poll.id
       : JSON.stringify(stage && { ...stage, build: undefined });
@@ -130,6 +146,8 @@ async function refresh() {
     updateStatus(poll ? null : stage);
     notice.textContent = voteError;
   } catch {
+    query("#audience-followers", document).textContent =
+      "Following: unavailable";
     notice.textContent = "Connection lost · holding the last view";
   }
 }

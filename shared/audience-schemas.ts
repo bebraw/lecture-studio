@@ -12,6 +12,7 @@ export const audienceStageSchema = v.object({
   version: v.optional(v.union([v.string(), v.number()]), 0),
 });
 export const audienceResponseSchema = v.object({
+  active: v.exactOptional(v.number()),
   stage: v.nullable(audienceStageSchema),
   poll: v.nullable(
     v.object({ id: v.string(), question: v.string(), html: v.string() }),

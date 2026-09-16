@@ -8,6 +8,9 @@ export class StageState extends DurableObject<Env> {
   constructor(ctx: DurableObjectState, env: Env) {
     super(ctx, env);
     ctx.storage.sql.exec(
+      "CREATE TABLE IF NOT EXISTS audience_presence (browser TEXT PRIMARY KEY, seen INTEGER NOT NULL)",
+    );
+    ctx.storage.sql.exec(
       "CREATE TABLE IF NOT EXISTS feedback_meta (id INTEGER PRIMARY KEY, round TEXT, mode TEXT, prompt TEXT, opened INTEGER, expires INTEGER)",
     );
     ctx.storage.sql.exec(
@@ -30,6 +33,33 @@ export class StageState extends DurableObject<Env> {
     if (stage.live === false)
       this.ctx.storage.sql.exec("UPDATE feedback_meta SET opened=0");
     await this.ctx.storage.put("stage", stage);
+  }
+  presence(browser?: string) {
+    const sql = this.ctx.storage.sql;
+    const now = Date.now();
+    sql.exec("DELETE FROM audience_presence WHERE seen<=?", now - 45000);
+    if (browser && /^[a-f0-9-]{36}$/.test(browser)) {
+      sql.exec(
+        "UPDATE audience_presence SET seen=? WHERE browser=?",
+        now,
+        browser,
+      );
+      if (
+        sql
+          .exec<{ n: number }>("SELECT count(*) n FROM audience_presence")
+          .one().n < 2000
+      )
+        sql.exec(
+          "INSERT OR IGNORE INTO audience_presence VALUES (?,?)",
+          browser,
+          now,
+        );
+    }
+    return {
+      active: sql
+        .exec<{ n: number }>("SELECT count(*) n FROM audience_presence")
+        .one().n,
+    };
   }
   async read() {
     return (

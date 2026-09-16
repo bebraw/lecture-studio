@@ -37,6 +37,12 @@ export function mountPresentations({ call, update }: MountOptions) {
   liveToggle.title =
     "Off: audience waits while you prepare privately. On: broadcast the selected slide.";
   query(".mode-switch", document).append(liveToggle);
+  const followers = document.createElement("span");
+  followers.id = "audience-followers";
+  followers.className = "small muted";
+  followers.title =
+    "Active browsers seen in the last 45 seconds. Multiple tabs share an identity; hidden tabs expire. Embedded debug views are excluded. This is not an exact headcount.";
+  liveToggle.after(followers);
   $("prepare-mode").hidden = true;
   $("present-mode").hidden = true;
   let liveChanging = false;
@@ -153,7 +159,7 @@ export function mountPresentations({ call, update }: MountOptions) {
     if (
       !data?.presentation ||
       !confirm(
-        "Restart this presentation from its latest Obsidian content? Slide position and recorded presentation decisions will reset. App workspace files will stay intact.",
+        "Restart this presentation from its latest Obsidian content? Slide position and decisions will reset. The next Live on prepares a fresh app project; the previous project is retained separately.",
       )
     )
       return;
@@ -358,6 +364,10 @@ export function mountPresentations({ call, update }: MountOptions) {
     });
   return (value: DeskState) => {
     data = value;
+    followers.textContent =
+      data.audienceSync.active == null
+        ? "Following: unavailable"
+        : `${data.audienceSync.active} following`;
     const p = data.presentation;
     syncNotice.textContent =
       data.audienceSync?.error || data.audienceSync?.readiness || "";
@@ -371,6 +381,8 @@ export function mountPresentations({ call, update }: MountOptions) {
       (data.live ? $("present-mode") : $("prepare-mode")).click();
     liveToggle.disabled = !p || liveChanging;
     syncLive();
+    if (data.rehearsalJob.status === "creating")
+      liveToggle.textContent = "Preparing fresh app…";
     document.body.classList.toggle("using-presentation", !!p);
     panel.hidden = !p;
     name.textContent = p?.title || "Choose presentation";

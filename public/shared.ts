@@ -89,7 +89,9 @@ export async function api<P extends ApiPath>(
   if (value !== undefined) validateApiRequest(path, value);
   const response = await fetch("/api/" + path, {
     // First connection can clone the pinned starter and install dependencies.
-    signal: AbortSignal.timeout(path === "codex/connect" ? 360000 : 65000),
+    signal: AbortSignal.timeout(
+      ["codex/connect", "presentation/live"].includes(path) ? 360000 : 65000,
+    ),
     headers: {
       Authorization: "Bearer " + token,
       ...(value === undefined ? {} : { "content-type": "application/json" }),

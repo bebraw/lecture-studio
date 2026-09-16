@@ -12,6 +12,64 @@ import {
 } from "../lib/rehearsals.ts";
 import { fixture } from "./fixture.ts";
 
+test("first Live on isolates a fresh app; pause resumes it and restart prepares another", async (t) => {
+  let created = 0,
+    fail = false;
+  const path = "Lectures/Web Development 2026/Presentations/Fresh.md";
+  const local = await fixture({
+    rehearsals: {
+      current: async (p) => p,
+      create: async () => {
+        if (fail) throw new Error("offline");
+        return `/fresh/rehearsal-${++created}`;
+      },
+    },
+    library: {
+      status: "Connected",
+      list: async () => [{ path, label: "Fresh" }],
+      read: async () => ({
+        sections: [
+          {
+            heading: "Presentation",
+            body: '```json\n{"version":1,"title":"Fresh","start":"intro","steps":[{"id":"intro","type":"title","title":"Intro","body":""}]}\n```',
+          },
+        ],
+      }),
+      close: async () => {},
+    },
+  });
+  t.after(local.stop);
+  const post = async (op: string, body: object) =>
+    fetch(local.address.origin + "/api/presentation/" + op, {
+      method: "POST",
+      headers: {
+        origin: local.address.origin,
+        authorization: "Bearer " + local.address.deskToken,
+        "content-type": "application/json",
+      },
+      body: JSON.stringify(body),
+    });
+  await post("load", { path });
+  local.bridge.state.messages = [
+    { id: "old", text: "old preview http://localhost:9999" },
+  ];
+  assert.equal((await post("live", { live: true })).status, 200);
+  assert.equal(local.studio.snapshot().workspace, "/fresh/rehearsal-1");
+  assert.equal(local.bridge.state.messages.length, 0);
+  await post("live", { live: false });
+  await post("live", { live: true });
+  assert.equal(created, 1);
+  await post("live", { live: false });
+  await post("load", { path });
+  fail = true;
+  assert.equal((await post("live", { live: true })).status, 400);
+  assert.equal(local.studio.snapshot().live, false);
+  assert.equal(local.studio.snapshot().workspace, "/fresh/rehearsal-1");
+  fail = false;
+  await post("live", { live: true });
+  assert.equal(local.studio.snapshot().workspace, "/fresh/rehearsal-2");
+});
+
 test("first connection prepares a missing default without resetting the lecture", async (t) => {
   const root = await mkdtemp(join(tmpdir(), "studio-first-connect-"));
   const defaultWorkspace = resolve(process.cwd(), "../lecture-demo");

@@ -84,6 +84,10 @@ export async function fixture(options: StudioOptions = {}) {
     port: 0,
     persist: false,
     workspace: process.cwd(),
+    rehearsals: {
+      current: async (path) => path,
+      create: async () => options.workspace || process.cwd(),
+    },
     ...options,
   });
   return {

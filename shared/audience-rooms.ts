@@ -2,6 +2,14 @@ export const audienceRooms: Record<
   string,
   { question: string; choices: { id: string; label: string }[] }
 > = {
+  "webdev-2026-practice": {
+    question: "Practice vote: which drink would you pick?",
+    choices: [
+      { id: "coffee", label: "Coffee" },
+      { id: "tea", label: "Tea" },
+      { id: "water", label: "Water" },
+    ],
+  },
   "webdev-2026-friction": {
     question: "What feels unnecessarily difficult on the web?",
     choices: [

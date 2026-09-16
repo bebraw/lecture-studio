@@ -47,6 +47,41 @@ async function authorized(request: Request, secret: string) {
 export default {
   async fetch(request: Request, env: Env): Promise<Response> {
     const url = new URL(request.url);
+    if (url.pathname === "/presenter/presence") {
+      if (!(await authorized(request, env.PRESENTER_TOKEN)))
+        return new Response("Unauthorized", { status: 401 });
+      if (request.method !== "GET")
+        return new Response("Method not allowed", { status: 405 });
+      return Response.json(
+        await env.STAGE_STATE.getByName("lecture").presence(),
+        { headers: { "cache-control": "no-store" } },
+      );
+    }
+    if (url.pathname === "/api/presence") {
+      if (request.method !== "POST")
+        return new Response("Method not allowed", { status: 405 });
+      if (
+        request.headers.get("origin") !== url.origin ||
+        request.headers.get("sec-fetch-site") === "cross-site"
+      )
+        return new Response("Same-origin request required", { status: 403 });
+      const existing = request.headers
+        .get("cookie")
+        ?.match(/(?:^|;\s*)lecture_presence=([a-f0-9-]{36})(?:;|$)/)?.[1];
+      const id = existing || crypto.randomUUID();
+      await env.STAGE_STATE.getByName("lecture").presence(id);
+      return new Response(null, {
+        status: 204,
+        headers: {
+          "cache-control": "no-store",
+          ...(!existing
+            ? {
+                "set-cookie": `lecture_presence=${id}; Path=/; HttpOnly; SameSite=Strict; Max-Age=86400${url.protocol === "https:" ? "; Secure" : ""}`,
+              }
+            : {}),
+        },
+      });
+    }
     if (url.pathname === "/api/capabilities" && request.method === "GET")
       return Response.json(audienceProtocol, {
         headers: { "cache-control": "no-store" },
@@ -160,10 +195,12 @@ export default {
       }
     }
     if (url.pathname === "/api/audience" && request.method === "GET") {
+      const { active: followers } =
+        await env.STAGE_STATE.getByName("lecture").presence();
       const stage = await env.STAGE_STATE.getByName("lecture").read();
       if (stage?.live === false)
         return Response.json(
-          { stage: null, poll: null },
+          { stage: null, poll: null, active: followers },
           {
             headers: {
               "cache-control": "no-store",
@@ -186,6 +223,7 @@ export default {
       return Response.json(
         {
           stage,
+          active: followers,
           poll: active
             ? {
                 id: active.id,
