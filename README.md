@@ -94,7 +94,7 @@ Codex CLI **0.153.4** is confirmed working by the lecturer. This is a tested ver
 
 ## Prepare and Present
 
-Author the full lecture in Obsidian using the [Markdown authoring workflow](docs/obsidian-authoring.md).
+Author the full lecture in Obsidian using the [Markdown + YAML authoring guide and complete type reference](docs/obsidian-authoring.md).
 The presentation menu offers **Edit in Obsidian**, **Reload from Obsidian**,
 **Download editable Markdown**, and **Preview reading copy**. Existing JSON
 notes still work. Local `/slides` renders the loaded snapshot; the deployed
@@ -221,7 +221,7 @@ Mermaid diagrams render locally. Raw HTML is not executed. Remote HTTPS images a
 
 ## Implementation boundary
 
-The Node proxy starts `codex app-server` over local stdio. Codex uses its existing login and a remote model; this is not an offline LLM. Model choices come from the installed CLI.
+The Node proxy starts `codex app-server` over local stdio. Codex uses its existing login and a remote model; this is not an offline LLM. Model choices come from the installed CLI. Lecture builds default to `gpt-5.6-luna` with low reasoning effort. Select another available model in Prepare to override it; unavailable Luna produces an explicit error rather than silently changing models.
 
 Each connection starts a new conversation when the first brief is sent. Subsequent briefs share that conversation. A disconnect/reconnect does not resume it. Only one turn can run at a time. A timeout is not automatically retried.
 

@@ -41,7 +41,8 @@
     "markdown-it": "15.0.1",
     "mermaid": "11.17.2",
     "smol-toml": "1.8.0",
-    "valibot": "1.5.0"
+    "valibot": "1.5.0",
+    "yaml": "2.9.0"
   },
   "devDependencies": {
     "@axe-core/playwright": "4.13.0",

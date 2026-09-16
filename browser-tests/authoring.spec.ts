@@ -8,7 +8,7 @@ test("Obsidian edits reload privately and reading copies use the validated snaps
 }) => {
   const path = "Lectures/Web Development 2026/Presentations/Authored.md";
   let content =
-    '# My lecture\n\n## Presentation\n\n```json\n{"version":1,"title":"My lecture"}\n```\n\n## Slide: My example\n\n```json\n{"id":"example"}\n```\n\nOriginal example.\n\n<!-- speaker-notes -->\n\nPRIVATE speaker notes.\n\n## Slide: Build\n\n```json\n{"id":"build","type":"build"}\n```\n\nPRIVATE implementation prompt.\n';
+    "# My lecture\n\n## Presentation\n\n```yaml\nversion: 1\ntitle: My lecture\n```\n\n## Slide: My example\n\n```yaml\nid: example\n```\n\nOriginal example.\n\n<!-- speaker-notes -->\n\nPRIVATE speaker notes.\n\n## Slide: Build\n\n```yaml\nid: build\ntype: build\n```\n\nPRIVATE implementation prompt.\n";
   const { address, stop } = await fixture({
     library: {
       status: "Connected · fixture",
@@ -41,7 +41,8 @@ test("Obsidian edits reload privately and reading copies use the validated snaps
     const file = await (await download).path();
     if (!file) throw new Error("No downloaded authoring file");
     expect(await readFile(file, "utf8")).toContain("## Slide: My example");
-    content = content.replace('"version":1', '"version":2');
+    expect(await readFile(file, "utf8")).toContain("```yaml");
+    content = content.replace("version: 1", "version: 2");
     await page
       .getByRole("button", { name: "Reload from Obsidian", exact: true })
       .click();

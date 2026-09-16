@@ -1,4 +1,12 @@
-# Obsidian presentation snapshots — first migration
+# Presentation notes
+
+For current authoring, supported types and all settings, use the
+[Markdown + YAML authoring guide](docs/obsidian-authoring.md). The versioned full
+lecture contains 89 slides. The notes below describe earlier migrations and
+subsequent implementation passes; their historical counts and UI descriptions
+are not the current authoring reference.
+
+## Obsidian presentation snapshots — first migration
 
 The full lecture is migrated as **Web development 2026**: 78 slides: 51 main lecture steps, eight reference slides (including the divider), and 19 optional detours. The lecture includes three polls and four build prompts. In Prepare, choose **Find presentations in Obsidian**, select that note, then **Load snapshot / restart presentation**. Its chapter-grouped outline is generated from the loaded definition; selecting an outline step stays private. In Present, use Begin presentation, Next, Previous, named detours and Return to narrative.
 

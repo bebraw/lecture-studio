@@ -1,3 +1,4 @@
+import { parseDocument, stringify } from "yaml";
 import * as v from "valibot";
 import { stepSchema } from "../shared/schemas.ts";
 import type {
@@ -38,11 +39,23 @@ export function parseTheme(input: unknown = {}) {
   }
   return theme as Theme;
 }
+function metadataValue(format: string, source: string): unknown {
+  if (format === "json") return JSON.parse(source);
+  const document = parseDocument(source, { version: "1.2", uniqueKeys: true });
+  const problem = document.errors[0] || document.warnings[0];
+  if (problem) throw new Error(problem.message);
+  return document.toJS({ maxAliasCount: 0 });
+}
 export function parsePresentation(note: Note): PresentationDefinition {
   const raw = note.sections.find((s) => s.heading === "Presentation")?.body;
-  const metadata: unknown = JSON.parse(
-    raw?.match(/^\s*(`{3,})json\s*\n([\s\S]*?)\n\1\s*$/)?.[2] || "null",
+  const headerBlock = raw?.match(
+    /^\s*(`{3,})(json|yaml|yml)\s*\n([\s\S]*?)\n\1\s*$/,
   );
+  if (!headerBlock)
+    throw new Error(
+      "Presentation requires a fenced YAML or JSON metadata block",
+    );
+  const metadata = metadataValue(headerBlock[2]!, headerBlock[3]!);
   const authored = note.sections.filter((s) => s.heading.startsWith("Slide: "));
   let definition = metadata;
   if (authored.length) {
@@ -56,11 +69,13 @@ export function parsePresentation(note: Note): PresentationDefinition {
       metadata,
     );
     const steps = authored.map((section) => {
-      const block = section.body.match(/^(`{3,})json\s*\n([\s\S]*?)\n\1\s*\n?/);
+      const block = section.body.match(
+        /^(`{3,})(json|yaml|yml)\s*\n([\s\S]*?)\n\1\s*\n?/,
+      );
       if (!block) throw new Error("Slide metadata missing: " + section.heading);
       const fields = v.parse(
         v.record(v.string(), v.unknown()),
-        JSON.parse(block[2]!),
+        metadataValue(block[2]!, block[3]!),
       );
       if ("body" in fields || "notes" in fields || "title" in fields)
         throw new Error(
@@ -75,7 +90,7 @@ export function parsePresentation(note: Note): PresentationDefinition {
         split < 0
           ? undefined
           : ("\n" + content).slice(split + marker.length).trim();
-      return v.parse(stepSchema, {
+      return v.parse(v.strictObject(stepSchema.entries), {
         type: "material",
         ...fields,
         title: section.heading.slice(7),
@@ -190,11 +205,11 @@ export function parsePresentation(note: Note): PresentationDefinition {
 export function authoringMarkdown(deck: PresentationDefinition) {
   const { steps, ...header } = deck;
   return (
-    `# ${deck.title}\n\n## Presentation\n\n\`\`\`json\n${JSON.stringify(header, null, 2)}\n\`\`\`\n\n` +
+    `# ${deck.title}\n\n## Presentation\n\n\`\`\`yaml\n${stringify(header, { lineWidth: 0 })}\`\`\`\n\n` +
     steps
       .map(
         ({ title, body, notes, ...metadata }) =>
-          `## Slide: ${title}\n\n\`\`\`json\n${JSON.stringify(metadata, null, 2)}\n\`\`\`\n\n${body || ""}${notes ? "\n\n<!-- speaker-notes -->\n\n" + notes : ""}\n`,
+          `## Slide: ${title}\n\n\`\`\`yaml\n${stringify(metadata, { lineWidth: 0 })}\`\`\`\n\n${body || ""}${notes ? "\n\n<!-- speaker-notes -->\n\n" + notes : ""}\n`,
       )
       .join("\n")
   );
