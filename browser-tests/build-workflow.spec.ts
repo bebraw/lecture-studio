@@ -2,6 +2,118 @@ import { audienceProtocol } from "../shared/audience-protocol.ts";
 import { test, expect } from "@playwright/test";
 import { fixture } from "../tests/fixture.ts";
 import { AudiencePoll, themePoll } from "../lib/audience-poll.ts";
+
+test("a slow demo can be skipped, revisited and stopped without blocking the next build", async ({
+  page,
+}) => {
+  const path = "Lectures/Web Development 2026/Presentations/Slow.md";
+  const definition = {
+    version: 1,
+    title: "Slow demo",
+    start: "build-document",
+    steps: [
+      {
+        id: "build-document",
+        type: "build",
+        title: "First build",
+        body: "Build first",
+        next: "check",
+      },
+      {
+        id: "check",
+        type: "material",
+        title: "Demo checkpoint",
+        previewOf: "build-document",
+        next: "after",
+      },
+      {
+        id: "after",
+        type: "material",
+        title: "Continue lecture",
+        body: "Keep explaining",
+        next: "second",
+      },
+      {
+        id: "second",
+        type: "build",
+        title: "Second build",
+        body: "Build second",
+      },
+    ],
+  };
+  const { address, bridge, stop } = await fixture({
+    library: {
+      status: "Connected · fixture",
+      list: async () => [{ path, label: "Slow demo" }],
+      read: async () => ({
+        sections: [
+          {
+            heading: "Presentation",
+            body: "```json\n" + JSON.stringify(definition) + "\n```",
+          },
+        ],
+      }),
+      close: async () => {},
+    },
+  });
+  try {
+    await page.goto(address.deskUrl);
+    await page.locator("#presentation-name").click();
+    await page.locator("#presentation-load").click();
+    await page.locator("#live-toggle").click();
+    await page.locator("#graph-build").click();
+    await expect(
+      page.getByRole("button", { name: "Stop build", exact: true }),
+    ).toBeVisible();
+    await expect(page.locator("#background-build-notice")).toContainText(
+      "First build is still active",
+    );
+    await page.locator("#graph-next").click();
+    await page
+      .getByRole("button", { name: "Skip demo →", exact: true })
+      .click();
+    const stage = page.frameLocator("#current-stage > iframe").locator("body");
+    await expect(stage).toContainText("Keep explaining");
+    expect(bridge.state.turnId).toBe("fake-turn");
+    // A late completion must not replace the slide the lecturer has moved to.
+    bridge.state = {
+      ...bridge.state,
+      status: "ready",
+      outcome: "completed",
+      turnId: null,
+      requests: [],
+    };
+    await expect(page.locator("#background-build-notice")).toBeHidden();
+    await expect(stage).toContainText("Keep explaining");
+    await page.locator('[data-step-id="check"]').click();
+    await expect(
+      page.getByRole("button", { name: "Skip demo →", exact: true }),
+    ).toBeVisible();
+    await page
+      .getByRole("button", { name: "Skip demo →", exact: true })
+      .click();
+    await page.locator("#graph-next").click();
+    await page.locator("#graph-build").click();
+    await expect.poll(() => bridge.lastPrompt).toContain("Build second");
+    await expect(page.locator("#graph-build")).toBeDisabled();
+    await page.getByRole("button", { name: "Stop build", exact: true }).click();
+    await expect(
+      page.getByRole("button", { name: "Retry this build", exact: true }),
+    ).toBeEnabled();
+    await expect(page.locator('[data-step-id="second"]')).toHaveAttribute(
+      "aria-current",
+      "step",
+    );
+    await page
+      .getByRole("button", { name: "Retry this build", exact: true })
+      .click();
+    await expect(page.locator("#graph-build")).toBeDisabled();
+    expect(bridge.state.turnId).toBe("fake-turn");
+  } finally {
+    await stop();
+  }
+});
+
 test("a frozen vote feeds the explicit build without launching during navigation", async ({
   context,
 }) => {

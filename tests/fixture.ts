@@ -24,6 +24,7 @@ export async function fixture(options: StudioOptions = {}) {
       this.state = {
         ...this.state,
         status: "waiting",
+        outcome: null,
         turnId: "fake-turn",
         activity: "Presenter input needed",
         requests: [
@@ -42,6 +43,7 @@ export async function fixture(options: StudioOptions = {}) {
       this.state = {
         ...this.state,
         status: "ready",
+        outcome: "interrupted",
         turnId: null,
         requests: [],
       };

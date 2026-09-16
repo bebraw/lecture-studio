@@ -81,7 +81,7 @@ export function mountPresentations({ call, update }: MountOptions) {
   const modelLabel = $("model").closest("label");
   const codexControls = document.createElement("div");
   codexControls.id = "codex-controls";
-  codexControls.append(modelLabel!, $("activity"), $("interrupt"));
+  codexControls.append(modelLabel!, $("activity"));
   query(".connections-panel", document).append(codexControls);
   notes.append($("requests"));
   const output = document.createElement("details");
@@ -103,6 +103,23 @@ export function mountPresentations({ call, update }: MountOptions) {
   projectionStatus.setAttribute("role", "status");
   $("graph-next").parentElement!.append(projectionStatus);
   $("graph-next").parentElement!.append($("live-progress"));
+  const skipDemo = document.createElement("button");
+  skipDemo.id = "skip-demo";
+  skipDemo.textContent = "Skip demo →";
+  skipDemo.title =
+    "Continue to the next slide. Any active build keeps running.";
+  skipDemo.hidden = true;
+  $("graph-next").after(skipDemo);
+  const stopBuild = $("interrupt");
+  stopBuild.textContent = "Stop build";
+  stopBuild.title =
+    "Interrupt the active build, preserving its files and the current slide.";
+  $("graph-next").parentElement!.append(stopBuild);
+  const buildNotice = document.createElement("p");
+  buildNotice.id = "background-build-notice";
+  buildNotice.className = "small muted";
+  buildNotice.role = "status";
+  $("graph-status").before(buildNotice);
   query(".section-heading", stagePanel).remove();
   $("graph-detours").remove();
   const picker = document.createElement("div");
@@ -356,6 +373,7 @@ export function mountPresentations({ call, update }: MountOptions) {
   ] as const)
     $("graph-" + id).onclick = () => run(`presentation/${op}`);
   $("graph-next").onclick = () => navigate("next");
+  skipDemo.onclick = () => navigate("next");
   $("graph-previous").onclick = () => navigate("previous");
   $("graph-build").onclick = () =>
     run("presentation/build", {
@@ -473,6 +491,18 @@ export function mountPresentations({ call, update }: MountOptions) {
     $("graph-prompt").textContent = p.resolved.prompt;
     $("graph-next").textContent = "Next →";
     $("graph-next").disabled = !neighbour("next");
+    skipDemo.hidden = !p.step.previewOf;
+    skipDemo.disabled = !neighbour("next");
+    const building =
+      !!data.codex.turnId ||
+      ["working", "running", "waiting"].includes(data.codex.status);
+    const activeRun = p.runs.findLast((r) => r.status === "running");
+    const buildTitle = p.outline.find((s) => s.id === activeRun?.step)?.title;
+    stopBuild.hidden = !building;
+    buildNotice.hidden = !building;
+    buildNotice.textContent = building
+      ? `${buildTitle || "Build"} is still active. Continue through the slides or skip this demo; generation keeps running. To start another build, stop this one and wait for it to finish stopping.`
+      : "";
     $("graph-previous").textContent = "← Previous";
     $("graph-previous").disabled = !neighbour("previous");
     $("graph-return").hidden = true;
