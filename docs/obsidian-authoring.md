@@ -20,7 +20,7 @@ No watch process changes the projection during your lecture.
 
 ## Format
 
-```markdown
+````markdown
 # My lecture
 
 ## Presentation
@@ -28,6 +28,7 @@ No watch process changes the projection during your lecture.
 ```json
 { "version": 1, "title": "My lecture" }
 ```
+````
 
 ## Slide: A concrete example
 
@@ -40,6 +41,7 @@ Write your slide here, using ordinary Markdown.
 <!-- speaker-notes -->
 
 Write private speaking notes here.
+
 ```
 
 Use backtick fences (`json`) for the actual metadata blocks; tildes above only
@@ -56,7 +58,14 @@ Write title, body and notes outside that block.
 Notes, build instructions and live responses are excluded. Print that page to
 save a PDF. It updates after an explicit reload from Obsidian.
 
+Print uses an A4 reading layout with chapter breaks, grouped slide content,
+wrapped code, readable tables and diagrams, and reference groups kept together.
+Enable browser headers/footers if you want page numbers in a saved PDF. The
+`browser-tests/print.spec.ts` check renders the full deck and attaches a PDF for
+visual review.
+
 For the deployed audience copy, save the downloaded Markdown as the versioned
 export and run the normal build/deployment workflow. The build can also read a
 chosen export with `node --import tsx scripts/build-handout.ts /path/to/lecture.md`.
 The deployed copy remains static until deployment; do not independently edit it.
+```

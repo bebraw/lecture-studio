@@ -121,8 +121,13 @@ li {
 }
 @media print {
   :root {
+    color: #202020;
     background: white;
-    font-size: 11pt;
+    font:
+      11pt/1.45 Georgia,
+      serif;
+    print-color-adjust: exact;
+    -webkit-print-color-adjust: exact;
   }
   .intro,
   main,
@@ -134,31 +139,90 @@ li {
     display: none;
   }
   .intro {
+    padding: 28mm 0 12mm;
     break-after: page;
+    border-bottom: 2pt solid #232723;
+  }
+  h1 {
+    font-size: 34pt;
+    line-height: 1.1;
+    max-width: 20ch;
+  }
+  h2 {
+    font-size: 21pt;
+    line-height: 1.15;
+    margin: 3mm 0 5mm;
+    break-after: avoid;
+  }
+  h3 {
+    font-size: 13pt;
+    break-after: avoid;
+  }
+  p,
+  li {
+    orphans: 3;
+    widows: 3;
   }
   .slide {
+    break-inside: avoid;
+    padding: 8mm 0;
+    border-bottom: 0.5pt solid #b8bdb5;
+  }
+  .slide-title {
     break-before: page;
-    padding: 0;
-    border: 0;
+  }
+  .slide-references {
+    break-inside: avoid;
+  }
+  .eyebrow {
+    font-size: 8pt;
+    margin: 0;
+    break-after: avoid;
+  }
+  .slide footer {
+    margin-top: 4mm;
+    font-size: 8.5pt;
+    break-before: avoid;
   }
   .slide img {
-    max-height: 135mm;
+    max-height: 100mm;
+    max-width: 100%;
+    margin: 5mm auto;
+    break-inside: avoid;
   }
   .slide svg {
-    max-height: 145mm;
+    max-height: 110mm;
+    width: 100%;
+    break-inside: avoid;
+  }
+  .mermaid-graphic {
+    break-inside: avoid;
   }
   pre {
     white-space: pre-wrap;
     overflow-wrap: anywhere;
+    overflow: visible;
+    font-size: 9pt;
+    padding: 4mm;
   }
-  h2 {
-    font-size: 23pt;
+  table {
+    font-size: 10pt;
+  }
+  thead {
+    display: table-header-group;
+  }
+  tr,
+  li {
+    break-inside: avoid;
   }
   a {
     text-decoration: underline;
   }
+  .end {
+    display: none;
+  }
   @page {
     size: A4;
-    margin: 16mm;
+    margin: 16mm 18mm 20mm;
   }
 }
