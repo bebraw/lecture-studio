@@ -141,6 +141,13 @@ const inputSchema = v.object({
   revision: v.nullable(count),
 });
 const presentationSchema = v.object({
+  demo: v.exactOptional(
+    v.object({
+      prepared: v.boolean(),
+      generated: v.boolean(),
+      selected: v.picklist(["prepared", "generated", "automatic"]),
+    }),
+  ),
   theme: themeSchema,
   preview: stageSchema,
   outline: v.array(

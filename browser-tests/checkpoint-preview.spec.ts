@@ -30,10 +30,10 @@ test("checkpoint projects its build preview and next returns to slides", async (
   const definition = {
     version: 1,
     title: "Preview",
-    start: "build",
+    start: "build-document",
     steps: [
       {
-        id: "build",
+        id: "build-document",
         type: "build",
         title: "Build app",
         body: "Build it",
@@ -43,7 +43,7 @@ test("checkpoint projects its build preview and next returns to slides", async (
         id: "check",
         type: "material",
         title: "Check app",
-        previewOf: "build",
+        previewOf: "build-document",
         next: "after",
       },
       {
@@ -76,8 +76,10 @@ test("checkpoint projects its build preview and next returns to slides", async (
     await page.locator("#live-toggle").click();
     await page.locator("#graph-next").click();
     await expect(
-      page.frameLocator("#current-stage > iframe").locator("body"),
-    ).toContainText("not available yet");
+      page
+        .frameLocator("#current-stage > iframe")
+        .locator("#stage-content iframe"),
+    ).toHaveAttribute("src", /\/teaching\/checkpoint\/build-document$/);
     await page.locator("#graph-previous").click();
     await page.locator("#graph-build").click();
     bridge.state.messages = [{ id: "preview", text: "Preview: " + appUrl }];
@@ -93,6 +95,26 @@ test("checkpoint projects its build preview and next returns to slides", async (
         .frameLocator("#stage-content iframe")
         .getByRole("heading", { name: "Working lecture app" }),
     ).toBeVisible();
+    await page
+      .getByRole("button", { name: "Show prepared demo", exact: true })
+      .click();
+    await expect(
+      page
+        .frameLocator("#current-stage > iframe")
+        .locator("#stage-content iframe"),
+    ).toHaveAttribute("src", /\/teaching\/checkpoint\/build-document$/);
+    expect(bridge.state.turnId).toBe("fake-turn");
+    await page
+      .getByRole("button", { name: "Show generated demo", exact: true })
+      .click();
+    await expect(
+      page
+        .frameLocator("#current-stage > iframe")
+        .locator("#stage-content iframe"),
+    ).toHaveAttribute("src", appUrl);
+    await page
+      .getByRole("button", { name: "Show prepared demo", exact: true })
+      .click();
     await page.locator("#graph-next").click();
     await expect(
       page.frameLocator("#current-stage > iframe").locator("body"),
@@ -102,6 +124,12 @@ test("checkpoint projects its build preview and next returns to slides", async (
         .frameLocator("#current-stage > iframe")
         .locator("#stage-content iframe"),
     ).toHaveCount(0);
+    await page.locator("#graph-previous").click();
+    await expect(
+      page
+        .frameLocator("#current-stage > iframe")
+        .locator("#stage-content iframe"),
+    ).toHaveAttribute("src", /\/teaching\/checkpoint\/build-document$/);
   } finally {
     await stop();
     await new Promise<void>((resolve, reject) =>

@@ -69,6 +69,7 @@ export const requestSchemas = {
   "presentation/poll-question": empty,
   "presentation/poll-results": empty,
   "presentation/build": model,
+  "presentation/preview": v.strictObject({ prepared: v.boolean() }),
   feedback: v.strictObject({
     action: v.picklist([
       "start",

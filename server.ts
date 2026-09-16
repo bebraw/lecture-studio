@@ -189,6 +189,7 @@ export function createStudio({
   const teachingRecords = new Set<string>();
   let servePreparedDemo = preparedDemo();
   const buildPreviews = new Map<string, string>();
+  const demoChoices = new Map<string, boolean>();
   const captureBuildPreview = () => {
     const run = presentation?.runs.at(-1);
     const url = previewCandidates(bridge.state.messages, origin).at(-1);
@@ -237,13 +238,14 @@ export function createStudio({
     const capturedPreview = s.previewOf
       ? buildPreviews.get(s.previewOf)
       : undefined;
+    const usePrepared = demoChoices.get(s.id) === true;
     const demoUrl = s.layersDemo
       ? origin + "/teaching/layers"
       : s.teachingDemo
         ? origin + "/teaching/failure"
-        : capturedPreview ||
+        : (!usePrepared && capturedPreview) ||
           (s.previewOf ? preparedPreview(s.previewOf, origin) : undefined);
-    if (capturedPreview) await sharePreview(capturedPreview);
+    if (capturedPreview && !usePrepared) await sharePreview(capturedPreview);
     if (s.type === "poll") {
       graphPoll = getGraphPoll(s);
       projectedPoll = graphPoll;
@@ -289,6 +291,7 @@ export function createStudio({
   const disconnectBuilder = () => {
     previewTunnel.close();
     buildPreviews.clear();
+    demoChoices.clear();
     teachingRecords.clear();
     servePreparedDemo = preparedDemo();
     bridge.close();
@@ -370,6 +373,7 @@ export function createStudio({
     }
   };
   const deskState = (): DeskState => {
+    captureBuildPreview();
     updateBuildRun();
     return {
       live,
@@ -379,7 +383,25 @@ export function createStudio({
         readiness: audienceReadiness,
         active: audienceSync.active,
       },
-      presentation: presentation?.state() || null,
+      presentation: presentation
+        ? {
+            ...presentation.state(),
+            demo: {
+              prepared: !!preparedPreview(
+                presentation.step().previewOf || "",
+                origin,
+              ),
+              generated: !!buildPreviews.get(
+                presentation.step().previewOf || "",
+              ),
+              selected: demoChoices.has(presentation.current)
+                ? demoChoices.get(presentation.current)
+                  ? "prepared"
+                  : "generated"
+                : "automatic",
+            },
+          }
+        : null,
       graphPoll: graphPoll?.state() || null,
       acts,
       scope,
@@ -820,6 +842,7 @@ export function createStudio({
               graphPoll = null;
               graphPolls.clear();
               buildPreviews.clear();
+              demoChoices.clear();
               // Loading is private: the existing projection stays until navigation.
             } else {
               if (!presentation) throw new Error("Load a presentation first");
@@ -832,6 +855,32 @@ export function createStudio({
                   presentation.move(op, optionalString(body.id, "step"));
                 if (live) await openGraphPoll();
                 await showGraph();
+              } else if (op === "preview") {
+                if (!live)
+                  throw new Error("Turn Live on before showing a demo");
+                const step = presentation.step();
+                if (!step.previewOf)
+                  throw new Error("Choose an app checkpoint");
+                captureBuildPreview();
+                if (
+                  body.prepared
+                    ? !preparedPreview(step.previewOf, origin)
+                    : !buildPreviews.has(step.previewOf)
+                )
+                  throw new Error(
+                    body.prepared
+                      ? "No prepared demo for this checkpoint"
+                      : "No generated preview captured yet",
+                  );
+                const previous = demoChoices.get(step.id);
+                demoChoices.set(step.id, body.prepared === true);
+                try {
+                  await showGraph();
+                } catch (error) {
+                  if (previous === undefined) demoChoices.delete(step.id);
+                  else demoChoices.set(step.id, previous);
+                  throw error;
+                }
               } else if (op === "defaults") {
                 presentation.defaults.add(presentation.current);
                 await showGraph();

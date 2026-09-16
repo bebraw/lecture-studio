@@ -110,6 +110,14 @@ export function mountPresentations({ call, update }: MountOptions) {
     "Continue to the next slide. Any active build keeps running.";
   skipDemo.hidden = true;
   $("graph-next").after(skipDemo);
+  const preparedDemo = document.createElement("button");
+  preparedDemo.textContent = "Show prepared demo";
+  preparedDemo.onclick = () => run("presentation/preview", { prepared: true });
+  const generatedDemo = document.createElement("button");
+  generatedDemo.textContent = "Show generated demo";
+  generatedDemo.onclick = () =>
+    run("presentation/preview", { prepared: false });
+  skipDemo.after(preparedDemo, generatedDemo);
   const stopBuild = $("interrupt");
   stopBuild.textContent = "Stop build";
   stopBuild.title =
@@ -532,6 +540,18 @@ export function mountPresentations({ call, update }: MountOptions) {
     $("graph-next").disabled = !neighbour("next");
     skipDemo.hidden = !p.step.previewOf;
     skipDemo.disabled = !neighbour("next");
+    preparedDemo.hidden = !p.demo?.prepared;
+    generatedDemo.hidden = !p.step.previewOf;
+    preparedDemo.disabled = !data.live;
+    generatedDemo.disabled = !data.live || !p.demo?.generated;
+    preparedDemo.setAttribute(
+      "aria-pressed",
+      String(p.demo?.selected === "prepared"),
+    );
+    generatedDemo.setAttribute(
+      "aria-pressed",
+      String(p.demo?.selected === "generated"),
+    );
     const building =
       !!data.codex.turnId ||
       ["working", "running", "waiting"].includes(data.codex.status);
