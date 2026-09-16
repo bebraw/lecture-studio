@@ -20,7 +20,7 @@ No watch process changes the projection during your lecture.
 
 ## Format
 
-````markdown
+`````markdown
 # My lecture
 
 ## Presentation
@@ -28,6 +28,7 @@ No watch process changes the projection during your lecture.
 ```json
 { "version": 1, "title": "My lecture" }
 ```
+
 ````
 
 ## Slide: A concrete example
@@ -44,8 +45,8 @@ Write private speaking notes here.
 
 ```
 
-Use backtick fences (`json`) for the actual metadata blocks; tildes above only
-keep this documentation example legible. Each slide starts with `## Slide:`.
+Use backtick fences (`json`) for metadata blocks. Each slide starts with
+`## Slide:`.
 Use level-three or deeper headings within slide text. Slide order follows the
 note. `start` and `next` are optional; when omitted they follow that order.
 Stable IDs connect polls, word clouds, builds and checkpoints. Existing metadata
@@ -69,3 +70,5 @@ export and run the normal build/deployment workflow. The build can also read a
 chosen export with `node --import tsx scripts/build-handout.ts /path/to/lecture.md`.
 The deployed copy remains static until deployment; do not independently edit it.
 ```
+````
+`````

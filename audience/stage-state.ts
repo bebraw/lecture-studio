@@ -40,7 +40,10 @@ export class StageState extends DurableObject<Env> {
       this.ctx.storage.sql.exec("UPDATE feedback_meta SET opened=0");
     const previous = await this.read();
     await this.ctx.storage.put("stage", stage);
-    if (stage.live === true && previous?.live !== true) {
+    if (
+      stage.live === true &&
+      (previous?.live !== true || !this.feedbackPublic(true))
+    ) {
       await this.feedbackManage("start", {
         mode: "questions",
         prompt: "What would you like to ask?",

@@ -57,4 +57,17 @@ test("questions remain available during word clouds and resume across Live off/o
     )
     .then((r) => r.json());
   expect(resumed).toMatchObject({ questionCount: 1 });
+  await audience.admin("/presenter/reset-lecture");
+  await publish(true);
+  const reset: unknown = await audience
+    .request(
+      new URL("/presenter/feedback?mode=questions", audience.url).href,
+      {},
+    )
+    .then((r) => r.json());
+  expect(reset).toMatchObject({
+    questionCount: 0,
+    items: [],
+    config: { open: true, mode: "questions" },
+  });
 });

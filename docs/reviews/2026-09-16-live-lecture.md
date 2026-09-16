@@ -151,4 +151,25 @@ The fixture confirms that slide navigation works during an active turn; the
 precise live-session block has not been reproduced. These changes expose the
 recovery controls rather than claiming to diagnose that incident. Early launches,
 parallel generation, model benchmarks, slide revisions, persistent questions,
-and print refinement remain follow-up work.
+and print refinement were initially left as follow-up work.
+
+## Follow-up implementation
+
+The five agreed engineering improvements are now implemented in separate commits:
+
+1. Obsidian Markdown authoring, an editable export, explicit private reload,
+   and a reading copy generated from the loaded snapshot. The repository deck
+   was converted without changing its content; the existing vault note is not
+   overwritten. See [authoring instructions](../obsidian-authoring.md).
+2. An independent moderated question queue available throughout Live, including
+   during word clouds, votes and demos. It resumes after Live off/on.
+3. Explicit prepared/generated demo selection at the four supported checkpoints,
+   preserving the choice when revisiting a checkpoint.
+4. A refined A4 reading layout, with rendered PDF inspection and a print
+   regression check covering the complete deck.
+5. Private, persistent build timing history with model, attempt outcome, first
+   detected preview and total duration, plus a JSON download for comparisons.
+
+The audience changes require deployment of the matching Worker. This work did
+not deploy it or benchmark real models. Earlier launches, parallel generation,
+and editorial revision/rehearsal of the lecture remain separate work.

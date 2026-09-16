@@ -15,8 +15,9 @@ are excluded. It preserves prepared slide content, not a recording of the sessio
 
 ### Private audience responses
 
-The header's **Responses** menu opens either questions or a word collection,
-independently of voting. Students submit from a collapsible form below their
+The header's **Responses** menu reviews questions or a word collection,
+independently of voting. Questions open with Live and stay available alongside
+word clouds and demos. Students submit from a collapsible form below their
 shared stage. Pending submissions remain private to the lecturer. Approving words allows their projection and inclusion as data in dependent build prompts; the lecturer must still explicitly start each build. Questions are projected only with **Discuss**.
 
 - **Discuss** projects one selected question; **Back to slide** restores the
@@ -92,6 +93,12 @@ Requirements: Node.js 24+, an authenticated Codex CLI on PATH, and Obsidian with
 Codex CLI **0.153.4** is confirmed working by the lecturer. This is a tested version, not a claimed minimum.
 
 ## Prepare and Present
+
+Author the full lecture in Obsidian using the [Markdown authoring workflow](docs/obsidian-authoring.md).
+The presentation menu offers **Edit in Obsidian**, **Reload from Obsidian**,
+**Download editable Markdown**, and **Preview reading copy**. Existing JSON
+notes still work. Local `/slides` renders the loaded snapshot; the deployed
+reading copy uses the versioned export until the next deployment.
 
 Present has one **On stage** panel reflecting published content, not the private draft. Blank state, prompts, graphics and audience counts follow the projection. For a live app it shows the selected URL instead of opening a second interactive app instance. The editable **Material draft · Private** preview is shown only in Prepare or Find something.
 
