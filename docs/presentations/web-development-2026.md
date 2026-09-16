@@ -1009,8 +1009,8 @@ Versioned export of the Obsidian lecture at `Lectures/Web Development 2026/Prese
       "type": "title",
       "chapter": "Closing",
       "title": "Questions?",
-      "body": "",
-      "notes": "Invite questions from the room. Use the desk’s source inspector or revisit a relevant slide if helpful.",
+      "body": "Keep the slides and explore the references:\n\n**[live.scalableweb.dev/slides](https://live.scalableweb.dev/slides)**",
+      "notes": "Invite questions from the room. Use the desk’s source inspector or revisit a relevant slide if helpful. Mention that the reading copy includes source links and can be saved as a PDF from its print button.",
       "next": "references-title"
     },
     {

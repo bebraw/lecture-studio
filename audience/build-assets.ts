@@ -13,6 +13,15 @@ const root = new URL("../", import.meta.url),
 // This directory is generated exclusively by this script, never user content.
 await rm(output, { recursive: true, force: true });
 await mkdir(output, { recursive: true });
+for (const name of ["slides.html", "slides.mjs"])
+  await copyFile(
+    new URL(".local/browser/public/" + name, root),
+    new URL(name, output),
+  );
+await copyFile(
+  new URL("public/slides.css", root),
+  new URL("slides.css", output),
+);
 // Deliberate allowlist: never publish the desk, notes, configuration or secrets.
 for (const name of ["shared.mjs", "style.css"])
   await copyFile(

@@ -254,6 +254,9 @@ export default {
           "/seminar-browser.mjs",
           "/room.css",
           "/shared.mjs",
+          "/slides",
+          "/slides.css",
+          "/slides.mjs",
         ].includes(url.pathname) ||
         url.pathname.startsWith("/vendor/mermaid/") ||
         url.pathname.startsWith("/lecture-assets/") ||

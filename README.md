@@ -4,6 +4,15 @@ For the current lecture workflow, use the [operator guide](docs/operator-guide.m
 
 ## Live broadcast and deployment
 
+### Attendee slides and references
+
+The audience footer and closing Questions slide link to **https://live.scalableweb.dev/slides**.
+This reading copy stays available with Live off, includes linked references and diagrams,
+and offers **Print / save as PDF**. It is also available locally at `/slides`.
+Each build generates it from the versioned lecture export; deploy after final slide edits.
+Speaker notes, private build instructions, live audience responses and generated app sessions
+are excluded. It preserves prepared slide content, not a recording of the session.
+
 ### Private audience responses
 
 The header's **Responses** menu opens either questions or a word collection,

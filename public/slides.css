@@ -1,0 +1,164 @@
+:root {
+  --paper: #fffdf8;
+  --ink: #232723;
+  --muted: #657064;
+  --accent: #e5eadf;
+  --body-font: Georgia, serif;
+  color: var(--ink);
+  background: var(--paper);
+  font:
+    18px/1.6 Georgia,
+    serif;
+}
+* {
+  box-sizing: border-box;
+}
+body {
+  margin: 0;
+}
+.intro,
+main,
+.end {
+  width: min(100% - 3rem, 60rem);
+  margin: auto;
+}
+.intro {
+  padding: 4rem 0 3rem;
+  border-bottom: 3px solid;
+}
+h1 {
+  font-size: clamp(2.2rem, 5vw, 4.4rem);
+  line-height: 1.08;
+  max-width: 20ch;
+  font-weight: normal;
+}
+h2 {
+  font-size: clamp(1.65rem, 3vw, 2.5rem);
+  line-height: 1.2;
+}
+.eyebrow {
+  font: 0.75rem/1.5 monospace;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--muted);
+}
+a {
+  color: inherit;
+  text-underline-offset: 0.2em;
+  overflow-wrap: anywhere;
+}
+a:hover {
+  color: #42652c;
+}
+nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.7rem 1.5rem;
+  margin: 2rem 0;
+}
+button {
+  font: inherit;
+  padding: 0.5rem 1rem;
+  border: 1px solid;
+  background: transparent;
+  cursor: pointer;
+}
+:focus-visible {
+  outline: 3px solid #42652c;
+  outline-offset: 5px;
+}
+.slide {
+  padding: 3rem 0;
+  border-bottom: 1px solid #c9cec3;
+  scroll-margin-top: 1rem;
+}
+.slide img {
+  display: block;
+  max-width: 100%;
+  max-height: 30rem;
+  object-fit: contain;
+  margin: 1.5rem 0;
+}
+.slide svg {
+  max-width: 100%;
+  height: auto;
+}
+.slide footer,
+.activity,
+.end {
+  font-size: 0.85rem;
+  color: #505a4d;
+}
+.slide footer {
+  margin-top: 2rem;
+}
+.end {
+  padding: 3rem 0;
+}
+pre {
+  overflow: auto;
+  padding: 1rem;
+  background: #f0f0e9;
+  font-size: 0.85rem;
+}
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+th,
+td {
+  text-align: left;
+  vertical-align: top;
+  border-bottom: 1px solid #c9cec3;
+  padding: 0.65rem;
+  overflow-wrap: anywhere;
+}
+li {
+  margin-bottom: 0.6rem;
+}
+[id^="reference-"]:target {
+  background: #e5eadf;
+}
+@media print {
+  :root {
+    background: white;
+    font-size: 11pt;
+  }
+  .intro,
+  main,
+  .end {
+    width: 100%;
+  }
+  button,
+  nav {
+    display: none;
+  }
+  .intro {
+    break-after: page;
+  }
+  .slide {
+    break-before: page;
+    padding: 0;
+    border: 0;
+  }
+  .slide img {
+    max-height: 135mm;
+  }
+  .slide svg {
+    max-height: 145mm;
+  }
+  pre {
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+  }
+  h2 {
+    font-size: 23pt;
+  }
+  a {
+    text-decoration: underline;
+  }
+  @page {
+    size: A4;
+    margin: 16mm;
+  }
+}

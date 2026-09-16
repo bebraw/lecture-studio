@@ -1165,6 +1165,9 @@ export function createStudio({
         "/desk": "desk.html",
         "/stage": "stage.html",
         "/hypotheses": "hypotheses.html",
+        "/slides": "slides.html",
+        "/slides.css": "slides.css",
+        "/slides.mjs": "slides.mjs",
         "/debug": "debug.html",
         "/teaching/failure": "failure-demo.html",
         "/failure-demo.mjs": "failure-demo.mjs",
@@ -1182,7 +1185,9 @@ export function createStudio({
       if (staticFile)
         path = resolve(
           root,
-          staticFile.endsWith(".mjs") ? ".local/browser/public" : "public",
+          staticFile.endsWith(".mjs") || staticFile === "slides.html"
+            ? ".local/browser/public"
+            : "public",
           staticFile,
         );
       else if (url.pathname === "/prepared-document.css")
