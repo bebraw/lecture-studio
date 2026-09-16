@@ -313,13 +313,16 @@ test("later builds and reviews use their own approved audience input", async () 
   assert.doesNotMatch(session.resolve().prompt, /clear feedback/);
   assert.doesNotMatch(session.resolve().prompt, /compare topics/);
   session.move("select", "build-agents");
-  assert.match(session.resolve().prompt, /compare topics/);
-  assert.match(session.resolve().prompt, /unsupported tasks/);
+  assert.doesNotMatch(session.resolve().prompt, /compare topics/);
+  assert.doesNotMatch(
+    session.resolve().prompt,
+    /No approved word-cloud responses/,
+  );
   session.move("select", "check-document-review");
   assert.match(session.resolve().prompt, /date/);
   session.move("select", "audience-evidence-recap");
-  for (const term of ["date", "compare topics"])
-    assert.ok(session.resolve().prompt.includes(term));
+  assert.match(session.resolve().prompt, /date/);
+  assert.doesNotMatch(session.resolve().prompt, /compare topics/);
   assert.doesNotMatch(session.resolve().prompt, /test offline/);
 });
 
