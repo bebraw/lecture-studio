@@ -140,12 +140,24 @@ export interface BuildInput {
   revision: number | null;
 }
 export interface BuildRun {
+  timingId?: string;
   status?: "running" | "completed" | "failed" | "interrupted";
   step: string;
   prompt: string;
   inputs: BuildInput[];
   model?: string;
   startedAt: string;
+}
+export interface BuildTiming {
+  id: string;
+  step: string;
+  title: string;
+  model: string;
+  promptHash: string;
+  startedAt: string;
+  finishedAt: string | null;
+  previewAt: string | null;
+  outcome: "running" | "completed" | "failed" | "interrupted" | "unknown";
 }
 export interface ApprovalQuestion {
   id: string;

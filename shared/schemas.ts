@@ -169,6 +169,7 @@ const presentationSchema = v.object({
   runs: v.array(
     v.object({
       step: text,
+      timingId: optionalText,
       prompt: text,
       inputs: v.array(inputSchema),
       model: optionalText,
@@ -215,7 +216,26 @@ export const bridgeSchema = v.object({
     }),
   ),
 });
+export const buildTimingSchema = v.object({
+  id: text,
+  step: text,
+  title: text,
+  model: text,
+  promptHash: text,
+  startedAt: text,
+  finishedAt: v.nullable(text),
+  previewAt: v.nullable(text),
+  outcome: v.picklist([
+    "running",
+    "completed",
+    "failed",
+    "interrupted",
+    "unknown",
+  ]),
+});
 export const deskSchema = v.object({
+  buildTimings: v.array(buildTimingSchema),
+  buildTimingWarning: text,
   live: v.boolean(),
   projection: stageSchema,
   audienceSync: v.object({

@@ -28,6 +28,21 @@ loaded snapshot.
 - App checkpoints open the captured app preview automatically. If no preview was captured, the four lecture builds open clearly labeled prepared reference views. These are local-only, volatile examples; public Live follows the projector. Direct recovery URLs are `/teaching/checkpoint/build-document`, `/teaching/checkpoint/build-forms`, `/teaching/checkpoint/build-application`, and `/teaching/checkpoint/build-agents`. The Future reference demonstrates the fixed fallback without a runtime model call. Do not treat a preview URL or a completed turn as proof that tests passed. Run the vote-selected test first and report the observation.
 - At those checkpoints, **Show prepared demo** explicitly selects the reference even when a generated preview exists. **Show generated demo** switches back when its URL is available. Your choice is remembered for that checkpoint until the lecture resets; late completion never changes the projection. Neither action interrupts generation. Rehearse the prepared interaction before delivery.
 
+## Build timing comparisons
+
+Open **Notes → Build timings** for the latest 20 presentation-build attempts.
+The studio retains the last 200 in `.local/build-timings.json`; **Download timing
+history** exports them as JSON. Each attempt records its model, start/end times,
+first detected preview, and outcome. Startup dispatch is included in total time.
+Retries are separate attempts. A restart leaves unfinished attempts with an
+unknown outcome and no invented finish time. Prompts, audience responses and
+preview URLs are omitted; a prompt fingerprint helps identify matching tasks.
+
+Compare the same step and prompt fingerprint across models. Include failed and
+interrupted attempts when assessing reliability. A URL appearing, or a model
+turn completing, does not mean the interaction passed its acceptance check.
+Rehearse that check and reserve margin beyond the observed generation duration.
+
 ## Failure experiment
 
 The prepared local experiment opens directly on its slide. Predict, run A, inspect, reset, then run B and inspect. A sends no POST. B stores a request ID and drops the response connection. Duplicate transport attempts use the same ID. Storage is isolated and volatile; this establishes the two failure cases, not the generated app’s behavior. Public Live may instruct students to follow the projector for this local-only experiment.

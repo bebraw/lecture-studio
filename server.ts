@@ -56,6 +56,7 @@ import {
   PresentationSession,
 } from "./lib/presentation.ts";
 import { renderHandout } from "./lib/handout.ts";
+import { BuildTimings } from "./lib/build-timings.ts";
 import { feedbackRequest, feedbackSlide } from "./lib/feedback.ts";
 
 const root = dirname(fileURLToPath(import.meta.url));
@@ -189,11 +190,17 @@ export function createStudio({
   const teachingRecords = new Set<string>();
   let servePreparedDemo = preparedDemo();
   const buildPreviews = new Map<string, string>();
+  const buildTimings = new BuildTimings(
+    persist ? resolve(root, ".local/build-timings.json") : undefined,
+  );
   const demoChoices = new Map<string, boolean>();
   const captureBuildPreview = () => {
     const run = presentation?.runs.at(-1);
     const url = previewCandidates(bridge.state.messages, origin).at(-1);
-    if (run && url) buildPreviews.set(run.step, validDemoUrl(url, origin));
+    if (run && url) {
+      buildPreviews.set(run.step, validDemoUrl(url, origin));
+      if (run.timingId) buildTimings.preview(run.timingId);
+    }
   };
   let wordCloudStep: string | null = null;
   const wordCloudRounds = new Map<string, string>();
@@ -289,6 +296,10 @@ export function createStudio({
     blank = false;
   };
   const disconnectBuilder = () => {
+    updateBuildRun();
+    const run = presentation?.runs.at(-1);
+    if (run?.timingId && run.status === "running")
+      buildTimings.finish(run.timingId, "interrupted");
     previewTunnel.close();
     buildPreviews.clear();
     demoChoices.clear();
@@ -340,7 +351,7 @@ export function createStudio({
     if (
       run?.status === "running" &&
       !state.turnId &&
-      !["running", "waiting"].includes(state.status)
+      !["working", "running", "waiting"].includes(state.status)
     ) {
       run.status =
         state.outcome === "completed"
@@ -348,6 +359,12 @@ export function createStudio({
           : state.outcome === "failed"
             ? "failed"
             : "interrupted";
+      if (run.timingId)
+        buildTimings.finish(
+          run.timingId,
+          run.status,
+          state.finishedAt || Date.now(),
+        );
     }
   };
   let audienceReadiness = "Audience service not checked";
@@ -376,6 +393,8 @@ export function createStudio({
     captureBuildPreview();
     updateBuildRun();
     return {
+      buildTimings: structuredClone(buildTimings.rows),
+      buildTimingWarning: buildTimings.warning,
       live,
       projection: publicState(),
       audienceSync: {
@@ -515,6 +534,8 @@ export function createStudio({
       await previewTunnel.open(url, origin);
   };
   const broadcastTimer = setInterval(() => {
+    captureBuildPreview();
+    updateBuildRun();
     void audienceSync.refreshPresence();
     if (!liveTransition) audienceSync.publish(audienceState());
   }, 1000);
@@ -952,17 +973,31 @@ export function createStudio({
                   preparedWorkspaceUnused = false;
                   workspacePrepared = false;
                 }
-                await bridge.start(
+                const requestedModel =
+                  optionalString(body.model, "model") ?? "";
+                const timing = buildTimings.begin(
+                  presentation.current,
+                  presentation.step().title,
+                  requestedModel ||
+                    bridge.state.models.find((model) => model.isDefault)?.id ||
+                    "Codex default",
                   attempt.prompt,
-                  optionalString(body.model, "model") ?? "",
                 );
+                try {
+                  await bridge.start(attempt.prompt, requestedModel);
+                } catch (error) {
+                  buildTimings.finish(timing.id, "failed");
+                  throw error;
+                }
                 lastBrief = brief = attempt.prompt;
                 presentation.runs.push({
                   step: presentation.current,
                   prompt: attempt.prompt,
                   inputs: structuredClone(attempt.inputs),
                   status: "running",
-                  startedAt: new Date().toISOString(),
+                  model: timing.model,
+                  timingId: timing.id,
+                  startedAt: timing.startedAt,
                 });
               } else throw new Error("Unknown presentation operation");
             }
@@ -1352,6 +1387,7 @@ export function createStudio({
     bridge,
     library,
     async start() {
+      await buildTimings.load();
       if (persist) workspace = await rehearsals.current(workspace);
       await new Promise<void>((resolve, reject) => {
         server.once("error", reject);

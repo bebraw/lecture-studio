@@ -2653,3 +2653,22 @@ blockquote {
   width: 100%;
   height: 55vh;
 }
+#build-timings {
+  margin-top: 1rem;
+}
+#build-timings .timing-scroll {
+  overflow-x: auto;
+}
+#build-timings table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.85rem;
+  font-variant-numeric: tabular-nums;
+}
+#build-timings th,
+#build-timings td {
+  padding: 0.5rem;
+  text-align: left;
+  border-bottom: 1px solid #ccc;
+  vertical-align: top;
+}

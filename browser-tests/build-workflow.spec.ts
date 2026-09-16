@@ -75,6 +75,11 @@ test("a slow demo can be skipped, revisited and stopped without blocking the nex
     const stage = page.frameLocator("#current-stage > iframe").locator("body");
     await expect(stage).toContainText("Keep explaining");
     expect(bridge.state.turnId).toBe("fake-turn");
+    await page.locator("#build-timings summary").click();
+    await expect(page.locator("#build-timings tbody tr")).toHaveCount(1);
+    await expect(page.locator("#build-timings tbody")).toContainText(
+      "Codex default",
+    );
     // A late completion must not replace the slide the lecturer has moved to.
     bridge.state = {
       ...bridge.state,
@@ -109,6 +114,18 @@ test("a slow demo can be skipped, revisited and stopped without blocking the nex
       .click();
     await expect(page.locator("#graph-build")).toBeDisabled();
     expect(bridge.state.turnId).toBe("fake-turn");
+    await expect(page.locator("#build-timings tbody tr")).toHaveCount(3);
+    await expect(page.locator("#build-timings tbody")).toContainText(
+      "completed",
+    );
+    await expect(page.locator("#build-timings tbody")).toContainText(
+      "interrupted",
+    );
+    const download = page.waitForEvent("download");
+    await page.getByRole("button", { name: "Download timing history" }).click();
+    expect((await download).suggestedFilename()).toBe(
+      "lecture-build-timings.json",
+    );
   } finally {
     await stop();
   }

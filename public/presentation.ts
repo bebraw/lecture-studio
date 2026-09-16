@@ -95,6 +95,24 @@ export function mountPresentations({ call, update }: MountOptions) {
     $("back-material"),
   );
   notes.append(output);
+  const timingPanel = document.createElement("details");
+  timingPanel.id = "build-timings";
+  timingPanel.innerHTML =
+    '<summary>Build timings</summary><p>Recent attempts · preview time means a URL was detected, not that the demo passed its checks. Compare the same task and prompt across models.</p><button type="button">Download timing history</button><p role="status"></p><div class="timing-scroll"><table><caption>Last 20 build attempts</caption><thead><tr><th>Build / started</th><th>Model</th><th>Outcome</th><th>First preview</th><th>Total</th></tr></thead><tbody></tbody></table></div>';
+  notes.append(timingPanel);
+  query("button", timingPanel).onclick = () => {
+    const url = URL.createObjectURL(
+      new Blob([JSON.stringify(data.buildTimings, null, 2)], {
+        type: "application/json",
+      }),
+    );
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = "lecture-build-timings.json";
+    link.click();
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+  };
+  let timingKey = "";
   const stagePanel = $("current-stage-panel");
   $("graph-detours").before(stagePanel);
   const projectionStatus = document.createElement("span");
@@ -426,6 +444,44 @@ export function mountPresentations({ call, update }: MountOptions) {
     });
   return (value: DeskState) => {
     data = value;
+    const nextTimingKey =
+      JSON.stringify(data.buildTimings) + Math.floor(Date.now() / 1000);
+    if (timingKey !== nextTimingKey) {
+      timingKey = nextTimingKey;
+      const elapsed = (start: string, end: string | null) =>
+        end
+          ? `${Math.max(0, (Date.parse(end) - Date.parse(start)) / 1000).toFixed(1)} s`
+          : "—";
+      query("[role=status]", timingPanel).textContent =
+        data.buildTimingWarning ||
+        (data.buildTimings.length
+          ? "Saved locally · last 200 attempts"
+          : "No build attempts recorded yet.");
+      const rows = data.buildTimings
+        .slice(-20)
+        .reverse()
+        .map((run) => {
+          const row = document.createElement("tr");
+          row.title = `Task: ${run.step} · Prompt fingerprint: ${run.promptHash}`;
+          for (const value of [
+            run.title + " · " + new Date(run.startedAt).toLocaleString(),
+            run.model,
+            run.outcome,
+            elapsed(run.startedAt, run.previewAt),
+            elapsed(
+              run.startedAt,
+              run.finishedAt ||
+                (run.outcome === "running" ? new Date().toISOString() : null),
+            ),
+          ]) {
+            const cell = document.createElement("td");
+            cell.textContent = value;
+            row.append(cell);
+          }
+          return row;
+        });
+      query("tbody", timingPanel).replaceChildren(...rows);
+    }
     followers.textContent =
       data.audienceSync.active == null
         ? "Following: unavailable"
