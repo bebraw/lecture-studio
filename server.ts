@@ -570,7 +570,14 @@ export function createStudio({
             );
           if (url.pathname === "/api/desk") return json(res, deskState());
           if (url.pathname === "/api/feedback")
-            return json(res, await feedbackRequest(poll));
+            return json(
+              res,
+              await feedbackRequest(
+                poll,
+                undefined,
+                url.searchParams.get("mode") === "questions",
+              ),
+            );
           if (url.pathname === "/api/stage") return json(res, publicState());
           if (url.pathname === "/api/stage-link")
             return json(res, { url: origin + "/stage" });
@@ -615,7 +622,11 @@ export function createStudio({
               body.action === "show-cloud"
             ) {
               if (!live) throw new Error("Turn Live on first");
-              const snapshot = await feedbackRequest(poll);
+              const snapshot = await feedbackRequest(
+                poll,
+                undefined,
+                body.action === "show-question",
+              );
               captureWords(snapshot);
               const selected = feedbackSlide(
                 snapshot,

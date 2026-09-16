@@ -20,6 +20,12 @@ export class StageState extends DurableObject<Env> {
       "INSERT OR IGNORE INTO feedback_collections SELECT 'legacy:' || round,round,mode,prompt,expires FROM feedback_meta WHERE round NOT IN (SELECT round FROM feedback_collections)",
     );
     ctx.storage.sql.exec(
+      "INSERT OR IGNORE INTO feedback_meta SELECT 2,round,mode,prompt,opened,expires FROM feedback_meta WHERE id=1 AND mode='questions'",
+    );
+    ctx.storage.sql.exec(
+      "DELETE FROM feedback_meta WHERE id=1 AND mode='questions'",
+    );
+    ctx.storage.sql.exec(
       "CREATE TABLE IF NOT EXISTS feedback_items (id TEXT PRIMARY KEY, round TEXT, text TEXT, status TEXT, voter TEXT, network TEXT, created INTEGER)",
     );
     ctx.storage.sql.exec(
@@ -32,7 +38,14 @@ export class StageState extends DurableObject<Env> {
   async publish(stage: Record<string, JsonValue>) {
     if (stage.live === false)
       this.ctx.storage.sql.exec("UPDATE feedback_meta SET opened=0");
+    const previous = await this.read();
     await this.ctx.storage.put("stage", stage);
+    if (stage.live === true && previous?.live !== true) {
+      await this.feedbackManage("start", {
+        mode: "questions",
+        prompt: "What would you like to ask?",
+      });
+    }
   }
   presence(browser?: string) {
     const sql = this.ctx.storage.sql;
@@ -66,7 +79,9 @@ export class StageState extends DurableObject<Env> {
       (await this.ctx.storage.get<Record<string, JsonValue>>("stage")) || null
     );
   }
-  feedbackPublic() {
+  feedbackPublic(
+    questions = false,
+  ): { round: string; mode: string; prompt: string; open: boolean } | null {
     const row = this.ctx.storage.sql
       .exec<{
         round: string;
@@ -74,8 +89,9 @@ export class StageState extends DurableObject<Env> {
         prompt: string;
         opened: number;
         expires: number;
-      }>("SELECT * FROM feedback_meta WHERE id=1")
+      }>("SELECT * FROM feedback_meta WHERE id=?", questions ? 2 : 1)
       .toArray()[0];
+    if (!row && !questions) return this.feedbackPublic(true);
     return row && row.expires > Date.now()
       ? {
           round: row.round,
@@ -85,8 +101,8 @@ export class StageState extends DurableObject<Env> {
         }
       : null;
   }
-  feedbackPrivate() {
-    const config = this.feedbackPublic();
+  feedbackPrivate(questions = false) {
+    const config = this.feedbackPublic(questions);
     const items = config
       ? this.ctx.storage.sql
           .exec<{ id: string; text: string; status: string }>(
@@ -104,7 +120,13 @@ export class StageState extends DurableObject<Env> {
           .toArray()
           .map((row) => row.text)
       : [];
-    return { config, items, approvedWords };
+    const questionCount = this.ctx.storage.sql
+      .exec<{ n: number }>(
+        "SELECT count(*) n FROM feedback_items WHERE status='pending' AND round IN (SELECT round FROM feedback_meta WHERE id=2 AND expires>?)",
+        Date.now(),
+      )
+      .one().n;
+    return { config, items, approvedWords, questionCount };
   }
   async feedbackManage(action: string, input: Record<string, unknown>) {
     const sql = this.ctx.storage.sql;
@@ -142,7 +164,8 @@ export class StageState extends DurableObject<Env> {
         expires,
       );
       sql.exec(
-        "INSERT OR REPLACE INTO feedback_meta VALUES (1,?,?,?,?,?)",
+        "INSERT OR REPLACE INTO feedback_meta VALUES (?,?,?,?,?,?)",
+        input.mode === "questions" ? 2 : 1,
         round,
         input.mode,
         input.prompt.trim(),
@@ -156,7 +179,14 @@ export class StageState extends DurableObject<Env> {
         .one().expires;
       await this.ctx.storage.setAlarm(earliest);
     } else if (action === "close")
-      sql.exec("UPDATE feedback_meta SET opened=0");
+      sql.exec(
+        "UPDATE feedback_meta SET opened=0 WHERE id=? OR (mode='questions' AND ?=2)",
+        input.mode === "questions" ||
+          (!input.mode && this.feedbackPublic()?.mode === "questions")
+          ? 2
+          : 1,
+        input.mode === "questions" ? 2 : 1,
+      );
     else if (action === "approve" || action === "done") {
       if (typeof input.id !== "string") throw new Error("Choose a response");
       if (action === "approve")
@@ -170,7 +200,7 @@ export class StageState extends DurableObject<Env> {
         input.id,
       );
     } else throw new Error("Unknown action");
-    return this.feedbackPrivate();
+    return this.feedbackPrivate(input.mode === "questions");
   }
   async feedbackSubmit(
     round: string,
@@ -179,7 +209,9 @@ export class StageState extends DurableObject<Env> {
     network: string,
   ) {
     const stage = await this.read(),
-      config = this.feedbackPublic(),
+      config = [this.feedbackPublic(), this.feedbackPublic(true)].find(
+        (value) => value?.round === round,
+      ),
       now = Date.now(),
       sql = this.ctx.storage.sql;
     if (stage?.live !== true || !config?.open || round !== config.round)

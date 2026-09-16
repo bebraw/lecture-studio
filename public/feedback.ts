@@ -20,11 +20,17 @@ export function mountFeedback({ call, update }: MountOptions) {
       $("feedback-mode").value === "words"
         ? "Which words come to mind?"
         : "What would you like to ask?";
+    revision++;
+    listKey = "";
+    void refresh(false);
   };
   const render = (value: FeedbackSnapshot) => {
     const { config, items } = value;
     query("summary", menu).textContent =
-      "Responses · " + items.filter((x) => x.status === "pending").length;
+      "Responses · " +
+      items.filter((x) => x.status === "pending").length +
+      " · Questions " +
+      (value.questionCount ?? 0);
     $("feedback-state").textContent = config
       ? (config.open ? "Open" : "Closed") + " · " + config.prompt
       : "Collection closed";
@@ -102,11 +108,15 @@ export function mountFeedback({ call, update }: MountOptions) {
   document.addEventListener("click", (e) => {
     if (!menu.contains(e.target as Node)) menu.open = false;
   });
-  async function refresh() {
+  async function refresh(schedule = true) {
     try {
       if (!busy) {
         const started = revision;
-        const value = await call("feedback");
+        const value = await call(
+          $("feedback-mode").value === "questions"
+            ? "feedback?mode=questions"
+            : "feedback",
+        );
         if (!busy && revision === started) {
           if ("config" in value) render(value);
         }
@@ -115,7 +125,7 @@ export function mountFeedback({ call, update }: MountOptions) {
       const e = asError(caught);
       if (menu.open) $("feedback-error").textContent = e.message;
     } finally {
-      setTimeout(asyncHandler(refresh), 5000);
+      if (schedule) setTimeout(asyncHandler(refresh), 5000);
     }
   }
   void refresh();

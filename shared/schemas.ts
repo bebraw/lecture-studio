@@ -252,6 +252,7 @@ export const deskSchema = v.object({
   poll: pollSchema,
 });
 export const feedbackSchema = v.object({
+  questionCount: v.exactOptional(count),
   approvedWords: v.exactOptional(strings),
   config: v.nullable(
     v.object({ round: text, mode: text, prompt: text, open: v.boolean() }),

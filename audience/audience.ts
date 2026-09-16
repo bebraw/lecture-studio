@@ -35,80 +35,106 @@ document.addEventListener("visibilitychange", () => void heartbeat());
 let key = "",
   submitting = false,
   voteError = "";
-const feedback = document.createElement("details");
-feedback.id = "student-feedback";
-feedback.hidden = true;
-feedback.innerHTML =
-  '<summary>Send a response</summary><form><label id="feedback-label" for="feedback-text"></label><textarea id="feedback-text" required maxlength="400" aria-describedby="feedback-hint"></textarea><p id="feedback-hint"></p><p>The lecturer reviews responses before sharing. Approved words may appear on slides and be sent to the AI builder when the lecturer starts a build. Do not include names or sensitive information. The response queue expires after 24 hours; projected slides, model conversations and generated apps may retain approved words longer.</p><button>Send for review</button><p id="feedback-notice" role="status"></p></form>';
-query(".stage-bottom", document).before(feedback);
-let feedbackConfig: FeedbackConfig | null = null,
-  feedbackBusy = false;
-async function refreshFeedback() {
-  try {
-    const response = await fetch("/api/feedback", {
-      cache: "no-store",
-      signal: AbortSignal.timeout(8000),
-    });
-    if (!response.ok) throw new Error();
-    const config = v.parse(publicFeedbackSchema, await response.json());
-    if (config?.round !== feedbackConfig?.round) {
-      feedback.open = config?.mode === "words" && config.open;
-      query("form", feedback).reset();
-      query("#feedback-notice", feedback).textContent = "";
-    }
-    feedbackConfig = config;
-    feedback.hidden = !config?.open;
-    if (config?.open) {
-      query("summary", feedback).textContent =
-        config.mode === "words" ? "Add words" : "Ask a question";
-      query("#feedback-label", feedback).textContent = config.prompt;
-      query("#feedback-hint", feedback).textContent =
-        config.mode === "words"
-          ? "One idea per line. Use 1–3 words and at most 32 characters per idea. Send up to five ideas together; commas do not separate ideas."
-          : "Ask one question, up to 400 characters.";
-      query("textarea", feedback).placeholder = "";
-
-      query("textarea", feedback).maxLength =
-        config.mode === "words" ? 164 : 400;
-    }
-  } catch {
-    feedback.hidden = true;
-  } finally {
-    setTimeout(asyncHandler(refreshFeedback), 3000);
+function mountAudienceFeedback(questions: boolean) {
+  const feedback = document.createElement("details");
+  feedback.id = questions ? "student-questions" : "student-feedback";
+  feedback.hidden = true;
+  feedback.innerHTML =
+    '<summary>Send a response</summary><form><label id="feedback-label" for="feedback-text"></label><textarea id="feedback-text" required maxlength="400" aria-describedby="feedback-hint"></textarea><p id="feedback-hint"></p><p>The lecturer reviews responses before sharing. Approved words may appear on slides and be sent to the AI builder when the lecturer starts a build. Do not include names or sensitive information. The response queue expires after 24 hours; projected slides, model conversations and generated apps may retain approved words longer.</p><button>Send for review</button><p id="feedback-notice" role="status"></p></form>';
+  if (questions) {
+    for (const element of feedback.querySelectorAll("[id]"))
+      element.id = element.id.replace("feedback-", "question-");
+    query("label", feedback).htmlFor = "question-text";
+    query("textarea", feedback).setAttribute(
+      "aria-describedby",
+      "question-hint",
+    );
   }
-}
-query("form", feedback).onsubmit = async (event) => {
-  event.preventDefault();
-  if (feedbackBusy || !feedbackConfig?.open) return;
-  feedbackBusy = true;
-  const button = query("button", feedback);
-  button.disabled = true;
-  try {
-    const response = await fetch("/api/feedback", {
-      method: "POST",
-      headers: { "content-type": "application/json" },
-      body: JSON.stringify({
-        round: feedbackConfig.round,
-        text: query("textarea", feedback).value,
-      }),
-      signal: AbortSignal.timeout(8000),
-    });
-    if (!response.ok) {
-      const result = v.safeParse(errorSchema, await response.json());
-      throw new Error(result.success ? result.output.error : "Not confirmed");
-    }
-    query("textarea", feedback).value = "";
-    query("#feedback-notice", feedback).textContent =
-      "Sent privately. The lecturer chooses what to show.";
-  } catch (caught) {
-    const e = asError(caught);
-    query("#feedback-notice", feedback).textContent = e.message;
-  } finally {
+  query(".stage-bottom", document).before(feedback);
+  const find = (selector: string) =>
+    query(
+      questions ? selector.replace("feedback-", "question-") : selector,
+      feedback,
+    );
+  let feedbackConfig: FeedbackConfig | null = null,
     feedbackBusy = false;
-    button.disabled = false;
+  async function refreshFeedback() {
+    try {
+      const response = await fetch(
+        "/api/feedback" + (questions ? "?mode=questions" : ""),
+        {
+          cache: "no-store",
+          signal: AbortSignal.timeout(8000),
+        },
+      );
+      if (!response.ok) throw new Error();
+      const parsed = v.parse(publicFeedbackSchema, await response.json());
+      const config = !questions && parsed?.mode === "questions" ? null : parsed;
+      if (config?.round !== feedbackConfig?.round) {
+        feedback.open = config?.mode === "words" && config.open;
+        query("form", feedback).reset();
+        find("#feedback-notice").textContent = "";
+      }
+      feedbackConfig = config;
+      feedback.hidden =
+        !config?.open || (!questions && config.mode === "questions");
+      if (config?.open) {
+        query("summary", feedback).textContent =
+          config.mode === "words" ? "Add words" : "Ask a question";
+        find("#feedback-label").textContent = config.prompt;
+        find("#feedback-hint").textContent =
+          config.mode === "words"
+            ? "One idea per line. Use 1–3 words and at most 32 characters per idea. Send up to five ideas together; commas do not separate ideas."
+            : "Ask one question, up to 400 characters.";
+        query("textarea", feedback).placeholder = "";
+
+        query("textarea", feedback).maxLength =
+          config.mode === "words" ? 164 : 400;
+      }
+    } catch {
+      feedback.hidden = true;
+    } finally {
+      setTimeout(asyncHandler(refreshFeedback), 3000);
+    }
   }
-};
-void refreshFeedback();
+  query("form", feedback).onsubmit = async (event) => {
+    event.preventDefault();
+    if (feedbackBusy || !feedbackConfig?.open) return;
+    feedbackBusy = true;
+    const button = query("button", feedback);
+    button.disabled = true;
+    try {
+      const response = await fetch(
+        "/api/feedback" + (questions ? "?mode=questions" : ""),
+        {
+          method: "POST",
+          headers: { "content-type": "application/json" },
+          body: JSON.stringify({
+            round: feedbackConfig.round,
+            text: query("textarea", feedback).value,
+          }),
+          signal: AbortSignal.timeout(8000),
+        },
+      );
+      if (!response.ok) {
+        const result = v.safeParse(errorSchema, await response.json());
+        throw new Error(result.success ? result.output.error : "Not confirmed");
+      }
+      query("textarea", feedback).value = "";
+      find("#feedback-notice").textContent =
+        "Sent privately. The lecturer chooses what to show.";
+    } catch (caught) {
+      const e = asError(caught);
+      find("#feedback-notice").textContent = e.message;
+    } finally {
+      feedbackBusy = false;
+      button.disabled = false;
+    }
+  };
+  void refreshFeedback();
+}
+mountAudienceFeedback(false);
+mountAudienceFeedback(true);
 async function refresh() {
   try {
     const response = await fetch("/api/audience", {

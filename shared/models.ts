@@ -199,6 +199,7 @@ export interface FeedbackItem {
   status: string;
 }
 export interface FeedbackSnapshot {
+  questionCount?: number;
   approvedWords?: string[];
   config: FeedbackConfig | null;
   items: FeedbackItem[];

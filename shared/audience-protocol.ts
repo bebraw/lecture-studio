@@ -1,7 +1,12 @@
 import { audienceRooms } from "./audience-rooms.ts";
 export const audienceProtocol = {
   version: 2,
-  features: ["lecture-reset", "poll-identity", "persistent-collections"],
+  features: [
+    "lecture-reset",
+    "poll-identity",
+    "persistent-collections",
+    "continuous-questions",
+  ],
   rooms: Object.keys(audienceRooms),
 };
 export function compatibleAudience(value: unknown): boolean {

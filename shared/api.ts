@@ -86,6 +86,7 @@ export const requestSchemas = {
 };
 export type PostPath = keyof typeof requestSchemas;
 type GetPath =
+  | "feedback?mode=questions"
   | "presentation/markdown"
   | "source/files"
   | `source/file?path=${string}`
@@ -136,7 +137,7 @@ export type ApiResponse<P extends ApiPath> = P extends "source/files"
               ? { url: string }
               : P extends "poll/receipt" | "presentation/markdown"
                 ? { text: string }
-                : P extends "feedback"
+                : P extends "feedback" | "feedback?mode=questions"
                   ? v.InferOutput<typeof feedbackResponseSchema>
                   : DeskState;
 export type ApiClient = <P extends ApiPath>(
@@ -174,7 +175,7 @@ export function parseApiResponse<P extends ApiPath>(
                   ? stageLinkSchema
                   : path === "poll/receipt" || path === "presentation/markdown"
                     ? receiptSchema
-                    : path === "feedback"
+                    : path === "feedback" || path === "feedback?mode=questions"
                       ? feedbackResponseSchema
                       : deskSchema;
   const result = v.safeParse(schema, value);

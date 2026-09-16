@@ -13,19 +13,23 @@ const escape = (value: unknown) =>
 export async function feedbackRequest(
   poll: AudiencePoll,
   body?: unknown,
+  questions = false,
 ): Promise<FeedbackSnapshot> {
   if (!poll.origin || !poll.token)
     throw new Error("Connect an audience service first");
-  const response = await poll.fetcher(poll.origin + "/presenter/feedback", {
-    method: body ? "POST" : "GET",
-    headers: {
-      authorization: "Bearer " + poll.token,
-      "content-type": "application/json",
+  const response = await poll.fetcher(
+    poll.origin + "/presenter/feedback" + (questions ? "?mode=questions" : ""),
+    {
+      method: body ? "POST" : "GET",
+      headers: {
+        authorization: "Bearer " + poll.token,
+        "content-type": "application/json",
+      },
+      ...(body ? { body: JSON.stringify(body) } : {}),
+      redirect: "error",
+      signal: AbortSignal.timeout(8000),
     },
-    ...(body ? { body: JSON.stringify(body) } : {}),
-    redirect: "error",
-    signal: AbortSignal.timeout(8000),
-  });
+  );
   if (response.status === 404) {
     await response.body?.cancel();
     throw new Error("Deploy the updated audience Worker to enable responses");

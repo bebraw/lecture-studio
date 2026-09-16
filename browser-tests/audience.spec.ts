@@ -127,7 +127,12 @@ test.describe("Native forms", () => {
         await (
           await audience.admin("/presenter/feedback", { action: "close" })
         ).json(),
-      ).toEqual({ config: null, items: [], approvedWords: [] });
+      ).toEqual({
+        config: null,
+        items: [],
+        approvedWords: [],
+        questionCount: 0,
+      });
       expect((await send(first)).status).toBe(409);
       await admin("open-session", "first-lecture");
       await send(second);
@@ -487,7 +492,12 @@ test("public capabilities describe required rooms without activating a lecture",
   expect(await response.json()).toMatchObject({
     version: 2,
     rooms,
-    features: ["lecture-reset", "poll-identity", "persistent-collections"],
+    features: [
+      "lecture-reset",
+      "poll-identity",
+      "persistent-collections",
+      "continuous-questions",
+    ],
   });
   expect(
     await (await fetch(new URL("/api/audience", audience.url))).json(),

@@ -47,7 +47,13 @@ export async function feedbackRequest(
   try {
     if (request.method === "GET")
       return json(
-        admin ? await object.feedbackPrivate() : await object.feedbackPublic(),
+        admin
+          ? await object.feedbackPrivate(
+              url.searchParams.get("mode") === "questions",
+            )
+          : await object.feedbackPublic(
+              url.searchParams.get("mode") === "questions",
+            ),
       );
     if (request.method !== "POST")
       return json({ error: "Method not allowed" }, 405);
