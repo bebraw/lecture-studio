@@ -145,6 +145,7 @@ export function createStudio({
     graphBusy = false;
   let audienceSessionStarted = false;
   let workspacePrepared = false;
+  let preparedWorkspaceUnused = false;
   const graphPolls = new Map<string, AudiencePoll>();
   const getGraphPoll = (step: Step) => {
     let selected = graphPolls.get(step.id);
@@ -307,6 +308,7 @@ export function createStudio({
     presentation = null;
     audienceSessionStarted = false;
     workspacePrepared = false;
+    preparedWorkspaceUnused = false;
     graphPoll = null;
     graphPolls.clear();
     disconnectBuilder();
@@ -666,6 +668,9 @@ export function createStudio({
                     };
                     throw new Error(rehearsalJob.error);
                   }
+                }
+                preparedWorkspaceUnused = false;
+                if (bridge.state.status === "disconnected") {
                   try {
                     await bridge.connect(workspace);
                   } catch {
@@ -784,7 +789,7 @@ export function createStudio({
               wordCloudRounds.clear();
               wordCloudStep = null;
               audienceSessionStarted = false;
-              workspacePrepared = false;
+              workspacePrepared = preparedWorkspaceUnused;
               graphPoll = null;
               graphPolls.clear();
               buildPreviews.clear();
@@ -867,6 +872,10 @@ export function createStudio({
                   );
                 const attempt = prior ?? resolved;
                 await showGraph();
+                if (preparedWorkspaceUnused) {
+                  preparedWorkspaceUnused = false;
+                  workspacePrepared = false;
+                }
                 await bridge.start(
                   attempt.prompt,
                   optionalString(body.model, "model") ?? "",
@@ -940,6 +949,7 @@ export function createStudio({
               workspace = next;
               resetLecture();
               workspacePrepared = true;
+              preparedWorkspaceUnused = true;
               rehearsalJob = { status: "ready" };
             })
             .catch(() => {
@@ -1078,6 +1088,8 @@ export function createStudio({
               rehearsalJob = { status: "creating" };
               try {
                 workspace = await rehearsals.create();
+                workspacePrepared = true;
+                preparedWorkspaceUnused = true;
                 rehearsalJob = { status: "ready" };
               } catch (error) {
                 rehearsalJob = { status: "failed" };
@@ -1093,6 +1105,10 @@ export function createStudio({
             body.brief.length > 20000
           )
             throw new Error("Review a non-empty brief first");
+          if (preparedWorkspaceUnused) {
+            preparedWorkspaceUnused = false;
+            workspacePrepared = false;
+          }
           await bridge.start(
             body.brief,
             optionalString(body.model, "model") ?? "",

@@ -122,7 +122,7 @@ Optional settings are documented in [.env.example](.env.example). Create your ow
 
 ## A ten-minute rehearsal
 
-Starting **Live on** for a newly loaded/restarted presentation prepares a fresh numbered app checkout from the pinned starter. It clears the prior builder session and preview records without deleting earlier checkouts. Setup failure preserves the current project and leaves the new lecture unstarted. Turning Live off and on during the same lecture retains that lecture’s project. Allow time for cloning and dependency installation before students arrive.
+Use **New rehearsal** before students arrive to clone the pinned starter and install dependencies. Loading slides preserves that unused checkout, so **Live on** reuses it and connects Codex without another install. Otherwise, starting **Live on** for a newly loaded/restarted presentation prepares a fresh numbered app checkout from the pinned starter. It clears the prior builder session and preview records without deleting earlier checkouts. Setup failure preserves the current project and leaves the new lecture unstarted. Turning Live off and on during the same lecture retains that lecture’s project. Allow time for cloning and dependency installation before students arrive.
 
 The opening QR slide links directly to `https://live.scalableweb.dev/`, followed by an isolated practice vote and moderated practice word cloud. Practice responses are not used in build prompts. **Following** beside the desk Live toggle and in the audience footer counts anonymous browsers with a heartbeat in the last 45 seconds, not people. Tabs share a short-lived cookie; hidden tabs expire and embedded debug previews are excluded. No IP address or identifying profile is stored for this count.
 

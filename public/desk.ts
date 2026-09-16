@@ -1202,7 +1202,7 @@ function setupRehearsals() {
   const panel = document.createElement("section");
   panel.className = "rehearsal-controls";
   panel.innerHTML =
-    '<span class="section-label">REHEARSAL</span><p class="small muted">Reset the lecture, or start in a fresh project folder. Previous checkouts and saved material stay intact.</p><div class="button-row"><button id="reset-lecture">Reset lecture…</button><button id="new-rehearsal">New rehearsal…</button></div><p id="rehearsal-status" role="status" class="small"></p>';
+    '<span class="section-label">REHEARSAL</span><p class="small muted">Use New rehearsal before students arrive to install a fresh project. Load the slides afterwards; Live on reuses this unused checkout. Demo builds use light reasoning and focused checks. Previous checkouts and saved material stay intact.</p><div class="button-row"><button id="reset-lecture">Reset lecture…</button><button id="new-rehearsal">New rehearsal…</button></div><p id="rehearsal-status" role="status" class="small"></p>';
   query(".plot", document).append(panel);
   for (const [id, question] of [
     [

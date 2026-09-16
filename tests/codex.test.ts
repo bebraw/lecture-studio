@@ -63,6 +63,21 @@ test("Codex uses reviewed text, workspace sandbox, automatic approval review and
     assert.equal(spawnArgs![2].env!.OBSIDIAN_API_KEY, undefined);
     assert.ok(!spawnArgs![1].some((s) => s.includes('mcp_servers."')));
     await bridge.start("EXACT reviewed brief", "test-model");
+    assert.deepEqual(
+      sent.find((x) => x.method === "thread/start")!.params!.config,
+      { model_reasoning_effort: "low" },
+    );
+    assert.equal(
+      sent.find((x) => x.method === "turn/start")!.params!.effort,
+      "low",
+    );
+    assert.match(
+      String(
+        sent.find((x) => x.method === "thread/start")!.params!
+          .developerInstructions,
+      ),
+      /LECTURE DEMO MODE/,
+    );
     assert.equal(
       sent.find((x) => x.method === "thread/start")!.params!.sandbox,
       "workspace-write",
@@ -146,6 +161,12 @@ test("Codex uses reviewed text, workspace sandbox, automatic approval review and
     });
     assert.equal(bridge.state.status, "ready");
     assert.equal(bridge.state.messages[0]?.text, "Finished");
+    await bridge.start("Second increment", "test-model");
+    assert.equal(sent.filter((x) => x.method === "thread/start").length, 1);
+    assert.equal(
+      sent.filter((x) => x.method === "turn/start").at(-1)!.params!.effort,
+      "low",
+    );
   } finally {
     bridge.close();
   }

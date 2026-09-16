@@ -26,7 +26,7 @@ Versioned export of the Obsidian lecture at `Lectures/Web Development 2026/Prese
       "chapter": "Opening",
       "title": "Today’s route",
       "body": "1. **Past** — Finding knowledge; documents, links and native forms\n2. **Present** — Browser interaction; AJAX and shared state\n3. **Future** — What people might delegate to agents\n4. **References** — Sources and further reading",
-      "notes": "Introduce the route before the CERN example. Across the sections, we build and inspect one application together.",
+      "notes": "Introduce the route. After the practice activities, introduce the seminar app, collect its audience inputs and start the first build. Then discuss Past while it runs.",
       "next": "join-live"
     },
     {
@@ -74,7 +74,75 @@ Versioned export of the Obsidian lecture at `Lectures/Web Development 2026/Prese
       "body": "Enter **one place per line** on live.scalableweb.dev.\n\nUse 1–3 words per idea, up to 32 characters. Submit up to five ideas together.",
       "wordCloud": true,
       "notes": "Practice only; these words are never used in build prompts. Showing this slide opens its collection. Close collection, review privately, approve a few entries, and show the approved cloud. Demonstrate that multiple ideas use separate lines. Return to the slide before continuing.",
-      "next": "step-4"
+      "next": "demo-background"
+    },
+    {
+      "id": "demo-background",
+      "type": "material",
+      "chapter": "Opening",
+      "title": "One seminar app, three stages",
+      "body": "We’ll build an app to help someone decide whether to attend **SDLCAI, a seminar about AI in software development**.\n\n1. **Document:** find the seminar essentials and follow source links.\n2. **Interactive app:** submit preferences and see shared results.\n3. **Generated view:** adapt the information to a chosen priority.",
+      "notes": "Introduce the seminar scenario before collecting the first build’s inputs. We start with an information page, then add a native form, browser interaction and a generated view. Audience information needs shape the first page’s headings and ordering; the theme vote shapes its presentation. No HTML knowledge is needed for these choices. Distinguish the coding agent implementing the app from the model used inside it later.",
+      "next": "knowledge-experience"
+    },
+    {
+      "id": "knowledge-experience",
+      "type": "question",
+      "chapter": "Opening",
+      "title": "When deciding whether to attend a seminar, what information do you need first?",
+      "body": "**Word cloud**\n\nOn live.scalableweb.dev, enter **one idea per line**.\n\nUse 1–3 words per idea, up to 32 characters. Submit up to five ideas together.",
+      "notes": "Showing this slide while Live is on automatically opens its word collection. Close collection, review submissions privately, approve relevant responses, then Show approved cloud. Discuss two or three needs drawn from the students’ own contributions; do not seed the collection with examples. Connect these needs to the first document’s headings and ordering; refer back to them when checking the build. Frequency is a discussion cue, not proof of importance. Use Back to slide before continuing. If collection is unavailable, take three spoken responses. Never project unreviewed submissions.",
+      "next": "vote-theme",
+      "wordCloud": true
+    },
+    {
+      "id": "vote-theme",
+      "type": "poll",
+      "chapter": "Opening",
+      "title": "Which visual theme should shape our app?",
+      "body": "",
+      "notes": "This slide opens its prepared poll automatically; closing or leaving freezes the result. Missing decisions require explicitly accepted defaults.",
+      "room": "webdev-2026",
+      "poll": {
+        "question": "Which visual theme should shape our app?",
+        "options": [
+          {
+            "id": "editorial",
+            "label": "Editorial"
+          },
+          {
+            "id": "retro-web",
+            "label": "Retro web"
+          },
+          {
+            "id": "playful",
+            "label": "Playful"
+          }
+        ],
+        "defaultId": "editorial"
+      },
+      "next": "build-document"
+    },
+    {
+      "id": "build-document",
+      "type": "build",
+      "chapter": "Opening",
+      "title": "Build · Create the seminar document",
+      "body": "Build a readable SDLCAI information page from the reviewed seminar sources. Use the approved audience needs for headings and ordering, and apply the chosen theme. Include real source links. Show a local preview and check the result. Stop before adding the form.",
+      "notes": "Review the approved audience needs and frozen theme, then explicitly start the first build here, before entering Past. The coding agent works in the separate app project while you discuss the historical visions, CERN, HTML, CSS, JavaScript and early editors. Keep the document checkpoint after Dreamweaver so the build has the entire historical discussion to finish. If it is still running, use the clearly labeled prepared reference without treating it as the build’s result.",
+      "uses": [
+        {
+          "poll": "vote-theme",
+          "instructions": {
+            "editorial": "Use an editorial theme with restrained typography.",
+            "retro-web": "Use a readable retro-web theme with accessible contrast.",
+            "playful": "Use a playful theme with readable typography and accessible controls."
+          }
+        }
+      ],
+      "next": "step-4",
+      "related": [],
+      "wordsFrom": "knowledge-experience"
     },
     {
       "id": "step-4",
@@ -186,7 +254,7 @@ Versioned export of the Obsidian lecture at `Lectures/Web Development 2026/Prese
       "chapter": "Past",
       "title": "HTML: headings, paragraphs and links",
       "body": "```html\n<h1>Seminar</h1>\n<p>Topic, date and location.</p>\n<a href=\"https://www.sdlcai.org/\">Seminar details</a>\n```\n\n### Seminar\nTopic, date and location.\n\n[Seminar details](https://www.sdlcai.org/)",
-      "notes": "Identify the heading, paragraph and link. This modern HTML teaching example leads directly into the app scenario: a seminar page can answer practical questions, but we still need to decide which information belongs first. The link opens the real SDLCAI site. Next distinguish styling and browser behavior, then introduce the seminar and visitor task.",
+      "notes": "Identify the heading, paragraph and link. Relate this modern HTML teaching example to the seminar page already being built from the audience’s needs. The link opens the real SDLCAI site. Next distinguish styling and browser behavior; inspect the generated document after the early editors.",
       "next": "css-foundations",
       "related": [],
       "source": "[13, 14] HTML semantics · Teaching example"
@@ -209,77 +277,9 @@ Versioned export of the Obsidian lecture at `Lectures/Web Development 2026/Prese
       "title": "JavaScript: behavior in the browser (1995)",
       "body": "Respond to an action and update the current page.\n\n```javascript\nconst button = document.querySelector(\"button\");\nbutton.addEventListener(\"click\", () => {\n  document.querySelector(\"h1\").textContent = \"Welcome!\";\n});\n```\n\nChanging the page does not by itself save anything on the server.",
       "source": "[16] Wirfs-Brock & Eich · JavaScript: The First 20 Years",
-      "notes": "Brendan Eich created JavaScript at Netscape in 1995. This uses modern syntax and DOM APIs; it is not 1995 source code. Assume the page has a button and heading. Explain the event, handler and visible change. The DOM is a browser API used from JavaScript. We cover HTML, CSS and JS by role, not strict release order; CSS1’s Recommendation followed JavaScript’s introduction. Transition to using these tools to build the seminar app.",
+      "notes": "Brendan Eich created JavaScript at Netscape in 1995. This uses modern syntax and DOM APIs; it is not 1995 source code. Assume the page has a button and heading. Explain the event, handler and visible change. The DOM is a browser API used from JavaScript. We cover HTML, CSS and JS by role, not strict release order; CSS1’s Recommendation followed JavaScript’s introduction. Connect these roles to the seminar app already being built, then turn to early web publishing and authoring tools.",
       "related": [],
-      "next": "demo-background"
-    },
-    {
-      "id": "demo-background",
-      "type": "material",
-      "chapter": "Past",
-      "title": "From an HTML page to a seminar app",
-      "body": "Let’s use those headings, paragraphs and links to help someone decide whether to attend **SDLCAI, a seminar about AI in software development**.\n\n1. **Document:** find the seminar essentials and follow source links.\n2. **Interactive app:** submit preferences and see shared results.\n3. **Generated view:** adapt the information to a chosen priority.",
-      "notes": "Introduce the seminar scenario for the first time here. The app does not exist yet. We first build its information page, then add the native form. Audience information needs shape the headings and ordering; the theme vote shapes presentation. Distinguish the coding agent implementing this app from the model used inside it later.",
-      "next": "knowledge-experience"
-    },
-    {
-      "id": "knowledge-experience",
-      "type": "question",
-      "chapter": "Past",
-      "title": "When deciding whether to attend a seminar, what information do you need first?",
-      "body": "**Word cloud**\n\nOn live.scalableweb.dev, enter **one idea per line**.\n\nUse 1–3 words per idea, up to 32 characters. Submit up to five ideas together.",
-      "notes": "Showing this slide while Live is on automatically opens its word collection. Close collection, review submissions privately, approve relevant responses, then Show approved cloud. Discuss two or three needs drawn from the students’ own contributions; do not seed the collection with examples. Connect these needs to the first document’s headings and ordering; refer back to them when checking the build. Frequency is a discussion cue, not proof of importance. Use Back to slide before continuing. If collection is unavailable, take three spoken responses. Never project unreviewed submissions.",
-      "next": "vote-theme",
-      "wordCloud": true
-    },
-    {
-      "id": "vote-theme",
-      "type": "poll",
-      "chapter": "Past",
-      "title": "Which visual theme should shape our app?",
-      "body": "",
-      "notes": "This slide opens its prepared poll automatically; closing or leaving freezes the result. Missing decisions require explicitly accepted defaults.",
-      "room": "webdev-2026",
-      "poll": {
-        "question": "Which visual theme should shape our app?",
-        "options": [
-          {
-            "id": "editorial",
-            "label": "Editorial"
-          },
-          {
-            "id": "retro-web",
-            "label": "Retro web"
-          },
-          {
-            "id": "playful",
-            "label": "Playful"
-          }
-        ],
-        "defaultId": "editorial"
-      },
-      "next": "build-document"
-    },
-    {
-      "id": "build-document",
-      "type": "build",
-      "chapter": "Past",
-      "title": "Build · Create the seminar document",
-      "body": "Build a readable SDLCAI information page from the reviewed seminar sources. Use the approved audience needs for headings and ordering, and apply the chosen theme. Include real source links. Show a local preview and check the result. Stop before adding the form.",
-      "notes": "The coding agent implements this in a separate app project. Review the approved audience needs and theme, then start the build. Discuss GeoCities, FrontPage and Dreamweaver while it runs. Allow around 3–5 minutes; use the labeled prepared reference if the build is not ready at the checkpoint.",
-      "uses": [
-        {
-          "poll": "vote-theme",
-          "instructions": {
-            "editorial": "Use an editorial theme with restrained typography.",
-            "retro-web": "Use a readable retro-web theme with accessible contrast.",
-            "playful": "Use a playful theme with readable typography and accessible controls."
-          }
-        }
-      ],
-      "next": "geocities-personal-page",
-      "related": [],
-      "wordsFrom": "knowledge-experience"
+      "next": "geocities-personal-page"
     },
     {
       "id": "geocities-personal-page",
@@ -383,7 +383,7 @@ Versioned export of the Obsidian lecture at `Lectures/Web Development 2026/Prese
       "source": "[22, 23] Teaching model · Adapted from Vepsäläinen",
       "notes": "Model, not a network recording. This example uses POST/Redirect/GET; returning HTML directly is another valid native-form response. Point to experience=some, then follow the same value through the server. Ask who rendered the results. Browser restoration of local fields can vary; do not claim every reload always clears every input. Compare with the actual generated form.\nReveal 1 of 4: Submit. Advance with Next; Previous revisits the preceding state.\nFull attribution: Explanatory model · [22, 23] Adapted for this lecture from Juho Vepsäläinen’s Web architecture lens",
       "next": "flow-native-2",
-      "related": ["flow-html-4", "flow-json-4"]
+      "related": ["flow-json-4"]
     },
     {
       "id": "flow-native-2",
@@ -394,7 +394,7 @@ Versioned export of the Obsidian lecture at `Lectures/Web Development 2026/Prese
       "source": "[22, 23] Teaching model · Adapted from Vepsäläinen",
       "notes": "Model, not a network recording. This example uses POST/Redirect/GET; returning HTML directly is another valid native-form response. Point to experience=some, then follow the same value through the server. Ask who rendered the results. Browser restoration of local fields can vary; do not claim every reload always clears every input. Compare with the actual generated form.\nReveal 2 of 4: Store. Advance with Next; Previous revisits the preceding state.\nFull attribution: Explanatory model · [22, 23] Adapted for this lecture from Juho Vepsäläinen’s Web architecture lens",
       "next": "flow-native-3",
-      "related": ["flow-html-4", "flow-json-4"]
+      "related": ["flow-json-4"]
     },
     {
       "id": "flow-native-3",
@@ -405,7 +405,7 @@ Versioned export of the Obsidian lecture at `Lectures/Web Development 2026/Prese
       "source": "[22, 23] Teaching model · Adapted from Vepsäläinen",
       "notes": "Model, not a network recording. This example uses POST/Redirect/GET; returning HTML directly is another valid native-form response. Point to experience=some, then follow the same value through the server. Ask who rendered the results. Browser restoration of local fields can vary; do not claim every reload always clears every input. Compare with the actual generated form.\nReveal 3 of 4: Redirect. Advance with Next; Previous revisits the preceding state.\nFull attribution: Explanatory model · [22, 23] Adapted for this lecture from Juho Vepsäläinen’s Web architecture lens",
       "next": "flow-native-4",
-      "related": ["flow-html-4", "flow-json-4"]
+      "related": ["flow-json-4"]
     },
     {
       "id": "flow-native-4",
@@ -416,7 +416,7 @@ Versioned export of the Obsidian lecture at `Lectures/Web Development 2026/Prese
       "source": "[22, 23] Teaching model · Adapted from Vepsäläinen",
       "notes": "Model, not a network recording. This example uses POST/Redirect/GET; returning HTML directly is another valid native-form response. Point to experience=some, then follow the same value through the server. Ask who rendered the results. Browser restoration of local fields can vary; do not claim every reload always clears every input. Compare with the actual generated form.\nReveal 4 of 4: Load results. Advance with Next; Previous revisits the preceding state. This slide focuses on the GET after the redirect; submission and storage were shown in the preceding slides.\nFull attribution: Explanatory model · [22, 23] Adapted for this lecture from Juho Vepsäläinen’s Web architecture lens",
       "next": "step-8",
-      "related": ["flow-html-4", "flow-json-4"]
+      "related": ["flow-json-4"]
     },
     {
       "id": "step-8",
@@ -480,7 +480,7 @@ Versioned export of the Obsidian lecture at `Lectures/Web Development 2026/Prese
       "body": "Web pages become application-like experiences.",
       "notes": "Gather audience opinions before revealing the build prompt: collect suggestions, discuss the approved cloud, then freeze a priority vote. Only then advance to the resolved prompt and start the Present build.",
       "next": "vote-interaction",
-      "related": ["rendering-location", "flow-html-4", "detour-2-1"],
+      "related": ["rendering-location", "flow-json-4", "detour-2-1"],
       "source": "Paraphrase · [25] Jesse James Garrett (2005)"
     },
     {
@@ -537,61 +537,17 @@ Versioned export of the Obsidian lecture at `Lectures/Web Development 2026/Prese
         }
       ],
       "next": "detour-2-1",
-      "related": ["flow-html-4", "detour-2-1"]
+      "related": ["flow-json-4", "detour-2-1"]
     },
     {
       "id": "detour-2-1",
       "type": "material",
       "title": "AJAX: requests without navigation (1999/2005)",
-      "body": "```mermaid\nsequenceDiagram\n Browser->>Server: JavaScript sends a request\n Server-->>Browser: Data or HTML fragment\n Note over Browser: Update the current page\n```\n\n**1999:** XMLHTTP ships with Internet Explorer 5.\n\n**2005:** Jesse James Garrett names the approach “Ajax”.",
-      "notes": "Start with the mechanism before naming the application architecture: JavaScript makes an HTTP request and updates part of the current document without navigating. AJAX is Asynchronous JavaScript and XML, but neither XML nor a whole SPA is required. XMLHTTP was the Microsoft precursor to XMLHttpRequest; modern code can use fetch. Hopmann recalls development around late 1998 for Outlook Web Access, followed by shipping in IE5 (18 March 1999). Garrett named the approach on 18 February 2005. Do not claim AJAX predates every SPA by several years: XMLHTTP and early application-style web interfaces developed together, and the AJAX name postdates OWA (2000) and Gmail (2004). Explain the following HTML and JSON responses, then show those early applications.",
+      "body": "```mermaid\nsequenceDiagram\n Browser->>Server: JavaScript sends a request\n Server-->>Browser: Response data\n Note over Browser: Update the current page\n```\n\n**1999:** XMLHTTP ships with Internet Explorer 5.\n\n**2005:** Jesse James Garrett names the approach “Ajax”.",
+      "notes": "Start with the mechanism before naming the application architecture: JavaScript makes an HTTP request and updates part of the current document without navigating. AJAX is Asynchronous JavaScript and XML, but neither XML nor a whole SPA is required. XMLHTTP was the Microsoft precursor to XMLHttpRequest; modern code can use fetch. Hopmann recalls development around late 1998 for Outlook Web Access, followed by shipping in IE5 (18 March 1999). Garrett named the approach on 18 February 2005. Do not claim AJAX predates every SPA by several years: XMLHTTP and early application-style web interfaces developed together, and the AJAX name postdates OWA (2000) and Gmail (2004). Trace the following JSON request/response flow, then show those early applications.",
       "source": "[25, 26, 27] Garrett; Hopmann; Microsoft · Teaching diagram",
       "chapter": "Present",
-      "next": "flow-html"
-    },
-    {
-      "id": "flow-html",
-      "type": "material",
-      "chapter": "Present",
-      "title": "AJAX: HTML response · 1/4 Request",
-      "body": "```mermaid\nsequenceDiagram\n%% focus-after: 0,0\n participant B as Browser\n participant S as Server\n participant D as Stored responses\nNote over B: JavaScript handles submit\nB->>S: POST /responses\n```",
-      "source": "[22, 23] Teaching model · Adapted from Vepsäläinen",
-      "notes": "The request happens without document navigation. The server still renders the result. AJAX does not require JSON. This is an alternative to compare, not a second required implementation. Preserve a native form path. Show the actual Network response when the build is ready.\nReveal 1 of 4: Request. Advance with Next; Previous revisits the preceding state.\nFull attribution: Explanatory model · [22, 23] Adapted for this lecture from Juho Vepsäläinen’s Web architecture lens",
-      "next": "flow-html-2",
-      "related": ["flow-native-4", "rendering-location"]
-    },
-    {
-      "id": "flow-html-2",
-      "type": "material",
-      "chapter": "Present",
-      "title": "AJAX: HTML response · 2/4 Store",
-      "body": "```mermaid\nsequenceDiagram\n%% focus-after: 1,1\n participant B as Browser\n participant S as Server\n participant D as Stored responses\nNote over B: JavaScript handles submit\nB->>S: POST /responses\nS->>S: Validate input\nS->>D: Save response\nD-->>S: Updated aggregate\n```",
-      "source": "[22, 23] Teaching model · Adapted from Vepsäläinen",
-      "notes": "The request happens without document navigation. The server still renders the result. AJAX does not require JSON. This is an alternative to compare, not a second required implementation. Preserve a native form path. Show the actual Network response when the build is ready.\nReveal 2 of 4: Store. Advance with Next; Previous revisits the preceding state.\nFull attribution: Explanatory model · [22, 23] Adapted for this lecture from Juho Vepsäläinen’s Web architecture lens",
-      "next": "flow-html-3",
-      "related": ["flow-native-4", "rendering-location"]
-    },
-    {
-      "id": "flow-html-3",
-      "type": "material",
-      "chapter": "Present",
-      "title": "AJAX: HTML response · 3/4 Respond",
-      "body": "```mermaid\nsequenceDiagram\n%% focus-after: 4,1\n participant B as Browser\n participant S as Server\n participant D as Stored responses\nNote over B: JavaScript handles submit\nB->>S: POST /responses\nS->>S: Validate input\nS->>D: Save response\nD-->>S: Updated aggregate\nS-->>B: HTML results fragment\n```",
-      "source": "[22, 23] Teaching model · Adapted from Vepsäläinen",
-      "notes": "The request happens without document navigation. The server still renders the result. AJAX does not require JSON. This is an alternative to compare, not a second required implementation. Preserve a native form path. Show the actual Network response when the build is ready.\nReveal 3 of 4: Respond. Advance with Next; Previous revisits the preceding state.\nFull attribution: Explanatory model · [22, 23] Adapted for this lecture from Juho Vepsäläinen’s Web architecture lens",
-      "next": "flow-html-4",
-      "related": ["flow-native-4", "rendering-location"]
-    },
-    {
-      "id": "flow-html-4",
-      "type": "material",
-      "chapter": "Present",
-      "title": "AJAX: HTML response · 4/4 Update",
-      "body": "```mermaid\nsequenceDiagram\n%% focus-after: 5,1\n participant B as Browser\n participant S as Server\n participant D as Stored responses\nNote over B: JavaScript handles submit\nB->>S: POST /responses\nS->>S: Validate input\nS->>D: Save response\nD-->>S: Updated aggregate\nS-->>B: HTML results fragment\nNote over B: JavaScript swaps the results region\n```",
-      "source": "[22, 23] Teaching model · Adapted from Vepsäläinen",
-      "notes": "The request happens without document navigation. The server still renders the result. AJAX does not require JSON. This is an alternative to compare, not a second required implementation. Preserve a native form path. Show the actual Network response when the build is ready.\nReveal 4 of 4: Update. Advance with Next; Previous revisits the preceding state.\nFull attribution: Explanatory model · [22, 23] Adapted for this lecture from Juho Vepsäläinen’s Web architecture lens",
-      "next": "flow-json",
-      "related": ["flow-native-4", "rendering-location"]
+      "next": "flow-json"
     },
     {
       "id": "flow-json",
@@ -600,9 +556,9 @@ Versioned export of the Obsidian lecture at `Lectures/Web Development 2026/Prese
       "title": "AJAX: JSON response · 1/4 Request",
       "body": "```mermaid\nsequenceDiagram\n%% focus-after: 0,0\n participant B as Browser\n participant S as Server\n participant D as Stored responses\nNote over B: JavaScript handles submit\nB->>S: POST /responses\n```",
       "source": "[22, 23] Teaching model · Adapted from Vepsäläinen",
-      "notes": "The server owns authoritative votes; the browser owns this rendering step. A small fetch handler can do this without SPA routing or a framework. If our demo uses HTML fragments, treat JSON as the comparison instead. These diagrams are teaching models, not promises about exact generated routes.\nReveal 1 of 4: Request. Advance with Next; Previous revisits the preceding state.\nFull attribution: Explanatory model · [22, 23] Adapted for this lecture from Juho Vepsäläinen’s Web architecture lens",
+      "notes": "The server owns authoritative votes; the browser owns this rendering step. A small fetch handler can do this without SPA routing or a framework. Compare this with the earlier native form flow: the server returns data, and JavaScript updates the current page. These diagrams are teaching models, not promises about exact generated routes.\nReveal 1 of 4: Request. Advance with Next; Previous revisits the preceding state.\nFull attribution: Explanatory model · [22, 23] Adapted for this lecture from Juho Vepsäläinen’s Web architecture lens",
       "next": "flow-json-2",
-      "related": ["flow-native-4", "flow-html-4", "rendering-location"]
+      "related": ["flow-native-4", "flow-json-4", "rendering-location"]
     },
     {
       "id": "flow-json-2",
@@ -611,9 +567,9 @@ Versioned export of the Obsidian lecture at `Lectures/Web Development 2026/Prese
       "title": "AJAX: JSON response · 2/4 Store",
       "body": "```mermaid\nsequenceDiagram\n%% focus-after: 1,1\n participant B as Browser\n participant S as Server\n participant D as Stored responses\nNote over B: JavaScript handles submit\nB->>S: POST /responses\nS->>S: Validate input\nS->>D: Save response\nD-->>S: Updated aggregate\n```",
       "source": "[22, 23] Teaching model · Adapted from Vepsäläinen",
-      "notes": "The server owns authoritative votes; the browser owns this rendering step. A small fetch handler can do this without SPA routing or a framework. If our demo uses HTML fragments, treat JSON as the comparison instead. These diagrams are teaching models, not promises about exact generated routes.\nReveal 2 of 4: Store. Advance with Next; Previous revisits the preceding state.\nFull attribution: Explanatory model · [22, 23] Adapted for this lecture from Juho Vepsäläinen’s Web architecture lens",
+      "notes": "The server owns authoritative votes; the browser owns this rendering step. A small fetch handler can do this without SPA routing or a framework. Compare this with the earlier native form flow: the server returns data, and JavaScript updates the current page. These diagrams are teaching models, not promises about exact generated routes.\nReveal 2 of 4: Store. Advance with Next; Previous revisits the preceding state.\nFull attribution: Explanatory model · [22, 23] Adapted for this lecture from Juho Vepsäläinen’s Web architecture lens",
       "next": "flow-json-3",
-      "related": ["flow-native-4", "flow-html-4", "rendering-location"]
+      "related": ["flow-native-4", "flow-json-4", "rendering-location"]
     },
     {
       "id": "flow-json-3",
@@ -622,9 +578,9 @@ Versioned export of the Obsidian lecture at `Lectures/Web Development 2026/Prese
       "title": "AJAX: JSON response · 3/4 Respond",
       "body": "```mermaid\nsequenceDiagram\n%% focus-after: 4,1\n participant B as Browser\n participant S as Server\n participant D as Stored responses\nNote over B: JavaScript handles submit\nB->>S: POST /responses\nS->>S: Validate input\nS->>D: Save response\nD-->>S: Updated aggregate\nS-->>B: JSON aggregate\n```",
       "source": "[22, 23] Teaching model · Adapted from Vepsäläinen",
-      "notes": "The server owns authoritative votes; the browser owns this rendering step. A small fetch handler can do this without SPA routing or a framework. If our demo uses HTML fragments, treat JSON as the comparison instead. These diagrams are teaching models, not promises about exact generated routes.\nReveal 3 of 4: Respond. Advance with Next; Previous revisits the preceding state.\nFull attribution: Explanatory model · [22, 23] Adapted for this lecture from Juho Vepsäläinen’s Web architecture lens",
+      "notes": "The server owns authoritative votes; the browser owns this rendering step. A small fetch handler can do this without SPA routing or a framework. Compare this with the earlier native form flow: the server returns data, and JavaScript updates the current page. These diagrams are teaching models, not promises about exact generated routes.\nReveal 3 of 4: Respond. Advance with Next; Previous revisits the preceding state.\nFull attribution: Explanatory model · [22, 23] Adapted for this lecture from Juho Vepsäläinen’s Web architecture lens",
       "next": "flow-json-4",
-      "related": ["flow-native-4", "flow-html-4", "rendering-location"]
+      "related": ["flow-native-4", "flow-json-4", "rendering-location"]
     },
     {
       "id": "flow-json-4",
@@ -633,9 +589,9 @@ Versioned export of the Obsidian lecture at `Lectures/Web Development 2026/Prese
       "title": "AJAX: JSON response · 4/4 Update",
       "body": "```mermaid\nsequenceDiagram\n%% focus-after: 5,1\n participant B as Browser\n participant S as Server\n participant D as Stored responses\nNote over B: JavaScript handles submit\nB->>S: POST /responses\nS->>S: Validate input\nS->>D: Save response\nD-->>S: Updated aggregate\nS-->>B: JSON aggregate\nNote over B: JavaScript renders the results region\n```",
       "source": "[22, 23] Teaching model · Adapted from Vepsäläinen",
-      "notes": "The server owns authoritative votes; the browser owns this rendering step. A small fetch handler can do this without SPA routing or a framework. If our demo uses HTML fragments, treat JSON as the comparison instead. These diagrams are teaching models, not promises about exact generated routes.\nReveal 4 of 4: Update. Advance with Next; Previous revisits the preceding state.\nFull attribution: Explanatory model · [22, 23] Adapted for this lecture from Juho Vepsäläinen’s Web architecture lens",
+      "notes": "The server owns authoritative votes; the browser owns this rendering step. A small fetch handler can do this without SPA routing or a framework. Compare this with the earlier native form flow: the server returns data, and JavaScript updates the current page. These diagrams are teaching models, not promises about exact generated routes.\nReveal 4 of 4: Update. Advance with Next; Previous revisits the preceding state.\nFull attribution: Explanatory model · [22, 23] Adapted for this lecture from Juho Vepsäläinen’s Web architecture lens",
       "next": "early-spas",
-      "related": ["flow-native-4", "flow-html-4", "rendering-location"]
+      "related": ["flow-native-4", "rendering-location"]
     },
     {
       "id": "early-spas",
@@ -709,7 +665,7 @@ Versioned export of the Obsidian lecture at `Lectures/Web Development 2026/Prese
       "body": "Change a seminar preference. Watch its aggregate update.",
       "notes": "Open two real views. Submit one predefined choice and watch the aggregate. The second view needs its own update mechanism: inspect whether this app polls, uses server-sent events or WebSockets. Do not suggest that updating one browser automatically updates another.",
       "next": "flow-shared",
-      "related": ["flow-shared", "flow-html-4", "detour-2-1"],
+      "related": ["flow-shared", "flow-json-4", "detour-2-1"],
       "previewOf": "build-application"
     },
     {
@@ -749,7 +705,7 @@ Versioned export of the Obsidian lecture at `Lectures/Web Development 2026/Prese
       "body": "**Inspect in pairs**\n\nPick one action in our app. Identify its required input and how a client can tell it succeeded.\n\nReport one detail that is explicit—and one the client would have to guess.",
       "notes": "Inspect the form or shared contract. Distinguish explicit actions from behavior that must be inferred.\nSource keys resolve to the References slides at the end. Unquoted explanations are lecture paraphrases; diagrams are not archival reproductions.\nFull attribution: Discussion informed by · [36] Petros, Gross, Shaffer and Revelle (2025)",
       "next": "step-14",
-      "related": ["flow-native-4", "flow-html-4", "flow-json-4", "detour-2-1"],
+      "related": ["flow-native-4", "flow-json-4", "detour-2-1"],
       "source": "[36] Petros et al., 2025 · Discussion"
     },
     {

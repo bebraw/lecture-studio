@@ -1,9 +1,31 @@
 import { test, expect } from "@playwright/test";
 import { fixture } from "../tests/fixture.ts";
+import { createServer } from "node:http";
+import { previewFraming } from "../shared/preview-framing.ts";
 
 test("checkpoint projects its build preview and next returns to slides", async ({
   page,
 }) => {
+  const app = createServer((req, res) => {
+    const response = previewFraming(
+      new Request(`http://${req.headers.host}/`),
+      new Response(null, {
+        headers: {
+          "content-type": "text/html",
+          "content-security-policy":
+            "default-src 'self'; frame-ancestors 'none'",
+          "x-frame-options": "DENY",
+        },
+      }),
+    );
+    res.writeHead(200, Object.fromEntries(response.headers));
+    res.end("<!doctype html><h1>Working lecture app</h1>");
+  });
+  await new Promise<void>((resolve) => app.listen(0, "127.0.0.1", resolve));
+  const appAddress = app.address();
+  if (!appAddress || typeof appAddress === "string")
+    throw new Error("No app port");
+  const appUrl = `http://127.0.0.1:${appAddress.port}/`;
   const path = "Lectures/Web Development 2026/Presentations/Preview.md";
   const definition = {
     version: 1,
@@ -58,15 +80,19 @@ test("checkpoint projects its build preview and next returns to slides", async (
     ).toContainText("not available yet");
     await page.locator("#graph-previous").click();
     await page.locator("#graph-build").click();
-    bridge.state.messages = [
-      { id: "preview", text: "Preview: http://127.0.0.1:54321/" },
-    ];
+    bridge.state.messages = [{ id: "preview", text: "Preview: " + appUrl }];
     await page.locator("#graph-next").click();
     await expect(
       page
         .frameLocator("#current-stage > iframe")
         .locator("#stage-content iframe"),
-    ).toHaveAttribute("src", "http://127.0.0.1:54321/");
+    ).toHaveAttribute("src", appUrl);
+    await expect(
+      page
+        .frameLocator("#current-stage > iframe")
+        .frameLocator("#stage-content iframe")
+        .getByRole("heading", { name: "Working lecture app" }),
+    ).toBeVisible();
     await page.locator("#graph-next").click();
     await expect(
       page.frameLocator("#current-stage > iframe").locator("body"),
@@ -78,5 +104,8 @@ test("checkpoint projects its build preview and next returns to slides", async (
     ).toHaveCount(0);
   } finally {
     await stop();
+    await new Promise<void>((resolve, reject) =>
+      app.close((error) => (error ? reject(error) : resolve())),
+    );
   }
 });

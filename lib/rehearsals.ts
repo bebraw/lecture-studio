@@ -1,4 +1,5 @@
 import { record } from "../shared/errors.ts";
+import { preparePreview } from "./prepare-preview.ts";
 import type { ExecFileOptions } from "node:child_process";
 type Run = (
   command: string,
@@ -85,6 +86,7 @@ export class Rehearsals {
         "Starter tag no longer matches the reviewed commit; checkout retained for inspection.",
       );
     await this.run("git", ["switch", "-c", "rehearsal"], { cwd: folder });
+    await preparePreview(folder);
     await this.run("npm", ["ci"], {
       cwd: folder,
       timeout: 180000,

@@ -2,7 +2,7 @@ import { parseApiResponse } from "../shared/api.ts";
 import { httpResult } from "./http-result.ts";
 import test from "node:test";
 import assert from "node:assert/strict";
-import { mkdtemp, access } from "node:fs/promises";
+import { mkdtemp, access, mkdir, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
 import {
@@ -68,6 +68,75 @@ test("first Live on isolates a fresh app; pause resumes it and restart prepares 
   fail = false;
   await post("live", { live: true });
   assert.equal(local.studio.snapshot().workspace, "/fresh/rehearsal-2");
+  await post("live", { live: false });
+  const prepared = await fetch(local.address.origin + "/api/new-rehearsal", {
+    method: "POST",
+    headers: {
+      origin: local.address.origin,
+      authorization: "Bearer " + local.address.deskToken,
+      "content-type": "application/json",
+    },
+    body: JSON.stringify({ confirm: true }),
+  });
+  assert.equal(prepared.status, 202);
+  for (
+    let i = 0;
+    i < 100 && local.studio.snapshot().rehearsalJob.status === "creating";
+    i++
+  )
+    await new Promise((resolve) => setTimeout(resolve, 5));
+  assert.equal(local.studio.snapshot().rehearsalJob.status, "ready");
+  assert.equal(created, 3);
+  await post("load", { path });
+  await post("load", { path });
+  assert.equal((await post("live", { live: true })).status, 200);
+  assert.equal(
+    created,
+    3,
+    "loading slides must retain the unused prepared checkout",
+  );
+  assert.equal(local.bridge.state.status, "ready");
+  await post("live", { live: false });
+  await post("load", { path });
+  await post("live", { live: true });
+  assert.equal(
+    created,
+    4,
+    "a used lecture must still start from a new checkout",
+  );
+  await post("live", { live: false });
+  const command = (op: string, body: object) =>
+    fetch(local.address.origin + "/api/" + op, {
+      method: "POST",
+      headers: {
+        origin: local.address.origin,
+        authorization: "Bearer " + local.address.deskToken,
+        "content-type": "application/json",
+      },
+      body: JSON.stringify(body),
+    });
+  await command("new-rehearsal", { confirm: true });
+  for (
+    let i = 0;
+    i < 100 && local.studio.snapshot().rehearsalJob.status === "creating";
+    i++
+  )
+    await new Promise((resolve) => setTimeout(resolve, 5));
+  await command("codex/connect", {});
+  assert.equal(
+    (await command("codex/start", { brief: "Try a change before the lecture" }))
+      .status,
+    200,
+  );
+  local.bridge.state.status = "ready";
+  local.bridge.state.turnId = null;
+  await post("load", { path });
+  assert.equal((await post("live", { live: true })).status, 200);
+  assert.equal(
+    created,
+    6,
+    "a build before the lecture consumes the prepared checkout",
+  );
 });
 
 test("first connection prepares a missing default without resetting the lecture", async (t) => {
@@ -118,6 +187,14 @@ test("numbered checkouts retain earlier attempts and verify the pinned starter",
   const calls: string[][] = [];
   const manager = new Rehearsals(root, async (bin, args) => {
     calls.push([bin, ...args]);
+    if (bin === "git" && args[0] === "clone") {
+      const target = args.at(-1)!;
+      await mkdir(join(target, "src"));
+      await writeFile(
+        join(target, "wrangler.jsonc"),
+        '{"main":"src/worker.ts"}',
+      );
+    }
     return { stdout: args[0] === "rev-parse" ? START_COMMIT : "" };
   });
   const one = await manager.create(),

@@ -36,26 +36,26 @@ test("sequence reveals mute previous actions and retain the current action when 
       expect(response.ok()).toBe(true);
     };
     await call("load", { path });
-    await call("select", { id: "flow-html-3" });
+    await call("select", { id: "flow-json-3" });
     await call("live", { live: true });
     await page.goto(f.address.stageUrl);
     const messages = page.locator(".messageText");
     await expect(messages).toHaveCount(5);
     await expect(messages.nth(0)).toHaveClass(/sequence-context/);
     await expect(messages.nth(4)).toHaveClass(/sequence-current/);
-    await expect(messages.nth(4)).toContainText("HTML results fragment");
+    await expect(messages.nth(4)).toContainText("JSON aggregate");
     await expect(messages.nth(0)).toHaveCSS("opacity", "0.65");
     await expect(page.locator(".noteText")).toHaveClass(/sequence-context/);
     await call("next");
     await expect(page.locator("h1")).toContainText("4/4 Update");
     await expect(page.locator(".noteText.sequence-current")).toContainText(
-      "swaps the results region",
+      "renders the results region",
     );
     await expect(page.locator(".messageText.sequence-context")).toHaveCount(5);
     await call("previous");
     await expect(page.locator("h1")).toContainText("3/4 Respond");
     await expect(page.locator(".messageText.sequence-current")).toHaveText(
-      "HTML results fragment",
+      "JSON aggregate",
     );
   } finally {
     await f.stop();
