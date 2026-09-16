@@ -1,3 +1,4 @@
+import { defaultBuildModel } from "./shared/build-model.ts";
 import { preparedDemo, preparedPreview } from "./lib/prepared-demo.ts";
 import { listSource, readSource, sourceExcerpt } from "./lib/source-browser.ts";
 import { compatibleAudience } from "./shared/audience-protocol.ts";
@@ -978,9 +979,7 @@ export function createStudio({
                 const timing = buildTimings.begin(
                   presentation.current,
                   presentation.step().title,
-                  requestedModel ||
-                    bridge.state.models.find((model) => model.isDefault)?.id ||
-                    "Codex default",
+                  requestedModel || defaultBuildModel,
                   attempt.prompt,
                 );
                 try {

@@ -161,7 +161,16 @@ test("Codex uses reviewed text, workspace sandbox, automatic approval review and
     });
     assert.equal(bridge.state.status, "ready");
     assert.equal(bridge.state.messages[0]?.text, "Finished");
-    await bridge.start("Second increment", "test-model");
+    await assert.rejects(
+      () => bridge.start("Default unavailable"),
+      /gpt-5.6-luna is unavailable/,
+    );
+    bridge.state.models.push({ id: "gpt-5.6-luna", name: "Luna" });
+    await bridge.start("Second increment");
+    assert.equal(
+      sent.filter((x) => x.method === "turn/start").at(-1)!.params!.model,
+      "gpt-5.6-luna",
+    );
     assert.equal(sent.filter((x) => x.method === "thread/start").length, 1);
     assert.equal(
       sent.filter((x) => x.method === "turn/start").at(-1)!.params!.effort,

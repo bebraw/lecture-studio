@@ -78,7 +78,7 @@ test("a slow demo can be skipped, revisited and stopped without blocking the nex
     await page.locator("#build-timings summary").click();
     await expect(page.locator("#build-timings tbody tr")).toHaveCount(1);
     await expect(page.locator("#build-timings tbody")).toContainText(
-      "Codex default",
+      "gpt-5.6-luna",
     );
     // A late completion must not replace the slide the lecturer has moved to.
     bridge.state = {

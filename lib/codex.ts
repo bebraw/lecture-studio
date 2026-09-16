@@ -1,3 +1,4 @@
+import { defaultBuildModel } from "../shared/build-model.ts";
 import * as v from "valibot";
 import { questionSchema } from "../shared/schemas.ts";
 import type { ChildProcess, SpawnOptions } from "node:child_process";
@@ -407,12 +408,15 @@ export class CodexBridge extends EventEmitter {
     this.state.messages = this.state.messages.slice(-12);
   }
   async start(prompt: string, model = "") {
+    model ||= defaultBuildModel;
     if (this.state.status !== "ready" || this.busy)
       throw new Error("Wait for the current turn or reconnect Codex");
     if (typeof prompt !== "string" || !prompt.trim() || prompt.length > 20000)
       throw new Error("Use a non-empty brief under 20,000 characters");
     if (model && !this.state.models.some((m) => m.id === model))
-      throw new Error("Choose a model returned by the local Codex server");
+      throw new Error(
+        `${model} is unavailable. Choose an available model in the presenter desk or update Codex.`,
+      );
     this.state.startedAt = Date.now();
     this.state.finishedAt = null;
     this.state.outcome = null;

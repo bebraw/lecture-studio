@@ -272,7 +272,7 @@ function updateRuntime(data: DeskState) {
     modelKey = key;
     const value = $("model").value;
     $("model").innerHTML =
-      '<option value="">Codex configured default</option>' +
+      '<option value="">Luna · lecture default</option>' +
       c.models
         .map(
           (m) =>
