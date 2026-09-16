@@ -2,6 +2,10 @@
 
 This is the canonical operator guide. [Run of show](../LECTURE-NARRATIVE.md) supplies timing; the Obsidian presentation and [export](presentations/web-development-2026.md) supply content.
 
+Use the [Obsidian authoring workflow](obsidian-authoring.md) to edit slide text
+and notes as Markdown, reload privately, and generate the reading copy from the
+loaded snapshot.
+
 ## Before students arrive
 
 1. Start the studio and open `/debug` to compare Desk, Stage and Live. Keep Desk private.

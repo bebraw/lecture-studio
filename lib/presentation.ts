@@ -40,6 +40,60 @@ export function parseTheme(input: unknown = {}) {
 }
 export function parsePresentation(note: Note): PresentationDefinition {
   const raw = note.sections.find((s) => s.heading === "Presentation")?.body;
+  const metadata: unknown = JSON.parse(
+    raw?.match(/^\s*(`{3,})json\s*\n([\s\S]*?)\n\1\s*$/)?.[2] || "null",
+  );
+  const authored = note.sections.filter((s) => s.heading.startsWith("Slide: "));
+  let definition = metadata;
+  if (authored.length) {
+    const header = v.parse(
+      v.strictObject({
+        version: v.literal(1),
+        title: v.string(),
+        start: v.exactOptional(v.string()),
+        theme: v.exactOptional(v.unknown()),
+      }),
+      metadata,
+    );
+    const steps = authored.map((section) => {
+      const block = section.body.match(/^(`{3,})json\s*\n([\s\S]*?)\n\1\s*\n?/);
+      if (!block) throw new Error("Slide metadata missing: " + section.heading);
+      const fields = v.parse(
+        v.record(v.string(), v.unknown()),
+        JSON.parse(block[2]!),
+      );
+      if ("body" in fields || "notes" in fields || "title" in fields)
+        throw new Error(
+          "Write slide title, body and notes as Markdown: " + section.heading,
+        );
+      const content = section.body.slice(block[0].length).trim();
+      const marker = "\n<!-- speaker-notes -->\n";
+      const split = ("\n" + content).indexOf(marker);
+      const body =
+        split < 0 ? content : ("\n" + content).slice(0, split).trim();
+      const notes =
+        split < 0
+          ? undefined
+          : ("\n" + content).slice(split + marker.length).trim();
+      return v.parse(stepSchema, {
+        type: "material",
+        ...fields,
+        title: section.heading.slice(7),
+        body,
+        ...(notes === undefined ? {} : { notes }),
+      });
+    });
+    definition = {
+      ...header,
+      start: header.start ?? steps[0]?.id,
+      steps: steps.map((step, index) => ({
+        ...step,
+        ...(step.next === undefined && steps[index + 1]
+          ? { next: steps[index + 1]!.id }
+          : {}),
+      })),
+    };
+  }
   const parsed = v.parse(
     v.object({
       version: v.literal(1),
@@ -48,9 +102,7 @@ export function parsePresentation(note: Note): PresentationDefinition {
       steps: v.array(stepSchema),
       theme: v.exactOptional(v.unknown()),
     }),
-    JSON.parse(
-      raw?.match(/^\s*(`{3,})json\s*\n([\s\S]*?)\n\1\s*$/)?.[2] || "null",
-    ),
+    definition,
   );
   const value = { ...parsed, theme: parseTheme(parsed.theme) };
   const text = (v: unknown, n: number) =>
@@ -133,6 +185,19 @@ export function parsePresentation(note: Note): PresentationDefinition {
     }
   }
   return structuredClone(value);
+}
+
+export function authoringMarkdown(deck: PresentationDefinition) {
+  const { steps, ...header } = deck;
+  return (
+    `# ${deck.title}\n\n## Presentation\n\n\`\`\`json\n${JSON.stringify(header, null, 2)}\n\`\`\`\n\n` +
+    steps
+      .map(
+        ({ title, body, notes, ...metadata }) =>
+          `## Slide: ${title}\n\n\`\`\`json\n${JSON.stringify(metadata, null, 2)}\n\`\`\`\n\n${body || ""}${notes ? "\n\n<!-- speaker-notes -->\n\n" + notes : ""}\n`,
+      )
+      .join("\n")
+  );
 }
 function topWords(words: string[], limit: number) {
   const counts = new Map<string, { text: string; count: number }>();

@@ -131,6 +131,42 @@ export function mountPresentations({ call, update }: MountOptions) {
   picker.append(name, setup);
   query(".brand", document).after(picker);
   setup.hidden = true;
+  const authoring = document.createElement("div");
+  authoring.className = "button-row";
+  const editNote = document.createElement("a");
+  editNote.textContent = "Edit in Obsidian ↗";
+  const reloadNote = document.createElement("button");
+  reloadNote.textContent = "Reload from Obsidian";
+  reloadNote.title =
+    "Load saved edits privately with Live off; resets the lecture session.";
+  reloadNote.onclick = async () => {
+    if (data?.presentation)
+      await run("presentation/load", { path: data.presentation.path });
+  };
+  const exportNote = document.createElement("button");
+  exportNote.textContent = "Download editable Markdown";
+  exportNote.onclick = async () => {
+    try {
+      const { text } = await call("presentation/markdown");
+      const url = URL.createObjectURL(
+        new Blob([text], { type: "text/markdown" }),
+      );
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = "lecture.md";
+      link.click();
+      setTimeout(() => URL.revokeObjectURL(url), 1000);
+    } catch (caught) {
+      $("presentation-message").textContent = asError(caught).message;
+    }
+  };
+  const readingCopy = document.createElement("a");
+  readingCopy.href = "/slides";
+  readingCopy.target = "_blank";
+  readingCopy.rel = "noopener";
+  readingCopy.textContent = "Preview reading copy ↗";
+  authoring.append(editNote, reloadNote, exportNote, readingCopy);
+  setup.append(authoring);
   setup.append($("restart-presentation"));
   if (rehearsalControls)
     query(".connections-panel", document).append(rehearsalControls);
@@ -387,6 +423,9 @@ export function mountPresentations({ call, update }: MountOptions) {
         ? "Following: unavailable"
         : `${data.audienceSync.active} following`;
     const p = data.presentation;
+    authoring.hidden = !p;
+    editNote.href = "obsidian://open?file=" + encodeURIComponent(p?.path || "");
+    reloadNote.disabled = !!data.live || !!data.codex.turnId;
     syncNotice.textContent =
       data.audienceSync?.error || data.audienceSync?.readiness || "";
     if (!initialListRequested && data.libraryStatus?.startsWith("Connected")) {

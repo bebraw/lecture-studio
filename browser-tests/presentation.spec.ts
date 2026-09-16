@@ -107,7 +107,7 @@ test("Obsidian snapshot uses a flat list and consecutive arrow navigation", asyn
     ).toHaveCount(0);
     await expect(desk.locator("#connections #model")).toHaveCount(1);
     await expect(desk.locator("#connections #activity")).toHaveCount(1);
-    await expect(desk.locator("#connections #interrupt")).toHaveCount(1);
+    await expect(desk.locator("#graph-presentation #interrupt")).toHaveCount(1);
     await expect(desk.locator("#graph-title")).toHaveText("Snapshot title");
     await expect(
       desk.frameLocator("#current-stage > iframe").locator("h1"),

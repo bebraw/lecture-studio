@@ -50,7 +50,12 @@ import { AudiencePoll } from "./lib/audience-poll.ts";
 import { PreviewTunnel } from "./lib/preview-tunnel.ts";
 import { AudienceStageSync } from "./lib/audience-stage.ts";
 import { LectureSearch } from "./lib/lecture-search.ts";
-import { parsePresentation, PresentationSession } from "./lib/presentation.ts";
+import {
+  authoringMarkdown,
+  parsePresentation,
+  PresentationSession,
+} from "./lib/presentation.ts";
+import { renderHandout } from "./lib/handout.ts";
 import { feedbackRequest, feedbackSlide } from "./lib/feedback.ts";
 
 const root = dirname(fileURLToPath(import.meta.url));
@@ -508,6 +513,11 @@ export function createStudio({
       if (req.headers["sec-fetch-site"] === "cross-site")
         return json(res, { error: "Cross-site request rejected" }, 403);
       const url = new URL(req.url ?? "/", origin);
+      if (url.pathname === "/slides" && req.method === "GET" && presentation) {
+        res.setHeader("content-type", "text/html; charset=utf-8");
+        res.end(renderHandout(presentation.definition));
+        return;
+      }
       if (await servePreparedDemo(req, res, url, origin)) return;
       if (
         ["/teaching/record", "/teaching/record/reset"].includes(url.pathname)
@@ -545,6 +555,12 @@ export function createStudio({
         )
           return json(res, { error: "This window is not authorized" }, 401);
         if (req.method === "GET") {
+          if (url.pathname === "/api/presentation/markdown") {
+            if (!presentation) throw new Error("Load a presentation first");
+            return json(res, {
+              text: authoringMarkdown(presentation.definition),
+            });
+          }
           if (url.pathname === "/api/source/files")
             return json(res, await listSource(workspace));
           if (url.pathname === "/api/source/file")

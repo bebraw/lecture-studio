@@ -86,6 +86,7 @@ export const requestSchemas = {
 };
 export type PostPath = keyof typeof requestSchemas;
 type GetPath =
+  | "presentation/markdown"
   | "source/files"
   | `source/file?path=${string}`
   | "desk"
@@ -133,7 +134,7 @@ export type ApiResponse<P extends ApiPath> = P extends "source/files"
             ? v.InferOutput<typeof stageSchema>
             : P extends "stage-link"
               ? { url: string }
-              : P extends "poll/receipt"
+              : P extends "poll/receipt" | "presentation/markdown"
                 ? { text: string }
                 : P extends "feedback"
                   ? v.InferOutput<typeof feedbackResponseSchema>
@@ -171,7 +172,7 @@ export function parseApiResponse<P extends ApiPath>(
                 ? stageSchema
                 : path === "stage-link"
                   ? stageLinkSchema
-                  : path === "poll/receipt"
+                  : path === "poll/receipt" || path === "presentation/markdown"
                     ? receiptSchema
                     : path === "feedback"
                       ? feedbackResponseSchema
