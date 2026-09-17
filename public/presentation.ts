@@ -5,6 +5,7 @@ import { query, all, byId } from "./dom.ts";
 import { asError } from "../shared/errors.ts";
 import { applyTheme } from "./shared.ts";
 import { renderSlidePreview } from "./slide-preview.ts";
+import { mountPollMonitor } from "./poll-monitor.ts";
 export function mountPresentations({ call, update }: MountOptions) {
   const setup = document.createElement("section");
   setup.id = "presentation-setup";
@@ -115,6 +116,7 @@ export function mountPresentations({ call, update }: MountOptions) {
   let timingKey = "";
   const stagePanel = $("current-stage-panel");
   $("graph-detours").before(stagePanel);
+  const updatePollMonitor = mountPollMonitor(stagePanel);
   const projectionStatus = document.createElement("span");
   projectionStatus.id = "projection-status";
   projectionStatus.className = "small muted";
@@ -444,6 +446,7 @@ export function mountPresentations({ call, update }: MountOptions) {
     });
   return (value: DeskState) => {
     data = value;
+    updatePollMonitor(data);
     const nextTimingKey =
       JSON.stringify(data.buildTimings) + Math.floor(Date.now() / 1000);
     if (timingKey !== nextTimingKey) {

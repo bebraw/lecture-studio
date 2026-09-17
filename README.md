@@ -175,6 +175,8 @@ The public app must already expose:
 
 For the default theme poll, seed the public app with exactly `editorial|Editorial`, `retro-web|Retro web`, and `playful|Playful` in a designated rehearsal room. **The pinned starter currently seeds seminar interests, not these themes.** Configure the app's choices first, or configure the studio to match its existing interests. The studio checks IDs and labels before opening or locking and refuses a mismatch. Opening an empty, locked room first initializes its server-defined options; existing options and votes are never overwritten. Loading/restarting a presentation, resetting the lecture, or restarting the server creates a fresh voting session.
 
+During a presentation poll, the lecturer's private vote panel shows the total, per-option counts and percentages, and highlights changes as the three-second refresh receives them. The activity line records the latest change, including voters switching options without changing the total. These counts stay private until you choose **Project results**.
+
 Reuse the audience join link/your existing QR. Closing the poll must succeed before a result can be used; failures display an error and retain last-known counts. Resetting the lecture is refused while a known vote is open. A studio restart does not close the public room. Cookie-based deduplication is a convenience, not strong identity or protection against determined multiple voting; retain the public app's anti-abuse controls.
 
 Tests cover the full studio flow with a simulated room, including explicit projection, freezing, ties, defaults and mismatch refusal. A live public-room rehearsal remains necessary after configuration.
