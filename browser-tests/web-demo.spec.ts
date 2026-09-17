@@ -20,9 +20,15 @@ test("Obsidian HTML demos synchronize lecturer controls with an isolated project
         type: "material",
         title: "Amdahl",
         demo: "./amdahl.html",
+        demoPoster: "./figure.svg",
         body: "Sequential work bounds speedup.",
       },
-      { id: "next", type: "material", title: "Discussion" },
+      {
+        id: "next",
+        type: "material",
+        title: "Discussion",
+        body: "![Course progression](./figure.svg)",
+      },
     ],
   };
   const library = {
@@ -36,6 +42,10 @@ test("Obsidian HTML demos synchronize lecturer controls with an isolated project
         },
       ],
     }),
+    readImage: async () =>
+      Buffer.from(
+        '<svg xmlns="http://www.w3.org/2000/svg" width="200" height="100"><rect width="200" height="100" fill="green"/></svg>',
+      ),
     readHtml: async (file: string) => {
       expect(file).toBe("Lectures/Test/Presentations/amdahl.html");
       return html;
@@ -92,6 +102,15 @@ test("Obsidian HTML demos synchronize lecturer controls with an isolated project
     await desk.locator("#graph-next").click();
     await expect(desk.locator("#web-demo-controller")).toBeHidden();
     await expect(stage.locator("h1")).toHaveText("Discussion");
+    await expect(stage.getByAltText("Course progression")).toBeVisible();
+    expect(
+      await stage
+        .getByAltText("Course progression")
+        .evaluate((image: HTMLImageElement) => image.naturalWidth),
+    ).toBe(200);
+    const reading = await context.newPage();
+    await reading.goto(new URL("/slides", address.deskUrl).href);
+    await expect(reading.getByAltText("Demo preview")).toBeVisible();
     await desk.locator("#graph-previous").click();
     await expect(controller.locator("#speedup")).toHaveText("4.00×");
     await expect(projection.locator("#speedup")).toHaveText("4.00×");

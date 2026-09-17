@@ -139,6 +139,14 @@ export const stepSchema = v.object({
   demo: v.exactOptional(
     v.pipe(text, v.regex(/^\.\/(?!.*(?:\.\.|[\\:#?]))[^\r\n]+\.html$/)),
   ),
+  demoPoster: v.exactOptional(
+    v.pipe(
+      text,
+      v.regex(
+        /^\.\/(?!.*(?:\.\.|[\\:#?%]))[^\r\n]+\.(?:svg|png|jpe?g|gif|webp)$/i,
+      ),
+    ),
+  ),
   layersDemo: v.exactOptional(v.boolean()),
   wordCloud: v.exactOptional(v.boolean()),
   wordsFrom: optionalText,

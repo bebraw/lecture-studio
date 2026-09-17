@@ -115,3 +115,5 @@ Recommended acceptance checks for the receiving project:
 - Inspect the public JSON and emitted files for private notes, classroom-only content, and build prompts.
 
 The experiment's remaining work belongs in scalableweb: choose the public learning sequence, supply sufficient explanations and exercises, connect book chapters, and decide the publication/review process. Accounts, certificates, shared responses, graded assessment, and cross-device progress are not part of this foundation.
+
+Local Markdown images and `demoPoster` assets are embedded in the exported HTML/JSON. Copy these files alongside the reviewed Markdown before export; see [local figure authoring](interactive-demos.md#local-figures-and-demo-reading-copies). Image changes update the module revision and reset its local study progress.

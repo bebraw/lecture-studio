@@ -49,3 +49,26 @@ Each file can contain inline HTML, CSS, JavaScript and data-URL images/fonts, up
 For a statechart, publish the active states and event history after each accepted event, and render them in `onState`. For a scalability illustration, publish the selected pressures and derive the diagram from those values. The integration is independent of the demo's framework.
 
 This first integration supports the lecturer and local projector. Student devices show a message to follow the projector; HTML and demo state are not sent to the public audience service. Reading copies retain the slide's explanatory Markdown, not a live demo.
+
+## Local figures and demo reading copies
+
+Place SVG, PNG, JPEG, GIF or WebP images beside the presentation note (subdirectories are supported):
+
+```markdown
+![Course progression](./course-progression.svg)
+```
+
+For a demo slide, declare a static visual for reading copies:
+
+```yaml
+id: progression
+type: material
+demo: ./course-progression.html
+demoPoster: ./course-progression.svg
+```
+
+Keep explanatory Markdown below the metadata. `demoPoster` appears alongside that text in `/slides`, printed reading copies, and the self-study export. It is an authored image, not an automatic screenshot. Interactive demos continue to use their HTML and synchronized state.
+
+References must start with `./` and stay within the presentation directory; parent traversal and external image references are not local assets. Images are limited to 2 MB each and 16 MB per deck. Export rejects symlinks that escape the presentation directory. SVGs render as images, never inline HTML, so their scripts cannot run. Image data is embedded in rendered output for portable exports; original Markdown references remain unchanged.
+
+The public audience service has a 100 KB stage limit. If embedded images exceed the publication budget, students see a pointer to the projector or reading copy; the local projector and exported copy retain the figures. Public HTML demo mirroring remains separate future work.

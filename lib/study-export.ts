@@ -1,3 +1,8 @@
+import {
+  imageSources,
+  loadPresentationImages,
+  posterMarkdown,
+} from "./presentation-images.ts";
 import { createHash } from "node:crypto";
 import {
   mkdir,
@@ -66,18 +71,26 @@ export function studySteps(deck: PresentationDefinition): StudyStep[] {
         html: renderMarkdown(
           step.type === "build"
             ? "This classroom build is not included. Use the explanation or reading references below."
-            : step.body || "",
-          { allowRemoteImages: step.allowRemoteImages === true },
+            : (step.body || "") + posterMarkdown(step),
+          {
+            allowRemoteImages: step.allowRemoteImages === true,
+            imageSources: imageSources(step),
+          },
         ),
-        explanationHtml: renderMarkdown(step.study?.explanation || ""),
+        explanationHtml: renderMarkdown(step.study?.explanation || "", {
+          imageSources: imageSources(step),
+        }),
         ...(activity
           ? {
               activity: {
                 promptHtml: renderMarkdown(
                   step.study?.prompt ||
                     "Consider your answer before revealing the discussion.",
+                  { imageSources: imageSources(step) },
                 ),
-                answerHtml: renderMarkdown(step.study?.answer || ""),
+                answerHtml: renderMarkdown(step.study?.answer || "", {
+                  imageSources: imageSources(step),
+                }),
                 options:
                   step.poll?.options.map(({ id, label }) => ({ id, label })) ||
                   [],
@@ -161,6 +174,17 @@ export async function exportStudy(configPath: string, outputPath: string) {
     for (const entry of config.modules) {
       const source = await realpath(resolve(dirname(configPath), entry.source));
       const deck = parsePresentation(sections(await readFile(source, "utf8")));
+      await loadPresentationImages(
+        { ...deck, steps: deck.steps.filter((step) => !step.study?.exclude) },
+        async (image) => {
+          const path = await realpath(resolve(dirname(source), image));
+          if (!path.startsWith(dirname(source) + sep))
+            throw new Error(
+              "Image must stay inside the presentation directory",
+            );
+          return readFile(path);
+        },
+      );
       const steps = studySteps(deck);
       if (!steps.length)
         throw new Error("No public sections in module " + entry.id);

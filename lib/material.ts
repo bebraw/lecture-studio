@@ -36,7 +36,13 @@ export function sections(markdown: string): Note {
 }
 export function renderMarkdown(
   value: unknown,
-  { allowRemoteImages = false } = {},
+  {
+    allowRemoteImages = false,
+    imageSources = {},
+  }: {
+    allowRemoteImages?: boolean | undefined;
+    imageSources?: Record<string, string>;
+  } = {},
 ) {
   const md = new MarkdownIt({ html: false, linkify: false, typographer: true });
   const defaultFence = md.renderer.rules.fence!;
@@ -92,6 +98,7 @@ export function renderMarkdown(
       .join("");
   };
   md.validateLink = (url) =>
+    /^\.\//.test(url) ||
     /^https:\/\//i.test(url) ||
     /^\/lecture-assets\/[a-z0-9-]+\.(jpg|png|gif)$/.test(url);
   const escape = md.utils.escapeHtml;
@@ -101,12 +108,13 @@ export function renderMarkdown(
     const src = String(token.attrGet("src") ?? ""),
       alt = escape(token.content || "Source image");
     if (
+      Object.hasOwn(imageSources, src) ||
       /^\/lecture-assets\/[a-z0-9-]+\.(jpg|png|gif)$/.test(src) ||
       (allowRemoteImages && /^https:\/\//i.test(src))
     )
       return (
         '<img referrerpolicy="no-referrer" src="' +
-        escape(src) +
+        escape(imageSources[src] || src) +
         '" alt="' +
         alt +
         '">'

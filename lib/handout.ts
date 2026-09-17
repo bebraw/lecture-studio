@@ -1,3 +1,4 @@
+import { imageSources, posterMarkdown } from "./presentation-images.ts";
 import { renderMarkdown } from "./material.ts";
 import type { PresentationDefinition } from "../shared/models.ts";
 export function renderHandout(deck: PresentationDefinition) {
@@ -25,9 +26,10 @@ export function renderHandout(deck: PresentationDefinition) {
       let body = renderMarkdown(
         step.type === "build"
           ? "Live demonstration · implementation instructions omitted from this reading copy."
-          : step.body || "",
+          : (step.body || "") + posterMarkdown(step),
         {
           allowRemoteImages: step.allowRemoteImages,
+          imageSources: imageSources(step),
         },
       );
       if (step.chapter === "References")

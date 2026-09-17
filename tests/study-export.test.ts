@@ -102,3 +102,47 @@ test("export rejects symlinked demo escapes and does not leave partial output", 
     ),
   );
 });
+
+test("export embeds local posters, versions image changes and rejects image symlink escapes", async (t) => {
+  const directory = await mkdtemp(join(tmpdir(), "study-images-"));
+  t.after(() => rm(directory, { recursive: true, force: true }));
+  await writeFile(
+    join(directory, "deck.md"),
+    "# Test\n## Presentation\n```yaml\nversion: 1\ntitle: Test\n```\n## Slide: Figure\n```yaml\nid: figure\ntype: material\ndemoPoster: ./figure.svg\n```\n![Figure](./figure.svg)",
+  );
+  const config = join(directory, "course.json");
+  await writeFile(
+    config,
+    JSON.stringify({
+      version: 1,
+      id: "test",
+      title: "Test",
+      description: "Test",
+      modules: [{ id: "test", source: "deck.md", description: "Test" }],
+    }),
+  );
+  const figure = join(directory, "figure.svg");
+  await writeFile(
+    figure,
+    '<svg xmlns="http://www.w3.org/2000/svg"><text>First</text></svg>',
+  );
+  const first = await exportStudy(config, join(directory, "first"));
+  const html = await readFile(join(directory, "first/test/index.html"), "utf8");
+  assert.match(html, /src="data:image\/svg\+xml;base64,/);
+  assert.match(html, /alt="Demo preview"/);
+  await writeFile(
+    figure,
+    '<svg xmlns="http://www.w3.org/2000/svg"><text>Second</text></svg>',
+  );
+  const second = await exportStudy(config, join(directory, "second"));
+  assert.notEqual(first.modules[0]!.revision, second.modules[0]!.revision);
+  await rm(figure);
+  const external = join(tmpdir(), "outside-" + crypto.randomUUID() + ".svg");
+  await symlink(external, figure);
+  await writeFile(external, "private");
+  t.after(() => rm(external));
+  await assert.rejects(
+    exportStudy(config, join(directory, "third")),
+    /inside the presentation directory/,
+  );
+});

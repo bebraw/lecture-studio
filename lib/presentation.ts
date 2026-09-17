@@ -1,3 +1,4 @@
+import { imageSources } from "./presentation-images.ts";
 import { parseDocument, stringify } from "yaml";
 import * as v from "valibot";
 import { stepSchema } from "../shared/schemas.ts";
@@ -391,6 +392,7 @@ export class PresentationSession {
                         .poll!.options.map((o) => o.label)
                         .join("\n\n")
                     : ""),
+            imageSources: imageSources(this.step()),
             source: this.step().source || "",
             allowRemoteImages: this.step().allowRemoteImages === true,
           },

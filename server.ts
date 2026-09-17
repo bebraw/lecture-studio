@@ -1,3 +1,8 @@
+import {
+  imageSources,
+  loadPresentationImages,
+} from "./lib/presentation-images.ts";
+import { posix } from "node:path";
 import { defaultBuildModel } from "./shared/build-model.ts";
 import {
   loadWebDemos,
@@ -296,6 +301,7 @@ export function createStudio({
       source: s.source || "",
       allowRemoteImages: s.allowRemoteImages === true,
     });
+    draft.imageSources = imageSources(s);
     publishedDraft = { ...draft };
     stage = {
       ...publicStage(draft, ++version),
@@ -892,6 +898,19 @@ export function createStudio({
                     ),
                   ),
                   stringValue(body.path, "presentation path"),
+                );
+                const imageDirectory = posix.dirname(
+                  stringValue(body.path, "presentation path"),
+                );
+                await loadPresentationImages(
+                  next.definition,
+                  async (relative) => {
+                    if (!library.readImage)
+                      throw new Error("Image loading is unavailable");
+                    return library.readImage(
+                      posix.join(imageDirectory, relative),
+                    );
+                  },
                 );
                 nextDemos = await loadWebDemos(
                   next.definition,

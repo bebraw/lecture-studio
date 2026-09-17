@@ -11,6 +11,7 @@ export type Theme = Record<
   string
 >;
 export interface Draft {
+  imageSources?: Record<string, string>;
   act: string;
   mode: string;
   title: string;
@@ -62,6 +63,7 @@ export interface NoteFile {
 }
 export interface Library {
   readHtml?(path: string): Promise<string>;
+  readImage?(path: string): Promise<Uint8Array>;
   status: string;
   list(): Promise<NoteFile[]>;
   read(path: string): Promise<Note>;
@@ -132,6 +134,7 @@ export interface Step {
   previewOf?: string;
   teachingDemo?: boolean;
   demo?: string;
+  demoPoster?: string;
   layersDemo?: boolean;
   wordCloud?: boolean;
   wordsFrom?: string;

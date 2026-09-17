@@ -50,6 +50,13 @@ export function audienceStage(state: Partial<Stage>): Partial<Stage> {
         "<p>This app is running on the lecturer’s machine. Follow the projected demonstration.</p>";
     }
   }
+  // Keep publication below the audience service's 100 KB request limit.
+  // Large figures remain available on the projector and in reading exports.
+  if (Buffer.byteLength(JSON.stringify(result), "utf8") > 90000 && result.html)
+    result.html = result.html.replace(
+      /<img\b[^>]*src="data:image\/[^>]*>/g,
+      '<p class="image-notice">View this figure on the projector or in the reading copy.</p>',
+    );
   return result;
 }
 

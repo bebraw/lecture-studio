@@ -169,6 +169,28 @@ export class ObsidianLibrary {
       throw new Error("Demo is missing or exceeds 250 KB");
     return content;
   }
+  async readImage(path: string) {
+    const safe = scopedPath(path);
+    if (!/\.(svg|png|jpe?g|gif|webp)$/i.test(safe))
+      throw new Error("Choose a supported image");
+    const client = await this.connect();
+    const result = (await client.callTool(
+      {
+        name: "get_vault_file",
+        arguments: { path: safe, format: "text" },
+      },
+      undefined,
+      { timeout: 15000 },
+    )) as CallToolResult;
+    if (result.isError) throw new Error("Cannot read presentation image");
+    const native = result.content.find((item) => item.type === "image");
+    if (native?.type === "image") return Buffer.from(native.data, "base64");
+    const value = payload(result);
+    const content = typeof value === "string" ? value : record(value).content;
+    if (/\.svg$/i.test(safe) && typeof content === "string")
+      return Buffer.from(content, "utf8");
+    throw new Error("Unexpected image response from Obsidian");
+  }
   async close() {
     await this.client?.close().catch(() => {});
     this.client = undefined;
