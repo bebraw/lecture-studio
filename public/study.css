@@ -201,6 +201,16 @@ aside nav a[aria-current="step"] {
   border: 1px solid var(--line);
   background: white;
 }
+.demo-host:empty,
+.demo-host[data-demo-status="error"],
+.demo-status:empty {
+  display: none;
+}
+@media screen {
+  .study-step:has(.demo-host[data-demo-status="ready"]) .demo-poster {
+    display: none;
+  }
+}
 .web-demo-frame {
   width: 100%;
   height: 100%;
@@ -303,6 +313,7 @@ input[type="radio"] {
   button,
   .step-navigation,
   .study-footer,
+  .demo-status,
   .demo-host {
     display: none !important;
   }

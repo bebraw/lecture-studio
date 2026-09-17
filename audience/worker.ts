@@ -1,7 +1,8 @@
 import { audienceProtocol } from "../shared/audience-protocol.ts";
 import { audienceRooms as rooms } from "../shared/audience-rooms.ts";
 import { parse } from "valibot";
-import { demoDocument, demoCsp } from "../shared/web-demo.ts";
+import { demoDocument } from "../shared/demo-document.ts";
+import { demoCsp } from "../shared/web-demo.ts";
 import { audiencePublicationSchema } from "../shared/audience-schemas.ts";
 import { handleRoomRequest, readRoomSnapshot } from "./room-http";
 import { renderRoomFragment } from "./room-view";

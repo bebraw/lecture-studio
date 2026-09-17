@@ -1,10 +1,11 @@
 import { test, expect } from "@playwright/test";
 import AxeBuilder from "@axe-core/playwright";
 import { createServer, type Server } from "node:http";
-import { mkdtemp, readFile, rm } from "node:fs/promises";
+import { mkdtemp, readFile, rm, cp, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join, resolve, extname, sep } from "node:path";
 import { exportStudy } from "../lib/study-export.ts";
+import { demoDocument } from "../shared/demo-document.ts";
 import { asyncHandler } from "../shared/errors.ts";
 let directory: string;
 let server: Server;
@@ -12,7 +13,37 @@ let origin: string;
 test.beforeAll(async () => {
   directory = await mkdtemp(join(tmpdir(), "study-browser-"));
   const output = join(directory, "site");
-  await exportStudy("examples/self-study/course.json", output);
+  await cp("examples", join(directory, "examples"), { recursive: true });
+  const source = join(directory, "examples/demos/scalability-study.md");
+  await writeFile(
+    source,
+    (await readFile(source, "utf8"))
+      .replace(
+        "demo: ./amdahl.html",
+        "demo: ./amdahl.html\ndemoPoster: ./poster.svg",
+      )
+      .replace(
+        "What changes if you increase the parallel portion instead?",
+        "What changes if you increase the parallel portion instead?\n\n![Regular illustration](./poster.svg)",
+      ),
+  );
+  await writeFile(
+    join(directory, "examples/demos/poster.svg"),
+    '<svg xmlns="http://www.w3.org/2000/svg" width="200" height="100"><text y="50">2.5×</text></svg>',
+  );
+  const measurement = join(directory, "examples/self-study/measurement.md");
+  await writeFile(
+    measurement,
+    (await readFile(measurement, "utf8")).replace(
+      "id: request-path",
+      "id: request-path\ndemo: ./amdahl.html",
+    ),
+  );
+  await cp(
+    join(directory, "examples/demos/amdahl.html"),
+    join(directory, "examples/self-study/amdahl.html"),
+  );
+  await exportStudy(join(directory, "examples/self-study/course.json"), output);
   server = createServer(
     asyncHandler(async (req, res) => {
       try {
@@ -74,6 +105,25 @@ test("self-study runs under a nested path with private progress, independent dem
   await page.locator("#study-next").click();
   const demo = page.frameLocator(".web-demo-frame");
   await expect(demo.locator("#speedup")).toHaveText("2.50×");
+  await expect(page.locator("#slide-amdahl .demo-poster")).toBeHidden();
+  await expect(page.getByAltText("Regular illustration")).toBeVisible();
+  await expect(
+    page.getByRole("button", { name: "Reset experiment" }),
+  ).toBeVisible();
+  await page.emulateMedia({ media: "print" });
+  await expect(page.locator("#slide-amdahl .demo-poster")).toBeVisible();
+  await expect(page.locator(".demo-host")).toBeHidden();
+  await page.emulateMedia({ media: "screen" });
+  expect(
+    await demo.locator("body").evaluate(async () => {
+      try {
+        await fetch(new URL("/csp-probe", location.href));
+        return false;
+      } catch {
+        return true;
+      }
+    }),
+  ).toBe(true);
   await demo.locator("#workers").fill("16");
   await expect(demo.locator("#speedup")).toHaveText("4.00×");
   await page.reload();
@@ -81,6 +131,9 @@ test("self-study runs under a nested path with private progress, independent dem
   await expect(page.locator("#study-progress")).toHaveText(
     "1 of 3 sections complete",
   );
+  await page.getByRole("button", { name: "Reset experiment" }).click();
+  await expect(demo.locator("#speedup")).toHaveText("2.50×");
+  await expect(page.locator("#slide-amdahl .demo-poster")).toBeHidden();
   const other = await browser.newContext();
   const independent = await other.newPage();
   await independent.goto(origin + "scalability/index.html#slide-amdahl");
@@ -128,10 +181,24 @@ test("reading remains available without JavaScript and when storage is blocked",
   const reading = await noJs.newPage();
   await reading.goto(origin + "scalability/index.html");
   await expect(reading.locator(".study-step:visible")).toHaveCount(3);
+  await expect(reading.locator(".demo-host")).toBeHidden();
+  await expect(reading.locator(".demo-poster")).toBeVisible();
+  await expect(reading.getByAltText("Regular illustration")).toBeVisible();
+  await reading.setViewportSize({ width: 390, height: 844 });
+  await expect(reading.locator(".demo-host")).toBeHidden();
+  await expect(reading.locator(".demo-poster")).toBeVisible();
   await reading.getByText("Reveal discussion", { exact: true }).click();
   await expect(reading.locator(".activity details")).toContainText(
     "not a promise",
   );
+  await reading.goto(origin + "measurement/index.html");
+  await expect(reading.locator(".demo-host")).toBeHidden();
+  await expect(reading.locator(".demo-poster")).toHaveCount(0);
+  await expect(
+    reading.getByText(
+      "The slowest segment is not necessarily the same under every workload.",
+    ),
+  ).toBeVisible();
   await noJs.close();
   const restricted = await browser.newContext({
     viewport: { width: 390, height: 844 },
@@ -157,4 +224,46 @@ test("reading remains available without JavaScript and when storage is blocked",
     ),
   ).toBe(true);
   await restricted.close();
+});
+
+test("a failed or uninitialized demo retains its poster and reading content", async ({
+  page,
+}) => {
+  await page.clock.install();
+  await page.route("**/demos/amdahl.html*", (route) =>
+    route.fulfill({
+      status: 404,
+      contentType: "text/html",
+      body: "Demo unavailable",
+    }),
+  );
+  await page.goto(origin + "scalability/index.html#slide-amdahl");
+  await expect(page.locator(".web-demo-frame")).toHaveCount(1);
+  await expect(page.locator(".demo-poster")).toBeVisible();
+  await page.clock.fastForward(11000);
+  await expect(page.locator(".demo-status")).toContainText("could not start");
+  await expect(page.locator(".demo-host")).toBeHidden();
+  await expect(page.locator(".demo-poster")).toBeVisible();
+  await expect(page.getByAltText("Regular illustration")).toBeVisible();
+  await expect(
+    page.getByRole("button", { name: "Reset experiment" }),
+  ).toBeHidden();
+});
+
+test("an authored initialization error keeps the poster visible", async ({
+  page,
+}) => {
+  await page.route("**/demos/amdahl.html*", (route) =>
+    route.fulfill({
+      contentType: "text/html",
+      body: demoDocument(
+        '<p>Broken demo</p><script>LectureDemo.onState(() => { throw new Error("Broken render"); });</script>',
+        true,
+      ),
+    }),
+  );
+  await page.goto(origin + "scalability/index.html#slide-amdahl");
+  await expect(page.locator(".demo-status")).toContainText("could not start");
+  await expect(page.locator(".demo-poster")).toBeVisible();
+  await expect(page.locator(".demo-host")).toBeHidden();
 });

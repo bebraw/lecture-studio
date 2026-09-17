@@ -91,7 +91,7 @@ assets/
 
 `course.json` has `format: "lecture-studio-study-course"`, `version: 1`, course metadata, and module entries with `id`, `title`, `description`, `href`, `data`, `revision`, and `steps` (count).
 
-`module.json` has `format: "lecture-studio-study-module"`, `version: 1`, `courseId`, module metadata, a content `revision`, and ordered `steps`. Each step includes `id`, `title`, `chapter`, rendered public `html`, `source`, and `explanationHtml`; optional `activity` contains `promptHtml`, `answerHtml`, `options`, and optionally `correctOption`; optional `demo` contains `url` and `revision`.
+`module.json` has `format: "lecture-studio-study-module"`, `version: 1`, `courseId`, module metadata, a content `revision`, and ordered `steps`. Each step includes `id`, `title`, `chapter`, rendered public `html`, `source`, and `explanationHtml`; optional `activity` contains `promptHtml`, `answerHtml`, `options`, and optionally `correctOption`; optional `demo` contains `url` and `revision`. Optional `posterHtml` contains the static demo fallback separately from `html`; custom renderers should retain it for reading, print, loading, and failure states.
 
 Runtime schemas/types are in `shared/study.ts`. Export logic is in `lib/study-export.ts`; the reference learner runtime and stylesheet are `public/study.ts` and `public/study.css`.
 
@@ -117,3 +117,13 @@ Recommended acceptance checks for the receiving project:
 The experiment's remaining work belongs in scalableweb: choose the public learning sequence, supply sufficient explanations and exercises, connect book chapters, and decide the publication/review process. Accounts, certificates, shared responses, graded assessment, and cross-device progress are not part of this foundation.
 
 Local Markdown images and `demoPoster` assets are embedded in the exported HTML/JSON. Copy these files alongside the reviewed Markdown before export; see [local figure authoring](interactive-demos.md#local-figures-and-demo-reading-copies). Image changes update the module revision and reset its local study progress.
+
+## Pilot fixes and consumer migration
+
+Full HTML demo documents and fragments now produce a single parsed document with one doctype. The exporter preserves authored language, title, styles, and body, while inserting CSP metadata and the bridge before authored scripts. No receiving-side HTML repair step is needed.
+
+Demo posters render in `.demo-poster`. The runtime sets `data-demo-status` on `.demo-host` to `loading`, `ready`, or `error`. `ready` means authored scripts finished loading and the initial state rendered; mounting an iframe is not enough. A ready demo hides its poster on screen. Print restores the poster and hides the interactive host. An empty host takes no space without JavaScript. Loading failures, initialization errors, and a ten-second initialization timeout retain the poster and explanatory Markdown, with a reload hint. Ordinary Markdown illustrations remain visible.
+
+After pinning the fixed exporter, remove the downstream document-repair adapter (and its dedicated parse5 dependency if unused elsewhere), the alt-text-based poster hiding rule, and the empty-host CSS workaround. Preserve the host's CSP, JavaScript MIME types, and cache revalidation. Regenerate the complete bundle and rerun HTML validation, unit tests, and browser checks. Demo revisions include the generated bridge/document, so wrapper changes also invalidate stale learner state.
+
+A standalone exporter npm package remains a separate enhancement. It should expose the CLI and export API with a bundled learner runtime, styles, Mermaid, and packaged assets, without Studio's development tools or backend configuration. Verify it in a clean consumer while retaining deterministic revisions, exclusions, and refusal to overwrite existing output.

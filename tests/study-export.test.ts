@@ -1,4 +1,5 @@
 import test from "node:test";
+import { parse } from "parse5";
 import assert from "node:assert/strict";
 import {
   mkdtemp,
@@ -47,6 +48,10 @@ test("export creates portable modules and refuses destructive overwrites", async
     join(output, "scalability/demos/amdahl.html"),
     "utf8",
   );
+  const htmlErrors: string[] = [];
+  parse(demo, { onParseError: (error) => htmlErrors.push(error.code) });
+  assert.deepEqual(htmlErrors, []);
+  assert.equal(demo.match(/<!doctype /gi)?.length, 1);
   assert.match(demo, /LectureDemo/);
   assert.match(demo, /Content-Security-Policy/);
   assert.match(demo, /connect-src 'none'/);

@@ -71,12 +71,19 @@ export function studySteps(deck: PresentationDefinition): StudyStep[] {
         html: renderMarkdown(
           step.type === "build"
             ? "This classroom build is not included. Use the explanation or reading references below."
-            : (step.body || "") + posterMarkdown(step),
+            : step.body || "",
           {
             allowRemoteImages: step.allowRemoteImages === true,
             imageSources: imageSources(step),
           },
         ),
+        ...(step.demoPoster
+          ? {
+              posterHtml: renderMarkdown(posterMarkdown(step), {
+                imageSources: imageSources(step),
+              }),
+            }
+          : {}),
         explanationHtml: renderMarkdown(step.study?.explanation || "", {
           imageSources: imageSources(step),
         }),
@@ -115,7 +122,7 @@ export function modulePage(module: StudyModule) {
   const slides = module.steps
     .map(
       (step, i) =>
-        `<section class="study-step" id="slide-${step.id}" tabindex="-1"><p class="eyebrow">${escape(step.chapter || "Explore")} / ${String(i + 1).padStart(2, "0")}</p><h2>${escape(step.title)}</h2><div class="prose">${step.html}</div>${step.demo ? `<div class="demo-host" data-demo="${step.id}"></div><button class="reset-demo" type="button" data-reset-demo="${step.id}" hidden>Reset experiment</button><noscript><p>Enable JavaScript to explore this demonstration.</p></noscript>` : ""}${step.explanationHtml ? `<details class="explanation"><summary>Read the explanation</summary><div class="prose">${step.explanationHtml}</div></details>` : ""}${step.activity ? `<div class="activity"><p class="eyebrow">${step.activity.correctOption ? "Check your understanding" : "Pause and reflect"}</p><div class="prose">${step.activity.promptHtml}</div>${step.activity.options.length ? `<fieldset><legend>Your choice</legend>${step.activity.options.map((option) => `<label><input type="radio" name="choice-${step.id}" value="${escape(option.id)}"> ${escape(option.label)}</label>`).join("")}</fieldset>` : ""}${step.activity.correctOption ? '<button class="check-answer" type="button" hidden>Check answer</button><p class="answer-result" role="status"></p>' : ""}${step.activity.answerHtml ? `<details><summary>Reveal discussion</summary><div class="prose">${step.activity.answerHtml}</div></details>` : ""}</div>` : ""}${step.source ? `<p class="source">${escape(step.source)}</p>` : ""}<button class="complete-step" type="button" hidden>Mark as complete</button></section>`,
+        `<section class="study-step" id="slide-${step.id}" tabindex="-1"><p class="eyebrow">${escape(step.chapter || "Explore")} / ${String(i + 1).padStart(2, "0")}</p><h2>${escape(step.title)}</h2><div class="prose">${step.html}</div>${step.posterHtml ? `<div class="demo-poster prose">${step.posterHtml}</div>` : ""}${step.demo ? `<div class="demo-host" data-demo="${step.id}"></div><p class="demo-status" role="status"></p><button class="reset-demo" type="button" data-reset-demo="${step.id}" hidden>Reset experiment</button><noscript><p>Enable JavaScript to explore this demonstration.</p></noscript>` : ""}${step.explanationHtml ? `<details class="explanation"><summary>Read the explanation</summary><div class="prose">${step.explanationHtml}</div></details>` : ""}${step.activity ? `<div class="activity"><p class="eyebrow">${step.activity.correctOption ? "Check your understanding" : "Pause and reflect"}</p><div class="prose">${step.activity.promptHtml}</div>${step.activity.options.length ? `<fieldset><legend>Your choice</legend>${step.activity.options.map((option) => `<label><input type="radio" name="choice-${step.id}" value="${escape(option.id)}"> ${escape(option.label)}</label>`).join("")}</fieldset>` : ""}${step.activity.correctOption ? '<button class="check-answer" type="button" hidden>Check answer</button><p class="answer-result" role="status"></p>' : ""}${step.activity.answerHtml ? `<details><summary>Reveal discussion</summary><div class="prose">${step.activity.answerHtml}</div></details>` : ""}</div>` : ""}${step.source ? `<p class="source">${escape(step.source)}</p>` : ""}<button class="complete-step" type="button" hidden>Mark as complete</button></section>`,
     )
     .join("\n");
   return page(
@@ -216,12 +223,9 @@ export async function exportStudy(configPath: string, outputPath: string) {
         if (Buffer.byteLength(html) > 250000)
           throw new Error("Demo exceeds 250 KB");
         const url = "./demos/" + step.id + ".html";
-        const sandboxed = demoDocument(html, true).replace(
-          "<meta charset=utf-8>",
-          `<meta charset=utf-8><meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src data:; font-src data:; connect-src 'none'; frame-src 'none'; base-uri 'none'; form-action 'none'">`,
-        );
+        const sandboxed = demoDocument(html, true);
         await writeFile(join(folder, url), sandboxed);
-        step.demo = { url, revision: hash(html) };
+        step.demo = { url, revision: hash(sandboxed) };
       }
       // Existing packaged lecture images are the only local image paths emitted by renderMarkdown.
       for (const step of steps) {

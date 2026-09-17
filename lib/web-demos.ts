@@ -42,4 +42,5 @@ export async function loadWebDemos(
   }
   return demos;
 }
-export { demoDocument, validateDemoState } from "../shared/web-demo.ts";
+export { demoDocument } from "../shared/demo-document.ts";
+export { validateDemoState } from "../shared/web-demo.ts";

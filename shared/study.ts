@@ -7,6 +7,7 @@ export const studyStepSchema = v.object({
   html: text,
   source: text,
   explanationHtml: text,
+  posterHtml: v.exactOptional(text),
   activity: v.exactOptional(
     v.object({
       promptHtml: text,

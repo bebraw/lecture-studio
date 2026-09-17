@@ -67,7 +67,7 @@ demo: ./course-progression.html
 demoPoster: ./course-progression.svg
 ```
 
-Keep explanatory Markdown below the metadata. `demoPoster` appears alongside that text in `/slides`, printed reading copies, and the self-study export. It is an authored image, not an automatic screenshot. Interactive demos continue to use their HTML and synchronized state.
+Keep explanatory Markdown below the metadata. `demoPoster` appears alongside that text in `/slides`, printed reading copies, and the self-study export. It is an authored image, not an automatic screenshot. In self-study it stays visible until the demo has initialized, then hides on screen; no-JavaScript reading, print, and demo failures retain it. Interactive demos continue to use their HTML and synchronized state.
 
 References must start with `./` and stay within the presentation directory; parent traversal and external image references are not local assets. Images are limited to 2 MB each and 16 MB per deck. Export rejects symlinks that escape the presentation directory. SVGs render as images, never inline HTML, so their scripts cannot run. Image data is embedded in rendered output for portable exports; original Markdown references remain unchanged.
 

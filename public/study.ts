@@ -148,6 +148,18 @@ function mountModule(module: StudyModule) {
     }
     if (step.demo) {
       const host = root.querySelector<HTMLElement>(".demo-host")!;
+      const reset = root.querySelector<HTMLButtonElement>(".reset-demo")!;
+      const demoStatus = root.querySelector<HTMLElement>(".demo-status")!;
+      host.addEventListener("demo-status", () => {
+        const state = host.dataset.demoStatus;
+        reset.hidden = state !== "ready";
+        demoStatus.textContent =
+          state === "ready"
+            ? ""
+            : state === "error"
+              ? "The interactive demo could not start. The reading content remains available. Reload the page to try again."
+              : "Loading interactive demo…";
+      });
       const view = {
         id: module.id + ":" + step.id,
         url: step.demo.url,
@@ -186,8 +198,6 @@ function mountModule(module: StudyModule) {
         }
       };
       renderWebDemo(host, view, change);
-      const reset = root.querySelector<HTMLButtonElement>(".reset-demo")!;
-      reset.hidden = false;
       reset.onclick = () => change("{}");
     }
   }

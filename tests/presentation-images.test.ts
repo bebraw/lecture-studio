@@ -39,7 +39,7 @@ test("relative SVGs load once and survive preview, reading and study rendering w
     /data:image/,
   );
   assert.match(renderHandout(deck), /alt="Demo preview"/);
-  assert.match(studySteps(deck)[0]!.html, /alt="Demo preview"/);
+  assert.match(studySteps(deck)[0]!.posterHtml!, /alt="Demo preview"/);
   assert.doesNotMatch(authoringMarkdown(deck), /base64/);
 });
 test("relative image reads reject traversal and oversized files", async () => {
