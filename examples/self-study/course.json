@@ -1,0 +1,18 @@
+{
+  "version": 1,
+  "id": "scalable-web-foundations",
+  "title": "Explore scalable web systems",
+  "description": "A small self-study pilot: name the pressure, test a scaling assumption, and decide what evidence you need.",
+  "modules": [
+    {
+      "id": "scalability",
+      "source": "../demos/scalability-study.md",
+      "description": "Explore why more parallel capacity cannot eliminate sequential work."
+    },
+    {
+      "id": "measurement",
+      "source": "./measurement.md",
+      "description": "Turn a performance claim into a bounded experiment."
+    }
+  ]
+}

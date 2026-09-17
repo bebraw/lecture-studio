@@ -156,6 +156,11 @@ export function parsePresentation(note: Note): PresentationDefinition {
   if (!ids.has(value.start)) throw new Error("Missing start step");
   for (const s of value.steps) {
     if (
+      s.study?.correctOption !== undefined &&
+      !s.poll?.options.some((option) => option.id === s.study!.correctOption)
+    )
+      throw new Error("Self-study correctOption must name a poll option");
+    if (
       s.previewOf !== undefined &&
       !value.steps.some(
         (step) => step.id === s.previewOf && step.type === "build",

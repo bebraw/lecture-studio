@@ -1,5 +1,8 @@
 # Interactive demos from Obsidian
 
+The same demo API also supports an independent learner. The [self-study exporter](self-study-handover.md)
+packages HTML demos with a browser-local controller, so learners can experiment without a live lecture or Studio server.
+
 Put a self-contained HTML file beside the presentation note. Reference it in a material slide's YAML:
 
 ````markdown

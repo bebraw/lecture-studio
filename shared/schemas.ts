@@ -113,6 +113,15 @@ const pollSchema = v.object({
   joinUrl: text,
 });
 export const stepSchema = v.object({
+  study: v.exactOptional(
+    v.strictObject({
+      exclude: v.exactOptional(v.boolean()),
+      explanation: v.exactOptional(v.pipe(text, v.maxLength(16000))),
+      prompt: v.exactOptional(v.pipe(text, v.maxLength(4000))),
+      answer: v.exactOptional(v.pipe(text, v.maxLength(16000))),
+      correctOption: optionalText,
+    }),
+  ),
   id: text,
   type: text,
   title: text,

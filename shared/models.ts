@@ -112,6 +112,13 @@ export interface Dependency {
   instructions: Record<string, string>;
 }
 export interface Step {
+  study?: {
+    exclude?: boolean;
+    explanation?: string;
+    prompt?: string;
+    answer?: string;
+    correctOption?: string;
+  };
   id: string;
   type: string;
   title: string;

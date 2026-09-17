@@ -1,5 +1,7 @@
 # Lecture Studio
 
+Self-study exports can publish reviewed slide collections and independent HTML demos as a static site. Start with `npm run export:study -- examples/self-study/course.json .local/self-study` and see the [scalableweb handover](docs/self-study-handover.md) for authoring, the bundle contract, and integration instructions.
+
 For the current lecture workflow, use the [operator guide](docs/operator-guide.md) and [90-minute run of show](LECTURE-NARRATIVE.md). The guide takes precedence over the legacy manual preparation workflows below.
 
 ## Live broadcast and deployment
