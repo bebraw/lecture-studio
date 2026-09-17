@@ -89,7 +89,7 @@ test("self-study runs under a nested path with private progress, independent dem
   ).toHaveText("2.50×");
   await other.close();
   await page.screenshot({
-    path: "/private/tmp/self-study-demo.png",
+    path: test.info().outputPath("self-study-demo.png"),
     fullPage: true,
   });
   await page.locator("#study-next").click();
@@ -111,7 +111,7 @@ test("self-study runs under a nested path with private progress, independent dem
     "1 / 3 complete",
   );
   await page.screenshot({
-    path: "/private/tmp/self-study-index.png",
+    path: test.info().outputPath("self-study-index.png"),
     fullPage: true,
   });
   await page.locator(".module-start").nth(1).click();

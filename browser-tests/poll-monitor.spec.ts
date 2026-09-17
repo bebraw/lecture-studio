@@ -101,7 +101,7 @@ test("lecturer sees incoming and changed votes without projecting results", asyn
       monitor.locator('[data-option-id="a"] .poll-monitor-delta'),
     ).toHaveText("-1");
     await desk.screenshot({
-      path: "/private/tmp/lecture-poll-monitor.png",
+      path: test.info().outputPath("lecture-poll-monitor.png"),
       fullPage: true,
     });
     expect(

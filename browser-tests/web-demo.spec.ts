@@ -262,11 +262,11 @@ test("Obsidian HTML demos mirror lecturer state to isolated projector and public
     await desk.locator("#live-toggle").click();
     await expect(mirrored.locator("#speedup")).toHaveText("1.00×");
     await stage.screenshot({
-      path: "/private/tmp/lecture-web-demo-stage.png",
+      path: test.info().outputPath("lecture-web-demo-stage.png"),
       fullPage: true,
     });
     await desk.screenshot({
-      path: "/private/tmp/lecture-web-demo-desk.png",
+      path: test.info().outputPath("lecture-web-demo-desk.png"),
       fullPage: true,
     });
   } finally {
