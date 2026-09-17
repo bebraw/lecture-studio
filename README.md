@@ -208,7 +208,7 @@ Restart the studio after this update to load the new search route and browser mo
 The adapter reads only Markdown files under:
 
 ```text
-Lectures/Web Development 2026
+Lectures
 ```
 
 It reuses the `mcp_servers.obsidian` URL and bearer-token environment variable from the normal Codex configuration. The default endpoint is loopback port 27200. Keep Obsidian running. A terminal launching this app needs the configured token in its environment; the fact that an editor has the token does not necessarily mean a new terminal does.

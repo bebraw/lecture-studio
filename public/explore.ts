@@ -10,8 +10,12 @@ const pair = (
   definition: string,
   diagram: string,
 ): Shortcut[] => [
-  [definition, "Projection/" + name + ".md", "Slide: Definition"],
-  [diagram, "Projection/" + name + ".md", "Slide: Image"],
+  [
+    definition,
+    "Web Development 2026/Projection/" + name + ".md",
+    "Slide: Definition",
+  ],
+  [diagram, "Web Development 2026/Projection/" + name + ".md", "Slide: Image"],
 ];
 const web = () =>
   pair("Web foundations", "What is hypermedia?", "How links connect resources");

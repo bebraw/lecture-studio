@@ -10,7 +10,7 @@ are not the current authoring reference.
 
 The full lecture is migrated as **Web development 2026**: 78 slides: 51 main lecture steps, eight reference slides (including the divider), and 19 optional detours. The lecture includes three polls and four build prompts. In Prepare, choose **Find presentations in Obsidian**, select that note, then **Load snapshot / restart presentation**. Its chapter-grouped outline is generated from the loaded definition; selecting an outline step stays private. In Present, use Begin presentation, Next, Previous, named detours and Return to narrative.
 
-Two example definitions live under **Lectures/Web Development 2026/Presentations**: Web opening and Discussion practice. The current scoped Obsidian connection is intentionally unchanged; presentations currently need to be inside that lecture folder. Use original lecture to return to the old implementation.
+Two example definitions live under **Lectures/Web Development 2026/Presentations**: Web opening and Discussion practice. The Obsidian connection searches within **Lectures**, including its subfolders. Keep presentation notes in **Lectures/<course>/Presentations/**; the presentation menu lists only notes inside a **Presentations** directory. Use **Refresh list** after adding or moving a presentation. Use original lecture to return to the old implementation.
 
 Each note has a **Presentation** heading containing one fenced JSON block:
 
