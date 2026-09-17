@@ -152,6 +152,23 @@ export class ObsidianLibrary {
       throw new Error("Note is missing or too large for the stage");
     return { path: safe, ...sections(content) };
   }
+  async readHtml(path: string) {
+    const safe = scopedPath(path);
+    if (!safe.endsWith(".html"))
+      throw new Error("Choose a self-contained HTML demo");
+    const result = await this.call("get_vault_file", {
+      path: safe,
+      format: "text",
+    });
+    const content =
+      typeof result === "string" ? result : record(result).content;
+    if (
+      typeof content !== "string" ||
+      Buffer.byteLength(content, "utf8") > 250000
+    )
+      throw new Error("Demo is missing or exceeds 250 KB");
+    return content;
+  }
   async close() {
     await this.client?.close().catch(() => {});
     this.client = undefined;

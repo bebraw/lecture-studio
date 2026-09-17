@@ -107,6 +107,18 @@ export async function api<P extends ApiPath>(
   }
   return parseApiResponse(path, data);
 }
+import { renderWebDemo } from "./web-demo.ts";
+export function renderSurface(host: HTMLElement, stage: Partial<Stage>) {
+  const sameDemo =
+    stage.webDemo &&
+    host.querySelector<HTMLIFrameElement>(".web-demo-frame")?.dataset.demoId ===
+      stage.webDemo.id;
+  if (!sameDemo) host.innerHTML = surface(stage);
+  if (stage.webDemo) {
+    const viewport = host.querySelector<HTMLElement>(".web-demo-viewport");
+    if (viewport) renderWebDemo(viewport, stage.webDemo);
+  }
+}
 const diagrams: Record<string, string> = {
   ages: '<div class="diagram ages"><div><span class="diagram-number">01</span><h3>Document</h3><p>Address it.<br>Link to it.<br>Act through a form.</p></div><b aria-hidden="true">→</b><div><span class="diagram-number">02</span><h3>Application</h3><p>Share state.<br>Improve feedback.<br>Keep the core.</p></div><b aria-hidden="true">→</b><div><span class="diagram-number">03</span><h3>Agentic</h3><p>Expose actions.<br>Compose context.<br>Verify the result.</p></div><footer>The capability survives. The interface changes.</footer></div>',
   enhancement:
@@ -147,6 +159,7 @@ export function surface(stage: Partial<Stage>, previewPosition = false) {
     ">" +
     escape(stage.title) +
     "</h1>";
+  if (stage.webDemo) return heading + '<div class="web-demo-viewport"></div>';
   if (stage.mode === "diagram")
     return (
       heading +

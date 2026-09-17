@@ -3,7 +3,7 @@ import {
   applyTheme,
   createStageStatus,
   renderDiagrams,
-  surface,
+  renderSurface,
 } from "./shared.ts";
 
 const previews = new WeakMap<HTMLElement, (stage: Partial<Stage>) => void>();
@@ -25,7 +25,7 @@ export function renderSlidePreview(host: HTMLElement, stage: Partial<Stage>) {
     applyTheme(doc.body, latest.theme);
     doc.body.classList.toggle("blank", !!latest.blank);
     const content = doc.querySelector<HTMLElement>("#stage-content")!;
-    content.innerHTML = surface(latest);
+    renderSurface(content, latest);
     content.dataset.mode = latest.mode;
     doc.querySelector("#era")!.textContent = (latest.act || "")
       .replaceAll("-", " ")

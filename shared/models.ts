@@ -28,6 +28,7 @@ export interface BuildState {
   outcome?: string | null;
 }
 export interface Stage {
+  webDemo?: WebDemo;
   act: string;
   mode: string;
   title: string;
@@ -60,10 +61,16 @@ export interface NoteFile {
   label: string;
 }
 export interface Library {
+  readHtml?(path: string): Promise<string>;
   status: string;
   list(): Promise<NoteFile[]>;
   read(path: string): Promise<Note>;
   close(): Promise<void>;
+}
+export interface WebDemo {
+  id: string;
+  url: string;
+  state: string;
 }
 export interface PollOption {
   id: string;
@@ -117,6 +124,7 @@ export interface Step {
   uses?: Dependency[];
   previewOf?: string;
   teachingDemo?: boolean;
+  demo?: string;
   layersDemo?: boolean;
   wordCloud?: boolean;
   wordsFrom?: string;

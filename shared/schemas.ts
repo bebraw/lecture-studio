@@ -6,6 +6,7 @@ const count = v.pipe(v.number(), v.integer(), v.minValue(0));
 const optionalText = v.exactOptional(text);
 const strings = v.array(text);
 const stringMap = v.record(text, text);
+export const webDemoSchema = v.object({ id: text, url: text, state: text });
 export const themeSchema = v.object({
   background: text,
   text,
@@ -33,6 +34,7 @@ const buildSchema = v.object({
   outcome: v.exactOptional(v.nullable(text)),
 });
 export const stageSchema = v.object({
+  webDemo: v.exactOptional(webDemoSchema),
   act: text,
   mode: text,
   title: text,
@@ -125,6 +127,9 @@ export const stepSchema = v.object({
   ),
   previewOf: optionalText,
   teachingDemo: v.exactOptional(v.boolean()),
+  demo: v.exactOptional(
+    v.pipe(text, v.regex(/^\.\/(?!.*(?:\.\.|[\\:#?]))[^\r\n]+\.html$/)),
+  ),
   layersDemo: v.exactOptional(v.boolean()),
   wordCloud: v.exactOptional(v.boolean()),
   wordsFrom: optionalText,
@@ -141,6 +146,7 @@ const inputSchema = v.object({
   revision: v.nullable(count),
 });
 const presentationSchema = v.object({
+  webDemo: v.exactOptional(webDemoSchema),
   demo: v.exactOptional(
     v.object({
       prepared: v.boolean(),

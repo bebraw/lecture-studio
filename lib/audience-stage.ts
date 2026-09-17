@@ -24,7 +24,12 @@ export function audienceStage(state: Partial<Stage>): Partial<Stage> {
     if (state[key] !== undefined)
       Object.assign(result, { [key]: structuredClone(state[key]) });
   }
-  if (result.mode === "demo") {
+  if (state.webDemo) {
+    result.mode = "material";
+    result.html =
+      "<p>Follow the interactive demonstration on the projector.</p>";
+    result.demoUrl = "";
+  } else if (result.mode === "demo") {
     let publicUrl = false;
     try {
       const u = new URL(result.demoUrl ?? "");

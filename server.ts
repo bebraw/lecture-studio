@@ -1,4 +1,10 @@
 import { defaultBuildModel } from "./shared/build-model.ts";
+import {
+  loadWebDemos,
+  demoDocument,
+  validateDemoState,
+  type LoadedDemo,
+} from "./lib/web-demos.ts";
 import { preparedDemo, preparedPreview } from "./lib/prepared-demo.ts";
 import { listSource, readSource, sourceExcerpt } from "./lib/source-browser.ts";
 import { compatibleAudience } from "./shared/audience-protocol.ts";
@@ -147,6 +153,8 @@ export function createStudio({
     blank: false,
     build: { status: "ready", startedAt: null, finishedAt: null },
   });
+  let webDemos = new Map<string, LoadedDemo>();
+  let projectedWebDemo: LoadedDemo | undefined;
   let presentation: PresentationSession | null = null,
     graphPoll: AudiencePoll | null = null,
     graphBusy = false;
@@ -239,6 +247,7 @@ export function createStudio({
     if (!presentation) throw new Error("Load a presentation first");
     feedbackPrevious = null;
     const s = presentation.step();
+    projectedWebDemo = webDemos.get(s.id);
     if (live) await syncWordCloud(true);
     if ((s.wordsFrom || s.reviewWordsFrom) && poll.origin && poll.token)
       captureWords(await feedbackRequest(poll));
@@ -290,6 +299,7 @@ export function createStudio({
     publishedDraft = { ...draft };
     stage = {
       ...publicStage(draft, ++version),
+      ...(projectedWebDemo ? { webDemo: { ...projectedWebDemo.view } } : {}),
       theme: presentation.definition.theme,
       slidePosition: presentation.position(),
       slideType: s.type,
@@ -326,6 +336,8 @@ export function createStudio({
     poll.reset();
     pollOnStage = false;
     presentation = null;
+    webDemos.clear();
+    projectedWebDemo = undefined;
     audienceSessionStarted = false;
     workspacePrepared = false;
     preparedWorkspaceUnused = false;
@@ -406,6 +418,9 @@ export function createStudio({
       presentation: presentation
         ? {
             ...presentation.state(),
+            ...(webDemos.get(presentation.current)
+              ? { webDemo: { ...webDemos.get(presentation.current)!.view } }
+              : {}),
             demo: {
               prepared: !!preparedPreview(
                 presentation.step().previewOf || "",
@@ -557,6 +572,30 @@ export function createStudio({
       if (req.headers["sec-fetch-site"] === "cross-site")
         return json(res, { error: "Cross-site request rejected" }, 403);
       const url = new URL(req.url ?? "/", origin);
+      if (url.pathname.startsWith("/slide-demo/") && req.method === "GET") {
+        const id = url.pathname.slice("/slide-demo/".length);
+        const demo = [...webDemos.values(), projectedWebDemo].find(
+          (demo) => demo?.view.id === id,
+        );
+        if (!demo)
+          return json(
+            res,
+            { error: "Demo snapshot not found. Reload the presentation." },
+            404,
+          );
+        res.setHeader(
+          "content-security-policy",
+          "default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src data:; font-src data:; connect-src 'none'; frame-src 'none'; frame-ancestors 'self'; base-uri 'none'; form-action 'none'; sandbox allow-scripts",
+        );
+        res.setHeader("content-type", "text/html; charset=utf-8");
+        res.end(
+          demoDocument(
+            demo.html,
+            url.searchParams.get("role") === "controller",
+          ),
+        );
+        return;
+      }
       if (url.pathname === "/slides" && req.method === "GET" && presentation) {
         res.setHeader("content-type", "text/html; charset=utf-8");
         res.end(renderHandout(presentation.definition));
@@ -839,6 +878,7 @@ export function createStudio({
                   "Finish the build and close voting before changing presentations",
                 );
               let next = null;
+              let nextDemos = new Map<string, LoadedDemo>();
               if (op === "load") {
                 const files = await library.list();
                 if (!files.some((f) => f.path === body.path))
@@ -853,10 +893,16 @@ export function createStudio({
                   ),
                   stringValue(body.path, "presentation path"),
                 );
+                nextDemos = await loadWebDemos(
+                  next.definition,
+                  next.path,
+                  library,
+                );
               }
               if (next) await checkAudience();
               poll.reset();
               presentation = next;
+              webDemos = nextDemos;
               wordCloudRounds.clear();
               wordCloudStep = null;
               audienceSessionStarted = false;
@@ -868,7 +914,21 @@ export function createStudio({
               // Loading is private: the existing projection stays until navigation.
             } else {
               if (!presentation) throw new Error("Load a presentation first");
-              if (op === "select") {
+              if (op === "demo-state") {
+                const demo = webDemos.get(presentation.current);
+                if (!demo || body.id !== demo.view.id)
+                  throw new Error("This demo is no longer selected");
+                demo.view.state = validateDemoState(
+                  stringValue(body.state, "demo state"),
+                );
+                if (live && stage.webDemo?.id === demo.view.id) {
+                  stage = {
+                    ...stage,
+                    webDemo: { ...demo.view },
+                    version: ++version,
+                  };
+                }
+              } else if (op === "select") {
                 presentation.move("select", stringValue(body.id, "step"));
               } else if (
                 ["next", "previous", "detour", "return", "show"].includes(op)

@@ -6,6 +6,7 @@ import { asError } from "../shared/errors.ts";
 import { applyTheme } from "./shared.ts";
 import { renderSlidePreview } from "./slide-preview.ts";
 import { mountPollMonitor } from "./poll-monitor.ts";
+import { renderWebDemo } from "./web-demo.ts";
 export function mountPresentations({ call, update }: MountOptions) {
   const setup = document.createElement("section");
   setup.id = "presentation-setup";
@@ -117,6 +118,36 @@ export function mountPresentations({ call, update }: MountOptions) {
   const stagePanel = $("current-stage-panel");
   $("graph-detours").before(stagePanel);
   const updatePollMonitor = mountPollMonitor(stagePanel);
+  const demoController = document.createElement("section");
+  demoController.id = "web-demo-controller";
+  demoController.hidden = true;
+  demoController.innerHTML =
+    '<h2></h2><p class="small muted">Demo controls · changes follow on the projector while Live is on.</p><div class="web-demo-controls-frame"></div><button type="button">Reset demo</button><p class="web-demo-status" role="status"></p>';
+  stagePanel.before(demoController);
+  let sendingDemo = false;
+  let pendingDemo: { id: string; state: string } | undefined;
+  const sendDemoState = async (state: string) => {
+    const demo = data?.presentation?.webDemo;
+    if (!demo) return;
+    pendingDemo = { id: demo.id, state };
+    if (sendingDemo) return;
+    sendingDemo = true;
+    try {
+      while (pendingDemo) {
+        const value = pendingDemo;
+        pendingDemo = undefined;
+        update(await call("presentation/demo-state", value));
+      }
+      query(".web-demo-status", demoController).textContent = "";
+    } catch (caught) {
+      pendingDemo = undefined;
+      query(".web-demo-status", demoController).textContent =
+        asError(caught).message;
+    } finally {
+      sendingDemo = false;
+    }
+  };
+  query("button", demoController).onclick = () => void sendDemoState("{}");
   const projectionStatus = document.createElement("span");
   projectionStatus.id = "projection-status";
   projectionStatus.className = "small muted";
@@ -446,6 +477,17 @@ export function mountPresentations({ call, update }: MountOptions) {
     });
   return (value: DeskState) => {
     data = value;
+    const authoredDemo = data.presentation?.webDemo;
+    demoController.hidden = !authoredDemo;
+    stagePanel.classList.toggle("has-demo-controller", !!authoredDemo);
+    if (authoredDemo) {
+      query("h2", demoController).textContent = data.presentation!.step.title;
+      renderWebDemo(
+        query(".web-demo-controls-frame", demoController),
+        authoredDemo,
+        (state) => void sendDemoState(state),
+      );
+    }
     updatePollMonitor(data);
     const nextTimingKey =
       JSON.stringify(data.buildTimings) + Math.floor(Date.now() / 1000);

@@ -62,6 +62,10 @@ export const requestSchemas = {
   "presentation/previous": empty,
   "presentation/return": empty,
   "presentation/show": empty,
+  "presentation/demo-state": v.strictObject({
+    id: text,
+    state: v.pipe(text, v.maxLength(16000)),
+  }),
   "presentation/defaults": empty,
   "presentation/poll-open": empty,
   "presentation/poll-close": empty,

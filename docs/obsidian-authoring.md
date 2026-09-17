@@ -5,6 +5,10 @@ build instructions. Studio loads a validated snapshot; it does not write back to
 your vault. Author prose in Markdown and settings in small YAML blocks. Existing
 JSON blocks and whole-deck JSON definitions remain supported.
 
+For interactive HTML demos, put a self-contained file beside the note and add
+`demo: ./example.html` to a material slide. The [demo authoring guide](interactive-demos.md)
+describes the small synchronization API and includes a complete starter example.
+
 ## Edit and present
 
 1. With Live off, open the presentation menu and choose **Download editable Markdown**.

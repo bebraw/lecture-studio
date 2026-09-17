@@ -3,7 +3,7 @@ import { query } from "./dom.ts";
 import {
   auth,
   api,
-  surface,
+  renderSurface,
   renderDiagrams,
   createStageStatus,
   applyTheme,
@@ -19,7 +19,7 @@ async function poll() {
     if (state.version !== version) {
       version = state.version;
       applyTheme(document.body, state.theme);
-      query("#stage-content", document).innerHTML = surface(state);
+      renderSurface(query("#stage-content", document), state);
       query("#stage-content", document).dataset.mode = state.mode;
       query("#era", document).textContent = state.act
         .replaceAll("-", " ")
