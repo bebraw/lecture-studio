@@ -48,7 +48,7 @@ Each file can contain inline HTML, CSS, JavaScript and data-URL images/fonts, up
 
 For a statechart, publish the active states and event history after each accepted event, and render them in `onState`. For a scalability illustration, publish the selected pressures and derive the diagram from those values. The integration is independent of the demo's framework.
 
-This first integration supports the lecturer and local projector. Student devices show a message to follow the projector; HTML and demo state are not sent to the public audience service. Reading copies retain the slide's explanatory Markdown, not a live demo.
+Student devices mirror the live demonstration as viewers. Reading copies retain the explanatory Markdown and optional `demoPoster` image.
 
 ## Local figures and demo reading copies
 
@@ -71,4 +71,14 @@ Keep explanatory Markdown below the metadata. `demoPoster` appears alongside tha
 
 References must start with `./` and stay within the presentation directory; parent traversal and external image references are not local assets. Images are limited to 2 MB each and 16 MB per deck. Export rejects symlinks that escape the presentation directory. SVGs render as images, never inline HTML, so their scripts cannot run. Image data is embedded in rendered output for portable exports; original Markdown references remain unchanged.
 
-The public audience service has a 100 KB stage limit. If embedded images exceed the publication budget, students see a pointer to the projector or reading copy; the local projector and exported copy retain the figures. Public HTML demo mirroring remains separate future work.
+The public audience service has a 100 KB stage limit. If embedded images exceed the publication budget, students see a pointer to the projector or reading copy; the local projector and exported copy retain the figures. HTML demos use a separate bounded publication field, so this image fallback does not limit demo mirroring.
+
+## Public audience mirroring
+
+With the updated audience service deployed, HTML demos automatically mirror to student devices while Live is on. No extra YAML or demo API is needed. The lecturer remains the only controller; students receive `LectureDemo.role === "viewer"` and follow the published state, including reset and late joining. Hide controls for viewer roles and derive all visuals from shared state. Audience refreshes normally arrive every 1.5 seconds, after Studio publishes the state.
+
+Only the currently projected live demo is uploaded. Loading a presentation or editing with Live off does not publish its demos. Studio sends the HTML when entering a demo, then sends state-only updates; the audience iframe remains mounted. Navigating away, blanking the stage, or turning Live off removes the stored public demo and makes its URL return 404. Resuming republishes the current snapshot. Already downloaded content cannot be recalled from a student's device.
+
+The public HTML runs in an opaque-origin sandbox, with scripts allowed but network access, forms, popups, storage and parent-page access blocked. Direct navigation is sandboxed by the response CSP too; a `role=controller` query cannot enable controls. The same 250 KB HTML and 16 KB JSON state limits apply. HTML is served separately from the audience polling response, with `Cache-Control: no-store`. Demo files are public teaching material while live: keep private information out of HTML and shared state.
+
+Deployment: update the audience Worker and restart Studio together. The `web-demo-mirroring` capability check detects an older service. No new bindings, secrets or Durable Object migrations are required. Self-study exports still give each learner independent controls.

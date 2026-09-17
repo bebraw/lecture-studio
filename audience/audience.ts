@@ -9,7 +9,7 @@ import type { FeedbackConfig } from "../shared/models.ts";
 import { query } from "../public/dom.ts";
 import { asError } from "../shared/errors.ts";
 import {
-  surface,
+  renderSurface,
   applyTheme,
   renderDiagrams,
   createStageStatus,
@@ -156,11 +156,10 @@ async function refresh() {
       applyTheme(document.body, stage?.theme);
       document.body.classList.toggle("blank", !poll && !!stage?.blank);
       main.dataset.mode = poll ? "poll" : stage?.mode || "material";
-      main.innerHTML = poll
-        ? "<h1>" + escape(poll.question) + "</h1>" + poll.html
-        : stage
-          ? surface(stage)
-          : "<h1>Waiting for the lecturer</h1>";
+      if (poll)
+        main.innerHTML = "<h1>" + escape(poll.question) + "</h1>" + poll.html;
+      else if (stage) renderSurface(main, stage);
+      else main.innerHTML = "<h1>Waiting for the lecturer</h1>";
       query("#era", document).textContent = poll
         ? "VOTE"
         : stage?.act?.replaceAll("-", " ").toUpperCase() || "";

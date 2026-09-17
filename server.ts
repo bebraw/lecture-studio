@@ -1,3 +1,4 @@
+import { demoCsp } from "./shared/web-demo.ts";
 import {
   imageSources,
   loadPresentationImages,
@@ -545,8 +546,15 @@ export function createStudio({
   };
   const audienceState = () => {
     const state = publicState();
+    const demo =
+      state.live &&
+      !state.blank &&
+      state.webDemo?.id === projectedWebDemo?.view.id
+        ? projectedWebDemo
+        : undefined;
     if (!previewTunnel.pending && (!state.live || state.mode !== "demo"))
       previewTunnel.close();
+    if (demo) return { ...state, demoHtml: demo.html };
     return state.mode === "demo"
       ? { ...state, demoUrl: previewTunnel.publicUrl(state.demoUrl) }
       : state;
@@ -589,10 +597,7 @@ export function createStudio({
             { error: "Demo snapshot not found. Reload the presentation." },
             404,
           );
-        res.setHeader(
-          "content-security-policy",
-          "default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src data:; font-src data:; connect-src 'none'; frame-src 'none'; frame-ancestors 'self'; base-uri 'none'; form-action 'none'; sandbox allow-scripts",
-        );
+        res.setHeader("content-security-policy", demoCsp);
         res.setHeader("content-type", "text/html; charset=utf-8");
         res.end(
           demoDocument(

@@ -1,7 +1,8 @@
 import { audienceProtocol } from "../shared/audience-protocol.ts";
 import { audienceRooms as rooms } from "../shared/audience-rooms.ts";
 import { parse } from "valibot";
-import { audienceStageSchema } from "../shared/audience-schemas.ts";
+import { demoDocument, demoCsp } from "../shared/web-demo.ts";
+import { audiencePublicationSchema } from "../shared/audience-schemas.ts";
 import { handleRoomRequest, readRoomSnapshot } from "./room-http";
 import { renderRoomFragment } from "./room-view";
 import { feedbackRequest } from "./feedback-http";
@@ -134,7 +135,7 @@ export default {
         if (!(value instanceof Uint8Array))
           throw new Error("Expected request bytes");
         bytes += value.length;
-        if (bytes > 100000) {
+        if (bytes > 1700000) {
           await reader.cancel();
           return new Response("Too large", { status: 413 });
         }
@@ -148,7 +149,7 @@ export default {
           offset += chunk.length;
         }
         const input = parse(
-          audienceStageSchema,
+          audiencePublicationSchema,
           JSON.parse(new TextDecoder().decode(buffer)),
         );
         if (
@@ -157,6 +158,22 @@ export default {
           typeof input.html !== "string"
         )
           throw new Error();
+        if (
+          input.webDemo &&
+          input.webDemo.url !== "/audience-demo/" + input.webDemo.id
+        )
+          throw new Error("Invalid demo URL");
+        if (
+          input.demoHtml !== undefined &&
+          (!input.webDemo || input.live !== true || input.blank)
+        )
+          throw new Error("Demo requires a live stage");
+        if (
+          new TextEncoder().encode(
+            JSON.stringify({ ...input, demoHtml: undefined }),
+          ).length > 100000
+        )
+          throw new Error("Stage too large");
         if (input.live === false) {
           const snapshots = await Promise.all(
             Object.keys(rooms).map((id) =>
@@ -186,13 +203,41 @@ export default {
           "slideType",
           "projectionKind",
           "pollId",
+          "webDemo",
         ] as const)
           if (input[key] !== undefined) stage[key] = input[key];
-        await env.STAGE_STATE.getByName("lecture").publish(stage);
+        if (
+          !(await env.STAGE_STATE.getByName("lecture").publish(
+            stage,
+            input.demoHtml,
+          ))
+        )
+          return new Response("Demo HTML required", { status: 409 });
         return Response.json({ ok: true });
       } catch {
         return new Response("Invalid stage", { status: 400 });
       }
+    }
+    const demoMatch = /^\/audience-demo\/([a-f0-9-]{36})$/.exec(url.pathname);
+    if (demoMatch) {
+      if (request.method !== "GET")
+        return new Response("Method not allowed", { status: 405 });
+      const demo = await env.STAGE_STATE.getByName("lecture").readDemo(
+        demoMatch[1]!,
+      );
+      return new Response(
+        demo === null ? "Demo is no longer live" : demoDocument(demo, false),
+        {
+          status: demo === null ? 404 : 200,
+          headers: {
+            "content-type": "text/html; charset=utf-8",
+            "content-security-policy": demoCsp,
+            "cache-control": "no-store",
+            "x-content-type-options": "nosniff",
+            "referrer-policy": "no-referrer",
+          },
+        },
+      );
     }
     if (url.pathname === "/api/audience" && request.method === "GET") {
       const { active: followers } =
@@ -266,7 +311,7 @@ export default {
       const response = new Response(asset.body, asset);
       response.headers.set(
         "content-security-policy",
-        "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' https: data:; frame-src https:; object-src 'none'; base-uri 'none'; frame-ancestors http://127.0.0.1:* http://localhost:*; form-action 'self'",
+        "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' https: data:; frame-src 'self' https:; object-src 'none'; base-uri 'none'; frame-ancestors http://127.0.0.1:* http://localhost:*; form-action 'self'",
       );
       response.headers.set("referrer-policy", "same-origin");
       response.headers.set("x-content-type-options", "nosniff");

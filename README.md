@@ -97,7 +97,7 @@ Codex CLI **0.153.4** is confirmed working by the lecturer. This is a tested ver
 ## Prepare and Present
 
 Author the full lecture in Obsidian using the [Markdown + YAML authoring guide and complete type reference](docs/obsidian-authoring.md).
-Self-contained HTML demos can sit beside the note and use `demo: ./example.html` on a material slide. See the [interactive demo guide](docs/interactive-demos.md) for synchronized lecturer controls and a working Amdahl's law example.
+Self-contained HTML demos can sit beside the note and use `demo: ./example.html` on a material slide. See the [interactive demo guide](docs/interactive-demos.md) for synchronized lecturer controls, public audience mirroring, and a working Amdahl's law example. Deploy the updated audience Worker to enable the `web-demo-mirroring` capability.
 The presentation menu offers **Edit in Obsidian**, **Reload from Obsidian**,
 **Download editable Markdown**, and **Preview reading copy**. Existing JSON
 notes still work. Local `/slides` renders the loaded snapshot; the deployed

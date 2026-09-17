@@ -169,3 +169,53 @@ test("readiness rejects stale protocols and missing prepared rooms", () => {
   );
   assert.equal(compatibleAudience({}), false);
 });
+
+test("public demo publication requires a live snapshot and retries lost HTML", async () => {
+  const view = {
+    id: crypto.randomUUID(),
+    url: "/slide-demo/local",
+    state: "{}",
+  };
+  const state = {
+    live: true,
+    title: "Demo",
+    webDemo: view,
+    demoHtml: "<p>Demo</p>",
+  };
+  const sanitized = audienceStage(state);
+  assert.equal(sanitized.webDemo?.url, "/audience-demo/" + view.id);
+  assert.equal(sanitized.demoHtml, state.demoHtml);
+  for (const privateState of [
+    { ...state, live: false },
+    { ...state, blank: true },
+  ]) {
+    const result = audienceStage(privateState);
+    assert.equal(result.webDemo, undefined);
+    assert.equal(result.demoHtml, undefined);
+  }
+  const bodies: Record<string, unknown>[] = [];
+  let fail = false;
+  const sync = new AudienceStageSync({
+    origin: "https://audience.invalid",
+    token: "fixture",
+    fetcher: async (_url, init) => {
+      bodies.push(
+        JSON.parse(stringValue(init.body, "body")) as Record<string, unknown>,
+      );
+      return new Response(null, { status: fail ? 400 : 204 });
+    },
+  });
+  try {
+    await sync.deliver(state);
+    await sync.deliver({ ...state, version: 2 });
+    assert.equal(bodies[0]!.demoHtml, state.demoHtml);
+    assert.equal(bodies[1]!.demoHtml, undefined);
+    fail = true;
+    await assert.rejects(sync.deliver({ ...state, version: 3 }), /unavailable/);
+    fail = false;
+    await sync.flush();
+    assert.equal(bodies.at(-1)!.demoHtml, state.demoHtml);
+  } finally {
+    sync.close();
+  }
+});

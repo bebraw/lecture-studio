@@ -1,8 +1,9 @@
 import type { Fetcher } from "../shared/models.ts";
 import type { Stage } from "../shared/models.ts";
+export type AudiencePublication = Partial<Stage> & { demoHtml?: string };
 // Only the already-published stage crosses this boundary.
-export function audienceStage(state: Partial<Stage>): Partial<Stage> {
-  const result: Partial<Stage> = {};
+export function audienceStage(state: AudiencePublication): AudiencePublication {
+  const result: AudiencePublication = {};
   for (const key of [
     "live",
     "act",
@@ -24,7 +25,20 @@ export function audienceStage(state: Partial<Stage>): Partial<Stage> {
     if (state[key] !== undefined)
       Object.assign(result, { [key]: structuredClone(state[key]) });
   }
-  if (state.webDemo) {
+  if (
+    state.webDemo &&
+    state.live === true &&
+    !state.blank &&
+    state.demoHtml !== undefined
+  ) {
+    result.webDemo = {
+      id: state.webDemo.id,
+      url: "/audience-demo/" + state.webDemo.id,
+      state: state.webDemo.state,
+    };
+    result.demoHtml = state.demoHtml;
+    result.demoUrl = "";
+  } else if (state.webDemo) {
     result.mode = "material";
     result.html =
       "<p>Follow the interactive demonstration on the projector.</p>";
@@ -52,7 +66,13 @@ export function audienceStage(state: Partial<Stage>): Partial<Stage> {
   }
   // Keep publication below the audience service's 100 KB request limit.
   // Large figures remain available on the projector and in reading exports.
-  if (Buffer.byteLength(JSON.stringify(result), "utf8") > 90000 && result.html)
+  if (
+    Buffer.byteLength(
+      JSON.stringify({ ...result, demoHtml: undefined }),
+      "utf8",
+    ) > 90000 &&
+    result.html
+  )
     result.html = result.html.replace(
       /<img\b[^>]*src="data:image\/[^>]*>/g,
       '<p class="image-notice">View this figure on the projector or in the reading copy.</p>',
@@ -92,7 +112,7 @@ export class AudienceStageSync {
     this.error = "";
     this.closed = false;
   }
-  publish(state: Partial<Stage>) {
+  publish(state: AudiencePublication) {
     if (!this.origin || !this.token || this.closed) return;
     this.pending = JSON.stringify(audienceStage(state));
     if (!this.timer) void this.flush();
@@ -131,7 +151,7 @@ export class AudienceStageSync {
       this.presenceBusy = false;
     }
   }
-  async deliver(state: Partial<Stage>) {
+  async deliver(state: AudiencePublication) {
     if (!this.origin || !this.token) return;
     const body = JSON.stringify(audienceStage(state));
     this.error = "";
@@ -151,18 +171,26 @@ export class AudienceStageSync {
     this.busy = true;
     const body = this.pending;
     try {
+      const publication = JSON.parse(body) as AudiencePublication;
+      const previous = this.sent
+        ? (JSON.parse(this.sent) as AudiencePublication)
+        : {};
+      if (publication.webDemo?.id === previous.webDemo?.id)
+        delete publication.demoHtml;
       const response = await this.fetcher(this.origin + "/presenter/stage", {
         method: "POST",
         headers: {
           "content-type": "application/json",
           authorization: "Bearer " + this.token,
         },
-        body,
+        body: JSON.stringify(publication),
         signal: AbortSignal.timeout(5000),
       });
       await response.body?.cancel();
-      if (!response.ok)
+      if (!response.ok) {
+        this.sent = ""; // Retry with HTML if the receiver lost its stored demo.
         throw new Error("Audience sync failed (" + response.status + ")");
+      }
       this.sent = body;
       this.error = "";
     } catch {

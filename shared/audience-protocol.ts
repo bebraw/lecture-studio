@@ -6,6 +6,7 @@ export const audienceProtocol = {
     "poll-identity",
     "persistent-collections",
     "continuous-questions",
+    "web-demo-mirroring",
   ],
   rooms: Object.keys(audienceRooms),
 };

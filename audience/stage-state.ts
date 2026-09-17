@@ -35,11 +35,29 @@ export class StageState extends DurableObject<Env> {
       "INSERT OR IGNORE INTO feedback_approvals SELECT id,round,text FROM feedback_items WHERE status='approved'",
     );
   }
-  async publish(stage: Record<string, JsonValue>) {
+  async publish(stage: Record<string, JsonValue>, demoHtml?: string) {
     if (stage.live === false)
       this.ctx.storage.sql.exec("UPDATE feedback_meta SET opened=0");
     const previous = await this.read();
-    await this.ctx.storage.put("stage", stage);
+    const published = await this.ctx.storage.transaction(async (storage) => {
+      const view = stage.webDemo;
+      const id =
+        view && typeof view === "object" && !Array.isArray(view)
+          ? view.id
+          : undefined;
+      if (typeof id === "string" && stage.live === true && !stage.blank) {
+        const prior = await storage.get<{ id: string; html: string }>("demo");
+        const html = demoHtml ?? (prior?.id === id ? prior.html : undefined);
+        if (html === undefined) return false;
+        if (demoHtml !== undefined) await storage.put("demo", { id, html });
+      } else {
+        delete stage.webDemo;
+        await storage.delete("demo");
+      }
+      await storage.put("stage", stage);
+      return true;
+    });
+    if (!published) return false;
     if (
       stage.live === true &&
       (previous?.live !== true || !this.feedbackPublic(true))
@@ -49,6 +67,7 @@ export class StageState extends DurableObject<Env> {
         prompt: "What would you like to ask?",
       });
     }
+    return true;
   }
   presence(browser?: string) {
     const sql = this.ctx.storage.sql;
@@ -81,6 +100,15 @@ export class StageState extends DurableObject<Env> {
     return (
       (await this.ctx.storage.get<Record<string, JsonValue>>("stage")) || null
     );
+  }
+  async readDemo(id: string) {
+    return this.ctx.storage.transaction(async (storage) => {
+      const stage = await storage.get<Record<string, JsonValue>>("stage");
+      const demo = await storage.get<{ id: string; html: string }>("demo");
+      return stage?.live === true && !stage.blank && demo?.id === id
+        ? demo.html
+        : null;
+    });
   }
   feedbackPublic(
     questions = false,

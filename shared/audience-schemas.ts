@@ -1,9 +1,26 @@
 import * as v from "valibot";
+import { validateDemoState } from "./web-demo.ts";
 import { stageSchema } from "./schemas.ts";
 
+export const publicDemoSchema = v.strictObject({
+  id: v.pipe(v.string(), v.regex(/^[a-f0-9-]{36}$/)),
+  url: v.pipe(v.string(), v.regex(/^\/audience-demo\/[a-f0-9-]{36}$/)),
+  state: v.pipe(
+    v.string(),
+    v.check((value) => {
+      try {
+        validateDemoState(value);
+        return true;
+      } catch {
+        return false;
+      }
+    }),
+  ),
+});
 // Public publishers may omit the local studio's optional presentation fields.
 export const audienceStageSchema = v.object({
   ...stageSchema.entries,
+  webDemo: v.exactOptional(publicDemoSchema),
   act: v.optional(v.string(), ""),
   mode: v.optional(v.string(), "material"),
   source: v.optional(v.string(), ""),
@@ -26,3 +43,13 @@ export const publicFeedbackSchema = v.nullable(
     open: v.boolean(),
   }),
 );
+
+export const audiencePublicationSchema = v.object({
+  ...audienceStageSchema.entries,
+  demoHtml: v.exactOptional(
+    v.pipe(
+      v.string(),
+      v.check((value) => new TextEncoder().encode(value).length <= 250000),
+    ),
+  ),
+});
