@@ -2783,3 +2783,45 @@ blockquote {
   border-bottom: 1px solid #ccc;
   vertical-align: top;
 }
+
+#feedback-menu.qa-desk .feedback-panel {
+  position: fixed;
+  inset: 72px 24px 24px;
+  width: auto;
+  max-height: none;
+  padding: 24px;
+  box-shadow: 0 10px 50px #0003;
+}
+.qa-desk #feedback-items {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 24px;
+}
+.qa-desk .feedback-group:last-child {
+  grid-column: 1 / -1;
+}
+.feedback-group h3 {
+  font-size: 16px;
+  border-bottom: 2px solid currentColor;
+  padding-bottom: 8px;
+}
+.feedback-item.selected {
+  outline: 2px solid #205b76;
+  outline-offset: 2px;
+  background: #f1f7fa;
+}
+.feedback-panel input[type="checkbox"] {
+  width: auto;
+}
+#feedback-keys {
+  font-size: 12px;
+}
+@media (max-width: 800px) {
+  .qa-desk #feedback-items {
+    grid-template-columns: 1fr;
+  }
+  #feedback-menu.qa-desk .feedback-panel {
+    inset: 64px 8px 8px;
+    padding: 12px;
+  }
+}

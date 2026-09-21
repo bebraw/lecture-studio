@@ -160,7 +160,7 @@ export class StageState extends DurableObject<Env> {
       : [];
     const questionCount = this.ctx.storage.sql
       .exec<{ n: number }>(
-        "SELECT count(*) n FROM feedback_items WHERE status='pending' AND round IN (SELECT round FROM feedback_meta WHERE id=2 AND expires>?)",
+        "SELECT count(*) n FROM feedback_items WHERE status IN ('pending','shortlist') AND round IN (SELECT round FROM feedback_meta WHERE id=2 AND expires>?)",
         Date.now(),
       )
       .one().n;
@@ -240,9 +240,15 @@ export class StageState extends DurableObject<Env> {
         input.mode === "questions" ? 2 : 1,
       );
     else if (
-      ["approve", "done", "answered", "reply-later", "dismissed"].includes(
-        action,
-      )
+      [
+        "approve",
+        "done",
+        "shortlist",
+        "pending",
+        "answered",
+        "reply-later",
+        "dismissed",
+      ].includes(action)
     ) {
       if (typeof input.id !== "string") throw new Error("Choose a response");
       const item = sql
@@ -256,7 +262,13 @@ export class StageState extends DurableObject<Env> {
       if (action === "approve" && item.mode !== "words")
         throw new Error("Only words can be approved for AI context");
       if (
-        ["answered", "reply-later", "dismissed"].includes(action) &&
+        [
+          "shortlist",
+          "pending",
+          "answered",
+          "reply-later",
+          "dismissed",
+        ].includes(action) &&
         item.mode !== "questions"
       )
         throw new Error("Choose a question");

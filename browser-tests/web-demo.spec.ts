@@ -230,6 +230,21 @@ test("Obsidian HTML demos mirror lecturer state to isolated projector and public
         }
       }),
     ).toBe(true);
+    await student.getByText("Ask a question", { exact: true }).click();
+    await student
+      .locator("#student-questions textarea")
+      .fill("Why this bound?");
+    await student.locator("#student-questions button").click();
+    await desk.locator("#feedback-menu > summary").click();
+    await desk.getByRole("button", { name: "Discuss", exact: true }).click();
+    await expect(stage.locator("h1")).toHaveText("Why this bound?");
+    await expect(stage.locator(".web-demo-frame")).toHaveCount(0);
+    await desk
+      .getByRole("button", { name: "Back to slide", exact: true })
+      .click();
+    await expect(projection.locator("#speedup")).toHaveText("4.00×");
+    await expect(mirrored.locator("#speedup")).toHaveText("4.00×");
+    await desk.keyboard.press("Escape");
     await desk.locator("#graph-next").click();
     await expect(student.locator("h1")).toHaveText("Discussion");
     expect((await fetch(new URL(demoUrl!, audience.url))).status).toBe(404);

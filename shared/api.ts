@@ -80,6 +80,8 @@ export const requestSchemas = {
       "close",
       "approve",
       "done",
+      "shortlist",
+      "pending",
       "answered",
       "reply-later",
       "dismissed",

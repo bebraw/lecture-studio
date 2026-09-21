@@ -552,7 +552,11 @@ export function createStudio({
       state.webDemo?.id === projectedWebDemo?.view.id
         ? projectedWebDemo
         : undefined;
-    if (!previewTunnel.pending && (!state.live || state.mode !== "demo"))
+    if (
+      !previewTunnel.pending &&
+      (!state.live ||
+        (state.mode !== "demo" && feedbackPrevious?.stage.mode !== "demo"))
+    )
       previewTunnel.close();
     if (demo) return { ...state, demoHtml: demo.html };
     return state.mode === "demo"
@@ -730,6 +734,8 @@ export function createStudio({
               );
               feedbackPrevious ||= { stage, pollOnStage };
               stage = { ...stage, ...selected, version: ++version };
+              delete stage.webDemo;
+              stage.demoUrl = "";
               pollOnStage = false;
               blank = false;
               return json(res, deskState());

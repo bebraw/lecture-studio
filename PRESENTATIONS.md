@@ -71,3 +71,12 @@ private Obsidian-compatible file. Keep that file outside published materials.
 Export works after Live ends, until the queue expires 24 hours after it opened
 (the desk shows the deadline). Starting a new lecture clears the queue. Sending
 replies is a separate action in your email application.
+
+Open **Responses → Q&A desk** for a focused private moderation view. Questions
+are grouped as pending, shortlisted, follow-ups and completed. Shortlisting never
+publishes a question. Use ↑/↓ to select, S to shortlist, D to discuss, A to mark
+answered live, F for follow-up, and R to return to the previous slide or demo.
+Escape exits the desk. Shortcuts are inactive while editing form fields. The open/closed
+indicator shows whether questions are still accepted; microphone questions can be
+handled alongside the queue without closing submissions. Returning restores the
+previous synchronized demo state.

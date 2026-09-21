@@ -1,3 +1,5 @@
+import { readFile } from "node:fs/promises";
+import type { FeedbackSnapshot } from "../shared/models.ts";
 import { audienceProtocol } from "../shared/audience-protocol.ts";
 import { parse } from "valibot";
 import { requestSchemas } from "../shared/api.ts";
@@ -9,14 +11,21 @@ import { initialDraft } from "../lib/narrative.ts";
 test("desk review publishes only selected questions or approved cloud snapshots", async ({
   context,
 }) => {
-  let snapshot = {
+  let snapshot: FeedbackSnapshot = {
     config: {
       mode: "questions",
       prompt: "Questions",
       round: "one",
       open: true,
     },
-    items: [{ id: "q", text: "Why use HTML?", status: "pending" }],
+    items: [
+      {
+        id: "q",
+        text: "Why use HTML?",
+        status: "pending",
+        email: "private@example.org",
+      },
+    ],
   };
   const poll = new AudiencePoll({
     origin: "https://feedback.invalid",
@@ -47,6 +56,17 @@ test("desk review publishes only selected questions or approved cloud snapshots"
         };
       if (body?.action === "approve")
         snapshot.items.find((x) => x.id === body.id)!.status = "approved";
+      if (
+        body &&
+        [
+          "shortlist",
+          "pending",
+          "reply-later",
+          "answered",
+          "dismissed",
+        ].includes(body.action)
+      )
+        snapshot.items.find((x) => x.id === body.id)!.status = body.action;
       if (body?.action === "done")
         snapshot.items.find((x) => x.id === body.id)!.status = "done";
       return Response.json(snapshot);
@@ -88,6 +108,38 @@ test("desk review publishes only selected questions or approved cloud snapshots"
       .getByRole("button", { name: "Back to slide", exact: true })
       .click();
     await expect(stage.locator("h1")).toHaveText("Original slide");
+    await desk.getByRole("button", { name: "Q&A desk", exact: true }).click();
+    await desk.keyboard.press("ArrowDown");
+    await desk.keyboard.press("s");
+    await expect(
+      desk
+        .locator(".feedback-group")
+        .filter({ hasText: "Shortlisted · up next" }),
+    ).toContainText("Why use HTML?");
+    await desk.keyboard.press("d");
+    await expect(stage.locator("h1")).toHaveText("Why use HTML?");
+    await expect(stage.locator("body")).not.toContainText(
+      "private@example.org",
+    );
+    await desk.keyboard.press("r");
+    await expect(stage.locator("h1")).toHaveText("Original slide");
+    await desk.keyboard.press("f");
+    await expect(
+      desk.locator(".feedback-group").filter({ hasText: "Follow-ups" }),
+    ).toContainText("private@example.org");
+    const downloadEvent = desk.waitForEvent("download");
+    await desk
+      .getByRole("button", {
+        name: "Export selected follow-ups (.md)",
+        exact: true,
+      })
+      .click();
+    const download = await downloadEvent;
+    const contents = await readFile((await download.path())!, "utf8");
+    expect(contents).toContain("private@example.org");
+    expect(contents).toContain("Why use HTML?");
+    expect(contents).toContain("Status: Reply later");
+    await desk.getByRole("button", { name: "Q&A desk", exact: true }).click();
     await desk.locator("#feedback-mode").selectOption("words");
     desk.once("dialog", (dialog) => dialog.accept());
     await desk
