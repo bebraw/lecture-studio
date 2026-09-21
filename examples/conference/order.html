@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Order cancellation</title>
+    <style>
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        padding: 42px;
+        background: #f4f6f8;
+        color: #172635;
+        font:
+          24px/1.4 Arial,
+          sans-serif;
+      }
+      article {
+        background: white;
+        border: 2px solid #53697d;
+        padding: 32px;
+      }
+      h1 {
+        font-size: 32px;
+        margin: 0 0 20px;
+      }
+      #status {
+        font-size: 36px;
+        font-weight: bold;
+      }
+      button {
+        padding: 12px 20px;
+        font: inherit;
+        color: inherit;
+        background: #e0ebf2;
+        border: 2px solid;
+      }
+      #detail {
+        min-height: 72px;
+      }
+      small {
+        display: block;
+        margin-top: 16px;
+      }
+    </style>
+  </head>
+  <body>
+    <article>
+      <h1>Order #1042</h1>
+      <p id="status"></p>
+      <p id="detail"></p>
+      <button id="action" type="button"></button><small id="version"></small>
+    </article>
+    <script>
+      let current = "available";
+      const states = {
+        available: [
+          "Ready to cancel",
+          "The order is open. The client knows version 7.",
+          "Cancel order",
+          "Expected version: 7",
+          "cancelled",
+        ],
+        cancelled: [
+          "Cancellation accepted",
+          "The server changes the order once and returns the new version.",
+          "Show a stale request",
+          "Server version: 8 · Cancelled",
+          "stale",
+        ],
+        stale: [
+          "Stale request rejected",
+          "A second client still sends version 7. The server leaves the cancelled order unchanged.",
+          "Refresh order",
+          "Expected version: 7 · Actual version: 8",
+          "recovered",
+        ],
+        recovered: [
+          "Current state restored",
+          "Refresh retrieves version 8. The client now shows that cancellation has already succeeded.",
+          "Start again",
+          "Client version: 8 · Cancelled",
+          "available",
+        ],
+      };
+      LectureDemo.onState(async (state) => {
+        await Promise.resolve();
+        current = Object.hasOwn(states, state.status)
+          ? state.status
+          : "available";
+        const [status, detail, action, version] = states[current];
+        document.querySelector("#status").textContent = status;
+        document.querySelector("#detail").textContent = detail;
+        document.querySelector("#action").textContent = action;
+        document.querySelector("#version").textContent = version;
+      });
+      document.querySelector("#action").onclick = () =>
+        LectureDemo.setState({ status: states[current][4] });
+    </script>
+  </body>
+</html>

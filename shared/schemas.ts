@@ -1,3 +1,4 @@
+import { demoSequenceSchema } from "./pdf.ts";
 import { revealDefinitionSchema, revealStateSchema } from "./reveals.ts";
 import { identitySchema } from "./identity.ts";
 import * as v from "valibot";
@@ -145,6 +146,7 @@ export const stepSchema = v.object({
   demo: v.exactOptional(
     v.pipe(text, v.regex(/^\.\/(?!.*(?:\.\.|[\\:#?]))[^\r\n]+\.html$/)),
   ),
+  demoSequence: v.exactOptional(demoSequenceSchema),
   demoPoster: v.exactOptional(
     v.pipe(
       text,

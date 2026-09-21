@@ -54,3 +54,39 @@ from reveal numbers, for example `Slide 4 / 12 · Reveal 2 / 3`.
 
 Advance or reverse in any PDF reader to follow the authored sequence. The export
 uses the same flat slide order as the desk's Next button, including detour slides.
+
+## Authored demo sequences
+
+Add `demoSequence` to a slide. Each frame needs a public caption and exactly one
+of `state` (a JSON object string for the slide's `demo`) or `image` (a local asset):
+
+```yaml
+demo: ./order.html
+demoSequence:
+  - state: '{"status":"available"}'
+    caption: The available action uses the version read by the client.
+  - state: '{"status":"cancelled"}'
+    caption: Successful cancellation moves the order to version 8.
+  - image: ./stale-request.svg
+    caption: A stale version 7 request is rejected without changing the order.
+```
+
+Frames appear in authored order and retain the same logical slide number. Static
+image sequences also work without an HTML demo. A `demoPoster` remains the
+single-frame fallback. Use separate slides for block reveals and demo sequences.
+
+HTML frames use the live demo's `LectureDemo.onState` callback in an isolated,
+network-disabled 1200 × 600 viewport. Return a promise for asynchronous rendering:
+the exporter waits for it, then fonts and images, before taking a 2× PNG snapshot.
+The exported PDF runs no demo code. State frames are raster visuals; slide text,
+SVG image alternatives and captions retain vector/text rendering.
+
+Each frame starts fresh with a fixed clock and seeded `Math.random`. Author the
+complete visible state; do not depend on earlier clicks, network calls, timers,
+random identifiers or uncontrolled animation. Unresolved render callbacks fail
+after 10 seconds. Missing images, rendering errors and overflowing demos identify
+the slide and frame; they never silently skip a state.
+
+See [the cancellation example](../examples/conference/talk.md), covering the
+available action, success, a stale request and recovery, with the same HTML demo
+usable live in Studio.

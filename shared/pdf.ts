@@ -32,3 +32,40 @@ declare global {
     renderPdf: (slides: PdfSlide[]) => Promise<void>;
   }
 }
+
+const caption = v.pipe(v.string(), v.minLength(1), v.maxLength(500));
+export const demoSequenceSchema = v.pipe(
+  v.array(
+    v.union([
+      v.strictObject({
+        caption,
+        state: v.pipe(
+          v.string(),
+          v.maxLength(16000),
+          v.check((state) => {
+            try {
+              const value: unknown = JSON.parse(state);
+              return (
+                !!value && typeof value === "object" && !Array.isArray(value)
+              );
+            } catch {
+              return false;
+            }
+          }, "Demo state must be a JSON object string"),
+        ),
+      }),
+      v.strictObject({
+        caption,
+        image: v.pipe(
+          v.string(),
+          v.regex(
+            /^\.\/(?!.*(?:\.\.|[\\:#?%]))[^\r\n]+\.(?:svg|png|jpe?g|gif|webp)$/i,
+          ),
+        ),
+      }),
+    ]),
+  ),
+  v.minLength(1),
+  v.maxLength(30),
+);
+export type DemoFrame = v.InferOutput<typeof demoSequenceSchema>[number];

@@ -1,3 +1,4 @@
+import { captureDemoFrames } from "./pdf-demo.ts";
 import { readFile, realpath, mkdir, rename, rm } from "node:fs/promises";
 import { dirname, resolve, sep, extname } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -34,7 +35,7 @@ export async function exportPdf(
   };
   const deck = parsePresentation(sections(await readFile(input, "utf8")));
   await loadPresentationImages(deck, read);
-  const slides = pdfSlides(deck);
+
   const ratio = options.aspectRatio || deck.pdf?.aspectRatio || "16:9";
   if (!["16:9", "4:3"].includes(ratio))
     throw new Error("Aspect ratio must be 16:9 or 4:3");
@@ -91,6 +92,10 @@ export async function exportPdf(
   const browser = await chromium.launch();
   const temporary = resolve(dirname(output), "." + randomUUID() + ".pdf");
   try {
+    const slides = pdfSlides(
+      deck,
+      await captureDemoFrames(browser, deck, read),
+    );
     const page = await browser.newPage({
       viewport: { width, height },
       serviceWorkers: "block",

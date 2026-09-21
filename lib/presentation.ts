@@ -159,12 +159,19 @@ export function parsePresentation(note: Note): PresentationDefinition {
     )
       throw new Error("Invalid or duplicate presentation step");
     ids.add(s.id);
+    if (s.demoSequence?.some((frame) => "state" in frame) && !s.demo)
+      throw new Error(`Slide ${s.id}: state frames require an HTML demo`);
+    if (s.demoSequence && s.reveals)
+      throw new Error(
+        `Slide ${s.id}: use separate slides for demo sequences and reveals`,
+      );
     const reveals = revealTotal(
       renderMarkdown(s.body || "", { reveals: s.reveals }),
     );
     if (
       reveals &&
-      (s.type === "build" ||
+      (s.demoSequence ||
+        s.type === "build" ||
         s.type === "poll" ||
         s.demo ||
         s.previewOf ||

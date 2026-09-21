@@ -86,3 +86,19 @@ test("PDF reveal pages preserve grouped steps, initial context and logical numbe
   deck.steps[0]!.body = "::: reveal 1\nOnly revealed content.\n:::";
   assert.equal(pdfSlides(deck)[0]!.stage.reveal?.current, 1);
 });
+
+test("demo sequence validation requires explicit states or images and public captions", () => {
+  const deck = parsePresentation(sections(source));
+  deck.steps[0]!.demo = "./order.html";
+  deck.steps[0]!.demoSequence = [
+    { state: '{"status":"ready"}', caption: "Ready to cancel" },
+    { image: "./result.svg", caption: "The result" },
+  ];
+  assert.deepEqual(parsePresentation(sections(authoringMarkdown(deck))), deck);
+  assert.throws(() => pdfSlides(deck), /missing demo visual/);
+  delete deck.steps[0]!.demo;
+  assert.throws(
+    () => parsePresentation(sections(authoringMarkdown(deck))),
+    /state frames require/,
+  );
+});

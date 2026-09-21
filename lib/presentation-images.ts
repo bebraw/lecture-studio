@@ -77,6 +77,8 @@ export async function loadPresentationImages(
       }
     }
     if (step.demoPoster) paths.add(step.demoPoster);
+    for (const frame of step.demoSequence || [])
+      if ("image" in frame) paths.add(frame.image);
     const images: Record<string, string> = {};
     for (const path of paths) {
       const decoded = decodeURIComponent(path);
