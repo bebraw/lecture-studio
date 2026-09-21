@@ -73,16 +73,18 @@ export class RoomState extends DurableObject<Env> implements RoomOperations {
     return row ? (JSON.parse(row.definition) as PollDefinition) : null;
   }
 
-  async preparePoll(definition: PollDefinition): Promise<RoomSnapshot> {
+  async preparePoll(
+    definition: PollDefinition,
+  ): Promise<RoomSnapshot | { error: string }> {
     validateChoices(definition.options);
     const encoded = JSON.stringify(definition);
     const previous = this.getDefinition();
     const snapshot = this.readSnapshot();
     if (previous && JSON.stringify(previous) === encoded) return snapshot;
     if (snapshot.status === "open" || snapshot.totalVotes > 0)
-      throw new Error(
-        "Poll definition conflicts with an open room or existing votes",
-      );
+      return {
+        error: "Poll definition conflicts with existing votes or open voting",
+      };
     this.ctx.storage.transactionSync(() => {
       this.ctx.storage.sql.exec("DELETE FROM choices");
       for (const [position, choice] of definition.options.entries())

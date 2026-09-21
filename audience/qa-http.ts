@@ -132,7 +132,8 @@ export async function handleQa(request: Request, env: Env) {
         return json(await session.privateSession());
       if (operation === "manage" && request.method === "POST") {
         const input = parse(qaActionSchema, await readBody(request));
-        return json(await session.manage(input.action, input.id));
+        const result = await session.manage(input.action, input.id);
+        return json(result, "error" in result ? 400 : 200);
       }
       return json({ error: "Method not allowed" }, 405);
     }

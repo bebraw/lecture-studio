@@ -64,9 +64,25 @@ test("questions remain available during word clouds and resume across Live off/o
     questions,
   );
   const id = snapshot.items[0]!.id;
-  await expect(
-    audience.admin("/presenter/feedback", { action: "approve", id }),
-  ).rejects.toThrow("Only words");
+  const rejected = await audience.request(
+    new URL("/presenter/feedback", audience.url).href,
+    {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ action: "approve", id }),
+    },
+  );
+  expect(rejected.status).toBe(400);
+  expect(await rejected.json()).toEqual({
+    error: "Only words can be approved for AI context",
+  });
+  const unchanged: unknown = await audience
+    .request(
+      new URL("/presenter/feedback?mode=questions", audience.url).href,
+      {},
+    )
+    .then((response) => response.json());
+  expect(unchanged).toEqual(questions);
   await audience.admin("/presenter/feedback", {
     action: "reply-later",
     id,

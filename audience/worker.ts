@@ -365,18 +365,13 @@ export default {
         const poll = validatePoll(await readBody(request));
         await env.STAGE_STATE.getByName("lecture").registerPollRoom(id);
         const snapshot = await env.ROOM_STATE.getByName(id).preparePoll(poll);
+        if ("error" in snapshot)
+          return new Response(snapshot.error, { status: 409 });
         return Response.json(snapshot, {
           headers: { "cache-control": "no-store" },
         });
-      } catch (error) {
-        const conflict =
-          error instanceof Error && error.message.includes("conflicts");
-        return new Response(
-          conflict
-            ? "Poll definition conflicts with existing votes or open voting"
-            : "Invalid poll definition",
-          { status: conflict ? 409 : 400 },
-        );
+      } catch {
+        return new Response("Invalid poll definition", { status: 400 });
       }
     }
     if (!(await roomIds(env)).includes(id))

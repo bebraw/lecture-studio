@@ -66,8 +66,10 @@ export async function feedbackRequest(
     )
       return json({ error: "Same-origin submission required" }, 403);
     const body = await readBody(request);
-    if (admin)
-      return json(await object.feedbackManage(String(body.action), body));
+    if (admin) {
+      const result = await object.feedbackManage(String(body.action), body);
+      return json(result, "error" in result ? 400 : 200);
+    }
     if (typeof body.round !== "string" || typeof body.text !== "string")
       return json({ error: "Missing response" }, 400);
     const existing = request.headers

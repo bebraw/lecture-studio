@@ -203,19 +203,19 @@ export class StageState extends DurableObject<Env> {
     const sql = this.ctx.storage.sql;
     if (action === "start") {
       if ((await this.read())?.live !== true)
-        throw new Error("Turn Live on first");
+        return { error: "Turn Live on first" };
       if (
         !["questions", "words"].includes(String(input.mode)) ||
         typeof input.prompt !== "string" ||
         !input.prompt.trim() ||
         input.prompt.length > 200
       )
-        throw new Error("Choose a mode and a short prompt");
+        return { error: "Choose a mode and a short prompt" };
       const key =
         input.collection ??
         (input.mode === "questions" ? "questions" : crypto.randomUUID());
       if (typeof key !== "string" || !key || key.length > 240)
-        throw new Error("Invalid collection identity");
+        return { error: "Invalid collection identity" };
       const prior = sql
         .exec<{ round: string; expires: number }>(
           "SELECT round,expires FROM feedback_collections WHERE collection=? AND expires>?",
@@ -269,7 +269,7 @@ export class StageState extends DurableObject<Env> {
         "dismissed",
       ].includes(action)
     ) {
-      if (typeof input.id !== "string") throw new Error("Choose a response");
+      if (typeof input.id !== "string") return { error: "Choose a response" };
       const item = sql
         .exec<{ mode: string }>(
           "SELECT c.mode FROM feedback_items i JOIN feedback_collections c ON c.round=i.round WHERE i.id=? AND c.expires>?",
@@ -277,9 +277,9 @@ export class StageState extends DurableObject<Env> {
           Date.now(),
         )
         .toArray()[0];
-      if (!item) throw new Error("Response expired or unavailable");
+      if (!item) return { error: "Response expired or unavailable" };
       if (action === "approve" && item.mode !== "words")
-        throw new Error("Only words can be approved for AI context");
+        return { error: "Only words can be approved for AI context" };
       if (
         [
           "shortlist",
@@ -290,7 +290,7 @@ export class StageState extends DurableObject<Env> {
         ].includes(action) &&
         item.mode !== "questions"
       )
-        throw new Error("Choose a question");
+        return { error: "Choose a question" };
       if (action === "approve")
         sql.exec(
           "INSERT OR IGNORE INTO feedback_approvals SELECT id,round,text FROM feedback_items WHERE id=?",
@@ -301,7 +301,7 @@ export class StageState extends DurableObject<Env> {
         action === "approve" ? "approved" : action,
         input.id,
       );
-    } else throw new Error("Unknown action");
+    } else return { error: "Unknown action" };
     return this.feedbackPrivate(input.mode === "questions");
   }
   async feedbackSubmit(

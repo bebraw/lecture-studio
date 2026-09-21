@@ -77,8 +77,13 @@ test("Obsidian polls prepare new rooms and protect votes from changed definition
     },
     { ...definition, options: [...definition.options].reverse() },
     { ...definition, defaultId: "fast" },
-  ])
-    expect((await prepare(changed)).status).toBe(409);
+  ]) {
+    const rejected = await prepare(changed);
+    expect(rejected.status).toBe(409);
+    expect(await rejected.text()).toBe(
+      "Poll definition conflicts with existing votes or open voting",
+    );
+  }
   const after: unknown = await audience
     .request(new URL("/api/rooms/" + id, audience.url).href, {})
     .then((r) => r.json());

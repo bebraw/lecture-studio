@@ -111,11 +111,14 @@ export class QuestionSession extends StageState {
     );
   }
   async manage(action: string, id?: string) {
-    await this.feedbackManage(action === "open" ? "start" : action, {
-      mode: "questions",
-      prompt: "What would you like to ask?",
-      ...(id ? { id } : {}),
-    });
-    return this.privateSession();
+    const result = await this.feedbackManage(
+      action === "open" ? "start" : action,
+      {
+        mode: "questions",
+        prompt: "What would you like to ask?",
+        ...(id ? { id } : {}),
+      },
+    );
+    return "error" in result ? result : this.privateSession();
   }
 }

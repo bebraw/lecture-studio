@@ -250,6 +250,14 @@ test("moderator keys, cookies and writes are scoped, revocable and origin protec
     expect(
       (await api("/q/session-a/manage", { action: "open" })).status(),
     ).toBe(200);
+    const invalidAction = await api("/q/session-a/manage", {
+      action: "answered",
+      id: "missing-question",
+    });
+    expect(invalidAction.status()).toBe(400);
+    expect(await invalidAction.json()).toEqual({
+      error: "Response expired or unavailable",
+    });
     const info: unknown = await (
       await context.request.get(
         new URL("/q/session-a/state", audience.url).href,
