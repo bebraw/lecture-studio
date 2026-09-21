@@ -5,6 +5,9 @@ export const studyStepSchema = v.object({
   title: text,
   chapter: text,
   html: text,
+  revealTotal: v.exactOptional(
+    v.pipe(v.number(), v.integer(), v.minValue(1), v.maxValue(20)),
+  ),
   source: text,
   explanationHtml: text,
   identityHtml: v.exactOptional(text),

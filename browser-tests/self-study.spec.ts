@@ -31,6 +31,18 @@ test.beforeAll(async () => {
     join(directory, "examples/demos/poster.svg"),
     '<svg xmlns="http://www.w3.org/2000/svg" width="200" height="100"><text y="50">2.5×</text></svg>',
   );
+  const revealSource = await readFile(source, "utf8");
+  const slideStart = revealSource.indexOf("## Slide:");
+  const nextSlide = revealSource.indexOf(
+    "<!-- speaker-notes -->",
+    slideStart + 1,
+  );
+  await writeFile(
+    source,
+    revealSource.slice(0, nextSlide) +
+      "\n::: reveal 1\nFirst revealed point.\n:::\n\n::: reveal 2\nSecond revealed point.\n:::\n\n" +
+      revealSource.slice(nextSlide),
+  );
   const measurement = join(directory, "examples/self-study/measurement.md");
   await writeFile(
     measurement,
@@ -266,4 +278,27 @@ test("an authored initialization error keeps the poster visible", async ({
   await expect(page.locator(".demo-status")).toContainText("could not start");
   await expect(page.locator(".demo-poster")).toBeVisible();
   await expect(page.locator(".demo-host")).toBeHidden();
+});
+
+test("self-study reveals step locally, persist and expand for reading and print", async ({
+  page,
+}) => {
+  await page.goto(origin + "scalability/index.html#slide-pressure");
+  const section = page.locator("#slide-pressure");
+  await expect(section.locator('[data-reveal-step="1"]')).toBeHidden();
+  await section.getByRole("button", { name: "Next reveal" }).click();
+  await expect(section.locator('[data-reveal-step="1"]')).toBeVisible();
+  await expect(section.locator('[data-reveal-step="2"]')).toBeHidden();
+  await page.reload();
+  await expect(section.locator('[data-reveal-step="1"]')).toBeVisible();
+  await expect(section.locator('[data-reveal-step="2"]')).toBeHidden();
+  await page.emulateMedia({ media: "print" });
+  await expect(section.locator('[data-reveal-step="2"]')).toBeVisible();
+  await page.emulateMedia({ media: "screen" });
+  await page.locator("#reading-mode").click();
+  await expect(section.locator('[data-reveal-step="2"]')).toBeVisible();
+  await expect(section.locator(".reveal-controls")).toBeHidden();
+  await page.locator("#reading-mode").click();
+  await section.getByRole("button", { name: "Previous reveal" }).click();
+  await expect(section.locator('[data-reveal-step="1"]')).toBeHidden();
 });

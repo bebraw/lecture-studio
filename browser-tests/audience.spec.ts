@@ -499,6 +499,7 @@ test("public capabilities describe required rooms without activating a lecture",
       "continuous-questions",
       "web-demo-mirroring",
       "poll-preparation",
+      "progressive-reveals",
       "private-question-follow-ups",
     ],
   });

@@ -17,7 +17,8 @@ import type {
   BuildInput,
 } from "../shared/models.ts";
 import { validatePoll } from "./audience-poll.ts";
-import { publicStage } from "./material.ts";
+import { revealTotal } from "./reveals.ts";
+import { publicStage, renderMarkdown } from "./material.ts";
 import { initialDraft } from "./narrative.ts";
 const defaultTheme = {
   background: "#ffffff",
@@ -155,6 +156,23 @@ export function parsePresentation(note: Note): PresentationDefinition {
     )
       throw new Error("Invalid or duplicate presentation step");
     ids.add(s.id);
+    const reveals = revealTotal(
+      renderMarkdown(s.body || "", { reveals: s.reveals }),
+    );
+    if (
+      reveals &&
+      (s.type === "build" ||
+        s.type === "poll" ||
+        s.demo ||
+        s.previewOf ||
+        s.layersDemo ||
+        s.teachingDemo ||
+        s.wordsFrom ||
+        s.reviewWordsFrom)
+    )
+      throw new Error(
+        "Use reveals on static title, material or question slides, separate from live demos, polls and generated content",
+      );
     if (s.chapter !== undefined && !text(s.chapter, 100))
       throw new Error("Invalid chapter");
     if (
@@ -265,6 +283,8 @@ export class PresentationSession {
   defaults: Set<string>;
   approvedWords: Record<string, string[]> = {};
   loadedAt: string;
+  revealSteps: Record<string, number> = {};
+  revealTotals = new Map<string, number>();
 
   constructor(definition: PresentationDefinition, path: string) {
     this.definition = definition;
@@ -276,6 +296,11 @@ export class PresentationSession {
     this.runs = [];
     this.defaults = new Set();
     this.loadedAt = new Date().toISOString();
+    for (const step of definition.steps)
+      this.revealTotals.set(
+        step.id,
+        revealTotal(renderMarkdown(step.body || "", { reveals: step.reveals })),
+      );
   }
   step(): Step {
     const step = this.definition.steps.find((s) => s.id === this.current);
@@ -287,12 +312,48 @@ export class PresentationSession {
     const number = steps.findIndex((step) => step.id === this.current) + 1;
     return { number, total: steps.length, progress: number / steps.length };
   }
+  reveal() {
+    const total = this.revealTotals.get(this.current) || 0;
+    return total
+      ? { current: this.revealSteps[this.current] || 0, total }
+      : undefined;
+  }
+  private stepReveal(direction: string) {
+    const reveal = this.reveal();
+    if (!reveal || (direction !== "next" && direction !== "previous"))
+      return false;
+    if (
+      direction === "next"
+        ? reveal.current >= reveal.total
+        : reveal.current === 0
+    )
+      return false;
+    this.revealSteps[this.current] =
+      reveal.current + (direction === "next" ? 1 : -1);
+    return true;
+  }
+  // Presenter controls keep the existing flat note order, including detours.
+  navigate(direction: "next" | "previous") {
+    if (this.stepReveal(direction)) return;
+    const steps = this.definition.steps;
+    const target =
+      steps[
+        steps.findIndex((step) => step.id === this.current) +
+          (direction === "next" ? 1 : -1)
+      ];
+    if (!target) return;
+    this.move("select", target.id);
+    if (direction === "previous")
+      this.revealSteps[this.current] = this.revealTotals.get(this.current) || 0;
+  }
   move(action: string, id?: string) {
     const s = this.step();
+    if (this.stepReveal(action)) return;
     if (action === "select") {
       if (!this.definition.steps.some((x) => x.id === id))
         throw new Error("Unknown step");
       this.current = id!;
+      this.revealSteps[this.current] = 0;
       this.history = [];
       this.returns = [];
       return;
@@ -306,7 +367,12 @@ export class PresentationSession {
       return;
     }
     if (action === "previous") {
-      this.current = this.history.pop() || this.current;
+      const previous = this.history.pop();
+      if (previous) {
+        this.current = previous;
+        this.revealSteps[this.current] =
+          this.revealTotals.get(this.current) || 0;
+      }
       return;
     }
     const target = action === "detour" ? id : s.next;
@@ -317,6 +383,7 @@ export class PresentationSession {
         this.returns.push({ id: this.current, depth: this.history.length });
       this.history.push(this.current);
       this.current = target;
+      this.revealSteps[this.current] = 0;
     }
   }
   resolve() {
@@ -392,8 +459,10 @@ export class PresentationSession {
   }
   state() {
     return {
+      ...(this.reveal() ? { reveal: this.reveal()! } : {}),
       theme: this.definition.theme,
       preview: {
+        ...(this.reveal() ? { reveal: this.reveal()! } : {}),
         ...(presentationIdentity(this.definition, this.step())
           ? { identity: presentationIdentity(this.definition, this.step())! }
           : {}),
@@ -415,6 +484,7 @@ export class PresentationSession {
                         .poll!.options.map((o) => o.label)
                         .join("\n\n")
                     : ""),
+            ...(this.step().reveals ? { reveals: this.step().reveals! } : {}),
             imageSources: imageSources(this.step()),
             source: this.step().source || "",
             allowRemoteImages: this.step().allowRemoteImages === true,
@@ -443,7 +513,7 @@ export class PresentationSession {
         this.definition.steps.find((s) => s.id === id)!,
       ),
       canReturn: !!this.returns.length,
-      canPrevious: !!this.history.length,
+      canPrevious: !!this.history.length || (this.reveal()?.current || 0) > 0,
       resolved: this.resolve(),
       runs: this.runs,
     };

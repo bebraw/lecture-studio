@@ -35,6 +35,7 @@ export function renderHandout(deck: PresentationDefinition) {
         {
           allowRemoteImages: step.allowRemoteImages,
           imageSources: imageSources(step),
+          reveals: step.reveals,
         },
       );
       if (step.chapter === "References")

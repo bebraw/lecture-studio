@@ -1,3 +1,4 @@
+import { revealDefinitionSchema, revealStateSchema } from "./reveals.ts";
 import { identitySchema } from "./identity.ts";
 import * as v from "valibot";
 import type { Stage, FeedbackSnapshot, Note } from "./models.ts";
@@ -35,6 +36,7 @@ const buildSchema = v.object({
   outcome: v.exactOptional(v.nullable(text)),
 });
 export const stageSchema = v.object({
+  reveal: v.exactOptional(revealStateSchema),
   identity: v.exactOptional(identitySchema),
   webDemo: v.exactOptional(webDemoSchema),
   act: text,
@@ -115,6 +117,7 @@ const pollSchema = v.object({
   joinUrl: text,
 });
 export const stepSchema = v.object({
+  reveals: v.exactOptional(revealDefinitionSchema),
   hideIdentity: v.exactOptional(v.boolean()),
   study: v.exactOptional(
     v.strictObject({
@@ -166,6 +169,7 @@ const inputSchema = v.object({
   revision: v.nullable(count),
 });
 const presentationSchema = v.object({
+  reveal: v.exactOptional(revealStateSchema),
   webDemo: v.exactOptional(webDemoSchema),
   demo: v.exactOptional(
     v.object({

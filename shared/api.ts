@@ -58,6 +58,9 @@ export const requestSchemas = {
   "presentation/unload": empty,
   "presentation/select": id,
   "presentation/detour": id,
+  "presentation/navigate": v.strictObject({
+    direction: v.picklist(["next", "previous"]),
+  }),
   "presentation/next": empty,
   "presentation/previous": empty,
   "presentation/return": empty,

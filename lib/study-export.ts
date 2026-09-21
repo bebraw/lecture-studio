@@ -1,3 +1,4 @@
+import { revealTotal } from "./reveals.ts";
 import { identityHtml } from "../shared/identity.ts";
 import {
   imageSources,
@@ -64,6 +65,17 @@ export function studySteps(deck: PresentationDefinition): StudyStep[] {
         step.type === "question" ||
         step.wordCloud ||
         step.study?.prompt !== undefined;
+      const html = renderMarkdown(
+        step.type === "build"
+          ? "This classroom build is not included. Use the explanation or reading references below."
+          : step.body || "",
+        {
+          allowRemoteImages: step.allowRemoteImages === true,
+          imageSources: imageSources(step),
+          reveals: step.reveals,
+        },
+      );
+      const total = revealTotal(html);
       // Explicit public allowlist. Never spread a Step or serialize the source deck.
       return {
         ...(deck.identity
@@ -78,15 +90,8 @@ export function studySteps(deck: PresentationDefinition): StudyStep[] {
         title: step.title,
         chapter: step.chapter || "",
         source: step.source || "",
-        html: renderMarkdown(
-          step.type === "build"
-            ? "This classroom build is not included. Use the explanation or reading references below."
-            : step.body || "",
-          {
-            allowRemoteImages: step.allowRemoteImages === true,
-            imageSources: imageSources(step),
-          },
-        ),
+        html,
+        ...(total ? { revealTotal: total } : {}),
         ...(step.demoPoster
           ? {
               posterHtml: renderMarkdown(posterMarkdown(step), {
@@ -319,6 +324,10 @@ export async function exportStudy(configPath: string, outputPath: string) {
     await copyFile(
       join(root, "public/identity.css"),
       join(temporary, "assets/identity.css"),
+    );
+    await copyFile(
+      join(root, "public/reveals.css"),
+      join(temporary, "assets/reveals.css"),
     );
     await writeFile(join(temporary, "course.json"), json(course));
     await writeFile(join(temporary, "index.html"), coursePage(course));

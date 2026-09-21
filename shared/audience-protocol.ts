@@ -8,6 +8,7 @@ export const audienceProtocol = {
     "continuous-questions",
     "web-demo-mirroring",
     "poll-preparation",
+    "progressive-reveals",
     "private-question-follow-ups",
   ],
   rooms: Object.keys(audienceRooms),

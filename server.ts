@@ -304,6 +304,7 @@ export function createStudio({
       allowRemoteImages: s.allowRemoteImages === true,
     });
     draft.imageSources = imageSources(s);
+    if (s.reveals) draft.reveals = s.reveals;
     publishedDraft = { ...draft };
     stage = {
       ...publicStage(draft, ++version),
@@ -314,6 +315,7 @@ export function createStudio({
       theme: presentation.definition.theme,
       slidePosition: presentation.position(),
       slideType: s.type,
+      ...(presentation.reveal() ? { reveal: presentation.reveal()! } : {}),
     };
     blank = false;
   };
@@ -740,6 +742,7 @@ export function createStudio({
               feedbackPrevious ||= { stage, pollOnStage };
               stage = { ...stage, ...selected, version: ++version };
               delete stage.webDemo;
+              delete stage.reveal;
               stage.demoUrl = "";
               pollOnStage = false;
               blank = false;
@@ -984,6 +987,14 @@ export function createStudio({
                     webDemo: { ...demo.view },
                     version: ++version,
                   };
+                }
+              } else if (op === "navigate") {
+                presentation.navigate(
+                  body.direction === "previous" ? "previous" : "next",
+                );
+                if (live) {
+                  await openGraphPoll();
+                  await showGraph();
                 }
               } else if (op === "select") {
                 presentation.move("select", stringValue(body.id, "step"));
@@ -1419,6 +1430,7 @@ export function createStudio({
         "/debug.mjs": "debug.mjs",
         "/style.css": "style.css",
         "/identity.css": "identity.css",
+        "/reveals.css": "reveals.css",
         "/desk.mjs": "desk.mjs",
         "/stage.mjs": "stage.mjs",
         "/shared.mjs": "shared.mjs",

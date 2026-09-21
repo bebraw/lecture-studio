@@ -1,3 +1,4 @@
+import { applyReveals } from "./reveals.ts";
 import * as v from "valibot";
 import {
   studyCourseSchema,
@@ -12,6 +13,13 @@ const savedSchema = v.object({
   completed: v.array(v.string()),
   demos: v.record(v.string(), v.string()),
   choices: v.record(v.string(), v.string()),
+  reveals: v.optional(
+    v.record(
+      v.string(),
+      v.pipe(v.number(), v.integer(), v.minValue(0), v.maxValue(20)),
+    ),
+    {},
+  ),
 });
 type Saved = v.InferOutput<typeof savedSchema>;
 const keyFor = (course: string, module: string, revision: string) =>
@@ -32,7 +40,7 @@ function load(key: string): Saved {
       "Browser storage is unavailable. You can still explore; progress will last for this page only.",
     );
   }
-  return { last: "", completed: [], demos: {}, choices: {} };
+  return { last: "", completed: [], demos: {}, choices: {}, reveals: {} };
 }
 async function diagrams(root: HTMLElement) {
   const blocks = [
@@ -66,6 +74,7 @@ function mountModule(module: StudyModule) {
   const key = keyFor(module.courseId, module.id, module.revision);
   const saved = load(key);
   let reading = false;
+  const updateReveals = new Map<string, () => void>();
   const validIds = new Set(module.steps.map((step) => step.id));
   saved.completed = [
     ...new Set(saved.completed.filter((id) => validIds.has(id))),
@@ -101,6 +110,7 @@ function mountModule(module: StudyModule) {
     save();
     for (const step of module.steps) {
       section(step.id).hidden = !reading && step.id !== id;
+      updateReveals.get(step.id)?.();
       element(`[data-step-link="${step.id}"]`).setAttribute(
         "aria-current",
         step.id === id ? "step" : "false",
@@ -114,6 +124,39 @@ function mountModule(module: StudyModule) {
   };
   for (const step of module.steps) {
     const root = section(step.id);
+    if (step.revealTotal) {
+      const total = step.revealTotal;
+      saved.reveals[step.id] = Math.min(total, saved.reveals[step.id] || 0);
+      const controls = document.createElement("div");
+      controls.className = "reveal-controls";
+      controls.innerHTML =
+        '<button type="button">Previous reveal</button><span role="status"></span><button type="button">Next reveal</button>';
+      root.querySelector(".prose")!.before(controls);
+      const [previous, next] = controls.querySelectorAll("button");
+      const refresh = () => {
+        const current = saved.reveals[step.id] || 0;
+        controls.hidden = reading;
+        applyReveals(root, reading ? total : current);
+        controls.querySelector("span")!.textContent =
+          "Reveal " + current + " / " + total;
+        previous!.disabled = current === 0;
+        next!.disabled = current === total;
+      };
+      for (const [button, delta] of [
+        [previous!, -1],
+        [next!, 1],
+      ] as const)
+        button.onclick = () => {
+          saved.reveals[step.id] = Math.max(
+            0,
+            Math.min(total, (saved.reveals[step.id] || 0) + delta),
+          );
+          refresh();
+          save();
+        };
+      updateReveals.set(step.id, refresh);
+      refresh();
+    }
     const complete = root.querySelector<HTMLButtonElement>(".complete-step")!;
     complete.hidden = false;
     complete.onclick = () => {

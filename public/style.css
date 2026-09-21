@@ -1,3 +1,4 @@
+@import url("./reveals.css");
 @import url("./identity.css");
 
 :root {
@@ -2844,4 +2845,26 @@ blockquote {
 }
 .qa-desk #feedback-items {
   margin-top: 20px;
+}
+
+#reveal-status {
+  font-variant-numeric: tabular-nums;
+  font-size: 13px;
+  padding: 8px;
+}
+#reveal-preview {
+  margin: 12px 0;
+  border-top: 1px solid var(--line);
+  padding-top: 10px;
+}
+#reveal-preview summary {
+  cursor: pointer;
+  font-size: 13px;
+}
+.reveal-preview-surface {
+  position: relative;
+  width: 100%;
+  height: min(40vw, 400px);
+  overflow: hidden;
+  margin-top: 10px;
 }

@@ -1,3 +1,4 @@
+import { applyReveals } from "./reveals.ts";
 import type { Stage, Theme, BuildState } from "../shared/models.ts";
 import {
   parseApiResponse,
@@ -108,12 +109,24 @@ export async function api<P extends ApiPath>(
   return parseApiResponse(path, data);
 }
 import { renderWebDemo } from "./web-demo.ts";
+const surfaces = new WeakMap<
+  HTMLElement,
+  { html: string; first: Element | null }
+>();
 export function renderSurface(host: HTMLElement, stage: Partial<Stage>) {
   const sameDemo =
     stage.webDemo &&
     host.querySelector<HTMLIFrameElement>(".web-demo-frame")?.dataset.demoId ===
       stage.webDemo.id;
-  if (!sameDemo) host.innerHTML = surface(stage);
+  const html = surface(stage);
+  const previous = surfaces.get(host);
+  if (
+    !sameDemo &&
+    (previous?.html !== html || previous.first !== host.firstElementChild)
+  )
+    host.innerHTML = html;
+  surfaces.set(host, { html, first: host.firstElementChild });
+  applyReveals(host, stage.reveal?.current ?? 20);
   if (stage.webDemo) {
     const viewport = host.querySelector<HTMLElement>(".web-demo-viewport");
     if (viewport) renderWebDemo(viewport, stage.webDemo);

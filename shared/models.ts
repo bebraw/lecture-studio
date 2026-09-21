@@ -1,3 +1,4 @@
+import type { RevealDefinition, RevealState } from "./reveals.ts";
 import type { PresentationIdentity } from "./identity.ts";
 export type JsonValue =
   string | number | boolean | null | JsonValue[] | { [key: string]: JsonValue };
@@ -12,6 +13,7 @@ export type Theme = Record<
   string
 >;
 export interface Draft {
+  reveals?: RevealDefinition;
   imageSources?: Record<string, string>;
   act: string;
   mode: string;
@@ -30,6 +32,7 @@ export interface BuildState {
   outcome?: string | null;
 }
 export interface Stage {
+  reveal?: RevealState;
   identity?: PresentationIdentity;
   webDemo?: WebDemo;
   act: string;
@@ -116,6 +119,7 @@ export interface Dependency {
   instructions: Record<string, string>;
 }
 export interface Step {
+  reveals?: RevealDefinition;
   hideIdentity?: boolean;
   study?: {
     exclude?: boolean;

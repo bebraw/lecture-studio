@@ -1,3 +1,5 @@
+import { installReveals, decorateReveals } from "./reveals.ts";
+import type { RevealDefinition } from "../shared/reveals.ts";
 import type { Draft, Stage, Note } from "../shared/models.ts";
 import { record } from "../shared/errors.ts";
 import MarkdownIt from "markdown-it";
@@ -39,12 +41,15 @@ export function renderMarkdown(
   {
     allowRemoteImages = false,
     imageSources = {},
+    reveals,
   }: {
     allowRemoteImages?: boolean | undefined;
     imageSources?: Record<string, string>;
+    reveals?: RevealDefinition | undefined;
   } = {},
 ) {
   const md = new MarkdownIt({ html: false, linkify: false, typographer: true });
+  installReveals(md);
   const defaultFence = md.renderer.rules.fence!;
   md.renderer.rules.fence = (tokens, index, options, env, self) => {
     const token = tokens[index]!;
@@ -142,7 +147,7 @@ export function renderMarkdown(
       return label.replace(/[<>*_[\]]/g, "");
     },
   );
-  return md.render(text);
+  return decorateReveals(md.render(text), reveals);
 }
 export function validateDraft(input: unknown): Draft {
   const value = record(input);

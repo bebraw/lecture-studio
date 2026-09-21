@@ -118,6 +118,16 @@ export function mountPresentations({ call, update }: MountOptions) {
   const stagePanel = $("current-stage-panel");
   $("graph-detours").before(stagePanel);
   const updatePollMonitor = mountPollMonitor(stagePanel);
+  const revealStatus = document.createElement("span");
+  revealStatus.id = "reveal-status";
+  revealStatus.role = "status";
+  $("graph-next").after(revealStatus);
+  const revealPreview = document.createElement("details");
+  revealPreview.id = "reveal-preview";
+  revealPreview.innerHTML =
+    '<summary>Preview all reveal content · private</summary><div class="reveal-preview-surface"></div>';
+  stagePanel.after(revealPreview);
+  let revealPreviewKey = "";
   const demoController = document.createElement("section");
   demoController.id = "web-demo-controller";
   demoController.hidden = true;
@@ -369,14 +379,9 @@ export function mountPresentations({ call, update }: MountOptions) {
     if (navigating) return;
     navigating = true;
     try {
-      if (preparing()) {
-        const id = neighbour(direction);
-        if (id) await run("presentation/select", { id });
-      } else {
-        const id = neighbour(direction);
-        if (id && (await run("presentation/select", { id })))
-          await run("presentation/show");
-      }
+      await run("presentation/navigate", {
+        direction: direction === "previous" ? "previous" : "next",
+      });
     } finally {
       if (keyboard) revealSelectedSlide();
       navigating = false;
@@ -578,7 +583,22 @@ export function mountPresentations({ call, update }: MountOptions) {
         outline.append(button);
       }
     }
+    revealStatus.hidden = !p?.reveal;
+    revealPreview.hidden = !p?.reveal;
     if (!p) return;
+    if (p.reveal) {
+      revealStatus.textContent =
+        "Reveal " + p.reveal.current + " / " + p.reveal.total;
+      const key = p.loadedAt + ":" + p.current;
+      if (key !== revealPreviewKey) {
+        revealPreviewKey = key;
+        renderSlidePreview(query(".reveal-preview-surface", revealPreview), {
+          ...p.preview,
+          theme: p.theme,
+          reveal: { ...p.reveal, current: p.reveal.total },
+        });
+      }
+    }
     const shown = data.projection;
     const preview = preparing() || !shown ? p.preview : shown;
     const kind = shown?.blank
@@ -638,8 +658,12 @@ export function mountPresentations({ call, update }: MountOptions) {
     $("graph-notes").hidden = !p.step.notes;
     $("graph-prompt").hidden = p.step.type !== "build";
     $("graph-prompt").textContent = p.resolved.prompt;
-    $("graph-next").textContent = "Next →";
-    $("graph-next").disabled = !neighbour("next");
+    $("graph-next").textContent =
+      p.reveal && p.reveal.current < p.reveal.total
+        ? "Reveal next →"
+        : "Next →";
+    $("graph-next").disabled =
+      !neighbour("next") && !(p.reveal && p.reveal.current < p.reveal.total);
     skipDemo.hidden = !p.step.previewOf;
     skipDemo.disabled = !neighbour("next");
     preparedDemo.hidden = !p.demo?.prepared;
@@ -665,7 +689,8 @@ export function mountPresentations({ call, update }: MountOptions) {
       ? `${buildTitle || "Build"} is still active. Continue through the slides or skip this demo; generation keeps running. To start another build, stop this one and wait for it to finish stopping.`
       : "";
     $("graph-previous").textContent = "← Previous";
-    $("graph-previous").disabled = !neighbour("previous");
+    $("graph-previous").disabled =
+      !neighbour("previous") && !(p.reveal && p.reveal.current > 0);
     $("graph-return").hidden = true;
     $("graph-defaults").hidden = !p.resolved.missing.length;
     $("graph-build").hidden = p.step.type !== "build";

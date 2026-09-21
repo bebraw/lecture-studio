@@ -222,6 +222,7 @@ export default {
           "version",
           "theme",
           "identity",
+          "reveal",
           "blank",
           "build",
           "slidePosition",
@@ -321,6 +322,7 @@ export default {
         [
           "/style.css",
           "/identity.css",
+          "/reveals.css",
           "/audience.css",
           "/audience.mjs",
           "/seminar-browser.mjs",

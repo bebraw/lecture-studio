@@ -330,3 +330,62 @@ The presentation metadata supports `identity` with `presenter`, `affiliation`,
 `contactEmail`, local `logo`, `joinUrl`, optional local `qrCode`, and `hideOn`.
 Use `hideIdentity: true` on a slide to give its content the full space. See the
 [identity example and asset limits](../PRESENTATIONS.md#reusable-presentation-identity).
+
+## Progressive reveals
+
+Use ordered containers to introduce points, annotations or process stages on a
+static title, material or question slide:
+
+```markdown
+This context is always visible.
+
+::: reveal 1
+
+- Introduce the first point.
+  :::
+
+::: reveal 1
+A second block appears at the same time.
+:::
+
+::: reveal 2
+Explain the next stage.
+:::
+```
+
+Steps start at 1 and must be consecutive (up to 20). Each container can hold
+multiple Markdown blocks. Containers cannot nest. Unrevealed blocks reserve their
+layout space and cannot receive keyboard focus. Reveals have no animation.
+
+For comparisons, keep the whole table visible and emphasize selected body rows
+at each step. Add this to the slide's YAML metadata:
+
+```yaml
+reveals:
+  rows:
+    - step: 1
+      table: 1
+      rows: [1, 2]
+    - step: 2
+      table: 1
+      rows: [3]
+```
+
+Tables and body rows are numbered from 1; headers do not count. Multiple rows
+can share a step, including a step used by content containers. Emphasis moves to
+the current step's rows while surrounding rows remain readable. A table inside a
+reveal container must be visible by the time its rows are emphasized.
+
+**Next** reveals each step before advancing. **Previous** hides the current step;
+going back from step 0 opens the previous slide fully revealed. Selecting a slide
+in the outline starts it at step 0. The desk shows the current step and provides
+**Preview all reveal content · private**. The projector and audience devices,
+including late joiners, receive the same step. Reveals control presentation pacing;
+the complete slide content is included in the page.
+
+Print/PDF and reading exports show everything. Self-study exports have local
+Previous reveal/Next reveal controls and save each reader's step on their device;
+reading mode expands all content. Slides without reveals behave as before.
+
+Use separate slides for reveals and live polls, builds, embedded demos or generated
+review content. See [the complete example](../examples/progressive-reveals.md).
