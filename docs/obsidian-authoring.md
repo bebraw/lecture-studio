@@ -154,10 +154,12 @@ links too, or remove them to use the new document order.
 
 ## Poll and dependent build
 
-The room must already be configured in the audience service. Its option IDs and
-labels must match the note. The current room definitions are in
-[`shared/audience-rooms.ts`](../shared/audience-rooms.ts); a new room requires a
-code/configuration change and deployment, not just an Obsidian edit.
+The note is the source of truth for question wording, option IDs, labels and the
+default. Explicitly loading/reloading the presentation prepares its rooms in the
+audience service while Live is off; new polls need no service deployment. The
+readiness indicator confirms the prepared poll count. Changed definitions are
+rejected if a room is open or contains votes. Use a new room ID for a revised
+question to preserve earlier votes. The bundled legacy rooms remain available.
 
 ````markdown
 ## Slide: Choose a theme
@@ -321,3 +323,10 @@ Only the currently projected live demo is uploaded. Loading a presentation or ed
 The public HTML runs in an opaque-origin sandbox, with scripts allowed but network access, forms, popups, storage and parent-page access blocked. Direct navigation is sandboxed by the response CSP too; a `role=controller` query cannot enable controls. The same 250 KB HTML and 16 KB JSON state limits apply. HTML is served separately from the audience polling response, with `Cache-Control: no-store`. Demo files are public teaching material while live: keep private information out of HTML and shared state.
 
 Deployment: update the audience Worker and restart Studio together. The `web-demo-mirroring` capability check detects an older service. No new bindings, secrets or Durable Object migrations are required. Self-study exports still give each learner independent controls.
+
+## Presenter identity
+
+The presentation metadata supports `identity` with `presenter`, `affiliation`,
+`contactEmail`, local `logo`, `joinUrl`, optional local `qrCode`, and `hideOn`.
+Use `hideIdentity: true` on a slide to give its content the full space. See the
+[identity example and asset limits](../PRESENTATIONS.md#reusable-presentation-identity).

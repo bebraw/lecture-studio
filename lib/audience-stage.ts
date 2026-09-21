@@ -15,6 +15,7 @@ export function audienceStage(state: AudiencePublication): AudiencePublication {
     "demoUrl",
     "version",
     "theme",
+    "identity",
     "blank",
     "build",
     "slidePosition",

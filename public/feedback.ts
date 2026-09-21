@@ -9,7 +9,7 @@ export function mountFeedback({ call, update }: MountOptions) {
   const menu = document.createElement("details");
   menu.id = "feedback-menu";
   menu.innerHTML =
-    '<summary>Responses</summary><section class="feedback-panel" aria-label="Private Q&A desk"><div class="button-row"><button id="feedback-focus" aria-pressed="false">Q&A desk</button><span id="feedback-keys" hidden>↑/↓ select · S shortlist · D discuss · A answered · F follow-up · R return · Esc exit</span></div><div class="button-row"><label>Collect <select id="feedback-mode"><option value="questions">Questions</option><option value="words">Word cloud</option></select></label></div><label>Prompt <input id="feedback-prompt" maxlength="200" value="What would you like to ask?"></label><div class="button-row"><button id="feedback-start">Open new collection</button><button id="feedback-close">Close collection</button></div><p>Approving words allows projection and inclusion in an explicitly launched AI build. Pending responses stay private.</p><p id="feedback-state"></p><div class="button-row"><button id="feedback-show">Show approved cloud</button><button id="feedback-return">Back to slide</button></div><button id="feedback-export">Export selected follow-ups (.md)</button><p id="feedback-error" role="status"></p><div id="feedback-items"></div></section>';
+    '<summary>Responses</summary><section class="feedback-panel" aria-label="Private Q&A desk"><h2 class="qa-title">Private Q&A desk</h2><div class="button-row"><button id="feedback-focus" aria-pressed="false">Q&A desk</button><span id="feedback-keys" hidden>↑/↓ select · S shortlist · D discuss · A answered · F follow-up · R return · Esc exit</span></div><div class="button-row feedback-setup"><label>Collect <select id="feedback-mode"><option value="questions">Questions</option><option value="words">Word cloud</option></select></label></div><label class="feedback-setup">Prompt <input id="feedback-prompt" maxlength="200" value="What would you like to ask?"></label><div class="button-row"><button id="feedback-start">Open new collection</button><button id="feedback-close">Close collection</button></div><p id="feedback-disclosure">Approving words allows projection and inclusion in an explicitly launched AI build. Pending responses stay private.</p><p id="feedback-state"></p><div class="button-row"><button id="feedback-show">Show approved cloud</button><button id="feedback-return">Back to slide</button></div><button id="feedback-export">Export selected follow-ups (.md)</button><p id="feedback-error" role="status"></p><div id="feedback-items"></div></section>';
   query(".top-actions", document).prepend(menu);
   const $ = byId;
   let snapshot: FeedbackSnapshot = { config: null, items: [] };
@@ -44,6 +44,10 @@ export function mountFeedback({ call, update }: MountOptions) {
         ? " (" + new Date(value.expires).toLocaleString() + ")"
         : "");
     $("feedback-show").hidden = config?.mode !== "words";
+    $("feedback-disclosure").textContent =
+      config?.mode === "words"
+        ? "Approving words allows projection and inclusion in an explicitly launched AI build. Pending responses stay private."
+        : "Only selected question text is projected. Reply emails and shortlists stay private.";
     const next = JSON.stringify([config?.mode, items]);
     if (next === listKey) return;
     listKey = next;

@@ -1,8 +1,8 @@
 # Public lecture companion
 
-This Worker is separate from the local studio and the live-built seminar app. The root URL follows the published stage. An open predefined poll temporarily replaces the student view; closing it returns students to the latest stage. The lecturer independently chooses Project question, Project results, or another slide. Three room IDs remain allowlisted.
+This Worker is separate from the local studio and the live-built seminar app. The root URL follows the published stage. An open predefined poll temporarily replaces the student view; closing it returns students to the latest stage. The lecturer independently chooses Project question, Project results, or another slide. Bundled legacy rooms and rooms explicitly prepared from Obsidian are available.
 
-Only published slide content, its theme, and generic build progress are synchronized. Private Obsidian notes, unshown slides, model output, workspace paths and presenter credentials stay local. A local-only app preview becomes a message to follow the projector; a public HTTPS app can be embedded. Student voting uses the same stable root URL. Results remain a lecturer-controlled reveal, not part of the student form.
+Only published slide content, its theme, public presentation identity, and generic build progress are synchronized. Private Obsidian notes, unshown slides, model output, workspace paths and presenter credentials stay local. A local-only app preview becomes a message to follow the projector; a public HTTPS app can be embedded. Student voting uses the same stable root URL. Results remain a lecturer-controlled reveal, not part of the student form.
 
 The build copies the actual stage renderer, stylesheet, and Mermaid runtime into an allowlisted generated asset directory. The desk is never deployed. StageState stores the last published stage separately from vote counts; migration v2 adds that store without resetting rooms. If the local studio disconnects, the last published stage remains available.
 
@@ -10,9 +10,9 @@ The room-state, room-http, and room-view modules were reused from the prepared r
 
 Install the pinned deployment tool with npm ci in this directory. Deploy only with an explicitly verified dedicated Worker name and account. Keep deployment identity and secrets under the studio's ignored .local directory. Use Wrangler --secrets-file; never place tokens in source, URLs, or command arguments.
 
-Authenticated POST /presenter/rooms/{id}/seed initializes only empty rooms; open and lock control voting. There is no public reset route. All rooms initially start locked. Public POST forms retain same-origin checks, bounded bodies, predefined-choice validation, and anonymous replaceable votes.
+Authenticated POST /presenter/rooms/{id}/prepare validates and stores the Obsidian poll definition without deployment. Changed definitions are refused while voting is open or votes exist. POST /presenter/rooms/{id}/seed initializes only empty legacy rooms; open and lock control voting. There is no public reset route. All rooms initially start locked. Public POST forms retain same-origin checks, bounded bodies, predefined-choice validation, and anonymous replaceable votes.
 
-After deployment, configure LECTURE_POLL_ORIGIN and LECTURE_POLL_TOKEN in the local studio's ignored .env and restart it. The three room IDs and labels match AUDIENCE-VOTES.md. Do not expose the studio to the internet.
+After deployment, configure LECTURE_POLL_ORIGIN and LECTURE_POLL_TOKEN in the local studio's ignored .env and restart it. Loading an Obsidian presentation prepares its declared room IDs and definitions. Do not expose the studio to the internet.
 
 ## Current verification
 
@@ -31,3 +31,8 @@ smoke test that records each attempt; do not delete its receipt to retry.
 `connect-studio.ts` saves private configuration without printing secrets.
 
 The pinned Wrangler development dependency currently reports three high-severity advisories through Miniflare's sharp image-decoder dependency. No image decoding is used here, and that dependency is not bundled into the deployed Worker. Do not use this dev toolchain to process untrusted images; dependency remediation remains a tooling follow-up.
+
+The current Worker includes private question reply emails and moderation statuses.
+Public feedback responses contain collection metadata only. Private question/email
+rows share the existing 24-hour expiry and lecture-reset deletion. The presenter
+can export selected follow-ups locally; the Worker does not send email.

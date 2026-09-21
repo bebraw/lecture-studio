@@ -1,3 +1,4 @@
+import { applyIdentity } from "../public/identity.ts";
 import * as v from "valibot";
 import { errorSchema } from "../shared/schemas.ts";
 import {
@@ -153,6 +154,7 @@ async function refresh() {
     );
     query("#audience-followers", document).textContent =
       active === undefined ? "Following: unavailable" : `${active} following`;
+    applyIdentity(document, stage?.identity, "audience");
     const next = poll
       ? "poll:" + poll.id
       : JSON.stringify(stage && { ...stage, build: undefined });

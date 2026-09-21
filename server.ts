@@ -2,6 +2,7 @@ import { demoCsp } from "./shared/web-demo.ts";
 import {
   imageSources,
   loadPresentationImages,
+  presentationIdentity,
 } from "./lib/presentation-images.ts";
 import { posix } from "node:path";
 import { defaultBuildModel } from "./shared/build-model.ts";
@@ -307,6 +308,9 @@ export function createStudio({
     stage = {
       ...publicStage(draft, ++version),
       ...(projectedWebDemo ? { webDemo: { ...projectedWebDemo.view } } : {}),
+      ...(presentationIdentity(presentation.definition, s)
+        ? { identity: presentationIdentity(presentation.definition, s)! }
+        : {}),
       theme: presentation.definition.theme,
       slidePosition: presentation.position(),
       slideType: s.type,
@@ -530,6 +534,7 @@ export function createStudio({
         : stage.mode,
       ...(pollOnStage ? { pollId: (projectedPoll || poll).room } : {}),
       ...(stage.theme === undefined ? {} : { theme: stage.theme }),
+      ...(stage.identity === undefined ? {} : { identity: stage.identity }),
       blank,
       build: {
         ...(activity === undefined ? {} : { activity }),
@@ -1413,6 +1418,7 @@ export function createStudio({
         "/debug.css": "debug.css",
         "/debug.mjs": "debug.mjs",
         "/style.css": "style.css",
+        "/identity.css": "identity.css",
         "/desk.mjs": "desk.mjs",
         "/stage.mjs": "stage.mjs",
         "/shared.mjs": "shared.mjs",

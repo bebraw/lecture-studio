@@ -78,6 +78,14 @@ test("Obsidian HTML demos mirror lecturer state to isolated projector and public
   const definition = {
     version: 1,
     title: "Laws",
+    identity: {
+      presenter: "Conference Speaker",
+      affiliation: "Aalto University",
+      contactEmail: "speaker@example.org",
+      logo: "./figure.svg",
+      joinUrl: "https://example.org/join",
+      qrCode: "./figure.svg",
+    },
     start: "demo",
     steps: [
       {
@@ -93,6 +101,7 @@ test("Obsidian HTML demos mirror lecturer state to isolated projector and public
         id: "next",
         type: "material",
         title: "Discussion",
+        hideIdentity: true,
         body: "![Course progression](./figure.svg)",
       },
     ],
@@ -161,6 +170,23 @@ test("Obsidian HTML demos mirror lecturer state to isolated projector and public
     const mirrored = student.frameLocator(".web-demo-frame");
     await expect(mirrored.locator("#speedup")).toHaveText("3.33×");
     await expect(mirrored.locator("#controls")).toBeHidden();
+    await expect(stage.locator(".presentation-identity")).toContainText(
+      "Aalto University",
+    );
+    await expect(student.locator(".presentation-identity")).toContainText(
+      "speaker@example.org",
+    );
+    await expect(stage.getByAltText("Aalto University logo")).toBeVisible();
+    await expect(
+      student.getByRole("link", { name: /Join the audience/ }),
+    ).toHaveAttribute("href", "https://example.org/join");
+    await stage.screenshot({
+      path: "test-results/conference-identity-stage.png",
+    });
+    await student.screenshot({
+      path: "test-results/conference-identity-audience.png",
+      fullPage: true,
+    });
     const demoUrl = await student
       .locator(".web-demo-frame")
       .getAttribute("src");
@@ -250,6 +276,8 @@ test("Obsidian HTML demos mirror lecturer state to isolated projector and public
     expect((await fetch(new URL(demoUrl!, audience.url))).status).toBe(404);
     await expect(desk.locator("#web-demo-controller")).toBeHidden();
     await expect(stage.locator("h1")).toHaveText("Discussion");
+    await expect(stage.locator("#presentation-identity")).toBeHidden();
+    await expect(student.locator("#presentation-identity")).toBeHidden();
     await expect(stage.getByAltText("Course progression")).toBeVisible();
     expect(
       await stage
@@ -259,6 +287,10 @@ test("Obsidian HTML demos mirror lecturer state to isolated projector and public
     const reading = await context.newPage();
     await reading.goto(new URL("/slides", address.deskUrl).href);
     await expect(reading.getByAltText("Demo preview")).toBeVisible();
+    await expect(reading.locator(".presentation-identity")).toHaveCount(1);
+    await expect(reading.locator(".presentation-identity")).toContainText(
+      "Aalto University",
+    );
     await desk.locator("#graph-previous").click();
     await expect(controller.locator("#speedup")).toHaveText("4.00×");
     await expect(projection.locator("#speedup")).toHaveText("4.00×");

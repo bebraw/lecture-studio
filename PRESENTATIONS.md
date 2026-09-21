@@ -94,3 +94,31 @@ option order, IDs, labels, or default is rejected if the room has votes or is op
 Use a new room ID for a revised question to preserve the original votes. An
 identical preparation is safe to repeat. A new lecture's first opening still
 starts a fresh voting round; reopening within that lecture preserves its votes.
+
+### Reusable presentation identity
+
+Add `identity` to the presentation-level YAML or JSON metadata, then reload:
+
+```yaml
+identity:
+  presenter: Your name
+  affiliation: Aalto University
+  contactEmail: presenter@example.org
+  logo: ./aalto-logo.svg
+  joinUrl: https://your-audience-service.example/
+  qrCode: ./audience-join-qr.svg
+  hideOn: []
+```
+
+All fields are optional. The contact email here is the **presenter's public contact**,
+not an attendee reply address. Use an institution of your choice. Logo and optional
+QR code are local image assets beside the note; the QR image should encode the join
+URL. SVG, PNG, JPEG, GIF and WebP work. Their combined size is limited to 32 KB so
+branding fits the live audience payload. Images are embedded into the snapshot and
+exports, so exports remain portable. Editable Markdown retains the original paths.
+
+Identity appears in a consistent footer on the stage, audience view, reading copy
+and self-study sections. Set `hideOn: [stage, audience, reading, study]` to hide it
+on selected surfaces, or add `hideIdentity: true` to an individual slide's metadata
+when content needs more space. Existing theme settings still control typography
+and colours. Identity configuration is not included in AI build prompts.

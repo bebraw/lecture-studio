@@ -23,7 +23,10 @@ word clouds and demos. Students submit from a collapsible form below their
 shared stage. Pending submissions remain private to the lecturer. Approving words allows their projection and inclusion as data in dependent build prompts; the lecturer must still explicitly start each build. Questions are projected only with **Discuss**.
 
 - **Discuss** projects one selected question; **Back to slide** restores the
-  previous projection. **Done** removes an item from the pending review list.
+  previous projection and synchronized demo state. Use **Q&A desk** to shortlist
+  questions and mark **Answered live**, **Reply later**, or **Dismissed**.
+  Optional reply emails stay private; selected follow-ups can be downloaded as
+  Markdown after Live ends, before the 24-hour expiry. **Done** dismisses words.
 - For words, **Approve** admits individual responses to the cloud.
   **Show approved cloud** publishes a frozen snapshot of approved responses only.
   Repeated terms are combined case-insensitively; the 40 most frequent approved
@@ -37,7 +40,7 @@ Limits: 400 characters per question; 1–3 words / 32 characters per cloud idea,
 120 submissions per minute per hashed network address; 500 ideas or questions total per collection.
 Polls admit up to 300 new voter cookies per minute per hashed network and 1,000 voters per room/session; existing voters can still update their choice. Counts are informal participation signals, not verified one-person votes. Cookies and network limits deter casual flooding, not determined abuse. The
 shared-network allowance accommodates a classroom behind one network.
-No names or raw IP addresses are stored. The queue and hashed limiter data expire
+No names or raw IP addresses are stored. Optional reply emails are stored privately with questions. The queue and hashed limiter data expire
 after 24 hours; already projected snapshots remain until you change the stage.
 Approved words in model conversations and generated artifacts have a separate lifecycle: the queue expiry does not delete them. Retention follows the configured model account and workspace; remove saved artifacts separately when appropriate.
 Cloudflare's storage recovery window may retain recoverable data beyond deletion.
@@ -176,7 +179,9 @@ The public app must already expose:
 - Authenticated `POST /presenter/rooms/{room}/open-session` with an `X-Lecture-Session` header, and `.../lock`, returning that same aggregate. A new session clears previous votes atomically on opening; retrying or reopening the same session preserves them.
 - `GET /rooms/{room}`: the audience's native form, posting back to the room. Keep its existing same-origin checks, predefined-choice validation, and replaceable anonymous vote semantics.
 
-For the default theme poll, seed the public app with exactly `editorial|Editorial`, `retro-web|Retro web`, and `playful|Playful` in a designated rehearsal room. **The pinned starter currently seeds seminar interests, not these themes.** Configure the app's choices first, or configure the studio to match its existing interests. The studio checks IDs and labels before opening or locking and refuses a mismatch. Opening an empty, locked room first initializes its server-defined options; existing options and votes are never overwritten. Loading/restarting a presentation, resetting the lecture, or restarting the server creates a fresh voting session.
+Presentation polls are prepared from Obsidian on explicit load/reload; see
+[PRESENTATIONS.md](PRESENTATIONS.md#prepare-polls-from-obsidian). Revised definitions
+are rejected while a room is open or has votes. For the legacy default theme poll, seed the public app with exactly `editorial|Editorial`, `retro-web|Retro web`, and `playful|Playful` in a designated rehearsal room. **The pinned starter currently seeds seminar interests, not these themes.** Configure the app's choices first, or configure the studio to match its existing interests. The studio checks IDs and labels before opening or locking and refuses a mismatch. Opening an empty, locked room first initializes its server-defined options; existing options and votes are never overwritten. Loading/restarting a presentation, resetting the lecture, or restarting the server creates a fresh voting session.
 
 During a presentation poll, the lecturer's private vote panel shows the total, per-option counts and percentages, and highlights changes as the three-second refresh receives them. The activity line records the latest change, including voters switching options without changing the total. These counts stay private until you choose **Project results**.
 

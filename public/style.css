@@ -1,3 +1,5 @@
+@import url("./identity.css");
+
 :root {
   --paper: #f4f1e9;
   --ink: #18382f;
@@ -2824,4 +2826,22 @@ blockquote {
     inset: 64px 8px 8px;
     padding: 12px;
   }
+}
+
+.qa-title {
+  display: none;
+}
+.qa-desk .qa-title {
+  display: block;
+  margin: 0 0 16px;
+}
+.qa-desk .feedback-setup {
+  display: none;
+}
+.qa-desk #feedback-state {
+  font-weight: 600;
+  font-size: 14px;
+}
+.qa-desk #feedback-items {
+  margin-top: 20px;
 }

@@ -1,3 +1,4 @@
+import type { PresentationIdentity } from "./identity.ts";
 export type JsonValue =
   string | number | boolean | null | JsonValue[] | { [key: string]: JsonValue };
 export type Theme = Record<
@@ -29,6 +30,7 @@ export interface BuildState {
   outcome?: string | null;
 }
 export interface Stage {
+  identity?: PresentationIdentity;
   webDemo?: WebDemo;
   act: string;
   mode: string;
@@ -114,6 +116,7 @@ export interface Dependency {
   instructions: Record<string, string>;
 }
 export interface Step {
+  hideIdentity?: boolean;
   study?: {
     exclude?: boolean;
     explanation?: string;
@@ -145,6 +148,7 @@ export interface Step {
   room?: string;
 }
 export interface PresentationDefinition {
+  identity?: PresentationIdentity;
   version: 1;
   title: string;
   start: string;

@@ -184,6 +184,11 @@ test("audience voting and feedback work with a keyboard and survive background u
   await accessible(page, info, "audience-feedback");
   await page.keyboard.press("Tab");
   await expect(
+    page.getByRole("textbox", { name: "Email for a reply (optional)" }),
+  ).toBeFocused();
+  await page.keyboard.type("keyboard@example.org");
+  await page.keyboard.press("Tab");
+  await expect(
     page.getByRole("button", { name: "Send for review" }),
   ).toBeFocused();
   await page.keyboard.press("Enter");

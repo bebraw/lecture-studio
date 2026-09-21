@@ -221,6 +221,7 @@ export default {
           "demoUrl",
           "version",
           "theme",
+          "identity",
           "blank",
           "build",
           "slidePosition",
@@ -319,6 +320,7 @@ export default {
       (url.pathname === "/" ||
         [
           "/style.css",
+          "/identity.css",
           "/audience.css",
           "/audience.mjs",
           "/seminar-browser.mjs",

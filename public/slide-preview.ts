@@ -1,3 +1,4 @@
+import { applyIdentity } from "./identity.ts";
 import type { Stage } from "../shared/models.ts";
 import {
   applyTheme,
@@ -23,6 +24,7 @@ export function renderSlidePreview(host: HTMLElement, stage: Partial<Stage>) {
     const doc = frame.contentDocument;
     if (!doc?.querySelector("#stage-content") || !updateStatus) return;
     applyTheme(doc.body, latest.theme);
+    applyIdentity(doc, latest.identity, "stage");
     doc.body.classList.toggle("blank", !!latest.blank);
     const content = doc.querySelector<HTMLElement>("#stage-content")!;
     renderSurface(content, latest);

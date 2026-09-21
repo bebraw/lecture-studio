@@ -1,3 +1,4 @@
+import { applyIdentity } from "./identity.ts";
 import { asyncHandler } from "../shared/errors.ts";
 import { query } from "./dom.ts";
 import {
@@ -19,6 +20,7 @@ async function poll() {
     if (state.version !== version) {
       version = state.version;
       applyTheme(document.body, state.theme);
+      applyIdentity(document, state.identity, "stage");
       renderSurface(query("#stage-content", document), state);
       query("#stage-content", document).dataset.mode = state.mode;
       query("#era", document).textContent = state.act

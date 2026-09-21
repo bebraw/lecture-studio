@@ -113,7 +113,7 @@ test("export embeds local posters, versions image changes and rejects image syml
   t.after(() => rm(directory, { recursive: true, force: true }));
   await writeFile(
     join(directory, "deck.md"),
-    "# Test\n## Presentation\n```yaml\nversion: 1\ntitle: Test\n```\n## Slide: Figure\n```yaml\nid: figure\ntype: material\ndemoPoster: ./figure.svg\n```\n![Figure](./figure.svg)",
+    "# Test\n## Presentation\n```yaml\nversion: 1\ntitle: Test\nidentity:\n  presenter: Conference Speaker\n  contactEmail: speaker@example.org\n  logo: ./figure.svg\n```\n## Slide: Figure\n```yaml\nid: figure\ntype: material\ndemoPoster: ./figure.svg\n```\n![Figure](./figure.svg)",
   );
   const config = join(directory, "course.json");
   await writeFile(
@@ -135,6 +135,12 @@ test("export embeds local posters, versions image changes and rejects image syml
   const html = await readFile(join(directory, "first/test/index.html"), "utf8");
   assert.match(html, /src="data:image\/svg\+xml;base64,/);
   assert.match(html, /alt="Demo preview"/);
+  assert.match(html, /class="presentation-identity"/);
+  assert.match(html, /speaker@example.org/);
+  assert.match(
+    await readFile(join(directory, "first/assets/identity.css"), "utf8"),
+    /identity-logo/,
+  );
   await writeFile(
     figure,
     '<svg xmlns="http://www.w3.org/2000/svg"><text>Second</text></svg>',

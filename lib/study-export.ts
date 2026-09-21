@@ -1,5 +1,7 @@
+import { identityHtml } from "../shared/identity.ts";
 import {
   imageSources,
+  presentationIdentity,
   loadPresentationImages,
   posterMarkdown,
 } from "./presentation-images.ts";
@@ -64,6 +66,14 @@ export function studySteps(deck: PresentationDefinition): StudyStep[] {
         step.study?.prompt !== undefined;
       // Explicit public allowlist. Never spread a Step or serialize the source deck.
       return {
+        ...(deck.identity
+          ? {
+              identityHtml: identityHtml(
+                presentationIdentity(deck, step),
+                "study",
+              ),
+            }
+          : {}),
         id: step.id,
         title: step.title,
         chapter: step.chapter || "",
@@ -122,7 +132,7 @@ export function modulePage(module: StudyModule) {
   const slides = module.steps
     .map(
       (step, i) =>
-        `<section class="study-step" id="slide-${step.id}" tabindex="-1"><p class="eyebrow">${escape(step.chapter || "Explore")} / ${String(i + 1).padStart(2, "0")}</p><h2>${escape(step.title)}</h2><div class="prose">${step.html}</div>${step.posterHtml ? `<div class="demo-poster prose">${step.posterHtml}</div>` : ""}${step.demo ? `<div class="demo-host" data-demo="${step.id}"></div><p class="demo-status" role="status"></p><button class="reset-demo" type="button" data-reset-demo="${step.id}" hidden>Reset experiment</button><noscript><p>Enable JavaScript to explore this demonstration.</p></noscript>` : ""}${step.explanationHtml ? `<details class="explanation"><summary>Read the explanation</summary><div class="prose">${step.explanationHtml}</div></details>` : ""}${step.activity ? `<div class="activity"><p class="eyebrow">${step.activity.correctOption ? "Check your understanding" : "Pause and reflect"}</p><div class="prose">${step.activity.promptHtml}</div>${step.activity.options.length ? `<fieldset><legend>Your choice</legend>${step.activity.options.map((option) => `<label><input type="radio" name="choice-${step.id}" value="${escape(option.id)}"> ${escape(option.label)}</label>`).join("")}</fieldset>` : ""}${step.activity.correctOption ? '<button class="check-answer" type="button" hidden>Check answer</button><p class="answer-result" role="status"></p>' : ""}${step.activity.answerHtml ? `<details><summary>Reveal discussion</summary><div class="prose">${step.activity.answerHtml}</div></details>` : ""}</div>` : ""}${step.source ? `<p class="source">${escape(step.source)}</p>` : ""}<button class="complete-step" type="button" hidden>Mark as complete</button></section>`,
+        `<section class="study-step" id="slide-${step.id}" tabindex="-1"><p class="eyebrow">${escape(step.chapter || "Explore")} / ${String(i + 1).padStart(2, "0")}</p><h2>${escape(step.title)}</h2><div class="prose">${step.html}</div>${step.posterHtml ? `<div class="demo-poster prose">${step.posterHtml}</div>` : ""}${step.demo ? `<div class="demo-host" data-demo="${step.id}"></div><p class="demo-status" role="status"></p><button class="reset-demo" type="button" data-reset-demo="${step.id}" hidden>Reset experiment</button><noscript><p>Enable JavaScript to explore this demonstration.</p></noscript>` : ""}${step.explanationHtml ? `<details class="explanation"><summary>Read the explanation</summary><div class="prose">${step.explanationHtml}</div></details>` : ""}${step.activity ? `<div class="activity"><p class="eyebrow">${step.activity.correctOption ? "Check your understanding" : "Pause and reflect"}</p><div class="prose">${step.activity.promptHtml}</div>${step.activity.options.length ? `<fieldset><legend>Your choice</legend>${step.activity.options.map((option) => `<label><input type="radio" name="choice-${step.id}" value="${escape(option.id)}"> ${escape(option.label)}</label>`).join("")}</fieldset>` : ""}${step.activity.correctOption ? '<button class="check-answer" type="button" hidden>Check answer</button><p class="answer-result" role="status"></p>' : ""}${step.activity.answerHtml ? `<details><summary>Reveal discussion</summary><div class="prose">${step.activity.answerHtml}</div></details>` : ""}</div>` : ""}${step.source ? `<p class="source">${escape(step.source)}</p>` : ""}${step.identityHtml || ""}<button class="complete-step" type="button" hidden>Mark as complete</button></section>`,
     )
     .join("\n");
   return page(
@@ -305,6 +315,10 @@ export async function exportStudy(configPath: string, outputPath: string) {
     await copyFile(
       join(root, "public/study.css"),
       join(temporary, "assets/study.css"),
+    );
+    await copyFile(
+      join(root, "public/identity.css"),
+      join(temporary, "assets/identity.css"),
     );
     await writeFile(join(temporary, "course.json"), json(course));
     await writeFile(join(temporary, "index.html"), coursePage(course));

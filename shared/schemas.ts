@@ -1,3 +1,4 @@
+import { identitySchema } from "./identity.ts";
 import * as v from "valibot";
 import type { Stage, FeedbackSnapshot, Note } from "./models.ts";
 
@@ -34,6 +35,7 @@ const buildSchema = v.object({
   outcome: v.exactOptional(v.nullable(text)),
 });
 export const stageSchema = v.object({
+  identity: v.exactOptional(identitySchema),
   webDemo: v.exactOptional(webDemoSchema),
   act: text,
   mode: text,
@@ -113,6 +115,7 @@ const pollSchema = v.object({
   joinUrl: text,
 });
 export const stepSchema = v.object({
+  hideIdentity: v.exactOptional(v.boolean()),
   study: v.exactOptional(
     v.strictObject({
       exclude: v.exactOptional(v.boolean()),

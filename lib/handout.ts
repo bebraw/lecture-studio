@@ -1,4 +1,9 @@
-import { imageSources, posterMarkdown } from "./presentation-images.ts";
+import { identityHtml } from "../shared/identity.ts";
+import {
+  imageSources,
+  posterMarkdown,
+  presentationIdentity,
+} from "./presentation-images.ts";
 import { renderMarkdown } from "./material.ts";
 import type { PresentationDefinition } from "../shared/models.ts";
 export function renderHandout(deck: PresentationDefinition) {
@@ -41,10 +46,10 @@ export function renderHandout(deck: PresentationDefinition) {
         step.poll || step.wordCloud
           ? '<p class="activity">Lecture activity · submissions are closed in this reading copy.</p>'
           : "";
-      return `<section class="slide${step.type === "title" ? " slide-title" : ""}${step.chapter === "References" ? " slide-references" : ""}" id="${escape(step.id)}"><p class="eyebrow">${escape(step.chapter || "Opening")} · ${index + 1}/${deck.steps.length}</p><h2>${escape(step.title)}</h2>${activity}${body}${options}${step.source ? `<footer>${citations(step.source)}</footer>` : ""}</section>`;
+      return `<section class="slide${step.type === "title" ? " slide-title" : ""}${step.chapter === "References" ? " slide-references" : ""}" id="${escape(step.id)}"><p class="eyebrow">${escape(step.chapter || "Opening")} · ${index + 1}/${deck.steps.length}</p><h2>${escape(step.title)}</h2>${activity}${body}${options}${identityHtml(presentationIdentity(deck, step), "reading")}${step.source ? `<footer>${citations(step.source)}</footer>` : ""}</section>`;
     })
     .join("\n");
   return `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${escape(deck.title)} · Slides</title><link rel="stylesheet" href="/slides.css"></head><body>
-<header class="intro"><p class="eyebrow">Lecture reading copy</p><h1>${escape(deck.title)}</h1><p>Juho Vepsäläinen</p><p>Revisit the slides, follow the sources, and keep a copy.</p><nav aria-label="Lecture sections">${[...chapters].map(([chapter, id]) => `<a href="#${escape(id)}">${escape(chapter)}</a>`).join(" ")}</nav><button id="print-slides" type="button" hidden>Print / save as PDF</button><noscript><p>Use your browser’s Print command to save a PDF. Diagrams are shown as source text without JavaScript.</p></noscript></header>
-<main>${slides}</main><footer class="end">Slides and references · <a href="https://live.scalableweb.dev/slides">live.scalableweb.dev/slides</a><p>Images and excerpts retain their source credits. Live demonstrations and audience responses are not recorded in this copy.</p></footer><script type="module" src="/slides.mjs"></script></body></html>`;
+<header class="intro"><p class="eyebrow">Lecture reading copy</p><h1>${escape(deck.title)}</h1><p>Revisit the slides, follow the sources, and keep a copy.</p><nav aria-label="Lecture sections">${[...chapters].map(([chapter, id]) => `<a href="#${escape(id)}">${escape(chapter)}</a>`).join(" ")}</nav><button id="print-slides" type="button" hidden>Print / save as PDF</button><noscript><p>Use your browser’s Print command to save a PDF. Diagrams are shown as source text without JavaScript.</p></noscript></header>
+<main>${slides}</main><footer class="end">Slides and references<p>Images and excerpts retain their source credits. Live demonstrations and audience responses are not recorded in this copy.</p></footer><script type="module" src="/slides.mjs"></script></body></html>`;
 }

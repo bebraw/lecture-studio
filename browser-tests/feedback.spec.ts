@@ -127,6 +127,7 @@ test("desk review publishes only selected questions or approved cloud snapshots"
     await expect(
       desk.locator(".feedback-group").filter({ hasText: "Follow-ups" }),
     ).toContainText("private@example.org");
+    await desk.screenshot({ path: "test-results/qa-desk.png", fullPage: true });
     const downloadEvent = desk.waitForEvent("download");
     await desk
       .getByRole("button", {

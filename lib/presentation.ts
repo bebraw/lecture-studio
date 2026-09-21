@@ -1,4 +1,9 @@
-import { imageSources } from "./presentation-images.ts";
+import { identitySchema } from "../shared/identity.ts";
+import {
+  imageSources,
+  presentationIdentity,
+  relativeImage,
+} from "./presentation-images.ts";
 import { parseDocument, stringify } from "yaml";
 import * as v from "valibot";
 import { stepSchema } from "../shared/schemas.ts";
@@ -66,6 +71,7 @@ export function parsePresentation(note: Note): PresentationDefinition {
         title: v.string(),
         start: v.exactOptional(v.string()),
         theme: v.exactOptional(v.unknown()),
+        identity: v.exactOptional(identitySchema),
       }),
       metadata,
     );
@@ -117,10 +123,17 @@ export function parsePresentation(note: Note): PresentationDefinition {
       start: v.string(),
       steps: v.array(stepSchema),
       theme: v.exactOptional(v.unknown()),
+      identity: v.exactOptional(identitySchema),
     }),
     definition,
   );
   const value = { ...parsed, theme: parseTheme(parsed.theme) };
+  for (const field of ["logo", "qrCode"] as const) {
+    if (value.identity?.[field] && !relativeImage.test(value.identity[field]))
+      throw new Error("Identity " + field + " requires a local ./ image path");
+  }
+  if (value.identity?.qrCode && !value.identity.joinUrl)
+    throw new Error("A QR code requires an audience join URL");
   const text = (v: unknown, n: number) =>
     typeof v === "string" && v.length <= n;
   if (
@@ -381,6 +394,9 @@ export class PresentationSession {
     return {
       theme: this.definition.theme,
       preview: {
+        ...(presentationIdentity(this.definition, this.step())
+          ? { identity: presentationIdentity(this.definition, this.step())! }
+          : {}),
         ...publicStage(
           {
             ...initialDraft(),

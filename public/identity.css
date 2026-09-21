@@ -1,0 +1,60 @@
+.presentation-identity {
+  display: flex;
+  align-items: center;
+  gap: 1.2em;
+  padding: 0.8em 0;
+  border-top: 1px solid currentColor;
+  font: 14px/1.4 var(--body-font, Georgia, serif);
+  color: var(--ink, #202020);
+  break-inside: avoid;
+}
+.presentation-identity .identity-person {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.presentation-identity .identity-join {
+  margin-left: auto;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.presentation-identity .identity-join span {
+  display: block;
+}
+.presentation-identity a {
+  color: inherit;
+}
+.presentation-identity img.identity-logo {
+  max-width: 130px;
+  max-height: 56px;
+  width: auto;
+  height: auto;
+  object-fit: contain;
+  margin: 0;
+}
+.presentation-identity img.identity-qr {
+  width: 76px;
+  height: 76px;
+  object-fit: contain;
+  margin: 0;
+  background: white;
+}
+.stage #presentation-identity {
+  flex-shrink: 0;
+}
+.stage .presentation-identity {
+  font-size: clamp(12px, 1.05vw, 20px);
+}
+.stage.blank #presentation-identity {
+  visibility: hidden;
+}
+@media (max-width: 650px) {
+  .presentation-identity {
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+  .presentation-identity .identity-join {
+    margin-left: 0;
+  }
+}
