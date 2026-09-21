@@ -64,3 +64,18 @@ test("fixed PDF canvases embed diagrams and fail clearly on clipped or missing c
     await rm(directory, { recursive: true, force: true });
   }
 });
+
+test("PDF pages follow reveals and retain separate logical slide labels", async () => {
+  const directory = await mkdtemp(join(tmpdir(), "pdf-reveals-"));
+  try {
+    const output = join(directory, "reveals.pdf");
+    const result = await exportPdf("examples/progressive-reveals.md", output);
+    expect(result.pages).toBe(7);
+    expect(result.slides).toBe(3);
+    expect(
+      (await readFile(output)).toString("latin1").match(/\/Type \/Page\b/g),
+    ).toHaveLength(7);
+  } finally {
+    await rm(directory, { recursive: true, force: true });
+  }
+});

@@ -63,3 +63,26 @@ test("PDF planning selects only public authored fields and retains export settin
     /image/,
   );
 });
+
+test("PDF reveal pages preserve grouped steps, initial context and logical numbering", () => {
+  const deck = parsePresentation(
+    sections(
+      source.replace(
+        "A public explanation.",
+        "Context.\n\n::: reveal 1\nFirst.\n:::\n\n::: reveal 1\nGrouped.\n:::\n\n::: reveal 2\nSecond.\n:::",
+      ),
+    ),
+  );
+  const pages = pdfSlides(deck);
+  assert.equal(pages.length, 4);
+  assert.deepEqual(
+    pages.slice(0, 3).map((page) => page.stage.reveal?.current),
+    [0, 1, 2],
+  );
+  assert.ok(
+    pages.slice(0, 3).every((page) => page.stage.html === pages[0]!.stage.html),
+  );
+  assert.match(pages[2]!.label, /Slide 1 \/ 2 · Reveal 2 \/ 2/);
+  deck.steps[0]!.body = "::: reveal 1\nOnly revealed content.\n:::";
+  assert.equal(pdfSlides(deck)[0]!.stage.reveal?.current, 1);
+});

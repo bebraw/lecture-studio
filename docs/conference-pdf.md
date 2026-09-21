@@ -43,3 +43,14 @@ theme:
 Only explicitly public slide fields enter the renderer. Speaker notes, build
 instructions, runtime responses and credentials are never serialized into it.
 Live demos require an authored static visual for export.
+
+## Reveal pages
+
+Each reveal state becomes a consecutive PDF page with the same reserved layout.
+Static initial content produces a `Reveal 0` page; a body consisting entirely of
+reveal blocks starts with step 1. Blocks sharing a step appear together. Table-row
+emphasis follows the current step. The footer distinguishes logical slide numbers
+from reveal numbers, for example `Slide 4 / 12 · Reveal 2 / 3`.
+
+Advance or reverse in any PDF reader to follow the authored sequence. The export
+uses the same flat slide order as the desk's Next button, including detour slides.
