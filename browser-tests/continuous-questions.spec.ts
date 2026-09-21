@@ -25,6 +25,9 @@ test("questions remain available during word clouds and resume across Live off/o
   await page
     .locator("#student-questions textarea")
     .fill("Can you explain the example?");
+  await page
+    .getByLabel("Email for a reply (optional)")
+    .fill("attendee@example.org");
   await page.locator("#student-questions button").click();
   await expect(page.locator("#question-notice")).toContainText(
     "Sent privately",
@@ -41,12 +44,50 @@ test("questions remain available during word clouds and resume across Live off/o
     .then((r) => r.json());
   expect(questions).toMatchObject({
     questionCount: 1,
-    items: [{ text: "Can you explain the example?", status: "pending" }],
+    items: [
+      {
+        text: "Can you explain the example?",
+        status: "pending",
+        email: "attendee@example.org",
+      },
+    ],
   });
   expect(
     await fetch(new URL("/api/audience", audience.url)).then((r) => r.text()),
   ).not.toContain("Can you explain");
+  for (const path of ["/api/audience", "/api/feedback?mode=questions"])
+    expect(
+      await fetch(new URL(path, audience.url)).then((r) => r.text()),
+    ).not.toContain("attendee@example.org");
+  const snapshot = (await import("valibot")).parse(
+    (await import("../shared/schemas.ts")).feedbackSchema,
+    questions,
+  );
+  const id = snapshot.items[0]!.id;
+  await expect(
+    audience.admin("/presenter/feedback", { action: "approve", id }),
+  ).rejects.toThrow("Only words");
+  await audience.admin("/presenter/feedback", {
+    action: "reply-later",
+    id,
+    mode: "questions",
+  });
   await publish(false);
+  const closed: unknown = await audience
+    .request(
+      new URL("/presenter/feedback?mode=questions", audience.url).href,
+      {},
+    )
+    .then((r) => r.json());
+  expect(closed).toMatchObject({
+    config: { open: false },
+    items: [{ status: "reply-later", email: "attendee@example.org" }],
+  });
+  await audience.admin("/presenter/feedback", {
+    action: "done",
+    id,
+    mode: "questions",
+  });
   await expect(page.locator("#student-questions")).toBeHidden();
   await publish(true);
   await expect(page.getByText("Ask a question", { exact: true })).toBeVisible();
@@ -56,7 +97,7 @@ test("questions remain available during word clouds and resume across Live off/o
       {},
     )
     .then((r) => r.json());
-  expect(resumed).toMatchObject({ questionCount: 1 });
+  expect(resumed).toMatchObject({ questionCount: 0 });
   await audience.admin("/presenter/reset-lecture");
   await publish(true);
   const reset: unknown = await audience

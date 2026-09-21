@@ -28,11 +28,20 @@ test("question projection requires a selected non-dismissed question", () => {
       open: true,
     },
     items: [
-      { id: "one", text: "Why?", status: "pending" },
+      {
+        id: "one",
+        text: "Why?",
+        status: "pending",
+        email: "private@example.org",
+      },
       { id: "two", text: "Hidden", status: "done" },
     ],
   };
   assert.equal(feedbackSlide(snapshot, "one").title, "Why?");
+  assert.doesNotMatch(
+    JSON.stringify(feedbackSlide(snapshot, "one")),
+    /private@example/,
+  );
   assert.throws(() => feedbackSlide(snapshot, "two"));
   assert.throws(() => feedbackSlide(snapshot));
 });

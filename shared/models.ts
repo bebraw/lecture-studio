@@ -224,11 +224,13 @@ export interface FeedbackConfig {
   open: boolean;
 }
 export interface FeedbackItem {
+  email?: string;
   id: string;
   text: string;
   status: string;
 }
 export interface FeedbackSnapshot {
+  expires?: number;
   questionCount?: number;
   approvedWords?: string[];
   config: FeedbackConfig | null;

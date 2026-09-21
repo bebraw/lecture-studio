@@ -91,6 +91,7 @@ export async function feedbackRequest(
       body.text,
       await hash(id),
       await hash(request.headers.get("cf-connecting-ip") || "local"),
+      body.email ?? "",
     );
     const cookie = existing
       ? {}

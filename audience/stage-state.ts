@@ -28,6 +28,13 @@ export class StageState extends DurableObject<Env> {
     ctx.storage.sql.exec(
       "CREATE TABLE IF NOT EXISTS feedback_items (id TEXT PRIMARY KEY, round TEXT, text TEXT, status TEXT, voter TEXT, network TEXT, created INTEGER)",
     );
+    const columns = ctx.storage.sql
+      .exec<{ name: string }>("PRAGMA table_info(feedback_items)")
+      .toArray();
+    if (!columns.some((column) => column.name === "email"))
+      ctx.storage.sql.exec(
+        "ALTER TABLE feedback_items ADD COLUMN email TEXT NOT NULL DEFAULT ''",
+      );
     ctx.storage.sql.exec(
       "CREATE TABLE IF NOT EXISTS feedback_approvals (id TEXT PRIMARY KEY, round TEXT, text TEXT)",
     );
@@ -136,8 +143,8 @@ export class StageState extends DurableObject<Env> {
     const config = this.feedbackPublic(questions);
     const items = config
       ? this.ctx.storage.sql
-          .exec<{ id: string; text: string; status: string }>(
-            "SELECT id,text,status FROM feedback_items WHERE round=? ORDER BY created,id",
+          .exec<{ id: string; text: string; status: string; email: string }>(
+            "SELECT id,text,status,email FROM feedback_items WHERE round=? ORDER BY created,id",
             config.round,
           )
           .toArray()
@@ -157,7 +164,21 @@ export class StageState extends DurableObject<Env> {
         Date.now(),
       )
       .one().n;
-    return { config, items, approvedWords, questionCount };
+    const expires = config
+      ? this.ctx.storage.sql
+          .exec<{ expires: number }>(
+            "SELECT expires FROM feedback_collections WHERE round=?",
+            config.round,
+          )
+          .toArray()[0]?.expires
+      : undefined;
+    return {
+      config,
+      items,
+      approvedWords,
+      questionCount,
+      ...(expires === undefined ? {} : { expires }),
+    };
   }
   async feedbackManage(action: string, input: Record<string, unknown>) {
     const sql = this.ctx.storage.sql;
@@ -218,8 +239,27 @@ export class StageState extends DurableObject<Env> {
           : 1,
         input.mode === "questions" ? 2 : 1,
       );
-    else if (action === "approve" || action === "done") {
+    else if (
+      ["approve", "done", "answered", "reply-later", "dismissed"].includes(
+        action,
+      )
+    ) {
       if (typeof input.id !== "string") throw new Error("Choose a response");
+      const item = sql
+        .exec<{ mode: string }>(
+          "SELECT c.mode FROM feedback_items i JOIN feedback_collections c ON c.round=i.round WHERE i.id=? AND c.expires>?",
+          input.id,
+          Date.now(),
+        )
+        .toArray()[0];
+      if (!item) throw new Error("Response expired or unavailable");
+      if (action === "approve" && item.mode !== "words")
+        throw new Error("Only words can be approved for AI context");
+      if (
+        ["answered", "reply-later", "dismissed"].includes(action) &&
+        item.mode !== "questions"
+      )
+        throw new Error("Choose a question");
       if (action === "approve")
         sql.exec(
           "INSERT OR IGNORE INTO feedback_approvals SELECT id,round,text FROM feedback_items WHERE id=?",
@@ -227,7 +267,7 @@ export class StageState extends DurableObject<Env> {
         );
       sql.exec(
         "UPDATE feedback_items SET status=? WHERE id=?",
-        action === "approve" ? "approved" : "done",
+        action === "approve" ? "approved" : action,
         input.id,
       );
     } else throw new Error("Unknown action");
@@ -238,6 +278,7 @@ export class StageState extends DurableObject<Env> {
     text: string,
     voter: string,
     network: string,
+    email: unknown = "",
   ) {
     const stage = await this.read(),
       config = [this.feedbackPublic(), this.feedbackPublic(true)].find(
@@ -247,6 +288,17 @@ export class StageState extends DurableObject<Env> {
       sql = this.ctx.storage.sql;
     if (stage?.live !== true || !config?.open || round !== config.round)
       return { status: 409, error: "Collection is closed" };
+    if (
+      typeof email !== "string" ||
+      email.length > 254 ||
+      (email.trim() &&
+        (config.mode !== "questions" ||
+          !/^[^\s@<>]+@[^\s@<>]+\.[^\s@<>]+$/.test(email.trim())))
+    )
+      return {
+        status: 400,
+        error: "Enter a valid reply email or leave it blank",
+      };
     // Preserve line boundaries until word-cloud entries have been separated.
     const entries = (
       config.mode === "words" ? text.split(/\r\n|\r|\n/) : [text]
@@ -313,7 +365,7 @@ export class StageState extends DurableObject<Env> {
     this.ctx.storage.transactionSync(() => {
       for (const entry of entries)
         sql.exec(
-          "INSERT INTO feedback_items VALUES (?,?,?,?,?,?,?)",
+          "INSERT INTO feedback_items (id,round,text,status,voter,network,created,email) VALUES (?,?,?,?,?,?,?,?)",
           crypto.randomUUID(),
           round,
           entry,
@@ -321,6 +373,7 @@ export class StageState extends DurableObject<Env> {
           voter,
           network,
           now,
+          email.trim(),
         );
     });
     return { status: 201 };

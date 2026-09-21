@@ -61,7 +61,9 @@ export async function feedbackRequest(
 export function feedbackSlide(snapshot: FeedbackSnapshot, id?: string) {
   if (id) {
     const item = snapshot.items.find(
-      (item) => item.id === id && item.status !== "done",
+      (item) =>
+        item.id === id &&
+        !["done", "dismissed", "answered"].includes(item.status),
     );
     if (snapshot.config?.mode !== "questions" || !item)
       throw new Error("Choose a pending question");

@@ -42,6 +42,10 @@ function mountAudienceFeedback(questions: boolean) {
   feedback.innerHTML =
     '<summary>Send a response</summary><form><label id="feedback-label" for="feedback-text"></label><textarea id="feedback-text" required maxlength="400" aria-describedby="feedback-hint"></textarea><p id="feedback-hint"></p><p>The lecturer reviews responses before sharing. Approved words may appear on slides and be sent to the AI builder when the lecturer starts a build. Do not include names or sensitive information. The response queue expires after 24 hours; projected slides, model conversations and generated apps may retain approved words longer.</p><button>Send for review</button><p id="feedback-notice" role="status"></p></form>';
   if (questions) {
+    query("textarea", feedback).insertAdjacentHTML(
+      "afterend",
+      '<label for="question-email">Email for a reply (optional)</label><input id="question-email" type="email" maxlength="254" autocomplete="email" aria-describedby="question-email-hint"><p id="question-email-hint">Leave blank to remain anonymous. Add your email if you’d like a reply when we cannot cover your question live. Your email is private to the presenter.</p>',
+    );
     for (const element of feedback.querySelectorAll("[id]"))
       element.id = element.id.replace("feedback-", "question-");
     query("label", feedback).htmlFor = "question-text";
@@ -112,6 +116,7 @@ function mountAudienceFeedback(questions: boolean) {
           body: JSON.stringify({
             round: feedbackConfig.round,
             text: query("textarea", feedback).value,
+            ...(questions ? { email: query("input", feedback).value } : {}),
           }),
           signal: AbortSignal.timeout(8000),
         },
@@ -120,7 +125,7 @@ function mountAudienceFeedback(questions: boolean) {
         const result = v.safeParse(errorSchema, await response.json());
         throw new Error(result.success ? result.output.error : "Not confirmed");
       }
-      query("textarea", feedback).value = "";
+      query("form", feedback).reset();
       find("#feedback-notice").textContent =
         "Sent privately. The lecturer chooses what to show.";
     } catch (caught) {

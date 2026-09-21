@@ -302,12 +302,15 @@ export const deskSchema = v.object({
   poll: pollSchema,
 });
 export const feedbackSchema = v.object({
+  expires: v.exactOptional(count),
   questionCount: v.exactOptional(count),
   approvedWords: v.exactOptional(strings),
   config: v.nullable(
     v.object({ round: text, mode: text, prompt: text, open: v.boolean() }),
   ),
-  items: v.array(v.object({ id: text, text, status: text })),
+  items: v.array(
+    v.object({ id: text, text, status: text, email: v.exactOptional(text) }),
+  ),
 }) satisfies v.GenericSchema<FeedbackSnapshot>;
 export const searchSchema = v.object({
   matches: v.array(

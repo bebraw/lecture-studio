@@ -59,3 +59,15 @@ The stage and private preview show `current/total` and a subtle bottom progress 
 The reviewed lecture export is versioned in [docs/presentations/web-development-2026.md](docs/presentations/web-development-2026.md). Obsidian remains the live source. Full attributions stay in speaker notes and the References section; footers use short credits.
 
 Staged Mermaid sequence diagrams can include `%% focus-after: M,N`, where `M` is the number of previously explained messages and `N` the number of previously explained notes. Those elements are muted; later elements remain emphasized. This is optional and does not affect other diagrams. The stage shows build status only while working or waiting for input. Standalone historical images expand to the slide area without cropping.
+
+### Private question follow-ups
+
+Attendees can leave **Email for a reply** blank to stay anonymous. Reply emails
+are visible only in the private Responses desk; selecting **Discuss** projects
+only the question text. Emails are not included in AI context or public exports.
+Mark questions **Answered live**, **Reply later**, or **Dismissed**. Select the
+follow-ups to include and use **Export selected follow-ups (.md)** to download a
+private Obsidian-compatible file. Keep that file outside published materials.
+Export works after Live ends, until the queue expires 24 hours after it opened
+(the desk shows the deadline). Starting a new lecture clears the queue. Sending
+replies is a separate action in your email application.
