@@ -1,0 +1,166 @@
+:root {
+  color: #172d39;
+  background: #f7f6f1;
+  font:
+    17px/1.5 system-ui,
+    sans-serif;
+}
+* {
+  box-sizing: border-box;
+}
+body {
+  margin: 0;
+}
+main {
+  max-width: 760px;
+  margin: auto;
+  padding: 28px 24px 64px;
+}
+header {
+  border-top: 4px solid;
+  padding-top: 18px;
+  margin-bottom: 28px;
+}
+h1 {
+  font:
+    500 clamp(30px, 6vw, 48px)/1.12 Georgia,
+    serif;
+  margin: 12px 0 20px;
+  overflow-wrap: anywhere;
+}
+.eyebrow {
+  font: 700 12px/1.4 monospace;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+}
+label {
+  display: block;
+  font-weight: 650;
+  margin: 22px 0 6px;
+}
+input,
+textarea,
+select,
+button {
+  font: inherit;
+  border: 1px solid #526872;
+  border-radius: 3px;
+  min-height: 46px;
+}
+input,
+textarea,
+select {
+  display: block;
+  width: 100%;
+  padding: 10px;
+  background: white;
+  color: inherit;
+  margin-top: 6px;
+}
+textarea {
+  resize: vertical;
+}
+button {
+  padding: 10px 16px;
+  cursor: pointer;
+  background: #173e50;
+  color: white;
+}
+button:disabled {
+  opacity: 0.55;
+  cursor: default;
+}
+button:hover:not(:disabled) {
+  background: #245b71;
+}
+button:focus-visible,
+a:focus-visible,
+input:focus-visible,
+textarea:focus-visible,
+select:focus-visible,
+summary:focus-visible {
+  outline: 3px solid #a14617;
+  outline-offset: 3px;
+}
+a {
+  color: #174e6b;
+  overflow-wrap: anywhere;
+}
+.hint,
+.optional {
+  color: #50616a;
+  font-size: 14px;
+  font-weight: 400;
+}
+.hint {
+  margin: 8px 0 20px;
+}
+.controls {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+#qa-error {
+  color: #9b2e19;
+}
+#qa-error:empty {
+  display: none;
+}
+#collection-status {
+  font-weight: 600;
+}
+#qa-export {
+  margin: 14px 0;
+}
+.question {
+  background: white;
+  border: 1px solid #abb7bc;
+  border-left: 4px solid #526872;
+  padding: 20px;
+  margin: 16px 0;
+}
+.question[data-status="shortlist"] {
+  border-left-color: #a14617;
+}
+.question h2 {
+  font:
+    500 23px/1.35 Georgia,
+    serif;
+  overflow-wrap: anywhere;
+  margin: 0 0 12px;
+  white-space: pre-wrap;
+}
+.question .state {
+  font: 700 12px/1.4 monospace;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+.question button {
+  font-size: 14px;
+  background: white;
+  color: #173e50;
+}
+.question button:hover:not(:disabled) {
+  background: #e4ecef;
+}
+.question details {
+  margin: 12px 0;
+  overflow-wrap: anywhere;
+}
+.question summary {
+  cursor: pointer;
+}
+[hidden] {
+  display: none !important;
+}
+@media (max-width: 480px) {
+  main {
+    padding: 20px 16px 40px;
+  }
+  .question {
+    padding: 16px;
+  }
+  .controls > button {
+    flex: 1 1 auto;
+  }
+}

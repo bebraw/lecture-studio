@@ -12,6 +12,7 @@
   "main": "worker.ts",
   "compatibility_date": "2026-09-04",
   "workers_dev": true,
+  "dev": { "host": "127.0.0.1" },
   "preview_urls": false,
   "secrets": { "required": ["PRESENTER_TOKEN"] },
   "build": { "command": "node --import tsx build-assets.ts" },
@@ -24,10 +25,12 @@
     "bindings": [
       { "name": "ROOM_STATE", "class_name": "RoomState" },
       { "name": "STAGE_STATE", "class_name": "StageState" },
+      { "name": "QUESTION_SESSIONS", "class_name": "QuestionSession" },
     ],
   },
   "migrations": [
     { "tag": "v1", "new_sqlite_classes": ["RoomState"] },
     { "tag": "v2", "new_sqlite_classes": ["StageState"] },
+    { "tag": "v3", "new_sqlite_classes": ["QuestionSession"] },
   ],
 }

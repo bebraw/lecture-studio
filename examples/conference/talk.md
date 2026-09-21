@@ -8,12 +8,16 @@ title: Explaining cancellation
 variants:
   ai-day:
     title: AI Day · 12 minutes
+    identity:
+      joinUrl: https://example.org/q/ai-day-2026
     slides: [opening, comparison, order, references]
     speakingMinutes: 12
     qaMinutes: 3
     durations: { opening: 60, comparison: 180, order: 420, references: 60 }
   webist:
     title: WEBIST · 15 minutes
+    identity:
+      joinUrl: https://example.org/q/webist-2026
     slides: [opening, comparison, order, process, references]
     speakingMinutes: 15
     qaMinutes: 5

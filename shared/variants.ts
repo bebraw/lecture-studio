@@ -1,3 +1,4 @@
+import { identitySchema } from "./identity.ts";
 import * as v from "valibot";
 const id = v.pipe(v.string(), v.regex(/^[a-z0-9-]{1,60}$/));
 export const durationSchema = v.pipe(
@@ -11,6 +12,7 @@ export const variantsSchema = v.pipe(
   v.record(
     id,
     v.strictObject({
+      identity: v.exactOptional(identitySchema),
       title: v.pipe(v.string(), v.minLength(1), v.maxLength(200)),
       slides: v.pipe(v.array(id), v.minLength(1), v.maxLength(100)),
       speakingMinutes: v.pipe(minutes, v.minValue(1)),

@@ -1,3 +1,4 @@
+import { relativeImage } from "./presentation-images.ts";
 import type { PresentationDefinition } from "../shared/models.ts";
 export function selectVariant(
   deck: PresentationDefinition,
@@ -6,6 +7,16 @@ export function selectVariant(
   if (!name) return deck;
   const variant = deck.variants?.[name];
   if (!variant) throw new Error(`Unknown event variant: ${name}`);
+  const identity = variant.identity
+    ? { ...deck.identity, ...variant.identity }
+    : deck.identity;
+  for (const field of ["logo", "qrCode"] as const)
+    if (identity?.[field] && !relativeImage.test(identity[field]))
+      throw new Error(
+        `Variant ${name}: identity ${field} requires a local ./ image path`,
+      );
+  if (identity?.qrCode && !identity.joinUrl)
+    throw new Error(`Variant ${name}: a QR code requires an audience join URL`);
   const selected = new Set(variant.slides);
   if (selected.size !== variant.slides.length)
     throw new Error(`Variant ${name}: duplicate slide IDs`);
@@ -40,7 +51,12 @@ export function selectVariant(
       throw new Error(
         `Variant ${name}: duration refers to omitted slide ${id}`,
       );
-  return { ...deck, start: steps[0]!.id, steps };
+  return {
+    ...deck,
+    start: steps[0]!.id,
+    steps,
+    ...(identity ? { identity } : {}),
+  };
 }
 export function variantTiming(deck: PresentationDefinition, name?: string) {
   const variant = name ? deck.variants?.[name] : undefined;

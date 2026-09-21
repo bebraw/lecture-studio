@@ -375,3 +375,5 @@ Select up to 12 lines and review the excerpt. **Show on stage** shares those lin
 The viewer is read-only and omits hidden files, generated folders, common credential filenames, and symlinks. Text files are limited to 128 KiB. Review selected code before sharing; ordinary source files can still contain embedded sensitive values. No full source tree is sent to the audience.
 
 For portable fixed-canvas slide PDFs, see [conference PDF exports](docs/conference-pdf.md). The A4 reading copy remains available separately.
+
+For audience questions while presenting venue PDFs, see [hosted Q&A without Studio](docs/independent-qa.md).

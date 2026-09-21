@@ -12,6 +12,7 @@
     "test:browser": "npm run build && playwright test",
     "check": "npm run quality:gate:fast && npm run build:worker && npm run test:browser",
     "build": "node --import tsx scripts/build-browser.ts",
+    "qa:session": "node --import tsx --env-file-if-exists=.env scripts/qa-session.ts",
     "export:pdf": "node --import tsx scripts/export-pdf.ts",
     "export:study": "node --import tsx scripts/export-study.ts",
     "typecheck": "npm run typegen && node node_modules/typescript-7/bin/tsc -p tsconfig.json && node node_modules/typescript-7/bin/tsc -p tsconfig.worker.json",

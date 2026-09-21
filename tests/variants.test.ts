@@ -27,6 +27,8 @@ test("event variants reorder shared slides, rebuild navigation and keep separate
     /Speaking 12:00 \/ 12:00 · Q&A 3:00/,
   );
   assert.equal(deck.steps.length, 6);
+  assert.equal(selected.identity?.joinUrl, "https://example.org/q/ai-day-2026");
+  assert.equal(selected.identity?.presenter, deck.identity?.presenter);
   const session = new PresentationSession(deck, "example", "webist");
   assert.equal(session.state().variant, "webist");
   assert.equal(session.state().timing?.qaSeconds, 300);

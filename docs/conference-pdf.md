@@ -142,7 +142,7 @@ Before submitting, open both PDFs in the venue's reader and inspect page navigat
 fonts, source credits and every example frame. The export preflight checks element
 bounds and asset readiness; it cannot judge whether an explanation is sufficient.
 The repository example produces 11 presentation pages and 8 publication pages.
-Independent Q&A is documented separately; PowerPoint export is not planned.
+[Hosted Q&A](independent-qa.md) runs independently of the venue PDF; PowerPoint export is not planned.
 
 ## Event variants and timing budgets
 
@@ -193,3 +193,22 @@ the selected order, starting at its first slide. Links to omitted detours are re
 Poll inputs, demo previews and word-review dependencies must remain in the variant
 before the slide that uses them. Invalid variants fail preparation with a named
 slide/dependency instead of leaving broken navigation.
+
+Variants can override `identity` for event-specific Q&A links and QR assets:
+
+```yaml
+variants:
+  ai-day:
+    title: AI Day 2026
+    slides: [opening, comparison, order, references]
+    speakingMinutes: 12
+    qaMinutes: 3
+    identity:
+      joinUrl: https://live.scalableweb.dev/q/ai-day-2026
+      qrCode: ./ai-day-questions.svg
+```
+
+Unspecified identity fields retain the shared presenter/affiliation/logo. Use a
+matching QR asset when changing the URL. Publication mode removes the resulting
+session link/QR as usual. [Provision the Q&A session](independent-qa.md) before
+exporting the PDF; the example's `example.org` addresses are placeholders.

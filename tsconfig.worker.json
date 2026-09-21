@@ -9,6 +9,10 @@
     "audience/room-*.ts",
     "audience/stage-state.ts",
     "audience/feedback-http.ts",
+    "audience/qa-state.ts",
+    "audience/qa-http.ts",
+    "audience/qa-view.ts",
+    "audience/authorization.ts",
     "audience/worker-configuration.d.ts"
   ],
   "exclude": []

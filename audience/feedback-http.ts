@@ -41,9 +41,9 @@ export async function feedbackRequest(
   request: Request,
   env: Env,
   admin: boolean,
+  object = env.STAGE_STATE.getByName("lecture"),
 ) {
-  const object = env.STAGE_STATE.getByName("lecture"),
-    url = new URL(request.url);
+  const url = new URL(request.url);
   try {
     if (request.method === "GET")
       return json(

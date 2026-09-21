@@ -1,3 +1,6 @@
+import { authorized } from "./authorization.ts";
+import { handleQa } from "./qa-http.ts";
+export { QuestionSession } from "./qa-state.ts";
 import { audienceProtocol } from "../shared/audience-protocol.ts";
 import { audienceRooms as rooms } from "../shared/audience-rooms.ts";
 import { parse } from "valibot";
@@ -58,20 +61,15 @@ function html(title: string, body: string, embeddableRoom = false) {
     },
   );
 }
-async function authorized(request: Request, secret: string) {
-  if (!secret || secret.length < 32) return false;
-  const supplied = request.headers.get("authorization") || "";
-  if (supplied.length > 4096) return false;
-  const encoder = new TextEncoder();
-  const [suppliedHash, expectedHash] = await Promise.all([
-    crypto.subtle.digest("SHA-256", encoder.encode(supplied)),
-    crypto.subtle.digest("SHA-256", encoder.encode("Bearer " + secret)),
-  ]);
-  return crypto.subtle.timingSafeEqual(suppliedHash, expectedHash);
-}
+
 export default {
   async fetch(request: Request, env: Env): Promise<Response> {
     const url = new URL(request.url);
+    if (
+      url.pathname.startsWith("/q/") ||
+      url.pathname.startsWith("/presenter/qa/")
+    )
+      return handleQa(request, env);
     if (url.pathname === "/presenter/presence") {
       if (!(await authorized(request, env.PRESENTER_TOKEN)))
         return new Response("Unauthorized", { status: 401 });
@@ -321,6 +319,8 @@ export default {
       (url.pathname === "/" ||
         [
           "/style.css",
+          "/qa.css",
+          "/qa.mjs",
           "/identity.css",
           "/reveals.css",
           "/audience.css",

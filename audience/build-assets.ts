@@ -23,7 +23,14 @@ await copyFile(
   new URL("slides.css", output),
 );
 // Deliberate allowlist: never publish the desk, notes, configuration or secrets.
-for (const name of ["shared.mjs", "style.css", "identity.css", "reveals.css"])
+for (const name of [
+  "shared.mjs",
+  "style.css",
+  "identity.css",
+  "reveals.css",
+  "qa.mjs",
+  "qa.css",
+])
   await copyFile(
     new URL(
       (name.endsWith(".mjs") ? ".local/browser/public/" : "public/") + name,
