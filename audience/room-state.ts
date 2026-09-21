@@ -1,3 +1,4 @@
+import type { PollDefinition } from "../shared/models.ts";
 import { DurableObject } from "cloudflare:workers";
 
 import type {
@@ -38,6 +39,7 @@ export class RoomState extends DurableObject<Env> implements RoomOperations {
     super(ctx, env);
     void ctx.blockConcurrencyWhile(async () => {
       this.ctx.storage.sql.exec(`
+        CREATE TABLE IF NOT EXISTS poll_definition (singleton INTEGER PRIMARY KEY CHECK (singleton = 1), definition TEXT NOT NULL);
         CREATE TABLE IF NOT EXISTS vote_limits (network TEXT PRIMARY KEY, since INTEGER, count INTEGER);
         CREATE TABLE IF NOT EXISTS lecture_session (singleton INTEGER PRIMARY KEY CHECK (singleton = 1), id TEXT NOT NULL);
         CREATE TABLE IF NOT EXISTS choices (
@@ -60,6 +62,43 @@ export class RoomState extends DurableObject<Env> implements RoomOperations {
         ON CONFLICT(singleton) DO NOTHING;
       `);
     });
+  }
+
+  getDefinition(): PollDefinition | null {
+    const row = this.ctx.storage.sql
+      .exec<{ definition: string }>(
+        "SELECT definition FROM poll_definition WHERE singleton=1",
+      )
+      .toArray()[0];
+    return row ? (JSON.parse(row.definition) as PollDefinition) : null;
+  }
+
+  async preparePoll(definition: PollDefinition): Promise<RoomSnapshot> {
+    validateChoices(definition.options);
+    const encoded = JSON.stringify(definition);
+    const previous = this.getDefinition();
+    const snapshot = this.readSnapshot();
+    if (previous && JSON.stringify(previous) === encoded) return snapshot;
+    if (snapshot.status === "open" || snapshot.totalVotes > 0)
+      throw new Error(
+        "Poll definition conflicts with an open room or existing votes",
+      );
+    this.ctx.storage.transactionSync(() => {
+      this.ctx.storage.sql.exec("DELETE FROM choices");
+      for (const [position, choice] of definition.options.entries())
+        this.ctx.storage.sql.exec(
+          "INSERT INTO choices (id,label,position) VALUES (?,?,?)",
+          choice.id,
+          choice.label,
+          position,
+        );
+      this.ctx.storage.sql.exec(
+        "INSERT OR REPLACE INTO poll_definition VALUES (1,?)",
+        encoded,
+      );
+      this.incrementRevision();
+    });
+    return this.readSnapshot();
   }
 
   async getSnapshot(voterKey?: string): Promise<RoomSnapshot> {

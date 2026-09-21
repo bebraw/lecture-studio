@@ -130,6 +130,7 @@ export function parsePresentation(note: Note): PresentationDefinition {
   )
     throw new Error("Invalid presentation v1");
   const ids = new Set();
+  const rooms = new Map<string, string>();
   for (const s of value.steps) {
     if (
       !/^[a-z0-9-]{1,60}$/.test(s.id) ||
@@ -151,7 +152,13 @@ export function parsePresentation(note: Note): PresentationDefinition {
     if (s.type === "poll") {
       s.poll = validatePoll(s.poll);
       if (typeof s.room !== "string" || !/^[a-z0-9-]{1,80}$/.test(s.room))
-        throw new Error("Poll requires a prepared room ID");
+        throw new Error(
+          "Poll requires a room ID (lowercase letters, numbers and hyphens)",
+        );
+      const definition = JSON.stringify(s.poll);
+      if (rooms.has(s.room) && rooms.get(s.room) !== definition)
+        throw new Error("Conflicting poll definitions for room " + s.room);
+      rooms.set(s.room, definition);
     }
   }
   if (!ids.has(value.start)) throw new Error("Missing start step");

@@ -6,17 +6,40 @@ import { demoCsp } from "../shared/web-demo.ts";
 import { audiencePublicationSchema } from "../shared/audience-schemas.ts";
 import { handleRoomRequest, readRoomSnapshot } from "./room-http";
 import { renderRoomFragment } from "./room-view";
-import { feedbackRequest } from "./feedback-http";
+import { validatePoll } from "../shared/poll-definition.ts";
+import { feedbackRequest, readBody } from "./feedback-http";
 import type { JsonValue } from "./stage-state";
 export { RoomState } from "./room-state";
 export { StageState } from "./stage-state";
 
+const escapeText = (text: string) =>
+  text.replace(
+    /[&<>"']/g,
+    (c) =>
+      ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[
+        c
+      ]!,
+  );
+async function roomIds(env: Env) {
+  return [
+    ...new Set([
+      ...Object.keys(rooms),
+      ...(await env.STAGE_STATE.getByName("lecture").pollRooms()),
+    ]),
+  ];
+}
+async function roomDefinition(env: Env, id: string) {
+  const prepared = await env.ROOM_STATE.getByName(id).getDefinition();
+  return prepared
+    ? { question: prepared.question, choices: prepared.options }
+    : rooms[id];
+}
 function html(title: string, body: string, embeddableRoom = false) {
   return new Response(
     '<!doctype html><html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>' +
-      title +
+      escapeText(title) +
       '</title><link rel="stylesheet" href="/style.css"><main><h1>' +
-      title +
+      escapeText(title) +
       "</h1>" +
       body +
       "</main></html>",
@@ -100,7 +123,7 @@ export default {
         return new Response("Method not allowed", { status: 405 });
       if (!(await authorized(request, env.PRESENTER_TOKEN)))
         return new Response("Unauthorized", { status: 401 });
-      for (const id of Object.keys(rooms)) {
+      for (const id of await roomIds(env)) {
         const room = env.ROOM_STATE.getByName(id);
         await room.setStatus("locked");
         await room.resetVotes();
@@ -113,7 +136,7 @@ export default {
         return new Response("Method not allowed", { status: 405 });
       if (!(await authorized(request, env.PRESENTER_TOKEN)))
         return new Response("Unauthorized", { status: 401 });
-      for (const id of Object.keys(rooms)) {
+      for (const id of await roomIds(env)) {
         const room = env.ROOM_STATE.getByName(id);
         if ((await room.getSnapshot()).status === "open")
           await room.setStatus("locked");
@@ -177,7 +200,7 @@ export default {
           throw new Error("Stage too large");
         if (input.live === false) {
           const snapshots = await Promise.all(
-            Object.keys(rooms).map((id) =>
+            (await roomIds(env)).map((id) =>
               env.ROOM_STATE.getByName(id).getSnapshot(),
             ),
           );
@@ -255,7 +278,7 @@ export default {
           },
         );
       const snapshots = await Promise.all(
-        Object.keys(rooms).map(async (id) => ({
+        (await roomIds(env)).map(async (id) => ({
           id,
           snapshot: await readRoomSnapshot(request, env, id),
         })),
@@ -273,7 +296,8 @@ export default {
           poll: active
             ? {
                 id: active.id,
-                question: rooms[active.id]?.question ?? "",
+                question:
+                  (await roomDefinition(env, active.id))?.question ?? "",
                 html: renderRoomFragment({
                   roomId: active.id,
                   snapshot: active.snapshot,
@@ -319,14 +343,41 @@ export default {
       return response;
     }
     const match =
-      /^\/(rooms|api\/rooms|presenter\/rooms)\/([a-z0-9-]+)(?:\/(seed|open|open-session|lock))?$/.exec(
+      /^\/(rooms|api\/rooms|presenter\/rooms)\/([a-z0-9-]+)(?:\/(seed|open|open-session|lock|prepare))?$/.exec(
         url.pathname,
       );
-    if (!match?.[2] || !Object.hasOwn(rooms, match[2]))
+    if (!match?.[2] || match[2].length > 80)
       return new Response("Not found", { status: 404 });
     const [, kind, , requestedOperation] = match;
     const id = match[2];
-    const definition = rooms[id];
+    if (kind === "presenter/rooms" && requestedOperation === "prepare") {
+      if (request.method !== "POST")
+        return new Response("Method not allowed", { status: 405 });
+      if (!(await authorized(request, env.PRESENTER_TOKEN)))
+        return new Response("Unauthorized", { status: 401 });
+      if (!request.headers.get("content-type")?.startsWith("application/json"))
+        return new Response("Expected JSON", { status: 415 });
+      try {
+        const poll = validatePoll(await readBody(request));
+        await env.STAGE_STATE.getByName("lecture").registerPollRoom(id);
+        const snapshot = await env.ROOM_STATE.getByName(id).preparePoll(poll);
+        return Response.json(snapshot, {
+          headers: { "cache-control": "no-store" },
+        });
+      } catch (error) {
+        const conflict =
+          error instanceof Error && error.message.includes("conflicts");
+        return new Response(
+          conflict
+            ? "Poll definition conflicts with existing votes or open voting"
+            : "Invalid poll definition",
+          { status: conflict ? 409 : 400 },
+        );
+      }
+    }
+    if (!(await roomIds(env)).includes(id))
+      return new Response("Not found", { status: 404 });
+    const definition = await roomDefinition(env, id);
     if (!definition) return new Response("Not found", { status: 404 });
     const operation =
       requestedOperation === "open-session" ? "open" : requestedOperation;
@@ -340,7 +391,7 @@ export default {
       if (operation === "open") {
         await room.initializeChoices(definition.choices);
         const others = await Promise.all(
-          Object.keys(rooms)
+          (await roomIds(env))
             .filter((key) => key !== id)
             .map((key) => env.ROOM_STATE.getByName(key).getSnapshot()),
         );

@@ -498,6 +498,8 @@ test("public capabilities describe required rooms without activating a lecture",
       "persistent-collections",
       "continuous-questions",
       "web-demo-mirroring",
+      "poll-preparation",
+      "private-question-follow-ups",
     ],
   });
   expect(

@@ -457,6 +457,7 @@ export function mountPresentations({ call, update }: MountOptions) {
   }
   const syncNotice = document.createElement("span");
   syncNotice.role = "status";
+  syncNotice.id = "audience-readiness";
   syncNotice.className = "small muted";
   $("graph-status").after(syncNotice);
   for (const [id, op] of [

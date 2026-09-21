@@ -8,6 +8,9 @@ export class StageState extends DurableObject<Env> {
   constructor(ctx: DurableObjectState, env: Env) {
     super(ctx, env);
     ctx.storage.sql.exec(
+      "CREATE TABLE IF NOT EXISTS prepared_rooms (id TEXT PRIMARY KEY)",
+    );
+    ctx.storage.sql.exec(
       "CREATE TABLE IF NOT EXISTS audience_presence (browser TEXT PRIMARY KEY, seen INTEGER NOT NULL)",
     );
     ctx.storage.sql.exec(
@@ -40,6 +43,22 @@ export class StageState extends DurableObject<Env> {
     );
     ctx.storage.sql.exec(
       "INSERT OR IGNORE INTO feedback_approvals SELECT id,round,text FROM feedback_items WHERE status='approved'",
+    );
+  }
+  pollRooms() {
+    return this.ctx.storage.sql
+      .exec<{ id: string }>("SELECT id FROM prepared_rooms ORDER BY id")
+      .toArray()
+      .map((row) => row.id);
+  }
+  registerPollRoom(id: string) {
+    if (!/^[a-z0-9-]{1,80}$/.test(id)) throw new Error("Invalid room ID");
+    const rooms = this.pollRooms();
+    if (!rooms.includes(id) && rooms.length >= 1000)
+      throw new Error("Prepared room limit reached");
+    this.ctx.storage.sql.exec(
+      "INSERT OR IGNORE INTO prepared_rooms VALUES (?)",
+      id,
     );
   }
   async publish(stage: Record<string, JsonValue>, demoHtml?: string) {

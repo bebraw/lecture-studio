@@ -8,7 +8,8 @@ import type {
   PollRound,
   PollState,
 } from "../shared/models.ts";
-import { record } from "../shared/errors.ts";
+import { validatePoll } from "../shared/poll-definition.ts";
+export { validatePoll } from "../shared/poll-definition.ts";
 import { asError } from "../shared/errors.ts";
 import { randomUUID } from "node:crypto";
 export const themePoll = (): PollDefinition => ({
@@ -62,46 +63,6 @@ const impacts: Record<string, string> = {
   practical:
     "Prioritize available dates, location and attendance details; do not invent missing facts.",
 };
-export function validatePoll(input: unknown): PollDefinition {
-  const value = record(input);
-  if (
-    !value ||
-    typeof value.question !== "string" ||
-    !value.question.trim() ||
-    value.question.length > 200 ||
-    !Array.isArray(value.options) ||
-    value.options.length < 2 ||
-    value.options.length > 6
-  )
-    throw new Error("Use a question and 2–6 predefined options");
-  const options = value.options
-    .map((input: unknown) => {
-      const o = record(input);
-      return o;
-    })
-    .map((o) => {
-      if (
-        !o ||
-        typeof o.id !== "string" ||
-        !/^[a-z0-9-]{1,50}$/.test(o.id) ||
-        typeof o.label !== "string" ||
-        !o.label.trim() ||
-        o.label.length > 80
-      )
-        throw new Error("Options need short IDs and labels");
-      return { id: o.id, label: o.label };
-    });
-  if (
-    new Set(options.map((o) => o.id)).size !== options.length ||
-    !options.some((o) => o.id === value.defaultId)
-  )
-    throw new Error("Choose unique option IDs and a valid default");
-  return {
-    question: value.question,
-    options,
-    defaultId: String(value.defaultId),
-  };
-}
 export interface PollOptions {
   origin?: string;
   room?: string;
@@ -220,6 +181,38 @@ export class AudiencePoll {
         "Poll already active or frozen. Keep this result, or reset the lecture before changing its definition.",
       );
     this.config = validatePoll(config);
+  }
+  async prepare() {
+    if (!this.origin || !this.token) return;
+    const response = await this.fetcher(
+      this.origin + "/presenter/rooms/" + this.room + "/prepare",
+      {
+        method: "POST",
+        redirect: "error",
+        signal: AbortSignal.timeout(10000),
+        headers: {
+          authorization: "Bearer " + this.token,
+          "content-type": "application/json",
+        },
+        body: JSON.stringify(this.config),
+      },
+    );
+    if (!response.ok) {
+      await response.body?.cancel();
+      throw new Error(
+        response.status === 409
+          ? "Poll " +
+              this.room +
+              " conflicts with an open room or existing votes. Close voting and use a new room ID for a revised question. Existing votes were preserved."
+          : "Could not prepare poll " +
+              this.room +
+              " (" +
+              response.status +
+              "). Check the audience service and reload.",
+      );
+    }
+    await response.body?.cancel();
+    this.snapshot = await this.request();
   }
   async request(
     operation?: string,

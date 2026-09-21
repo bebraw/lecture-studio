@@ -17,7 +17,7 @@ Each note has a **Presentation** heading containing one fenced JSON block:
 - version: 1, title, start (step ID), steps.
 - Each step: stable id, type (title, question, material, poll, build), title, body, private notes, optional source.
 - next is the preferred path; related is a list of named detour step IDs.
-- Poll steps declare room and poll (question, options with id/label, defaultId). The room must already exist; the studio does not provision or reset it.
+- Poll steps declare room and poll (question, options with id/label, defaultId). Loading the snapshot prepares the room through the authenticated audience service; no per-poll deployment is needed.
 - Build steps use body as their template and uses as dependencies: each dependency names a poll step and supplies instructions keyed by each valid option ID.
 
 Loading validates and snapshots the entire definition, privately. Note edits take effect only when explicitly loaded again. The prototype snapshot, navigation history, decisions and build receipts live in server memory, not in the note; restarting the server loses that session. Switching presentations starts fresh and is blocked during running builds or open polls. Previous sessions are not yet archived.
@@ -80,3 +80,17 @@ Escape exits the desk. Shortcuts are inactive while editing form fields. The ope
 indicator shows whether questions are still accepted; microphone questions can be
 handled alongside the queue without closing submissions. Returning restores the
 previous synchronized demo state.
+
+### Prepare polls from Obsidian
+
+Each poll slide declares `room` plus `poll.question`, `poll.options` (unique IDs
+and labels), and `poll.defaultId`. Use a room ID specific to the talk, such as
+`conference-prediction`. Loading/reloading the presentation explicitly creates or
+updates those rooms while Live is off. The readiness message confirms the service
+and prepared poll count. No file watching changes a running poll.
+
+Conflicting definitions for one room in a deck are rejected. Any change to wording,
+option order, IDs, labels, or default is rejected if the room has votes or is open.
+Use a new room ID for a revised question to preserve the original votes. An
+identical preparation is safe to repeat. A new lecture's first opening still
+starts a fresh voting round; reopening within that lecture preserves its votes.

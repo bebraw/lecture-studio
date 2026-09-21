@@ -929,7 +929,29 @@ export function createStudio({
                   library,
                 );
               }
-              if (next) await checkAudience();
+              if (next) {
+                const ready = await checkAudience();
+                if (poll.origin && poll.token) {
+                  if (!ready) throw new Error(audienceReadiness);
+                  const prepared = new Set<string>();
+                  for (const step of next.definition.steps.filter(
+                    (step) => step.type === "poll",
+                  )) {
+                    if (prepared.has(step.room!)) continue;
+                    const candidate = new AudiencePoll({
+                      origin: poll.origin,
+                      token: poll.token,
+                      room: step.room!,
+                      fetcher: poll.fetcher,
+                    });
+                    candidate.configure(step.poll);
+                    await candidate.prepare();
+                    prepared.add(step.room!);
+                  }
+                  audienceReadiness +=
+                    " · " + prepared.size + " polls prepared";
+                }
+              }
               poll.reset();
               presentation = next;
               webDemos = nextDemos;

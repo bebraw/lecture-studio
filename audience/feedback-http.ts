@@ -1,5 +1,5 @@
 import { asError } from "../shared/errors.ts";
-async function readBody(request: Request) {
+export async function readBody(request: Request) {
   const reader = request.body?.getReader();
   if (!reader) throw new Error("Expected JSON");
   const chunks: Uint8Array[] = [];
