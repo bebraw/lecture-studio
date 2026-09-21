@@ -373,3 +373,5 @@ Choose **Inspect source** in the desk toolbar. Select a file from the active app
 Select up to 12 lines and review the excerpt. **Show on stage** shares those lines with Stage and Live when the lecture is live. **Return to slide** restores the prior projection; moving to another slide also ends the source detour. Changed files must be reloaded before sharing. Lines longer than 72 columns are rejected to keep projected code legible.
 
 The viewer is read-only and omits hidden files, generated folders, common credential filenames, and symlinks. Text files are limited to 128 KiB. Review selected code before sharing; ordinary source files can still contain embedded sensitive values. No full source tree is sent to the audience.
+
+For portable fixed-canvas slide PDFs, see [conference PDF exports](docs/conference-pdf.md). The A4 reading copy remains available separately.

@@ -1,3 +1,4 @@
+import type { PdfOptions } from "./pdf.ts";
 import type { RevealDefinition, RevealState } from "./reveals.ts";
 import type { PresentationIdentity } from "./identity.ts";
 export type JsonValue =
@@ -152,6 +153,7 @@ export interface Step {
   room?: string;
 }
 export interface PresentationDefinition {
+  pdf?: PdfOptions;
   identity?: PresentationIdentity;
   version: 1;
   title: string;

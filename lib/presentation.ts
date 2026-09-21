@@ -1,3 +1,4 @@
+import { pdfOptionsSchema } from "../shared/pdf.ts";
 import { identitySchema } from "../shared/identity.ts";
 import {
   imageSources,
@@ -73,6 +74,7 @@ export function parsePresentation(note: Note): PresentationDefinition {
         start: v.exactOptional(v.string()),
         theme: v.exactOptional(v.unknown()),
         identity: v.exactOptional(identitySchema),
+        pdf: v.exactOptional(pdfOptionsSchema),
       }),
       metadata,
     );
@@ -125,6 +127,7 @@ export function parsePresentation(note: Note): PresentationDefinition {
       steps: v.array(stepSchema),
       theme: v.exactOptional(v.unknown()),
       identity: v.exactOptional(identitySchema),
+      pdf: v.exactOptional(pdfOptionsSchema),
     }),
     definition,
   );
