@@ -132,12 +132,16 @@ export function parsePresentation(note: Note): PresentationDefinition {
     definition,
   );
   const value = { ...parsed, theme: parseTheme(parsed.theme) };
-  for (const field of ["logo", "qrCode"] as const) {
-    if (value.identity?.[field] && !relativeImage.test(value.identity[field]))
-      throw new Error("Identity " + field + " requires a local ./ image path");
+  for (const identity of [value.identity, value.pdf?.publicationIdentity]) {
+    for (const field of ["logo", "qrCode"] as const) {
+      if (identity?.[field] && !relativeImage.test(identity[field]))
+        throw new Error(
+          "Identity " + field + " requires a local ./ image path",
+        );
+    }
+    if (identity?.qrCode && !identity.joinUrl)
+      throw new Error("A QR code requires an audience join URL");
   }
-  if (value.identity?.qrCode && !value.identity.joinUrl)
-    throw new Error("A QR code requires an audience join URL");
   const text = (v: unknown, n: number) =>
     typeof v === "string" && v.length <= n;
   if (

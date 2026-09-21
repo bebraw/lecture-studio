@@ -1,4 +1,4 @@
-import { demoSequenceSchema } from "./pdf.ts";
+import { demoSequenceSchema, publicationSchema } from "./pdf.ts";
 import { revealDefinitionSchema, revealStateSchema } from "./reveals.ts";
 import { identitySchema } from "./identity.ts";
 import * as v from "valibot";
@@ -118,6 +118,7 @@ const pollSchema = v.object({
   joinUrl: text,
 });
 export const stepSchema = v.object({
+  publication: v.exactOptional(publicationSchema),
   reveals: v.exactOptional(revealDefinitionSchema),
   hideIdentity: v.exactOptional(v.boolean()),
   study: v.exactOptional(

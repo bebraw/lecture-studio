@@ -1,6 +1,8 @@
+import { identitySchema } from "./identity.ts";
 import * as v from "valibot";
 import type { Stage } from "./models.ts";
 export const pdfOptionsSchema = v.strictObject({
+  publicationIdentity: v.exactOptional(identitySchema),
   aspectRatio: v.exactOptional(v.picklist(["16:9", "4:3"])),
   fonts: v.exactOptional(
     v.pipe(
@@ -23,6 +25,7 @@ export const pdfOptionsSchema = v.strictObject({
 });
 export type PdfOptions = v.InferOutput<typeof pdfOptionsSchema>;
 export interface PdfSlide {
+  mode: PdfMode;
   id: string;
   label: string;
   stage: Partial<Stage>;
@@ -69,3 +72,14 @@ export const demoSequenceSchema = v.pipe(
   v.maxLength(30),
 );
 export type DemoFrame = v.InferOutput<typeof demoSequenceSchema>[number];
+
+export type PdfMode = "presentation" | "publication";
+const publicMarkdown = v.pipe(v.string(), v.maxLength(16000));
+export const publicationSchema = v.strictObject({
+  omit: v.exactOptional(v.boolean()),
+  title: v.exactOptional(v.pipe(v.string(), v.maxLength(200))),
+  body: v.exactOptional(publicMarkdown),
+  explanation: v.exactOptional(publicMarkdown),
+  hideIdentity: v.exactOptional(v.boolean()),
+});
+export type Publication = v.InferOutput<typeof publicationSchema>;

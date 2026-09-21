@@ -11,6 +11,7 @@ identity:
   presenter: Example presenter
   affiliation: Example research group
   logo: ./logo.svg
+  joinUrl: https://example.org/live-session
 ```
 
 ## Slide: Explain the action and the recovery
@@ -30,6 +31,9 @@ PRIVATE_CONFERENCE_NOTE: rehearse the transition.
 
 ```yaml
 id: comparison
+publication:
+  explanation: |
+    The expected version distinguishes a valid action from a stale request.
 reveals:
   rows:
     - step: 1
@@ -83,6 +87,16 @@ B --> C{Version matches?}
 C -->|Yes| D[Confirm change]
 C -->|No| E[Refresh current state]
 ```
+
+## Slide: Join the discussion
+
+```yaml
+id: discussion
+publication:
+  omit: true
+```
+
+Open the live-session link and submit your question now.
 
 ## Slide: References
 

@@ -1,7 +1,7 @@
 import { parseFragment, type DefaultTreeAdapterMap } from "parse5";
 import { revealTotal } from "./reveals.ts";
 import type { PresentationDefinition } from "../shared/models.ts";
-import type { PdfSlide } from "../shared/pdf.ts";
+import type { PdfSlide, PdfMode } from "../shared/pdf.ts";
 import { renderMarkdown } from "./material.ts";
 import {
   imageSources,
@@ -13,6 +13,7 @@ import {
 export function pdfSlides(
   deck: PresentationDefinition,
   frames: Record<string, string[]> = {},
+  mode: PdfMode = "presentation",
 ): PdfSlide[] {
   return deck.steps.flatMap((step, index) => {
     if (
@@ -38,6 +39,7 @@ export function pdfSlides(
       );
     const page: PdfSlide = {
       id: step.id,
+      mode,
       label: `Slide ${index + 1} / ${deck.steps.length}`,
       stage: {
         mode: "material",
@@ -79,6 +81,7 @@ export function pdfSlides(
           },
         };
       });
+    if (mode === "publication") return [page];
     const total = revealTotal(html);
     if (!total) return [page];
     const initial = hasInitialContent(parseFragment(html)) ? 0 : 1;
@@ -103,4 +106,44 @@ function hasInitialContent(node: DefaultTreeAdapterMap["node"]): boolean {
   if ("tagName" in node && ["img", "svg", "hr"].includes(node.tagName))
     return true;
   return "childNodes" in node && node.childNodes.some(hasInitialContent);
+}
+
+/** Apply only deliberately authored public replacements, before loading their assets. */
+export function publicationDeck(
+  deck: PresentationDefinition,
+): PresentationDefinition {
+  const identity = { ...deck.identity };
+  delete identity.joinUrl;
+  delete identity.qrCode;
+  const steps = deck.steps
+    .filter((step) => !step.publication?.omit)
+    .map((step) => {
+      const publication = step.publication;
+      const replacement = { ...step, title: publication?.title ?? step.title };
+      if (publication?.body !== undefined) {
+        replacement.body = publication.body;
+        delete replacement.reveals;
+        // A public replacement for build prose is explicitly authored, never inferred from instructions.
+        if (replacement.type === "build") replacement.type = "material";
+      }
+      if (publication?.explanation) {
+        const body =
+          replacement.type === "build"
+            ? "Live demonstration."
+            : replacement.body || "";
+        replacement.body = body + "\n\n" + publication.explanation;
+        if (replacement.type === "build") replacement.type = "material";
+      }
+      if (publication?.hideIdentity !== undefined)
+        replacement.hideIdentity = publication.hideIdentity;
+      return replacement;
+    });
+  if (!steps.length) throw new Error("Publication omits every slide");
+  return {
+    ...deck,
+    steps,
+    ...(deck.identity || deck.pdf?.publicationIdentity
+      ? { identity: { ...identity, ...deck.pdf?.publicationIdentity } }
+      : {}),
+  };
 }

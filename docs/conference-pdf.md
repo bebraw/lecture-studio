@@ -90,3 +90,57 @@ the slide and frame; they never silently skip a state.
 See [the cancellation example](../examples/conference/talk.md), covering the
 available action, success, a stale request and recovery, with the same HTML demo
 usable live in Studio.
+
+## Presentation and publication copies
+
+`--mode presentation` (the default) preserves reveal and demo-frame pages.
+`--mode publication` collapses each reveal slide to its complete content while
+retaining every authored demo frame and caption. Source credits and references
+remain visible. Slide numbers count the logical slides included in that output.
+
+Author public changes in the slide metadata, separately from speaker notes:
+
+```yaml
+publication:
+  title: A title for independent reading
+  body: |
+    This replaces temporary participation instructions with public content.
+  explanation: |
+    This additional explanation is intended for readers without the speaker.
+```
+
+`body` is an optional complete replacement; `explanation` appends public prose.
+Use `publication: { omit: true }` to omit a session-only slide, or
+`publication: { hideIdentity: true }` to hide its identity footer. Explanations
+must fit the fixed canvas too; use another authored slide for longer discussion.
+Private `<!-- speaker-notes -->` content is never used as an explanation.
+
+Publication mode removes the live join URL and QR by default, preserving presenter,
+affiliation, logo and public contact details. To replace them with permanent
+resources, add this to the Presentation metadata:
+
+```yaml
+pdf:
+  publicationIdentity:
+    joinUrl: https://example.org/paper
+    qrCode: ./paper-qr.svg
+```
+
+For the AI Day filenames in the requirements:
+
+```sh
+npm run export:pdf -- /path/to/talk.md output/Vepsalainen_Juho_AI_Day_2026.pdf --mode presentation
+npm run export:pdf -- /path/to/talk.md output/Publish_Vepsalainen_Juho_AI_Day_2026.pdf --mode publication
+```
+
+The source remains editable in Obsidian; PDFs are generated snapshots. Export does
+not connect to Studio, Obsidian's API, audience services or a venue account. Build
+instructions, speaker notes, credentials, audience responses and attendee emails
+are not read from runtime state or serialized into either PDF.
+
+Before submitting, open both PDFs in the venue's reader and inspect page navigation,
+fonts, source credits and every example frame. The export preflight checks element
+bounds and asset readiness; it cannot judge whether an explanation is sufficient.
+The repository example produces 11 presentation pages and 8 publication pages.
+Event selection/timing budgets, independent Q&A and native PowerPoint export are
+separate follow-up features.

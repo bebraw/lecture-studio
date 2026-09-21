@@ -8,14 +8,14 @@ import { build } from "esbuild";
 import { parsePresentation } from "../lib/presentation.ts";
 import { sections } from "../lib/material.ts";
 import { loadPresentationImages } from "../lib/presentation-images.ts";
-import { pdfSlides } from "../lib/pdf-plan.ts";
-import type { PdfOptions } from "../shared/pdf.ts";
+import { pdfSlides, publicationDeck } from "../lib/pdf-plan.ts";
+import type { PdfOptions, PdfMode } from "../shared/pdf.ts";
 const root = fileURLToPath(new URL("../", import.meta.url));
 
 export async function exportPdf(
   source: string,
   output: string,
-  options: Pick<PdfOptions, "aspectRatio"> = {},
+  options: Pick<PdfOptions, "aspectRatio"> & { mode?: PdfMode } = {},
 ) {
   if (extname(output).toLowerCase() !== ".pdf")
     throw new Error("Output filename must end in .pdf");
@@ -33,7 +33,11 @@ export async function exportPdf(
       throw new Error(`Cannot load asset ${path}: ${String(error)}`);
     }
   };
-  const deck = parsePresentation(sections(await readFile(input, "utf8")));
+  const mode = options.mode || "presentation";
+  if (!["presentation", "publication"].includes(mode))
+    throw new Error("Mode must be presentation or publication");
+  const authored = parsePresentation(sections(await readFile(input, "utf8")));
+  const deck = mode === "publication" ? publicationDeck(authored) : authored;
   await loadPresentationImages(deck, read);
 
   const ratio = options.aspectRatio || deck.pdf?.aspectRatio || "16:9";
@@ -95,6 +99,7 @@ export async function exportPdf(
     const slides = pdfSlides(
       deck,
       await captureDemoFrames(browser, deck, read),
+      mode,
     );
     const page = await browser.newPage({
       viewport: { width, height },
@@ -148,7 +153,17 @@ export async function exportPdf(
     }, deck.title);
     await page.addScriptTag({ content: bundle.outputFiles[0]!.text });
     await page.evaluate(async () => {
-      await Promise.all([...document.fonts].map((font) => font.load()));
+      await Promise.all(
+        [...document.fonts].map(async (font) => {
+          try {
+            await font.load();
+          } catch {
+            throw new Error(
+              `Font ${font.family} could not be decoded; check pdf.fonts assets`,
+            );
+          }
+        }),
+      );
     });
     await page.evaluate((pages) => window.renderPdf(pages), slides);
     await page.evaluate(async () => {

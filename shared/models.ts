@@ -1,4 +1,4 @@
-import type { PdfOptions, DemoFrame } from "./pdf.ts";
+import type { PdfOptions, DemoFrame, Publication } from "./pdf.ts";
 import type { RevealDefinition, RevealState } from "./reveals.ts";
 import type { PresentationIdentity } from "./identity.ts";
 export type JsonValue =
@@ -144,6 +144,7 @@ export interface Step {
   demo?: string;
   demoPoster?: string;
   demoSequence?: DemoFrame[];
+  publication?: Publication;
   layersDemo?: boolean;
   wordCloud?: boolean;
   wordsFrom?: string;

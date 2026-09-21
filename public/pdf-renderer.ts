@@ -7,7 +7,17 @@ window.renderPdf = async (slides: PdfSlide[]) => {
     const root = document.createElement("section");
     root.className = "stage pdf-slide";
     root.dataset.slide = slide.id;
-    root.innerHTML = `<header><span>${escape(slide.stage.act || "")}</span></header><main class="pdf-content stage-surface"></main>${identityHtml(slide.stage.identity, "stage")}<footer class="pdf-footer"><span>${escape(slide.stage.source || "")}</span><span>${escape(slide.label)}</span></footer>`;
+    const identity = identityHtml(slide.stage.identity, "stage");
+    const publicIdentity =
+      slide.mode === "publication"
+        ? identity
+            .replace(">Join the audience<span>", ">Further reading<span>")
+            .replace(
+              'alt="Scan to join the audience"',
+              'alt="Scan for further reading"',
+            )
+        : identity;
+    root.innerHTML = `<header><span>${escape(slide.stage.act || "")}</span></header><main class="pdf-content stage-surface"></main>${publicIdentity}<footer class="pdf-footer"><span>${escape(slide.stage.source || "")}</span><span>${escape(slide.label)}</span></footer>`;
     document.body.append(root);
     applyTheme(root, slide.stage.theme);
     const content = root.querySelector<HTMLElement>("main")!;

@@ -389,3 +389,10 @@ reading mode expands all content. Slides without reveals behave as before.
 
 Use separate slides for reveals and live polls, builds, embedded demos or generated
 review content. See [the complete example](../examples/progressive-reveals.md).
+
+## Conference PDF exports
+
+See [conference PDF exports](conference-pdf.md) for `pdf` presentation metadata,
+captioned `demoSequence` states or images, and per-slide `publication` overrides.
+These settings round-trip with the editable Obsidian source. Public explanations
+belong in `publication.explanation`, separate from private speaker notes.
