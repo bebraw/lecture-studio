@@ -1,3 +1,4 @@
+import { selectVariant, variantTiming } from "../lib/variants.ts";
 import { captureDemoFrames } from "./pdf-demo.ts";
 import { readFile, realpath, mkdir, rename, rm } from "node:fs/promises";
 import { dirname, resolve, sep, extname } from "node:path";
@@ -15,7 +16,10 @@ const root = fileURLToPath(new URL("../", import.meta.url));
 export async function exportPdf(
   source: string,
   output: string,
-  options: Pick<PdfOptions, "aspectRatio"> & { mode?: PdfMode } = {},
+  options: Pick<PdfOptions, "aspectRatio"> & {
+    mode?: PdfMode;
+    variant?: string;
+  } = {},
 ) {
   if (extname(output).toLowerCase() !== ".pdf")
     throw new Error("Output filename must end in .pdf");
@@ -37,7 +41,9 @@ export async function exportPdf(
   if (!["presentation", "publication"].includes(mode))
     throw new Error("Mode must be presentation or publication");
   const authored = parsePresentation(sections(await readFile(input, "utf8")));
-  const deck = mode === "publication" ? publicationDeck(authored) : authored;
+  const selected = selectVariant(authored, options.variant);
+  const timing = variantTiming(selected, options.variant);
+  const deck = mode === "publication" ? publicationDeck(selected) : selected;
   await loadPresentationImages(deck, read);
 
   const ratio = options.aspectRatio || deck.pdf?.aspectRatio || "16:9";
@@ -183,7 +189,13 @@ export async function exportPdf(
       tagged: true,
     });
     await rename(temporary, resolve(output));
-    return { pages: slides.length, slides: deck.steps.length, width, height };
+    return {
+      pages: slides.length,
+      slides: deck.steps.length,
+      width,
+      height,
+      ...(timing ? { timing } : {}),
+    };
   } finally {
     await browser.close();
     await rm(temporary, { force: true });

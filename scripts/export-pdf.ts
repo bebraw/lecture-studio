@@ -1,10 +1,15 @@
+import { timingLabel } from "../shared/variants.ts";
 import { resolve } from "node:path";
 import { exportPdf } from "./pdf-export.ts";
 import type { PdfMode } from "../shared/pdf.ts";
 const [source, output, ...args] = process.argv.slice(2);
-const options: { aspectRatio?: "16:9" | "4:3"; mode?: PdfMode } = {};
+const options: {
+  aspectRatio?: "16:9" | "4:3";
+  mode?: PdfMode;
+  variant?: string;
+} = {};
 const usage =
-  "Usage: npm run export:pdf -- <presentation.md> <output.pdf> [--aspect 16:9|4:3] [--mode presentation|publication]";
+  "Usage: npm run export:pdf -- <presentation.md> <output.pdf> [--aspect 16:9|4:3] [--mode presentation|publication] [--variant name]";
 if (!source || !output || args.length % 2) throw new Error(usage);
 const seen = new Set<string>();
 for (let i = 0; i < args.length; i += 2) {
@@ -19,9 +24,13 @@ for (let i = 0; i < args.length; i += 2) {
     ["presentation", "publication"].includes(value)
   )
     options.mode = value as PdfMode;
+  else if (option === "--variant" && /^[a-z0-9-]{1,60}$/.test(value))
+    options.variant = value;
   else throw new Error(usage);
 }
 const result = await exportPdf(resolve(source), resolve(output), options);
 console.log(
   `Exported ${options.mode || "presentation"}: ${result.pages} pages (${result.slides} logical slides) to ${resolve(output)}`,
 );
+
+if (result.timing) console.log(timingLabel(result.timing));

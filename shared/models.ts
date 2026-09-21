@@ -1,3 +1,4 @@
+import type { EventVariants } from "./variants.ts";
 import type { PdfOptions, DemoFrame, Publication } from "./pdf.ts";
 import type { RevealDefinition, RevealState } from "./reveals.ts";
 import type { PresentationIdentity } from "./identity.ts";
@@ -142,6 +143,7 @@ export interface Step {
   previewOf?: string;
   teachingDemo?: boolean;
   demo?: string;
+  durationSeconds?: number;
   demoPoster?: string;
   demoSequence?: DemoFrame[];
   publication?: Publication;
@@ -155,6 +157,7 @@ export interface Step {
   room?: string;
 }
 export interface PresentationDefinition {
+  variants?: EventVariants;
   pdf?: PdfOptions;
   identity?: PresentationIdentity;
   version: 1;

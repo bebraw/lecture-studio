@@ -5,6 +5,20 @@
 ```yaml
 version: 1
 title: Explaining cancellation
+variants:
+  ai-day:
+    title: AI Day · 12 minutes
+    slides: [opening, comparison, order, references]
+    speakingMinutes: 12
+    qaMinutes: 3
+    durations: { opening: 60, comparison: 180, order: 420, references: 60 }
+  webist:
+    title: WEBIST · 15 minutes
+    slides: [opening, comparison, order, process, references]
+    speakingMinutes: 15
+    qaMinutes: 5
+    durations:
+      { opening: 60, comparison: 180, order: 420, process: 180, references: 60 }
 pdf:
   aspectRatio: "16:9"
 identity:

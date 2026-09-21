@@ -142,5 +142,54 @@ Before submitting, open both PDFs in the venue's reader and inspect page navigat
 fonts, source credits and every example frame. The export preflight checks element
 bounds and asset readiness; it cannot judge whether an explanation is sufficient.
 The repository example produces 11 presentation pages and 8 publication pages.
-Event selection/timing budgets, independent Q&A and native PowerPoint export are
-separate follow-up features.
+Independent Q&A is documented separately; PowerPoint export is not planned.
+
+## Event variants and timing budgets
+
+Keep shared material in one note. Presentation metadata can select and order slides
+for each event, without copying their content:
+
+```yaml
+variants:
+  ai-day:
+    title: AI Day 2026
+    slides: [opening, comparison, order, references]
+    speakingMinutes: 12
+    qaMinutes: 3
+    durations: { opening: 60, comparison: 180, order: 420, references: 60 }
+  webist:
+    title: WEBIST 2026
+    slides: [opening, comparison, order, process, references]
+    speakingMinutes: 15
+    qaMinutes: 5
+    durations:
+      { opening: 60, comparison: 180, order: 420, process: 180, references: 60 }
+```
+
+Set `durationSeconds` in slide metadata for a shared estimate. A variant's
+`durations` override those estimates, allowing more explanation at a longer event.
+Each estimate covers the entire logical slide, including its reveals/demo frames.
+Budgets are planned timings, not a running stopwatch. Missing estimates are listed
+as untimed; over-budget speaking plans are reported without consuming the Q&A
+allocation or silently blocking export.
+
+```sh
+npm run export:pdf -- talk.md Vepsalainen_Juho_AI_Day_2026.pdf --variant ai-day
+npm run export:pdf -- talk.md Publish_Vepsalainen_Juho_AI_Day_2026.pdf --variant ai-day --mode publication
+npm run export:pdf -- talk.md WEBIST_2026.pdf --variant webist
+```
+
+Timing reports describe the selected delivery plan, even when publication mode
+omits a session-only slide. Publication overrides apply after variant selection.
+Without `--variant`, all authored slides are exported.
+
+In Studio, load the source, reopen the presentation picker, choose **Event variant**,
+and click **Load variant** with Live off. Reload and restart preserve the selected
+variant. **All authored slides** returns to the full note. Editable Markdown export
+always retains the entire source and all variant definitions.
+
+Variant slide IDs must be unique and present in the source. Next/Previous follow
+the selected order, starting at its first slide. Links to omitted detours are removed.
+Poll inputs, demo previews and word-review dependencies must remain in the variant
+before the slide that uses them. Invalid variants fail preparation with a named
+slide/dependency instead of leaving broken navigation.

@@ -1,3 +1,4 @@
+import { durationSchema, timingSchema } from "./variants.ts";
 import { demoSequenceSchema, publicationSchema } from "./pdf.ts";
 import { revealDefinitionSchema, revealStateSchema } from "./reveals.ts";
 import { identitySchema } from "./identity.ts";
@@ -118,6 +119,7 @@ const pollSchema = v.object({
   joinUrl: text,
 });
 export const stepSchema = v.object({
+  durationSeconds: v.exactOptional(durationSchema),
   publication: v.exactOptional(publicationSchema),
   reveals: v.exactOptional(revealDefinitionSchema),
   hideIdentity: v.exactOptional(v.boolean()),
@@ -172,6 +174,9 @@ const inputSchema = v.object({
   revision: v.nullable(count),
 });
 const presentationSchema = v.object({
+  variant: optionalText,
+  variants: v.exactOptional(v.array(v.object({ id: text, title: text }))),
+  timing: v.exactOptional(timingSchema),
   reveal: v.exactOptional(revealStateSchema),
   webDemo: v.exactOptional(webDemoSchema),
   demo: v.exactOptional(

@@ -149,3 +149,33 @@ test("publication collapses reveals, keeps demo frames and omits session-only sl
     await rm(directory, { recursive: true, force: true });
   }
 });
+
+test("one Obsidian source exports distinct event variants with separate speaking and Q&A budgets", async () => {
+  const directory = await mkdtemp(join(tmpdir(), "pdf-variants-"));
+  try {
+    const ai = await exportPdf(
+      "examples/conference/talk.md",
+      join(directory, "ai.pdf"),
+      { variant: "ai-day" },
+    );
+    const webist = await exportPdf(
+      "examples/conference/talk.md",
+      join(directory, "webist.pdf"),
+      { variant: "webist" },
+    );
+    expect(ai.slides).toBe(4);
+    expect(webist.slides).toBe(5);
+    expect(ai.timing).toMatchObject({
+      plannedSeconds: 720,
+      speakingSeconds: 720,
+      qaSeconds: 180,
+    });
+    expect(webist.timing).toMatchObject({
+      plannedSeconds: 900,
+      speakingSeconds: 900,
+      qaSeconds: 300,
+    });
+  } finally {
+    await rm(directory, { recursive: true, force: true });
+  }
+});

@@ -1,3 +1,5 @@
+import { variantsSchema } from "../shared/variants.ts";
+import { selectVariant, variantTiming } from "./variants.ts";
 import { pdfOptionsSchema } from "../shared/pdf.ts";
 import { identitySchema } from "../shared/identity.ts";
 import {
@@ -75,6 +77,7 @@ export function parsePresentation(note: Note): PresentationDefinition {
         theme: v.exactOptional(v.unknown()),
         identity: v.exactOptional(identitySchema),
         pdf: v.exactOptional(pdfOptionsSchema),
+        variants: v.exactOptional(variantsSchema),
       }),
       metadata,
     );
@@ -128,6 +131,7 @@ export function parsePresentation(note: Note): PresentationDefinition {
       theme: v.exactOptional(v.unknown()),
       identity: v.exactOptional(identitySchema),
       pdf: v.exactOptional(pdfOptionsSchema),
+      variants: v.exactOptional(variantsSchema),
     }),
     definition,
   );
@@ -257,6 +261,8 @@ export function parsePresentation(note: Note): PresentationDefinition {
         throw new Error("Each poll option needs an implementation instruction");
     }
   }
+  for (const name of Object.keys(value.variants || {}))
+    selectVariant(value, name);
   return structuredClone(value);
 }
 
@@ -300,7 +306,16 @@ export class PresentationSession {
   revealSteps: Record<string, number> = {};
   revealTotals = new Map<string, number>();
 
-  constructor(definition: PresentationDefinition, path: string) {
+  authoredDefinition: PresentationDefinition;
+  variant: string | undefined;
+  constructor(
+    definition: PresentationDefinition,
+    path: string,
+    variant?: string,
+  ) {
+    this.authoredDefinition = definition;
+    this.variant = variant;
+    definition = selectVariant(definition, variant);
     this.definition = definition;
     this.path = path;
     this.current = definition.start;
@@ -472,7 +487,17 @@ export class PresentationSession {
     };
   }
   state() {
+    const timing = variantTiming(this.definition, this.variant);
     return {
+      ...(this.variant ? { variant: this.variant } : {}),
+      ...(timing ? { timing } : {}),
+      ...(this.definition.variants
+        ? {
+            variants: Object.entries(this.definition.variants).map(
+              ([id, variant]) => ({ id, title: variant.title }),
+            ),
+          }
+        : {}),
       ...(this.reveal() ? { reveal: this.reveal()! } : {}),
       theme: this.definition.theme,
       preview: {

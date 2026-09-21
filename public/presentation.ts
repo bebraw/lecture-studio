@@ -1,3 +1,4 @@
+import { timingLabel } from "../shared/variants.ts";
 import { asyncHandler } from "../shared/errors.ts";
 import type { PresentationCommand } from "../shared/api.ts";
 import type { MountOptions, DeskState } from "../shared/api.ts";
@@ -210,7 +211,12 @@ export function mountPresentations({ call, update }: MountOptions) {
     "Load saved edits privately with Live off; resets the lecture session.";
   reloadNote.onclick = async () => {
     if (data?.presentation)
-      await run("presentation/load", { path: data.presentation.path });
+      await run("presentation/load", {
+        path: data.presentation.path,
+        ...(data.presentation.variant
+          ? { variant: data.presentation.variant }
+          : {}),
+      });
   };
   const exportNote = document.createElement("button");
   exportNote.textContent = "Download editable Markdown";
@@ -285,9 +291,40 @@ export function mountPresentations({ call, update }: MountOptions) {
       )
     )
       return;
-    if (await run("presentation/load", { path: data.presentation.path }))
+    if (
+      await run("presentation/load", {
+        path: data.presentation.path,
+        ...(data.presentation.variant
+          ? { variant: data.presentation.variant }
+          : {}),
+      })
+    )
       closePicker();
   };
+  const variantControls = document.createElement("div");
+  variantControls.hidden = true;
+  variantControls.innerHTML =
+    '<label>Event variant<select id="presentation-variant"><option value="">All authored slides</option></select></label><button type="button" id="apply-variant">Load variant</button><p id="variant-timing" role="status"></p>';
+  setup.append(variantControls);
+  const variantChoice =
+    variantControls.querySelector<HTMLSelectElement>("select")!;
+  const variantApply =
+    variantControls.querySelector<HTMLButtonElement>("button")!;
+  variantApply.onclick = async () => {
+    if (
+      data?.presentation &&
+      (await run("presentation/load", {
+        path: data.presentation.path,
+        ...(variantChoice.value ? { variant: variantChoice.value } : {}),
+      }))
+    )
+      closePicker();
+  };
+  let variantOptions = "";
+  const timingStatus = document.createElement("p");
+  timingStatus.id = "presentation-timing";
+  timingStatus.className = "small";
+  query("#graph-presentation > .button-row").after(timingStatus);
   $("presentation-choice").hidden = true;
   $("presentation-load").hidden = true;
   query("h2", setup).remove();
@@ -583,6 +620,23 @@ export function mountPresentations({ call, update }: MountOptions) {
         outline.append(button);
       }
     }
+    variantControls.hidden = !p?.variants?.length;
+    variantApply.disabled = data.live;
+    variantChoice.disabled = data.live;
+    const variantsKey = JSON.stringify([p?.loadedAt, p?.variants || []]);
+    if (variantsKey !== variantOptions) {
+      variantOptions = variantsKey;
+      variantChoice.replaceChildren(
+        new Option("All authored slides", ""),
+        ...(p?.variants || []).map(
+          (variant) => new Option(variant.title, variant.id),
+        ),
+      );
+      variantChoice.value = p?.variant || "";
+    }
+    timingStatus.hidden = !p?.timing;
+    timingStatus.textContent = p?.timing ? timingLabel(p.timing) : "";
+    variantControls.querySelector("p")!.textContent = timingStatus.textContent;
     revealStatus.hidden = !p?.reveal;
     revealPreview.hidden = !p?.reveal;
     if (!p) return;

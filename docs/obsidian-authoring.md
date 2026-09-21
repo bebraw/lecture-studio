@@ -396,3 +396,7 @@ See [conference PDF exports](conference-pdf.md) for `pdf` presentation metadata,
 captioned `demoSequence` states or images, and per-slide `publication` overrides.
 These settings round-trip with the editable Obsidian source. Public explanations
 belong in `publication.explanation`, separate from private speaker notes.
+
+Event-specific `variants` select and order shared slides. Use slide
+`durationSeconds` and variant `durations` for planned speaking estimates; speaking
+and Q&A budgets stay separate. See the [variant syntax and workflow](conference-pdf.md#event-variants-and-timing-budgets).

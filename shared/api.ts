@@ -54,7 +54,10 @@ export const requestSchemas = {
   "reset-lecture": v.strictObject({ confirm: v.literal(true) }),
   "new-rehearsal": v.strictObject({ confirm: v.literal(true) }),
   "presentation/live": v.strictObject({ live: v.boolean() }),
-  "presentation/load": v.strictObject({ path: text }),
+  "presentation/load": v.strictObject({
+    path: text,
+    variant: v.exactOptional(text),
+  }),
   "presentation/unload": empty,
   "presentation/select": id,
   "presentation/detour": id,

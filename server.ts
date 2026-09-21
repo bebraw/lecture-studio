@@ -663,7 +663,7 @@ export function createStudio({
           if (url.pathname === "/api/presentation/markdown") {
             if (!presentation) throw new Error("Load a presentation first");
             return json(res, {
-              text: authoringMarkdown(presentation.definition),
+              text: authoringMarkdown(presentation.authoredDefinition),
             });
           }
           if (url.pathname === "/api/source/files")
@@ -917,6 +917,7 @@ export function createStudio({
                     ),
                   ),
                   stringValue(body.path, "presentation path"),
+                  typeof body.variant === "string" ? body.variant : undefined,
                 );
                 const imageDirectory = posix.dirname(
                   stringValue(body.path, "presentation path"),
