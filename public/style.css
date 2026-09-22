@@ -2868,3 +2868,11 @@ blockquote {
   overflow: hidden;
   margin-top: 10px;
 }
+
+/* Transparent borders preserve slide geometry while hiding only decorative rules. */
+.stage.no-header-rule > header {
+  border-top-color: transparent;
+}
+.stage.no-footer-rule > footer {
+  border-top-color: transparent;
+}

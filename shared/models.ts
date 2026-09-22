@@ -13,7 +13,7 @@ export type Theme = Record<
   | "bodyFont"
   | "codeFont",
   string
->;
+> & { headerRule?: boolean; footerRule?: boolean };
 export interface Draft {
   reveals?: RevealDefinition;
   imageSources?: Record<string, string>;

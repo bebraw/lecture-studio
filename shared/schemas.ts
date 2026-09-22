@@ -19,6 +19,8 @@ export const themeSchema = v.object({
   headingFont: text,
   bodyFont: text,
   codeFont: text,
+  headerRule: v.exactOptional(v.boolean()),
+  footerRule: v.exactOptional(v.boolean()),
 });
 export const draftSchema = v.object({
   act: text,
@@ -59,6 +61,8 @@ export const stageSchema = v.object({
       headingFont: optionalText,
       bodyFont: optionalText,
       codeFont: optionalText,
+      headerRule: v.exactOptional(v.boolean()),
+      footerRule: v.exactOptional(v.boolean()),
     }),
   ),
   live: v.exactOptional(v.boolean()),

@@ -264,3 +264,24 @@ logos; footer and reading-page branding keep their existing sizes. Event
 `identity` overrides and `pdf.publicationIdentity` can set it independently.
 Larger logos leave less space for slide content; PDF overflow errors identify
 slides that need shorter content or a smaller logo.
+
+## Optional header and footer rules
+
+Hide the decorative lines independently in presentation metadata:
+
+```yaml
+theme:
+  headerRule: false
+  footerRule: false
+identity:
+  logo: ./assets/aalto-logo.svg
+  logoPosition: top-right
+  logoScale: 2
+```
+
+Both rules default to enabled. These boolean settings apply to the live stage,
+presenter previews, and presentation/publication PDFs. Hiding a rule preserves
+its layout space, including logo clearance, chapter labels, source credits and
+slide/reveal/example numbering. Tables, code, diagrams, demo content and Studio
+UI separators keep their own styling. Loading a deck without these options
+restores the rules.

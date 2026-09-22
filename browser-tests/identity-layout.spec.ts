@@ -81,6 +81,12 @@ for (const scale of [undefined, 2]) {
                 "```json\n" +
                 JSON.stringify({
                   ...deck,
+                  theme: {
+                    ...deck.theme,
+                    ...(scale === 2
+                      ? { headerRule: false, footerRule: false }
+                      : {}),
+                  },
                   identity: {
                     ...deck.identity,
                     ...(scale === undefined ? {} : { logoScale: scale }),
@@ -109,6 +115,15 @@ for (const scale of [undefined, 2]) {
         await expect(stage.locator("h1")).toHaveText(step.title);
         await expect(preview.locator("h1")).toHaveText(step.title);
         for (const surface of [stage, preview]) {
+          for (const selector of ["header", "footer"]) {
+            const transparent = await surface
+              .locator(selector)
+              .evaluate(
+                (el) =>
+                  getComputedStyle(el).borderTopColor === "rgba(0, 0, 0, 0)",
+              );
+            expect(transparent).toBe(scale === 2);
+          }
           await expect(surface.locator(".presentation-identity")).toHaveCount(
             0,
           );

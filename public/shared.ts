@@ -13,6 +13,8 @@ import { errorSchema } from "../shared/schemas.ts";
 import type { Mermaid } from "mermaid";
 import { all, query } from "./dom.ts";
 export function applyTheme(element: HTMLElement, theme: Partial<Theme> = {}) {
+  element.classList.toggle("no-header-rule", theme.headerRule === false);
+  element.classList.toggle("no-footer-rule", theme.footerRule === false);
   for (const [key, variable] of Object.entries({
     background: "paper",
     text: "ink",
@@ -22,8 +24,9 @@ export function applyTheme(element: HTMLElement, theme: Partial<Theme> = {}) {
     bodyFont: "body-font",
     codeFont: "code-font",
   })) {
-    if (theme[key as keyof Theme])
-      element.style.setProperty("--" + variable, theme[key as keyof Theme]!);
+    const value = theme[key as keyof Theme];
+    if (typeof value === "string" && value)
+      element.style.setProperty("--" + variable, value);
     else element.style.removeProperty("--" + variable);
   }
 }

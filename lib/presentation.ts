@@ -35,8 +35,13 @@ const defaultTheme = {
 export function parseTheme(input: unknown = {}) {
   if (!input || typeof input !== "object" || Array.isArray(input))
     throw new Error("Invalid presentation theme");
-  const theme: Record<string, string> = { ...defaultTheme };
+  const theme: Record<string, string | boolean> = { ...defaultTheme };
   for (const [key, value] of Object.entries(input)) {
+    if (key === "headerRule" || key === "footerRule") {
+      if (typeof value !== "boolean") throw new Error("Invalid theme " + key);
+      theme[key] = value;
+      continue;
+    }
     if (
       !(key in defaultTheme) ||
       typeof value !== "string" ||
