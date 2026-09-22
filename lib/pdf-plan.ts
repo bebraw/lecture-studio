@@ -1,3 +1,4 @@
+import MarkdownIt from "markdown-it";
 import { parseFragment, type DefaultTreeAdapterMap } from "parse5";
 import { revealTotal } from "./reveals.ts";
 import type { PresentationDefinition } from "../shared/models.ts";
@@ -24,7 +25,7 @@ export function pdfSlides(
       throw new Error(
         `Slide ${step.id}: provide a demoSequence or demoPoster for static export`,
       );
-    const html = renderMarkdown(
+    const bodyHtml = renderMarkdown(
       step.type === "build"
         ? "Live demonstration · implementation instructions omitted."
         : (step.body || "") + (step.demoSequence ? "" : posterMarkdown(step)),
@@ -33,6 +34,16 @@ export function pdfSlides(
         reveals: step.reveals,
       },
     );
+    // Poll metadata is plain authored text, not Markdown or runtime results.
+    const escape = new MarkdownIt().utils.escapeHtml;
+    const poll = step.type === "poll" ? step.poll : undefined;
+    const activity = poll
+      ? (poll.question === step.title
+          ? ""
+          : `<p>${escape(poll.question)}</p>`) +
+        `<ul>${poll.options.map((option) => `<li>${escape(option.label)}</li>`).join("")}</ul>`
+      : "";
+    const html = activity + bodyHtml;
     if (html.includes('class="image-notice"'))
       throw new Error(
         `Slide ${step.id}: an image is unavailable; use a local ./ image asset`,
@@ -123,6 +134,8 @@ export function publicationDeck(
       if (publication?.body !== undefined) {
         replacement.body = publication.body;
         delete replacement.reveals;
+        // Explicit public prose replaces the whole activity; explanations only supplement it.
+        delete replacement.poll;
         // A public replacement for build prose is explicitly authored, never inferred from instructions.
         if (replacement.type === "build") replacement.type = "material";
       }

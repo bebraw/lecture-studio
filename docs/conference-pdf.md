@@ -212,3 +212,15 @@ Unspecified identity fields retain the shared presenter/affiliation/logo. Use a
 matching QR asset when changing the URL. Publication mode removes the resulting
 session link/QR as usual. [Provision the Q&A session](independent-qa.md) before
 exporting the PDF; the example's `example.org` addresses are placeholders.
+
+## Static poll activities
+
+PDF exports include `poll.question` and all option labels in authored order,
+alongside the slide title and Markdown body. A question identical to the title
+is shown only once. Choices are plain text: `defaultId` does not indicate an
+answer or selection, and runtime votes/results are never included. Poll text
+uses the same slide-boundary checks as other content.
+
+Publication copies retain the activity by default. `publication.explanation`
+adds context; an explicit `publication.body` replaces the activity (including
+its metadata question and choices), and `publication.omit` removes the slide.

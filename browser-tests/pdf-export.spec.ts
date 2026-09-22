@@ -179,3 +179,54 @@ test("one Obsidian source exports distinct event variants with separate speaking
     await rm(directory, { recursive: true, force: true });
   }
 });
+
+test("metadata poll activities export in both modes and their choices are checked for overflow", async () => {
+  const directory = await mkdtemp(join(tmpdir(), "pdf-poll-"));
+  try {
+    const input = join(directory, "poll.md");
+    const poll = {
+      question: "Does a visible cancellation control guarantee success?",
+      options: [
+        { id: "guaranteed", label: "Yes, because the control is visible" },
+        { id: "revalidate", label: "No, the server must revalidate" },
+      ],
+      defaultId: "revalidate",
+    };
+    const markdown = () =>
+      "## Presentation\n```yaml\nversion: 1\ntitle: Poll export reproduction\n```\n\n## Slide: Predict the outcome\n```json\n" +
+      JSON.stringify({
+        id: "prediction",
+        type: "poll",
+        room: "pdf-export-test",
+        poll,
+      }) +
+      "\n```\n\nConsider what happens when the resource changes after the page was loaded.";
+    await writeFile(input, markdown());
+    for (const mode of ["presentation", "publication"] as const) {
+      const result = await exportPdf(input, join(directory, mode + ".pdf"), {
+        mode,
+      });
+      expect(result.pages).toBe(1);
+    }
+    poll.question = "A long question about cancellation. ".repeat(5);
+    poll.options = Array.from({ length: 6 }, (_, i) => ({
+      id: i === 0 ? "revalidate" : "option-" + i,
+      label:
+        "The server must revalidate before cancelling this resource, even with a control.",
+    }));
+    await writeFile(
+      input,
+      markdown() +
+        "\n\n" +
+        "More context for discussing the resource after cancellation.\n\n".repeat(
+          8,
+        ),
+    );
+    for (const mode of ["presentation", "publication"] as const)
+      await expect(
+        exportPdf(input, join(directory, mode + ".pdf"), { mode }),
+      ).rejects.toThrow(/prediction.*(boundaries|overlaps)/);
+  } finally {
+    await rm(directory, { recursive: true, force: true });
+  }
+});
