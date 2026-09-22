@@ -1,5 +1,5 @@
 import { applyTheme, renderSurface, renderDiagrams, escape } from "./shared.ts";
-import { identityHtml } from "../shared/identity.ts";
+import { identityHtml, identityTopLogoHtml } from "../shared/identity.ts";
 import type { PdfSlide } from "../shared/pdf.ts";
 
 window.renderPdf = async (slides: PdfSlide[]) => {
@@ -17,7 +17,8 @@ window.renderPdf = async (slides: PdfSlide[]) => {
               'alt="Scan for further reading"',
             )
         : identity;
-    root.innerHTML = `<header><span>${escape(slide.stage.act || "")}</span></header><main class="pdf-content stage-surface"></main>${publicIdentity}<footer class="pdf-footer"><span>${escape(slide.stage.source || "")}</span><span>${escape(slide.label)}</span></footer>`;
+    const logo = identityTopLogoHtml(slide.stage.identity);
+    root.innerHTML = `<header><span>${escape(slide.stage.act || "")}</span>${logo ? `<div class="identity-top-logo">${logo}</div>` : ""}</header><main class="pdf-content stage-surface"></main>${publicIdentity}<footer class="pdf-footer"><span>${escape(slide.stage.source || "")}</span><span>${escape(slide.label)}</span></footer>`;
     document.body.append(root);
     applyTheme(root, slide.stage.theme);
     const content = root.querySelector<HTMLElement>("main")!;

@@ -106,3 +106,56 @@ test("identity rejects unsafe links, remote assets and oversized branding", asyn
     /32 KB/,
   );
 });
+
+test("top-right branding is independent of the footer and respects publication and variant controls", async () => {
+  const { identityTopLogoHtml } = await import("../shared/identity.ts");
+  const { publicationDeck, pdfSlides } = await import("../lib/pdf-plan.ts");
+  const { selectVariant } = await import("../lib/variants.ts");
+  const deck = parse({ logo: "./logo.svg", logoPosition: "top-right" });
+  deck.variants = {
+    conference: {
+      title: "Conference",
+      slides: ["one"],
+      speakingMinutes: 12,
+      qaMinutes: 3,
+      identity: { logoPosition: "footer" },
+    },
+  };
+  assert.equal(
+    selectVariant(deck, "conference").identity?.logoPosition,
+    "footer",
+  );
+  const published = publicationDeck(deck);
+  for (const current of [deck, published]) {
+    await loadPresentationImages(current, async () =>
+      Buffer.from(
+        '<svg xmlns="http://www.w3.org/2000/svg" width="80" height="40"/>',
+      ),
+    );
+    const brand = presentationIdentity(current)!;
+    assert.equal(identityHtml(brand, "stage"), "");
+    assert.match(identityTopLogoHtml(brand), /identity-logo/);
+    assert.equal(identityTopLogoHtml({ ...brand, hideOn: ["stage"] }), "");
+    assert.equal(
+      identityTopLogoHtml(presentationIdentity(current, current.steps[1])),
+      "",
+    );
+    assert.equal(
+      pdfSlides(current)[0]!.stage.identity?.logoPosition,
+      "top-right",
+    );
+    assert.match(
+      identityHtml({ ...brand, presenter: "Presenter" }, "stage"),
+      /Presenter/,
+    );
+    assert.doesNotMatch(
+      identityHtml({ ...brand, presenter: "Presenter" }, "stage"),
+      /identity-logo/,
+    );
+    assert.match(
+      identityHtml({ ...brand, logoPosition: "footer" }, "stage"),
+      /identity-logo/,
+    );
+  }
+  assert.throws(() => parse({ logo: "./logo.svg", logoPosition: "left" }));
+});

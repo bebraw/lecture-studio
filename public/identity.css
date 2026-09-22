@@ -58,3 +58,37 @@
     margin-left: 0;
   }
 }
+
+/* Header branding stays in normal flow, reserving space above all slide content. */
+.stage > header:has(.identity-top-logo) {
+  min-height: 90px;
+  flex-shrink: 0;
+  gap: 24px;
+}
+.stage .identity-top-logo {
+  margin-left: auto;
+  flex: 0 0 160px;
+  width: 160px;
+  height: 72px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+}
+.stage .identity-top-logo img {
+  width: auto;
+  height: auto;
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  margin: 0;
+}
+.stage.blank .identity-top-logo {
+  visibility: hidden;
+}
+.stage:has(> header .identity-top-logo) > main {
+  justify-content: safe center;
+}
+.stage:has(> header .identity-top-logo) .stage-copy > p:only-child > img {
+  height: 52vh;
+  max-height: 52vh;
+}

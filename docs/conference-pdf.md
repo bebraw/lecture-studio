@@ -224,3 +224,26 @@ uses the same slide-boundary checks as other content.
 Publication copies retain the activity by default. `publication.explanation`
 adds context; an explicit `publication.body` replaces the activity (including
 its metadata question and choices), and `publication.omit` removes the slide.
+
+## Top-right institutional logo
+
+Use shared identity metadata to place a logo in the slide header:
+
+```yaml
+identity:
+  logo: ./assets/aalto-logo.svg
+  logoPosition: top-right
+```
+
+The default is `footer`. `top-right` reserves a header area on the live stage,
+its presenter previews, and both PDF modes, preserving the image proportions.
+Omit `presenter`, `affiliation`, and `contactEmail` for logo-only branding with
+no identity footer. Put contact details in ordinary Questions slide content.
+Source credits and slide numbers remain in their independent bottom row.
+
+Event variants can override `identity.logoPosition`. Existing `hideIdentity`,
+`identity.hideOn`, and publication visibility/identity overrides still apply.
+Publication removes live join links and QR codes while retaining the logo and
+placement. Reading, self-study, and audience pages keep their identity block
+layout. Dense slide content must fit the reduced space below the header;
+PDF export reports overflow rather than allowing overlap.

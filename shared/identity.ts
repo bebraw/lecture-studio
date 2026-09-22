@@ -19,6 +19,7 @@ export const identitySchema = v.strictObject({
     ),
   ),
   logo: v.exactOptional(image),
+  logoPosition: v.exactOptional(v.picklist(["footer", "top-right"])),
   joinUrl: v.exactOptional(
     v.pipe(
       v.string(),
@@ -49,37 +50,44 @@ const escape = (text: string) =>
         c
       ]!,
   );
+const identityImage = (
+  source: string | undefined,
+  label: string,
+  className: string,
+) =>
+  source &&
+  /^data:image\/(?:svg\+xml|png|jpeg|gif|webp);base64,[A-Za-z0-9+/=]+$/.test(
+    source,
+  )
+    ? '<img class="' +
+      className +
+      '" src="' +
+      escape(source) +
+      '" alt="' +
+      escape(label) +
+      '">'
+    : "";
 export function identityHtml(
   identity: PresentationIdentity | undefined,
   surface: IdentitySurface,
 ) {
   if (!identity || identity.hideOn?.includes(surface)) return "";
-  const image = (
-    source: string | undefined,
-    label: string,
-    className: string,
-  ) =>
-    source &&
-    /^data:image\/(?:svg\+xml|png|jpeg|gif|webp);base64,[A-Za-z0-9+/=]+$/.test(
-      source,
-    )
-      ? '<img class="' +
-        className +
-        '" src="' +
-        escape(source) +
-        '" alt="' +
-        escape(label) +
-        '">'
-      : "";
+  const logo =
+    surface === "stage" && identity.logoPosition === "top-right"
+      ? ""
+      : identityImage(
+          identity.logo,
+          identity.affiliation
+            ? identity.affiliation + " logo"
+            : "Institution logo",
+          "identity-logo",
+        );
+  const person =
+    identity.presenter || identity.affiliation || identity.contactEmail;
+  if (!logo && !person && !identity.joinUrl && !identity.qrCode) return "";
   return (
     '<aside class="presentation-identity" aria-label="Presenter and audience information">' +
-    image(
-      identity.logo,
-      identity.affiliation
-        ? identity.affiliation + " logo"
-        : "Institution logo",
-      "identity-logo",
-    ) +
+    logo +
     '<div class="identity-person">' +
     (identity.presenter
       ? "<strong>" + escape(identity.presenter) + "</strong>"
@@ -102,7 +110,24 @@ export function identityHtml(
         escape(identity.joinUrl) +
         "</span></a>"
       : "") +
-    image(identity.qrCode, "Scan to join the audience", "identity-qr") +
+    identityImage(identity.qrCode, "Scan to join the audience", "identity-qr") +
     "</aside>"
+  );
+}
+
+/** Header branding is independent of the presenter footer on slide surfaces. */
+export function identityTopLogoHtml(
+  identity: PresentationIdentity | undefined,
+) {
+  if (
+    !identity ||
+    identity.logoPosition !== "top-right" ||
+    identity.hideOn?.includes("stage")
+  )
+    return "";
+  return identityImage(
+    identity.logo,
+    identity.affiliation ? identity.affiliation + " logo" : "Institution logo",
+    "identity-logo",
   );
 }
