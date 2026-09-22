@@ -42,3 +42,46 @@ test("ordinary tool warnings do not fail the browser suite", async () => {
     undefined,
   );
 });
+
+const nativeDisconnect =
+  "✘ [ERROR] kj::getCaughtExceptionAsKj() = kj/async-io-unix.c++:186: disconnected: ::write(fd, buffer.begin(), buffer.size()): Connection reset by peer";
+const passed = {
+  status: "passed" as const,
+  startTime: new Date(),
+  duration: 1,
+};
+
+test("Linux workerd client-disconnect diagnostics remain nonfatal across chunk boundaries", async () => {
+  for (const chunks of [
+    [nativeDisconnect + "\n\n  stack: workerd@123\n"],
+    [
+      "\u001b[31m" + nativeDisconnect.slice(0, 12),
+      nativeDisconnect.slice(12) + "\u001b[0m\n",
+    ],
+    [nativeDisconnect],
+    [nativeDisconnect.replace("Connection reset by peer", "Broken pipe")],
+  ]) {
+    const reporter = new BrowserErrorsReporter();
+    for (const chunk of chunks) reporter.onStdErr(chunk);
+    assert.equal(await reporter.onEnd(passed), undefined);
+  }
+});
+
+test("native disconnects never mask nearby application errors or different native failures", async (context) => {
+  context.mock.method(console, "error", () => {});
+  for (const error of [
+    "[ERROR] Uncaught Error: Connection reset by peer",
+    nativeDisconnect.replace("Connection reset by peer", "Permission denied"),
+    nativeDisconnect + " Uncaught TypeError: broken handler",
+    "[ERROR] unexpected runtime failure",
+  ]) {
+    for (const text of [
+      nativeDisconnect + "\n" + error,
+      error + "\n" + nativeDisconnect,
+    ]) {
+      const reporter = new BrowserErrorsReporter();
+      reporter.onStdErr(text);
+      assert.deepEqual(await reporter.onEnd(passed), { status: "failed" });
+    }
+  }
+});
