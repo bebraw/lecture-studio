@@ -247,3 +247,20 @@ Publication removes live join links and QR codes while retaining the logo and
 placement. Reading, self-study, and audience pages keep their identity block
 layout. Dense slide content must fit the reduced space below the header;
 PDF export reports overflow rather than allowing overlap.
+
+To make a top-right logo twice its current visible size:
+
+```yaml
+identity:
+  logo: ./assets/aalto-logo.svg
+  logoPosition: top-right
+  logoScale: 2
+```
+
+`logoScale` accepts numbers from `0.5` to `3` (default `1`). It scales both
+visible dimensions proportionally and reserves the corresponding header space
+on the stage, previews and both PDF modes. It applies only to top-right slide
+logos; footer and reading-page branding keep their existing sizes. Event
+`identity` overrides and `pdf.publicationIdentity` can set it independently.
+Larger logos leave less space for slide content; PDF overflow errors identify
+slides that need shorter content or a smaller logo.

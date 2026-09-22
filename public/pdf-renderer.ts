@@ -7,6 +7,10 @@ window.renderPdf = async (slides: PdfSlide[]) => {
     const root = document.createElement("section");
     root.className = "stage pdf-slide";
     root.dataset.slide = slide.id;
+    root.style.setProperty(
+      "--identity-logo-scale",
+      String(slide.stage.identity?.logoScale ?? 1),
+    );
     const identity = identityHtml(slide.stage.identity, "stage");
     const publicIdentity =
       slide.mode === "publication"

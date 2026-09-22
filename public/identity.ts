@@ -15,6 +15,10 @@ export function applyIdentity(
     host.id = "presentation-identity";
     document.querySelector(".stage-bottom")?.before(host);
   }
+  document.body.style.setProperty(
+    "--identity-logo-scale",
+    String(identity?.logoScale ?? 1),
+  );
   const logoHtml = surface === "stage" ? identityTopLogoHtml(identity) : "";
   let logo = document.querySelector<HTMLElement>(".identity-top-logo");
   if (logoHtml && !logo) {

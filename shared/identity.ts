@@ -20,6 +20,9 @@ export const identitySchema = v.strictObject({
   ),
   logo: v.exactOptional(image),
   logoPosition: v.exactOptional(v.picklist(["footer", "top-right"])),
+  logoScale: v.exactOptional(
+    v.pipe(v.number(), v.minValue(0.5), v.maxValue(3)),
+  ),
   joinUrl: v.exactOptional(
     v.pipe(
       v.string(),

@@ -159,3 +159,33 @@ test("top-right branding is independent of the footer and respects publication a
   }
   assert.throws(() => parse({ logo: "./logo.svg", logoPosition: "left" }));
 });
+
+test("logo scale validates bounds and survives event and publication overrides", async () => {
+  const { selectVariant } = await import("../lib/variants.ts");
+  const { publicationDeck } = await import("../lib/pdf-plan.ts");
+  for (const logoScale of [0.5, 1, 2, 3])
+    assert.equal(
+      parse({ logo: "./logo.svg", logoPosition: "top-right", logoScale })
+        .identity?.logoScale,
+      logoScale,
+    );
+  for (const logoScale of [0, -1, 0.49, 3.01, "2", null, Infinity, NaN])
+    assert.throws(() => parse({ logoScale }));
+  const deck = parse({ logo: "./logo.svg", logoPosition: "top-right" });
+  assert.equal(deck.identity?.logoScale, undefined);
+  deck.variants = {
+    conference: {
+      title: "Conference",
+      slides: ["one"],
+      speakingMinutes: 12,
+      qaMinutes: 3,
+      identity: { logoScale: 2 },
+    },
+  };
+  const selected = selectVariant(deck, "conference");
+  assert.equal(selected.identity?.logoScale, 2);
+  assert.equal(selected.identity?.logo, "./logo.svg");
+  selected.pdf = { publicationIdentity: { logoScale: 1.5 } };
+  assert.equal(publicationDeck(selected).identity?.logoScale, 1.5);
+  assert.equal(selected.identity?.logoScale, 2);
+});

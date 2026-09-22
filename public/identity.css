@@ -61,15 +61,15 @@
 
 /* Header branding stays in normal flow, reserving space above all slide content. */
 .stage > header:has(.identity-top-logo) {
-  min-height: 90px;
+  min-height: calc(18px + 72px * var(--identity-logo-scale, 1));
   flex-shrink: 0;
   gap: 24px;
 }
 .stage .identity-top-logo {
   margin-left: auto;
-  flex: 0 0 160px;
-  width: 160px;
-  height: 72px;
+  flex: 0 0 calc(160px * var(--identity-logo-scale, 1));
+  width: calc(160px * var(--identity-logo-scale, 1));
+  height: calc(72px * var(--identity-logo-scale, 1));
   display: flex;
   align-items: center;
   justify-content: flex-end;
@@ -77,8 +77,11 @@
 .stage .identity-top-logo img {
   width: auto;
   height: auto;
-  max-width: 100%;
-  max-height: 100%;
+  max-width: 160px;
+  max-height: 72px;
+  flex-shrink: 0;
+  transform: scale(var(--identity-logo-scale, 1));
+  transform-origin: right center;
   object-fit: contain;
   margin: 0;
 }
@@ -89,6 +92,9 @@
   justify-content: safe center;
 }
 .stage:has(> header .identity-top-logo) .stage-copy > p:only-child > img {
-  height: 52vh;
-  max-height: 52vh;
+  height: max(10vh, calc(52vh - 72px * (var(--identity-logo-scale, 1) - 1)));
+  max-height: max(
+    10vh,
+    calc(52vh - 72px * (var(--identity-logo-scale, 1) - 1))
+  );
 }
